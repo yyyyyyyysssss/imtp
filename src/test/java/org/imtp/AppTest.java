@@ -1,4 +1,4 @@
-package org.icp;
+package org.imtp;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
