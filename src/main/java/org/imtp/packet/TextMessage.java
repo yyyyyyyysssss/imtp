@@ -29,7 +29,7 @@ public class TextMessage extends Packet{
     }
 
     public TextMessage(String message,long sender, long receiver, Command command) {
-        super(sender, receiver, command, message.length());
+        super(sender, receiver, command, message.getBytes(StandardCharsets.UTF_8).length);
         if(StringUtil.isNullOrEmpty(message) || StringUtil.length(message) > MAX_CHAR_LENGTH){
             throw new RuntimeException("messages cannot be empty or exceed the maximum length limit");
         }

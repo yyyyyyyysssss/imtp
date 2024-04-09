@@ -7,7 +7,7 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import org.imtp.codec.IMTPDecoder;
 import org.imtp.codec.IMTPEncoder;
-import org.imtp.server.handler.ServerCmdHandler;
+import org.imtp.server.handler.InitializeHandler;
 
 /**
  * @Description
@@ -29,7 +29,7 @@ public class Server {
                             ChannelPipeline pipeline = socketChannel.pipeline();
                             pipeline.addLast(new IMTPDecoder());
                             pipeline.addLast(new IMTPEncoder());
-                            pipeline.addLast(new ServerCmdHandler());
+                            pipeline.addLast(new InitializeHandler());
                         }
                     });
             ChannelFuture cf = serverBootstrap.bind("127.0.0.1", 2921).sync();

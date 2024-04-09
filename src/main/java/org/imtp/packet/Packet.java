@@ -32,4 +32,14 @@ public abstract class Packet{
 
     public abstract void encodeBodyAsByteBuf(ByteBuf byteBuf);
 
+    public Long getSender(){
+
+        return this.header.getSender();
+    }
+
+    public Long getReceiver(){
+
+        return this.header.getReceiver();
+    }
+
 }

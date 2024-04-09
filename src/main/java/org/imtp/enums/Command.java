@@ -5,6 +5,10 @@ import lombok.Getter;
 @Getter
 public enum Command {
 
+
+    LOGIN_REQ((byte) 126,"登录请求"),
+    LOGIN_RES((byte) -126,"登录响应"),
+
     TEXT_MSG_REQ((byte) 1, "普通文本消息请求"),
     TEXT_MSG_RES((byte) -1, "普通文本消息响应"),
 

@@ -8,10 +8,6 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import org.imtp.client.handler.ClientCmdHandler;
 import org.imtp.codec.IMTPDecoder;
 import org.imtp.codec.IMTPEncoder;
-import org.imtp.enums.Command;
-import org.imtp.packet.TextMessage;
-
-import java.util.Scanner;
 
 /**
  * @Description

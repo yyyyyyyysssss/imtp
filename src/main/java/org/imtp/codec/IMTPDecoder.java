@@ -4,10 +4,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import org.imtp.enums.Command;
-import org.imtp.packet.DefaultMessageResponse;
-import org.imtp.packet.Header;
-import org.imtp.packet.Packet;
-import org.imtp.packet.TextMessage;
+import org.imtp.packet.*;
 
 import java.util.List;
 
@@ -37,6 +34,12 @@ public class IMTPDecoder extends ByteToMessageDecoder {
         Packet packet = null;
         Command cmd = header.getCmd();
         switch (cmd){
+            case LOGIN_REQ:
+                packet = new LoginRequest(byteBuf,header);
+                break;
+            case LOGIN_RES:
+                packet = new LoginResponse(byteBuf,header);
+                break;
             case TEXT_MSG_REQ :
                 packet = new TextMessage(byteBuf,header);
                 break;

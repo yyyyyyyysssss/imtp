@@ -6,7 +6,7 @@ import org.imtp.enums.Command;
 import org.imtp.enums.MessageState;
 
 /**
- * @Description
+ * @Description 默认的消息响应
  * @Author ys
  * @Date 2024/4/8 15:05
  */
@@ -23,7 +23,7 @@ public class DefaultMessageResponse extends Packet{
 
     public DefaultMessageResponse(MessageState state){
         //服务器收到消息回复一个已送达响应给到客户端
-        super(-1, -1, Command.TEXT_MSG_RES, 1);
+        super(0, 0, Command.TEXT_MSG_RES, 1);
         this.state = state;
     }
 

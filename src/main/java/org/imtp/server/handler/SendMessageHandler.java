@@ -1,18 +1,21 @@
 package org.imtp.server.handler;
 
+import com.google.common.cache.Cache;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import org.imtp.enums.MessageState;
 import org.imtp.packet.DefaultMessageResponse;
 import org.imtp.packet.Packet;
 import org.imtp.packet.TextMessage;
+import org.imtp.utils.CacheUtil;
 
 /**
  * @Description
  * @Author ys
  * @Date 2024/4/7 14:53
  */
-public class ServerCmdHandler extends SimpleChannelInboundHandler<Packet> {
+public class SendMessageHandler extends SimpleChannelInboundHandler<Packet> {
 
 
     @Override
@@ -21,8 +24,13 @@ public class ServerCmdHandler extends SimpleChannelInboundHandler<Packet> {
             case TEXT_MSG_REQ :
                 TextMessage textMessage = (TextMessage) packet;
                 System.out.println(textMessage.getMessage());
-
                 channelHandlerContext.channel().writeAndFlush(new DefaultMessageResponse(MessageState.DELIVERED));
+
+                Channel channel = CacheUtil.getChannel(textMessage.getReceiver());
+                if(channel != null){
+                    channel.writeAndFlush(textMessage);
+                }
+
                 break;
             case TEXT_MSG_RES:
                 break;

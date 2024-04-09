@@ -3,9 +3,10 @@ package org.imtp.client.handler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import org.imtp.enums.Command;
-import org.imtp.packet.DefaultMessageResponse;
-import org.imtp.packet.Packet;
-import org.imtp.packet.TextMessage;
+import org.imtp.enums.LoginState;
+import org.imtp.packet.*;
+
+import java.util.Scanner;
 
 /**
  * @Description
@@ -14,15 +15,35 @@ import org.imtp.packet.TextMessage;
  */
 public class ClientCmdHandler extends SimpleChannelInboundHandler<Packet> {
 
-
     @Override
     public void channelActive(ChannelHandlerContext ctx) {
-        ctx.channel().writeAndFlush(new TextMessage("hello server",123456789,987654321, Command.TEXT_MSG_REQ));
+        Packet packet = new LoginRequest("18855193274","136156");
+        ctx.channel().writeAndFlush(packet);
+        new Thread(){
+            @Override
+            public void run() {
+                Scanner scanner = new Scanner(System.in);
+                while (scanner.hasNextLine()){
+                    String s = scanner.nextLine();
+                    ctx.channel().writeAndFlush(new TextMessage(s,18855193274L,1085385084L, Command.TEXT_MSG_REQ));
+                }
+            }
+        }.start();
     }
 
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, Packet packet) {
         switch (packet.getHeader().getCmd()){
+            case LOGIN_REQ:
+                break;
+            case LOGIN_RES:
+                LoginResponse loginResponse = (LoginResponse)packet;
+                if(loginResponse.getLoginState().equals(LoginState.SUCCESS)){
+                    System.out.println("登录成功");
+                }else {
+                    System.out.println("登录失败");
+                }
+                break;
             case TEXT_MSG_REQ :
                 TextMessage textMessage = (TextMessage) packet;
                 System.out.println(textMessage.getMessage());
