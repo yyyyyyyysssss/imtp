@@ -1,16 +1,35 @@
 package org.imtp.packet;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.util.internal.ObjectUtil;
+import lombok.Getter;
+import lombok.Setter;
+import org.imtp.enums.Command;
 
 /**
  * @Description
  * @Author ys
  * @Date 2023/4/2 13:49
  */
-public class Packet {
+@Getter
+@Setter
+public abstract class Packet{
 
-    private Header header;
+    protected Header header;
 
-    private Object body;
+    public Packet(long sender, long receiver, Command command,int bodyLength){
+        this(new Header(sender,receiver,command,bodyLength));
+    }
+
+    public Packet(Header header){
+        this.header = header;
+    }
+
+    public void encodeAsByteBuf(ByteBuf byteBuf) {
+        this.header.encodeAsByteBuf(byteBuf);
+        encodeBodyAsByteBuf(byteBuf);
+    }
+
+    public abstract void encodeBodyAsByteBuf(ByteBuf byteBuf);
 
 }

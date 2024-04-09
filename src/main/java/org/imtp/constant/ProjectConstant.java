@@ -7,8 +7,4 @@ package org.imtp.constant;
  */
 public interface ProjectConstant {
 
-    short MAGIC = 0xdf;
-
-    byte VERSION_1 = 0x01;
-
 }

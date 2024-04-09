@@ -5,13 +5,16 @@ import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import org.imtp.codec.IMTPDecoder;
+import org.imtp.codec.IMTPEncoder;
+import org.imtp.server.handler.ServerCmdHandler;
 
 /**
  * @Description
  * @Author ys
  * @Date 2023/4/10 11:44
  */
-public class IMTPServer {
+public class Server {
 
     public static void main(String[] args) {
         final EventLoopGroup bossEventLoopGroup=new NioEventLoopGroup(2);
@@ -22,22 +25,22 @@ public class IMTPServer {
                     .channel(NioServerSocketChannel.class)
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
-                        protected void initChannel(SocketChannel socketChannel) throws Exception {
+                        protected void initChannel(SocketChannel socketChannel) {
                             ChannelPipeline pipeline = socketChannel.pipeline();
+                            pipeline.addLast(new IMTPDecoder());
+                            pipeline.addLast(new IMTPEncoder());
+                            pipeline.addLast(new ServerCmdHandler());
                         }
                     });
-            ChannelFuture channelFuture = serverBootstrap.bind("127.0.0.1", 2921).sync();
-            channelFuture.addListener(new ChannelFutureListener() {
-                @Override
-                public void operationComplete(ChannelFuture channelFuture) throws Exception {
-                    if (channelFuture.isSuccess()){
-                        System.out.println("imtp服务器启动成功");
-                    }
+            ChannelFuture cf = serverBootstrap.bind("127.0.0.1", 2921).sync();
+            cf.addListener((ChannelFutureListener) channelFuture -> {
+                if (channelFuture.isSuccess()){
+                    System.out.println("服务器启动成功");
                 }
             });
-            channelFuture.channel().closeFuture().sync();
+            cf.channel().closeFuture().sync();
         }catch (Exception e){
-            e.printStackTrace();
+            System.out.println(e.getMessage());
         }finally {
             bossEventLoopGroup.shutdownGracefully();
             workEventLoopGroup.shutdownGracefully();

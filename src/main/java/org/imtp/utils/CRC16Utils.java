@@ -1,9 +1,8 @@
 package org.imtp.utils;
 
 import org.imtp.constant.ProjectConstant;
-import org.imtp.enumeration.Command;
-import org.imtp.enumeration.ProtocolVersion;
-import org.imtp.enumeration.SerializeType;
+import org.imtp.enums.Command;
+import org.imtp.enums.ProtocolVersion;
 import org.imtp.packet.Header;
 
 /**
@@ -80,19 +79,6 @@ public class CRC16Utils {
             }
         }
         return (short) (~((High << 8) + Low)); // 取反
-    }
-
-    public static void main(String[] args) {
-        Header header = Header.builder()
-                .magic(ProjectConstant.MAGIC)
-                .ver(ProtocolVersion.IMTP01.getVer())
-                .serializeType(SerializeType.JSON.getType())
-                .seq(1L)
-                .cmd(Command.HEARTBEAT_RES.getCmdCode())
-                .length(1123).build();
-        byte[] bytes = JSONUtils.objectTransformBytes(header);
-        short crc16 = CRC16Utils.getCRC16(bytes);
-        System.out.println(crc16);
     }
 
 }
