@@ -31,24 +31,7 @@ public class IMTPDecoder extends ByteToMessageDecoder {
             byteBuf.resetReaderIndex();
             return;
         }
-        Packet packet = null;
-        Command cmd = header.getCmd();
-        switch (cmd){
-            case LOGIN_REQ:
-                packet = new LoginRequest(byteBuf,header);
-                break;
-            case LOGIN_RES:
-                packet = new LoginResponse(byteBuf,header);
-                break;
-            case TEXT_MSG_REQ :
-                packet = new TextMessage(byteBuf,header);
-                break;
-            case TEXT_MSG_RES:
-                packet = new DefaultMessageResponse(byteBuf,header);
-                break;
-        }
-
-
+        Packet packet = new CommandPacket(header,byteBuf);
         list.add(packet);
     }
 }
