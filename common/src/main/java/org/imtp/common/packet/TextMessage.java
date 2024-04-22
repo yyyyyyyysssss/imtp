@@ -15,9 +15,9 @@ import java.nio.charset.StandardCharsets;
 public class TextMessage extends Packet{
 
     //最大字符长度
-    private final int MAX_CHAR_LENGTH = 1000;
+    protected final int MAX_CHAR_LENGTH = 1000;
 
-    private String message;
+    protected String message;
 
     public TextMessage(ByteBuf byteBuf,Header header){
         super(header);

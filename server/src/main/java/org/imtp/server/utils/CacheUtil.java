@@ -34,7 +34,7 @@ public class CacheUtil {
     public static Channel getChannel(Long k){
         try {
             return channelCache.get(k);
-        } catch (ExecutionException e) {
+        } catch (Exception e) {
             return null;
         }
     }

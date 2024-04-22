@@ -4,6 +4,8 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import lombok.extern.slf4j.Slf4j;
+import org.imtp.client.context.ClientContext;
 import org.imtp.common.enums.Command;
 import org.imtp.common.enums.LoginState;
 import org.imtp.common.packet.*;
@@ -13,6 +15,7 @@ import org.imtp.common.packet.*;
  * @Author ys
  * @Date 2024/4/8 14:53
  */
+@Slf4j
 public class ClientCmdHandler extends SimpleChannelInboundHandler<Packet> {
 
     @Override
@@ -30,18 +33,22 @@ public class ClientCmdHandler extends SimpleChannelInboundHandler<Packet> {
             case LOGIN_RES:
                 LoginResponse loginResponse = new LoginResponse(byteBuf,header);
                 if(loginResponse.getLoginState().equals(LoginState.SUCCESS)){
-                    System.out.println("登录成功");
+                    log.info("登录成功");
+                    ClientContext.setUser(loginResponse.getReceiver() + "");
                 }else {
-                    System.out.println("登录失败");
+                    log.info("登录失败");
                 }
                 break;
-            case TEXT_MSG_REQ :
-                TextMessage textMessage = new TextMessage(byteBuf,header);
-                System.out.println(textMessage.getMessage());
+            case PRIVATE_MSG :
+                PrivateChatMessage privateChatMessage = new PrivateChatMessage(byteBuf,header);
+                System.out.println("用户["+ privateChatMessage.getSender() + "]:" + privateChatMessage.getMessage());
                 break;
-            case TEXT_MSG_RES:
+            case GROUP_CHAT_MSG:
+                GroupChatMessage groupChatMessage = new GroupChatMessage(byteBuf,header);
+                System.out.println("用户["+ groupChatMessage.getSender() + "]:" + groupChatMessage.getMessage());
+                break;
+            case MSG_RES:
                 DefaultMessageResponse response = new DefaultMessageResponse(byteBuf,header);
-                System.out.println(response.getState().name());
                 break;
             default:
                 throw new UnsupportedOperationException("不支持的操作");

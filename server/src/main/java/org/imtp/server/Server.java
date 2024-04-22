@@ -5,10 +5,9 @@ import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import org.imtp.server.handler.CommandHandler;
-import org.imtp.server.handler.InitializeHandler;
 import org.imtp.common.codec.IMTPDecoder;
 import org.imtp.common.codec.IMTPEncoder;
+import org.imtp.server.handler.CommandHandler;
 
 /**
  * @Description
@@ -36,7 +35,7 @@ public class Server {
             ChannelFuture cf = serverBootstrap.bind("127.0.0.1", 2921).sync();
             cf.addListener((ChannelFutureListener) channelFuture -> {
                 if (channelFuture.isSuccess()){
-                    System.out.println("服务器启动成功");
+                    System.out.println("Server started");
                 }
             });
             cf.channel().closeFuture().sync();

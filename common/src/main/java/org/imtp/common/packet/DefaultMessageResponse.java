@@ -22,9 +22,9 @@ public class DefaultMessageResponse extends Packet{
         this.state = MessageState.find(res);
     }
 
-    public DefaultMessageResponse(MessageState state){
+    public DefaultMessageResponse(MessageState state,Header header){
         //服务器收到消息回复一个已送达响应给到客户端
-        super(0, 0, Command.TEXT_MSG_RES, 1);
+        super(0, header.getReceiver(), Command.MSG_RES, 1);
         this.state = state;
     }
 

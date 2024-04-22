@@ -15,8 +15,8 @@ public class LoginResponse extends Packet{
 
     private LoginState loginState;
 
-    public LoginResponse(LoginState loginState) {
-        super(0, 0, Command.LOGIN_RES, 1);
+    public LoginResponse(LoginState loginState,Long receiver) {
+        super(0, receiver, Command.LOGIN_RES, 1);
         this.loginState = loginState;
     }
 

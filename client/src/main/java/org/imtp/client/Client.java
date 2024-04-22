@@ -9,9 +9,7 @@ import org.imtp.client.handler.ClientCmdHandler;
 import org.imtp.common.codec.IMTPDecoder;
 import org.imtp.common.codec.IMTPEncoder;
 import org.imtp.common.enums.Command;
-import org.imtp.common.packet.LoginRequest;
-import org.imtp.common.packet.Packet;
-import org.imtp.common.packet.TextMessage;
+import org.imtp.common.packet.*;
 
 import java.util.Scanner;
 
@@ -26,14 +24,18 @@ public class Client {
 
     private Long receiver;
 
-    public Client(Long account,Long receiver){
+    private boolean isGroupChat;
+
+    public Client(Long account,Long receiver,boolean isGroupChat){
         this.account = account;
         this.receiver = receiver;
+        this.isGroupChat = isGroupChat;
     }
 
     public static void main(String[] args) {
         int length;
         Long account = null,receiver = null;
+        boolean isGroupChat = false;
         String p;
         char c;
         char[] cc;
@@ -50,6 +52,9 @@ public class Client {
                     case 's':
                         receiver = Long.parseLong(args[++i]);
                         break;
+                    case 'g':
+                        isGroupChat = true;
+                        break;
                     default:
                         throw new UnsupportedOperationException("不支持的操作: -" + c);
                 }
@@ -57,7 +62,7 @@ public class Client {
             }
         }
 
-        Client client = new Client(account, receiver);
+        Client client = new Client(account, receiver,isGroupChat);
         client.start();
     }
 
@@ -81,13 +86,17 @@ public class Client {
             ChannelFuture connected = bootstrap.connect("127.0.0.1", 2921);
             connected.addListener((ChannelFutureListener) channelFuture -> {
                 if(channelFuture.isSuccess()){
-                    Packet packet = new LoginRequest(this.account.toString(),"136156");
+                    Packet packet = new LoginRequest(this.account.toString(),"123456");
                     channelFuture.channel().writeAndFlush(packet);
                     new Thread(() -> {
                         Scanner scanner = new Scanner(System.in);
                         while (scanner.hasNextLine()){
                             String s = scanner.nextLine();
-                            channelFuture.channel().writeAndFlush(new TextMessage(s,this.account,this.receiver, Command.TEXT_MSG_REQ));
+                            if(isGroupChat){
+                                channelFuture.channel().writeAndFlush(new GroupChatMessage(s,this.account,this.receiver));
+                            }else {
+                                channelFuture.channel().writeAndFlush(new PrivateChatMessage(s,this.account,this.receiver));
+                            }
                         }
                     }).start();
                 }else {
