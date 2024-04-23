@@ -6,9 +6,14 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.imtp.client.context.ClientContext;
+import org.imtp.client.context.ClientContextHolder;
+import org.imtp.client.send.ConsoleSendMessage;
+import org.imtp.client.send.SendMessage;
 import org.imtp.common.enums.Command;
 import org.imtp.common.enums.LoginState;
 import org.imtp.common.packet.*;
+
+import java.util.Scanner;
 
 /**
  * @Description
@@ -20,7 +25,9 @@ public class ClientCmdHandler extends SimpleChannelInboundHandler<Packet> {
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) {
-
+        ClientContext clientContext = ClientContextHolder.clientContext();
+        Packet packet = new LoginRequest(clientContext.user(),"123456");
+        clientContext.channel().writeAndFlush(packet);
     }
 
     @Override
@@ -34,7 +41,9 @@ public class ClientCmdHandler extends SimpleChannelInboundHandler<Packet> {
                 LoginResponse loginResponse = new LoginResponse(byteBuf,header);
                 if(loginResponse.getLoginState().equals(LoginState.SUCCESS)){
                     log.info("登录成功");
-                    ClientContext.setUser(loginResponse.getReceiver() + "");
+                    //登录成功开始发送消息
+                    SendMessage sendMessage = new ConsoleSendMessage();
+                    new Thread(sendMessage::send).start();
                 }else {
                     log.info("登录失败");
                 }
@@ -45,7 +54,7 @@ public class ClientCmdHandler extends SimpleChannelInboundHandler<Packet> {
                 break;
             case GROUP_CHAT_MSG:
                 GroupChatMessage groupChatMessage = new GroupChatMessage(byteBuf,header);
-                System.out.println("用户["+ groupChatMessage.getSender() + "]:" + groupChatMessage.getMessage());
+                System.out.println("*用户["+ groupChatMessage.getSender() + "]:" + groupChatMessage.getMessage());
                 break;
             case MSG_RES:
                 DefaultMessageResponse response = new DefaultMessageResponse(byteBuf,header);

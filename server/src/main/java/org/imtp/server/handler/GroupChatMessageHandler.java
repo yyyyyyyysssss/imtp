@@ -6,7 +6,8 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import org.imtp.common.enums.MessageState;
 import org.imtp.common.packet.DefaultMessageResponse;
 import org.imtp.common.packet.GroupChatMessage;
-import org.imtp.server.utils.CacheUtil;
+import org.imtp.server.context.ChannelContextHolder;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -25,7 +26,8 @@ public class GroupChatMessageHandler extends SimpleChannelInboundHandler<GroupCh
         List<Long> list = new ArrayList<>();
         list.add(147L);
         list.add(258L);
-        testGroupChatMap.put(5688L,list);
+        list.add(369L);
+        testGroupChatMap.put(9527L,list);
     }
 
     @Override
@@ -35,8 +37,8 @@ public class GroupChatMessageHandler extends SimpleChannelInboundHandler<GroupCh
         Long receiver = groupChatMessage.getReceiver();
         List<Long> longs = testGroupChatMap.get(receiver);
         for(Long l : longs){
-            Channel channel = CacheUtil.getChannel(l);
-            if(channel != null && channel.isActive()){
+            Channel channel = ChannelContextHolder.createChannelContext().getChannel(l.toString());
+            if(channel != null && channel.isActive() && !l.equals(groupChatMessage.getSender())){
                 channel.writeAndFlush(groupChatMessage);
             }else {
                 //记录消息，等待用户上线后推送

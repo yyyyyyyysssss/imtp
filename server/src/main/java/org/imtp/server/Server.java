@@ -7,6 +7,7 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import org.imtp.common.codec.IMTPDecoder;
 import org.imtp.common.codec.IMTPEncoder;
+import org.imtp.server.context.ChannelContextHolder;
 import org.imtp.server.handler.CommandHandler;
 
 /**
@@ -36,6 +37,8 @@ public class Server {
             cf.addListener((ChannelFutureListener) channelFuture -> {
                 if (channelFuture.isSuccess()){
                     System.out.println("Server started");
+                    //初始化上下文对象
+                    ChannelContextHolder.createChannelContext();
                 }
             });
             cf.channel().closeFuture().sync();

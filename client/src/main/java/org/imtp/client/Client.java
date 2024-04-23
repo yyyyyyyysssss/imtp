@@ -5,13 +5,10 @@ import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import org.imtp.client.context.ClientContextHolder;
 import org.imtp.client.handler.ClientCmdHandler;
 import org.imtp.common.codec.IMTPDecoder;
 import org.imtp.common.codec.IMTPEncoder;
-import org.imtp.common.enums.Command;
-import org.imtp.common.packet.*;
-
-import java.util.Scanner;
 
 /**
  * @Description
@@ -22,14 +19,8 @@ public class Client {
 
     private Long account;
 
-    private Long receiver;
-
-    private boolean isGroupChat;
-
-    public Client(Long account,Long receiver,boolean isGroupChat){
+    public Client(Long account){
         this.account = account;
-        this.receiver = receiver;
-        this.isGroupChat = isGroupChat;
     }
 
     public static void main(String[] args) {
@@ -62,7 +53,7 @@ public class Client {
             }
         }
 
-        Client client = new Client(account, receiver,isGroupChat);
+        Client client = new Client(account);
         client.start();
     }
 
@@ -86,19 +77,8 @@ public class Client {
             ChannelFuture connected = bootstrap.connect("127.0.0.1", 2921);
             connected.addListener((ChannelFutureListener) channelFuture -> {
                 if(channelFuture.isSuccess()){
-                    Packet packet = new LoginRequest(this.account.toString(),"123456");
-                    channelFuture.channel().writeAndFlush(packet);
-                    new Thread(() -> {
-                        Scanner scanner = new Scanner(System.in);
-                        while (scanner.hasNextLine()){
-                            String s = scanner.nextLine();
-                            if(isGroupChat){
-                                channelFuture.channel().writeAndFlush(new GroupChatMessage(s,this.account,this.receiver));
-                            }else {
-                                channelFuture.channel().writeAndFlush(new PrivateChatMessage(s,this.account,this.receiver));
-                            }
-                        }
-                    }).start();
+                    //初始化
+                    ClientContextHolder.createClientContext(channelFuture.channel(),this.account.toString());
                 }else {
 
                     System.out.println("连接失败");

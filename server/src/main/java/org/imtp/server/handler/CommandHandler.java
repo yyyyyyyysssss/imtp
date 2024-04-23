@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.imtp.common.enums.Command;
 import org.imtp.common.packet.*;
 import org.imtp.server.constant.ProjectConstant;
+import org.imtp.server.context.ChannelContextHolder;
 
 import java.net.SocketException;
 
@@ -56,7 +57,9 @@ public class CommandHandler extends SimpleChannelInboundHandler<Packet> {
             log.warn("用户[{}]已断开连接",loginUser);
             //移除channel
         }else {
-            cause.printStackTrace();
+            log.error("exception message",cause);
         }
+        //移除
+        ChannelContextHolder.createChannelContext().removeChannel(loginUser.toString());
     }
 }
