@@ -18,6 +18,6 @@ public class PrivateChatMessage extends TextMessage{
     }
 
     public PrivateChatMessage(String message, long sender, long receiver) {
-        super(message, sender, receiver, Command.PRIVATE_MSG);
+        super(message, sender, receiver, Command.PRIVATE_CHAT_MSG);
     }
 }
