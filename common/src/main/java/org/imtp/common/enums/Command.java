@@ -11,9 +11,8 @@ public enum Command {
 
     MSG_RES((byte) -1, "通用消息响应"),
 
-    PRIVATE_MSG((byte) 1, "普通文本消息请求"),
-
-    GROUP_CHAT_MSG((byte) 2, "普通文本消息请求"),
+    PRIVATE_CHAT_MSG((byte) 1, "私聊"),
+    GROUP_CHAT_MSG((byte) 2, "群聊"),
 
 
     HEARTBEAT_REQ((byte) 127, "心跳请求"),

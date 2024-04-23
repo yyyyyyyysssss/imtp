@@ -39,7 +39,7 @@ public class ClientCmdHandler extends SimpleChannelInboundHandler<Packet> {
                     log.info("登录失败");
                 }
                 break;
-            case PRIVATE_MSG :
+            case PRIVATE_CHAT_MSG :
                 PrivateChatMessage privateChatMessage = new PrivateChatMessage(byteBuf,header);
                 System.out.println("用户["+ privateChatMessage.getSender() + "]:" + privateChatMessage.getMessage());
                 break;

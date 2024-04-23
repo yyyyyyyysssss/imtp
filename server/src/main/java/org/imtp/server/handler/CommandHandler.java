@@ -4,9 +4,11 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.util.AttributeKey;
 import lombok.extern.slf4j.Slf4j;
 import org.imtp.common.enums.Command;
 import org.imtp.common.packet.*;
+import org.imtp.server.constant.ProjectConstant;
 
 import java.net.SocketException;
 
@@ -29,7 +31,7 @@ public class CommandHandler extends SimpleChannelInboundHandler<Packet> {
                     packet = new LoginRequest(byteBuf, header);
                     channelHandlerContext.pipeline().addLast(new LoginHandler()).fireChannelRead(packet);
                     break;
-                case PRIVATE_MSG:
+                case PRIVATE_CHAT_MSG:
                     packet = new PrivateChatMessage(byteBuf, header);
                     channelHandlerContext.pipeline().addLast(new PrivateChatMessageHandler()).fireChannelRead(packet);
                     break;
@@ -48,10 +50,13 @@ public class CommandHandler extends SimpleChannelInboundHandler<Packet> {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
+        AttributeKey<Long> attributeKey = AttributeKey.valueOf(ProjectConstant.CHANNEL_ATTR_LOGIN_USER);
+        Long loginUser = ctx.channel().attr(attributeKey).get();
         if (cause instanceof SocketException){
-
+            log.warn("用户[{}]已断开连接",loginUser);
+            //移除channel
         }else {
-
+            cause.printStackTrace();
         }
     }
 }
