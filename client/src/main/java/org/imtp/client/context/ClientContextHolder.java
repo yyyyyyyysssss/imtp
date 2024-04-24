@@ -12,7 +12,7 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class ClientContextHolder {
 
-    private static ClientContext clientContext;
+    private static volatile ClientContext clientContext;
 
     //使用lock  为后续虚拟线程做准备
     private static final Lock lock = new ReentrantLock();

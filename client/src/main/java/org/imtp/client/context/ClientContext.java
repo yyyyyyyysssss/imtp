@@ -11,6 +11,8 @@ public interface ClientContext {
 
     Channel channel();
 
+    void setChannel(Channel channel);
+
     String user();
 
 }

@@ -19,4 +19,10 @@ public abstract class AbstractClientChannelContext implements ClientContext{
     public Channel channel() {
         return this.channel;
     }
+
+
+    @Override
+    public void setChannel(Channel channel) {
+        this.channel = channel;
+    }
 }

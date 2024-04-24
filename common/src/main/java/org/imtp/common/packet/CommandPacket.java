@@ -16,10 +16,10 @@ public class CommandPacket extends Packet{
     private byte[] bytes;
 
 
-    public CommandPacket(Header header,ByteBuf byteBuf) {
+    public CommandPacket(Header header,byte[] bytes,short verify) {
         super(header);
-        this.bytes = new byte[header.getLength()];
-        byteBuf.readBytes(bytes);
+        this.bytes = bytes;
+        this.verify = verify;
     }
 
     @Override

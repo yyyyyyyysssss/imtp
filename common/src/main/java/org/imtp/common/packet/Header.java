@@ -12,14 +12,16 @@ import org.imtp.common.enums.ProtocolVersion;
  */
 @Getter
 public class Header{
-    //魔数 占2个字节
-    private short magic = 0xdf;
+    //魔数 占1个字节
+    private byte magic = (byte) 0xdf;
     //协议版本 占1个字节
     private ProtocolVersion ver;
     //发送端标识 占8个字节
     private long sender;
     //接收端标识 占8个字节
     private long receiver;
+    //保留位 占1个字节
+    private byte reserved;
     //业务指令 占1个字节
     private Command cmd;
     //消息长度 占4个字节
@@ -30,8 +32,8 @@ public class Header{
     }
 
     public Header(ByteBuf byteBuf){
-        this.magic = byteBuf.readShort();
-        if(magic != 0xdf){
+        this.magic = byteBuf.readByte();
+        if(magic != (byte) 0xdf){
             throw new RuntimeException("invalid magic number: " + magic);
         }
 
@@ -43,6 +45,8 @@ public class Header{
 
         this.sender = byteBuf.readLong();
         this.receiver = byteBuf.readLong();
+
+        this.reserved = byteBuf.readByte();
 
         byte c = byteBuf.readByte();
         this.cmd = Command.find(c);
@@ -62,13 +66,14 @@ public class Header{
     }
 
     public void encodeAsByteBuf(ByteBuf byteBuf) {
-        if(this.magic != 0xdf){
+        if(this.magic != (byte) 0xdf){
             throw new RuntimeException("magic error");
         }
-        byteBuf.writeShort(this.magic);
+        byteBuf.writeByte(this.magic);
         byteBuf.writeByte(this.ver.getVer());
         byteBuf.writeLong(this.sender);
         byteBuf.writeLong(this.receiver);
+        byteBuf.writeByte(this.reserved);
         byteBuf.writeByte(this.cmd.getCmdCode());
         byteBuf.writeInt(this.length);
     }

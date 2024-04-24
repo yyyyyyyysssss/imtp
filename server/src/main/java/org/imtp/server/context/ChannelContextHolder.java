@@ -10,7 +10,7 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class ChannelContextHolder {
 
-    private static ChannelContext channelContext;
+    private static volatile ChannelContext channelContext;
 
     //使用lock  为后续虚拟线程做准备
     private static final Lock lock = new ReentrantLock();
