@@ -19,11 +19,14 @@ public class ConsoleSendMessage implements SendMessage{
         ClientContext clientContext = ClientContextHolder.clientContext();
         Scanner scanner = new Scanner(System.in);
         Long receiver = null;
-        boolean isGroupChat = false;
+        boolean isGroupChat;
+        boolean isSend;
         String p,msg = null;
         char c;
         char[] cc;
         while (scanner.hasNextLine()){
+            isGroupChat = false;
+            isSend = true;
             String s = scanner.nextLine();
             String[] args = s.split(" ");
             for (int i = 0; i < args.length; i++) {
@@ -42,14 +45,20 @@ public class ConsoleSendMessage implements SendMessage{
                             break;
                         case 't':
                             msg = args[++i];
-                            break;
-                        case 'p':
-                            isGroupChat = false;
+                        case 'h':
+                            System.out.println("可选操作:");
+                            System.out.println("    -r 消息接收人(对方账号)*");
+                            System.out.println("    -g 群聊消息 ");
+                            System.out.println("    -t 消息主体(可省略)");
+                            isSend = false;
                             break;
                         default:
                             throw new UnsupportedOperationException("不支持的操作: -" + c);
                     }
                 }
+            }
+            if(!isSend){
+                continue;
             }
             if(receiver == null){
                 throw new RuntimeException("接收人不可为空");
