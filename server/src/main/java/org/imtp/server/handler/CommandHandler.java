@@ -55,7 +55,6 @@ public class CommandHandler extends SimpleChannelInboundHandler<Packet> {
         Long loginUser = ctx.channel().attr(attributeKey).get();
         if (cause instanceof SocketException){
             log.warn("用户[{}]已断开连接",loginUser);
-            //移除channel
         }else {
             log.error("exception message",cause);
         }

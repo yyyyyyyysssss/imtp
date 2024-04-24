@@ -25,8 +25,7 @@ public class Client {
 
     public static void main(String[] args) {
         int length;
-        Long account = null,receiver = null;
-        boolean isGroupChat = false;
+        Long account = null;
         String p;
         char c;
         char[] cc;
@@ -39,12 +38,6 @@ public class Client {
                 switch ((c = cc[1])){
                     case 'u':
                         account = Long.parseLong(args[++i]);
-                        break;
-                    case 's':
-                        receiver = Long.parseLong(args[++i]);
-                        break;
-                    case 'g':
-                        isGroupChat = true;
                         break;
                     default:
                         throw new UnsupportedOperationException("不支持的操作: -" + c);
