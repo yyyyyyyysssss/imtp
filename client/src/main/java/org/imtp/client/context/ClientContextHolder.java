@@ -17,12 +17,12 @@ public class ClientContextHolder {
     //使用lock  为后续虚拟线程做准备
     private static final Lock lock = new ReentrantLock();
 
-    public static ClientContext createClientContext(Channel channel,String user){
+    public static ClientContext createClientContext(Channel channel,String principal,String credentials){
         if(clientContext == null){
             try {
                 lock.lock();
                 if(clientContext == null){
-                    clientContext = new DefaultClientUserChannelContext(channel,user);
+                    clientContext = new DefaultClientUserChannelContext(channel,principal,credentials);
                 }
             }finally {
                 lock.unlock();

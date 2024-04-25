@@ -15,4 +15,5 @@ public interface ClientContext {
 
     String user();
 
+    String credentials();
 }

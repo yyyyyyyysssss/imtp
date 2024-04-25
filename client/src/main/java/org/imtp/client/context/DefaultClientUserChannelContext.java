@@ -9,15 +9,23 @@ import io.netty.channel.Channel;
  */
 public class DefaultClientUserChannelContext extends AbstractClientChannelContext {
 
-    private String user;
+    private String principal;
 
-    public DefaultClientUserChannelContext(Channel channel, String user) {
+    private String credentials;
+
+    public DefaultClientUserChannelContext(Channel channel, String principal,String credentials) {
         super(channel);
-        this.user = user;
+        this.principal = principal;
+        this.credentials = credentials;
     }
 
     @Override
     public String user() {
-        return this.user;
+        return this.principal;
+    }
+
+    @Override
+    public String credentials() {
+        return this.credentials;
     }
 }

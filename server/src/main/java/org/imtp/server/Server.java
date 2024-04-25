@@ -9,6 +9,9 @@ import org.imtp.common.codec.IMTPDecoder;
 import org.imtp.common.codec.IMTPEncoder;
 import org.imtp.server.context.ChannelContextHolder;
 import org.imtp.server.handler.CommandHandler;
+import org.imtp.server.service.H2DBChatService;
+import org.imtp.server.service.ChatService;
+import org.imtp.server.storage.SqlHandler;
 
 /**
  * @Description
@@ -17,7 +20,20 @@ import org.imtp.server.handler.CommandHandler;
  */
 public class Server {
 
+    private ChatService chatService;
+
+    public Server(ChatService chatService){
+        this.chatService = chatService;
+    }
+
     public static void main(String[] args) {
+        SqlHandler sqlHandler = new SqlHandler();
+        ChatService chatService = new H2DBChatService(sqlHandler);
+        Server server = new Server(chatService);
+        server.start();
+    }
+
+    public void start(){
         final EventLoopGroup bossEventLoopGroup=new NioEventLoopGroup(2);
         final EventLoopGroup workEventLoopGroup=new NioEventLoopGroup(8);
         try {
@@ -30,7 +46,7 @@ public class Server {
                             ChannelPipeline pipeline = socketChannel.pipeline();
                             pipeline.addLast(new IMTPDecoder());
                             pipeline.addLast(new IMTPEncoder());
-                            pipeline.addLast(new CommandHandler());
+                            pipeline.addLast(new CommandHandler(chatService));
                         }
                     });
             ChannelFuture cf = serverBootstrap.bind("127.0.0.1", 2921).sync();

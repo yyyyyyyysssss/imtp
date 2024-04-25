@@ -10,6 +10,8 @@ import org.imtp.common.packet.LoginResponse;
 import org.imtp.server.constant.ProjectConstant;
 import org.imtp.server.context.ChannelContext;
 import org.imtp.server.context.ChannelContextHolder;
+import org.imtp.server.entity.User;
+import org.imtp.server.service.ChatService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,13 +24,20 @@ import java.util.List;
 @Slf4j
 public class LoginHandler extends SimpleChannelInboundHandler<LoginRequest> {
 
+    private ChatService chatService;
+
+    public LoginHandler(ChatService chatService){
+        this.chatService = chatService;
+    }
+
     //测试登录
     private final List<String> testUsernames = new ArrayList<>(){{add("147");add("258");add("369");}};
     private final String testPassword = "123456";
 
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, LoginRequest loginRequest) {
-        if(testUsernames.contains(loginRequest.getUsername()) && loginRequest.getPassword().equals(testPassword)){
+        User user = chatService.findByUserId(Long.valueOf(loginRequest.getUsername()));
+        if(user != null && user.getPassword().equals(loginRequest.getPassword())){
             channelHandlerContext.channel().writeAndFlush(new LoginResponse(LoginState.SUCCESS, Long.valueOf(loginRequest.getUsername())));
             //登录成功则移除当前handler
             channelHandlerContext.pipeline().remove(this);

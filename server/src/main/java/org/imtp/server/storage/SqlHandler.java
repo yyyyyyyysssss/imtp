@@ -17,9 +17,9 @@ import java.util.List;
 @Slf4j
 public class SqlHandler {
     private static final String USER_TABLE_SQL = "create table if not exists users (id bigint auto_increment primary key,account bigint not null,password varchar(48),name varchar(24))";
-    private static final String HISTORY_MESSAGE_TABLE_SQL = "create table if not exists h_message (id bigint auto_increment primary key,sender bigint not null,receiver bigint not null,timestamp bigint not null,type int not null)";
+    private static final String HISTORY_MESSAGE_TABLE_SQL = "create table if not exists h_message (id bigint auto_increment primary key,sender bigint not null,receiver bigint not null,timestamp bigint not null,type int not null,status int not null)";
     private static final String DRIVER_CLASS_NAME = "org.h2.Driver";
-    private static final String JDBC_URL = "jdbc:h2:~/imtp_server;AUTO_SERVER=TRUE";
+    private static final String JDBC_URL = "jdbc:h2:~/imtp_server;AUTO_SERVER=TRUE;MODE=MySQL";
     private static final int MAXIMUM_POOL_SIZE = 10;
     private static final HikariConfig hikariConfig;
     private static final DataSource dataSource;
@@ -60,12 +60,6 @@ public class SqlHandler {
         }
     }
 
-    public static void main(String[] args) throws SQLException {
-        SqlHandler sqlHandler = new SqlHandler();
-        String sql = "insert into users(account,password,name) values(369,123456,'王二')";
-        sqlHandler.execute(sql);
-    }
-
     public boolean execute(String sql) throws SQLException {
         try (Statement statement = getStatement()){
             return statement.execute(sql);
@@ -94,8 +88,9 @@ public class SqlHandler {
                 for (int i = 1; i <= columnCount; i++) {
                     String columnName = metaData.getColumnName(i);
                     Object value = resultSet.getObject(i);
-                    Field field = c.getDeclaredField(columnName);
+                    Field field = c.getDeclaredField(columnName.toLowerCase());
                     if(value != null){
+                        field.setAccessible(true);
                         if(field.getType() == Long.class || field.getType() == long.class){
                             field.set(t, resultSet.getLong(i));
                         }else if(field.getType() == Integer.class || field.getType() == int.class){

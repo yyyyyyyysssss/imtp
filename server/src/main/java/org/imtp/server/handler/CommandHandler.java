@@ -10,6 +10,7 @@ import org.imtp.common.enums.Command;
 import org.imtp.common.packet.*;
 import org.imtp.server.constant.ProjectConstant;
 import org.imtp.server.context.ChannelContextHolder;
+import org.imtp.server.service.ChatService;
 
 import java.net.SocketException;
 
@@ -21,6 +22,12 @@ import java.net.SocketException;
 @Slf4j
 public class CommandHandler extends SimpleChannelInboundHandler<Packet> {
 
+    private ChatService chatService;
+
+    public CommandHandler(ChatService chatService){
+        this.chatService = chatService;
+    }
+
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, Packet packet) {
         if(packet instanceof CommandPacket commandPacket){
@@ -30,7 +37,7 @@ public class CommandHandler extends SimpleChannelInboundHandler<Packet> {
             switch (cmd) {
                 case LOGIN_REQ:
                     packet = new LoginRequest(byteBuf, header);
-                    channelHandlerContext.pipeline().addLast(new LoginHandler()).fireChannelRead(packet);
+                    channelHandlerContext.pipeline().addLast(new LoginHandler(chatService)).fireChannelRead(packet);
                     break;
                 case PRIVATE_CHAT_MSG:
                     packet = new PrivateChatMessage(byteBuf, header);

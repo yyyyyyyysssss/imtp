@@ -26,7 +26,7 @@ public class ClientCmdHandler extends SimpleChannelInboundHandler<Packet> {
     @Override
     public void channelActive(ChannelHandlerContext ctx) {
         ClientContext clientContext = ClientContextHolder.clientContext();
-        Packet packet = new LoginRequest(clientContext.user(),"123456");
+        Packet packet = new LoginRequest(clientContext.user(),clientContext.credentials());
         clientContext.channel().writeAndFlush(packet);
     }
 

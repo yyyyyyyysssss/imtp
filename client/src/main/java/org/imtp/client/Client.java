@@ -19,25 +19,31 @@ public class Client {
 
     private Long account;
 
-    public Client(Long account){
+    private String password;
+
+    public Client(Long account, String password) {
         this.account = account;
+        this.password = password;
     }
 
     public static void main(String[] args) {
         int length;
         Long account = null;
-        String p;
+        String password = null,p = null;
         char c;
         char[] cc;
-        if(args != null && (length = args.length) > 0){
+        if (args != null && (length = args.length) > 0) {
             for (int i = 0; i < length; i++) {
                 p = args[i];
-                if((cc = p.toCharArray())[0] != '-'){
+                if ((cc = p.toCharArray())[0] != '-') {
                     throw new RuntimeException("参数错误! 参数必须以-开头");
                 }
-                switch ((c = cc[1])){
+                switch ((c = cc[1])) {
                     case 'u':
                         account = Long.parseLong(args[++i]);
+                        break;
+                    case 'p':
+                        password = args[++i];
                         break;
                     default:
                         throw new UnsupportedOperationException("不支持的操作: -" + c);
@@ -46,18 +52,18 @@ public class Client {
             }
         }
 
-        Client client = new Client(account);
+        Client client = new Client(account,password);
         client.start();
     }
 
 
-    public void start(){
-        final EventLoopGroup group=new NioEventLoopGroup(1);
-        Bootstrap bootstrap=new Bootstrap();
+    public void start() {
+        final EventLoopGroup group = new NioEventLoopGroup(1);
+        Bootstrap bootstrap = new Bootstrap();
         try {
             bootstrap.group(group)
                     .channel(NioSocketChannel.class)
-                    .option(ChannelOption.TCP_NODELAY,true)
+                    .option(ChannelOption.TCP_NODELAY, true)
                     .handler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel socketChannel) {
@@ -69,16 +75,16 @@ public class Client {
                     });
             ChannelFuture connected = bootstrap.connect("127.0.0.1", 2921);
             connected.addListener((ChannelFutureListener) channelFuture -> {
-                if(channelFuture.isSuccess()){
+                if (channelFuture.isSuccess()) {
                     //初始化
-                    ClientContextHolder.createClientContext(channelFuture.channel(),this.account.toString());
-                }else {
+                    ClientContextHolder.createClientContext(channelFuture.channel(), this.account.toString(),password);
+                } else {
 
                     System.out.println("连接失败");
                 }
             });
             connected.channel().closeFuture().sync();
-        }catch (Exception e){
+        } catch (Exception e) {
             System.out.println(e.getMessage());
         } finally {
             group.shutdownGracefully();
