@@ -1,5 +1,8 @@
 package org.imtp.server.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Getter;
 import lombok.Setter;
 import org.imtp.server.enums.HistoryMsg;
@@ -11,6 +14,7 @@ import org.imtp.server.enums.HistoryMsg;
  */
 @Getter
 @Setter
+@TableName("h_msg")
 public class HistoryMessage {
 
     public HistoryMessage(){
@@ -26,18 +30,25 @@ public class HistoryMessage {
         this.msg = msg;
     }
 
+    @TableId
     private Long id;
 
+    @TableField("sender")
     private Long sender;
 
+    @TableField("receiver")
     private Long receiver;
 
+    @TableField("timestamp")
     private Long timestamp;
 
+    @TableField("type")
     private Integer type;
 
+    @TableField("status")
     private Integer status;
 
+    @TableField("msg")
     private String msg;
 
 }

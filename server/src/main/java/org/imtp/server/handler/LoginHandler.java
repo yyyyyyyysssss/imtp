@@ -27,10 +27,6 @@ public class LoginHandler extends AbstractHandler<LoginRequest> {
         super(chatService);
     }
 
-    //测试登录
-    private final List<String> testUsernames = new ArrayList<>(){{add("147");add("258");add("369");}};
-    private final String testPassword = "123456";
-
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, LoginRequest loginRequest) {
         User user = chatService.findByUserId(Long.valueOf(loginRequest.getUsername()));

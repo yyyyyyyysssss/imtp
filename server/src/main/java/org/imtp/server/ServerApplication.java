@@ -10,27 +10,27 @@ import org.imtp.common.codec.IMTPEncoder;
 import org.imtp.server.context.ChannelContextHolder;
 import org.imtp.server.handler.CommandHandler;
 import org.imtp.server.service.H2DBChatService;
-import org.imtp.server.service.ChatService;
 import org.imtp.server.storage.SqlHandler;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.ApplicationRunner;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.EnableAsync;
 
 /**
  * @Description
  * @Author ys
  * @Date 2023/4/10 11:44
  */
-public class Server {
+@SpringBootApplication
+@EnableAsync
+public class ServerApplication implements ApplicationRunner {
 
-    private ChatService chatService;
 
-    public Server(ChatService chatService){
-        this.chatService = chatService;
-    }
 
     public static void main(String[] args) {
-        SqlHandler sqlHandler = new SqlHandler();
-        ChatService chatService = new H2DBChatService(sqlHandler);
-        Server server = new Server(chatService);
-        server.start();
+        SpringApplication.run(ServerApplication.class);
     }
 
     public void start(){
@@ -46,24 +46,30 @@ public class Server {
                             ChannelPipeline pipeline = socketChannel.pipeline();
                             pipeline.addLast(new IMTPDecoder());
                             pipeline.addLast(new IMTPEncoder());
-                            pipeline.addLast(new CommandHandler(chatService));
+                            pipeline.addLast(new CommandHandler(new H2DBChatService(new SqlHandler())));
                         }
                     });
             ChannelFuture cf = serverBootstrap.bind("127.0.0.1", 2921).sync();
             cf.addListener((ChannelFutureListener) channelFuture -> {
                 if (channelFuture.isSuccess()){
-                    System.out.println("Server started");
+                    System.out.println("ServerApplication started");
                     //初始化上下文对象
                     ChannelContextHolder.createChannelContext();
                 }
             });
             cf.channel().closeFuture().sync();
         }catch (Exception e){
-            System.out.println(e.getMessage());
+            bossEventLoopGroup.shutdownGracefully();
+            workEventLoopGroup.shutdownGracefully();
         }finally {
             bossEventLoopGroup.shutdownGracefully();
             workEventLoopGroup.shutdownGracefully();
         }
     }
 
+    @Async
+    @Override
+    public void run(ApplicationArguments args) {
+        start();
+    }
 }

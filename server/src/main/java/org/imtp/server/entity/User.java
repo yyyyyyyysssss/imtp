@@ -1,5 +1,8 @@
 package org.imtp.server.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,21 +13,26 @@ import lombok.Setter;
  */
 @Getter
 @Setter
+@TableName("u_user")
 public class User {
 
+    @TableId
     private Long id;
 
-    private Long account;
+    @TableField("username")
+    private String username;
 
+    @TableField("password")
     private String password;
 
+    @TableField("name")
     private String name;
 
     @Override
     public String toString() {
         return "User{" +
                 "id=" + id +
-                ", account=" + account +
+                ", username=" + username +
                 ", password='" + password + '\'' +
                 ", name='" + name + '\'' +
                 '}';
