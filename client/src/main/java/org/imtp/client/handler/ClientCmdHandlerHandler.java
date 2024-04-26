@@ -3,17 +3,14 @@ package org.imtp.client.handler;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.SimpleChannelInboundHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.imtp.client.context.ClientContext;
 import org.imtp.client.context.ClientContextHolder;
-import org.imtp.client.send.ConsoleSendMessage;
-import org.imtp.client.send.SendMessage;
+import org.imtp.client.controller.MessageController;
+import org.imtp.client.controller.Controller;
 import org.imtp.common.enums.Command;
 import org.imtp.common.enums.LoginState;
 import org.imtp.common.packet.*;
-
-import java.util.Scanner;
 
 /**
  * @Description
@@ -21,7 +18,7 @@ import java.util.Scanner;
  * @Date 2024/4/8 14:53
  */
 @Slf4j
-public class ClientCmdHandler extends SimpleChannelInboundHandler<Packet> {
+public class ClientCmdHandlerHandler extends AbstractMessageModelHandler<Packet> {
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) {
@@ -42,19 +39,16 @@ public class ClientCmdHandler extends SimpleChannelInboundHandler<Packet> {
                 if(loginResponse.getLoginState().equals(LoginState.SUCCESS)){
                     log.info("登录成功");
                     //登录成功开始发送消息
-                    SendMessage sendMessage = new ConsoleSendMessage();
-                    new Thread(sendMessage::send).start();
+                    new MessageController(this);
                 }else {
                     log.info("登录失败");
                 }
                 break;
             case PRIVATE_CHAT_MSG :
-                PrivateChatMessage privateChatMessage = new PrivateChatMessage(byteBuf,header);
-                System.out.println("用户["+ privateChatMessage.getSender() + "]:" + privateChatMessage.getMessage());
+                setMessage(new PrivateChatMessage(byteBuf,header));
                 break;
             case GROUP_CHAT_MSG:
-                GroupChatMessage groupChatMessage = new GroupChatMessage(byteBuf,header);
-                System.out.println("*用户["+ groupChatMessage.getSender() + "]:" + groupChatMessage.getMessage());
+                setMessage(new GroupChatMessage(byteBuf,header));
                 break;
             case MSG_RES:
                 DefaultMessageResponse response = new DefaultMessageResponse(byteBuf,header);

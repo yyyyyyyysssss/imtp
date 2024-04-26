@@ -23,9 +23,7 @@ public class H2DBChatService implements ChatService {
 
     @Override
     public User findByUserId(Long userId) {
-        StringBuilder sql = new StringBuilder();
-        sql.append("select * from users where account = '").append(userId).append("'");
-        return sqlHandler.queryOne(sql.toString(), User.class);
+        return sqlHandler.queryOne("select * from users where account = '" + userId + "'", User.class);
     }
 
     @Override
@@ -42,12 +40,13 @@ public class H2DBChatService implements ChatService {
     @Override
     public boolean saveHistoryMessage(HistoryMessage historyMessage) {
         StringBuilder  sql = new StringBuilder();
-        sql.append("insert into h_message(sender,receiver,timestamp,type,status) values(")
+        sql.append("insert into h_message(sender,receiver,timestamp,type,status,msg) values(")
                 .append(historyMessage.getSender()).append(",")
                 .append(historyMessage.getReceiver()).append(",")
                 .append(historyMessage.getTimestamp()).append(",")
                 .append(historyMessage.getType()).append(",")
-                .append(historyMessage.getStatus())
+                .append(historyMessage.getStatus()).append(",")
+                .append("'").append(historyMessage.getMsg()).append("'")
                 .append(")");
         try {
             return sqlHandler.execute(sql.toString());

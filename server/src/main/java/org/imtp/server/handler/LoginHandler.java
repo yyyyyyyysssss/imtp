@@ -1,7 +1,6 @@
 package org.imtp.server.handler;
 
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.util.AttributeKey;
 import lombok.extern.slf4j.Slf4j;
 import org.imtp.common.enums.LoginState;
@@ -22,12 +21,10 @@ import java.util.List;
  * @Date 2024/4/21 15:06
  */
 @Slf4j
-public class LoginHandler extends SimpleChannelInboundHandler<LoginRequest> {
-
-    private ChatService chatService;
+public class LoginHandler extends AbstractHandler<LoginRequest> {
 
     public LoginHandler(ChatService chatService){
-        this.chatService = chatService;
+        super(chatService);
     }
 
     //测试登录

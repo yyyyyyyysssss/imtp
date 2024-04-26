@@ -3,7 +3,6 @@ package org.imtp.server.handler;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.util.AttributeKey;
 import lombok.extern.slf4j.Slf4j;
 import org.imtp.common.enums.Command;
@@ -20,12 +19,10 @@ import java.net.SocketException;
  * @Date 2024/4/21 12:58
  */
 @Slf4j
-public class CommandHandler extends SimpleChannelInboundHandler<Packet> {
-
-    private ChatService chatService;
+public class CommandHandler extends AbstractHandler<Packet> {
 
     public CommandHandler(ChatService chatService){
-        this.chatService = chatService;
+        super(chatService);
     }
 
     @Override
@@ -41,11 +38,11 @@ public class CommandHandler extends SimpleChannelInboundHandler<Packet> {
                     break;
                 case PRIVATE_CHAT_MSG:
                     packet = new PrivateChatMessage(byteBuf, header);
-                    channelHandlerContext.pipeline().addLast(new PrivateChatMessageHandler()).fireChannelRead(packet);
+                    channelHandlerContext.pipeline().addLast(new PrivateChatMessageHandler(chatService)).fireChannelRead(packet);
                     break;
                 case GROUP_CHAT_MSG:
                     packet = new GroupChatMessage(byteBuf,header);
-                    channelHandlerContext.pipeline().addLast(new GroupChatMessageHandler()).fireChannelRead(packet);
+                    channelHandlerContext.pipeline().addLast(new GroupChatMessageHandler(chatService)).fireChannelRead(packet);
                     break;
                 default:
                     throw new UnsupportedOperationException("不支持的操作");

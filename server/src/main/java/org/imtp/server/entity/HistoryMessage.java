@@ -17,12 +17,13 @@ public class HistoryMessage {
 
     }
 
-    public HistoryMessage(Long sender,Long receiver,Integer type){
+    public HistoryMessage(Long sender,Long receiver,Integer type,String msg){
         this.sender = sender;
         this.receiver = receiver;
         this.type = type;
         this.timestamp = System.currentTimeMillis();
         this.status = HistoryMsg.WAIT_PUSH.getType();
+        this.msg = msg;
     }
 
     private Long id;
@@ -36,5 +37,7 @@ public class HistoryMessage {
     private Integer type;
 
     private Integer status;
+
+    private String msg;
 
 }

@@ -1,21 +1,57 @@
-package org.imtp.client.send;
+package org.imtp.client.view;
 
 import org.imtp.client.context.ClientContext;
 import org.imtp.client.context.ClientContextHolder;
+import org.imtp.client.controller.Controller;
+import org.imtp.client.model.Observer;
+import org.imtp.client.model.MessageModel;
 import org.imtp.common.packet.GroupChatMessage;
+import org.imtp.common.packet.Packet;
 import org.imtp.common.packet.PrivateChatMessage;
 
 import java.util.Scanner;
 
 /**
- * @Description 控制台发送消息
+ * @Description 控制台聊天框
  * @Author ys
- * @Date 2024/4/23 16:52
+ * @Date 2024/4/26 11:44
  */
-public class ConsoleSendMessage implements SendMessage{
+public class ConsoleView implements Observer,Runnable {
+
+    //持有模型对象
+    private MessageModel messageModel;
+
+    //持有控制层对象
+    private Controller controller;
+
+    public ConsoleView(Controller controller, MessageModel messageModel){
+        this.messageModel = messageModel;
+        this.controller = controller;
+        messageModel.registerObserver(this);
+    }
 
     @Override
-    public void send() {
+    public void update() {
+        Packet packet = messageModel.getMessage();
+        switch (packet.getHeader().getCmd()){
+            case PRIVATE_CHAT_MSG :
+                PrivateChatMessage privateChatMessage = (PrivateChatMessage)packet;
+                System.out.println("用户["+ privateChatMessage.getSender() + "]:" + privateChatMessage.getMessage());
+                break;
+            case GROUP_CHAT_MSG:
+                GroupChatMessage groupChatMessage = (GroupChatMessage)packet;
+                System.out.println("*用户["+ groupChatMessage.getSender() + "]:" + groupChatMessage.getMessage());
+                break;
+
+        }
+    }
+
+    @Override
+    public void run() {
+        sendMessage();
+    }
+
+    public void sendMessage() {
         ClientContext clientContext = ClientContextHolder.clientContext();
         Scanner scanner = new Scanner(System.in);
         Long receiver = null;
@@ -63,11 +99,13 @@ public class ConsoleSendMessage implements SendMessage{
             if(receiver == null){
                 throw new RuntimeException("接收人不可为空");
             }
+            Packet packet;
             if(isGroupChat){
-                clientContext.channel().writeAndFlush(new GroupChatMessage(msg,Long.parseLong(clientContext.user()),receiver));
+                packet = new GroupChatMessage(msg,Long.parseLong(clientContext.user()),receiver);
             }else {
-                clientContext.channel().writeAndFlush(new PrivateChatMessage(msg,Long.parseLong(clientContext.user()),receiver));
+                packet = new PrivateChatMessage(msg,Long.parseLong(clientContext.user()),receiver);
             }
+            controller.send(packet);
         }
     }
 }

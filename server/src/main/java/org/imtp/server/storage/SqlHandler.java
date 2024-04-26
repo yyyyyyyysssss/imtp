@@ -10,14 +10,13 @@ import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
 @Slf4j
 public class SqlHandler {
-    private static final String USER_TABLE_SQL = "create table if not exists users (id bigint auto_increment primary key,account bigint not null,password varchar(48),name varchar(24))";
-    private static final String HISTORY_MESSAGE_TABLE_SQL = "create table if not exists h_message (id bigint auto_increment primary key,sender bigint not null,receiver bigint not null,timestamp bigint not null,type int not null,status int not null)";
+    private static final String USER_TABLE_SQL = "create table if not exists users (id bigint auto_increment primary key,account bigint UNIQUE not null,password varchar(48),name varchar(24))";
+    private static final String HISTORY_MESSAGE_TABLE_SQL = "create table if not exists h_message (id bigint auto_increment primary key,sender bigint not null,receiver bigint not null,timestamp bigint not null,type int not null,status int not null,msg varchar(2048))";
     private static final String DRIVER_CLASS_NAME = "org.h2.Driver";
     private static final String JDBC_URL = "jdbc:h2:~/imtp_server;AUTO_SERVER=TRUE;MODE=MySQL";
     private static final int MAXIMUM_POOL_SIZE = 10;
@@ -58,6 +57,12 @@ public class SqlHandler {
                 }
             }
         }
+    }
+
+    public void init() throws SQLException {
+        this.execute("insert into users(account,password,name) values(147,123456,'大鱼')");
+        this.execute("insert into users(account,password,name) values(258,123456,'！')");
+        this.execute("insert into users(account,password,name) values(369,123456,'。')");
     }
 
     public boolean execute(String sql) throws SQLException {
