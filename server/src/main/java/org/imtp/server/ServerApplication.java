@@ -5,12 +5,11 @@ import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import jakarta.annotation.Resource;
 import org.imtp.common.codec.IMTPDecoder;
 import org.imtp.common.codec.IMTPEncoder;
 import org.imtp.server.context.ChannelContextHolder;
 import org.imtp.server.handler.CommandHandler;
-import org.imtp.server.service.H2DBChatService;
-import org.imtp.server.storage.SqlHandler;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
@@ -28,6 +27,8 @@ import org.springframework.scheduling.annotation.EnableAsync;
 public class ServerApplication implements ApplicationRunner {
 
 
+    @Resource
+    private CommandHandler commandHandler;
 
     public static void main(String[] args) {
         SpringApplication.run(ServerApplication.class);
@@ -46,7 +47,7 @@ public class ServerApplication implements ApplicationRunner {
                             ChannelPipeline pipeline = socketChannel.pipeline();
                             pipeline.addLast(new IMTPDecoder());
                             pipeline.addLast(new IMTPEncoder());
-                            pipeline.addLast(new CommandHandler(new H2DBChatService(new SqlHandler())));
+                            pipeline.addLast(commandHandler);
                         }
                     });
             ChannelFuture cf = serverBootstrap.bind("127.0.0.1", 2921).sync();

@@ -3,9 +3,11 @@ package org.imtp.server.entity;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import org.imtp.server.enums.HistoryMsg;
+import org.imtp.common.packet.Packet;
+import org.imtp.server.enums.OfflineMsgEnum;
 
 /**
  * @Description
@@ -14,19 +16,21 @@ import org.imtp.server.enums.HistoryMsg;
  */
 @Getter
 @Setter
-@TableName("h_msg")
-public class HistoryMessage {
+@Builder
+@TableName("o_msg")
+public class OfflineMessage {
 
-    public HistoryMessage(){
+
+    public OfflineMessage(){
 
     }
 
-    public HistoryMessage(Long sender,Long receiver,Integer type,String msg){
-        this.sender = sender;
-        this.receiver = receiver;
-        this.type = type;
+    public OfflineMessage(Packet packet, OfflineMsgEnum type, String msg){
+        this.sender = packet.getSender();
+        this.receiver = packet.getReceiver();
+        this.type = type.getType();
         this.timestamp = System.currentTimeMillis();
-        this.status = HistoryMsg.WAIT_PUSH.getType();
+        this.status = OfflineMsgEnum.WAIT_PUSH.getType();
         this.msg = msg;
     }
 
@@ -46,7 +50,7 @@ public class HistoryMessage {
     private Integer type;
 
     @TableField("status")
-    private Integer status;
+    private Integer status = OfflineMsgEnum.WAIT_PUSH.getType();
 
     @TableField("msg")
     private String msg;

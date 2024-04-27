@@ -3,7 +3,7 @@ package org.imtp.server.enums;
 import lombok.Getter;
 
 @Getter
-public enum HistoryMsg {
+public enum OfflineMsgEnum {
     PRIVATE_CHAT_TYPE(10,"私聊"),
     GROUP_CHAT_TYPE(20,"群聊"),
 
@@ -14,7 +14,7 @@ public enum HistoryMsg {
     private int type;
     private String desc;
 
-    HistoryMsg(int type, String desc){
+    OfflineMsgEnum(int type, String desc){
         this.type = type;
         this.desc = desc;
     }

@@ -12,7 +12,7 @@ create table G_CHAT
     NAME CHARACTER VARYING(48)
 );
 
-create table H_MSG
+create table O_MSG
 (
     ID        BIGINT auto_increment primary key,
     SENDER    BIGINT  not null,
