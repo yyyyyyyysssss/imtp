@@ -2,9 +2,12 @@
 spring:
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
-    driver-class-name: org.h2.Driver
+    driver-class-name: com.mysql.cj.jdbc.Driver
 #    url: jdbc:h2:~/imtp_server;AUTO_SERVER=TRUE;MODE=MySQL
-    url: jdbc:h2:mem:imtp_server;MODE=MySQL
+#    url: jdbc:h2:mem:imtp_server;MODE=MySQL
+    url: jdbc:mysql://ys0921.top:33306/im?useUnicode=true&useSSL=false&useLegacyDatetimeCode=false&allowMultiQueries=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
+    username: root
+    password: Yan@136156
     hikari:
       maximum-pool-size: 10
   h2:
@@ -14,7 +17,7 @@ spring:
     init:
       schema-locations: schema.sql
       data-locations: data.sql
-      mode: always
+      mode: never
 
 
 mybatis-plus:

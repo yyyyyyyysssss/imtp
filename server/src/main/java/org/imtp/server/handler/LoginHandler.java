@@ -27,22 +27,19 @@ import java.util.List;
 @Slf4j
 @Component
 @ChannelHandler.Sharable
-public class LoginHandler extends SimpleChannelInboundHandler<LoginRequest> {
-
-    @Resource
-    private ChatService chatService;
+public class LoginHandler extends AbstractHandler<LoginRequest> {
 
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, LoginRequest loginRequest) {
         User user = chatService.findByUsername(loginRequest.getUsername());
         if(user != null && user.getPassword().equals(loginRequest.getPassword())){
-            channelHandlerContext.channel().writeAndFlush(new LoginResponse(LoginState.SUCCESS, Long.valueOf(loginRequest.getUsername())));
+            channelHandlerContext.channel().writeAndFlush(new LoginResponse(LoginState.SUCCESS, user.getId()));
             //登录成功则移除当前handler
             channelHandlerContext.pipeline().remove(this);
 
             //存储channel
             ChannelContext channelContext = ChannelContextHolder.createChannelContext();
-            channelContext.addChannel(loginRequest.getUsername(),channelHandlerContext.channel());
+            channelContext.addChannel(user.getId().toString(),channelHandlerContext.channel());
             //建立channel与用户之间的关系
             AttributeKey<Long> attributeKey = AttributeKey.valueOf(ProjectConstant.CHANNEL_ATTR_LOGIN_USER);
             channelHandlerContext.channel().attr(attributeKey).set(Long.parseLong(loginRequest.getUsername()));

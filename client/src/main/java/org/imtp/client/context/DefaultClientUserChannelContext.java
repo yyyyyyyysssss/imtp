@@ -19,8 +19,9 @@ public class DefaultClientUserChannelContext extends AbstractClientChannelContex
         this.credentials = credentials;
     }
 
+
     @Override
-    public String user() {
+    public String principal() {
         return this.principal;
     }
 

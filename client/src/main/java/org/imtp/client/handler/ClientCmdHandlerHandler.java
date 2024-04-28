@@ -23,7 +23,7 @@ public class ClientCmdHandlerHandler extends AbstractMessageModelHandler<Packet>
     @Override
     public void channelActive(ChannelHandlerContext ctx) {
         ClientContext clientContext = ClientContextHolder.clientContext();
-        Packet packet = new LoginRequest(clientContext.user(),clientContext.credentials());
+        Packet packet = new LoginRequest(clientContext.principal(),clientContext.credentials());
         clientContext.channel().writeAndFlush(packet);
     }
 
@@ -38,10 +38,13 @@ public class ClientCmdHandlerHandler extends AbstractMessageModelHandler<Packet>
                 LoginResponse loginResponse = new LoginResponse(byteBuf,header);
                 if(loginResponse.getLoginState().equals(LoginState.SUCCESS)){
                     log.info("登录成功");
+                    ClientContextHolder.clientContext().setId(loginResponse.getReceiver());
                     //登录成功开始发送消息
                     new MessageController(this);
                 }else {
                     log.info("登录失败");
+                    channelHandlerContext.channel().close();
+                    System.exit(-1);
                 }
                 break;
             case PRIVATE_CHAT_MSG :

@@ -1,20 +1,7 @@
 package org.imtp.server;
 
-import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.*;
-import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.SocketChannel;
-import io.netty.channel.socket.nio.NioServerSocketChannel;
-import jakarta.annotation.Resource;
-import org.imtp.common.codec.IMTPDecoder;
-import org.imtp.common.codec.IMTPEncoder;
-import org.imtp.server.context.ChannelContextHolder;
-import org.imtp.server.handler.CommandHandler;
-import org.springframework.boot.ApplicationArguments;
-import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
 
 /**
@@ -24,53 +11,9 @@ import org.springframework.scheduling.annotation.EnableAsync;
  */
 @SpringBootApplication
 @EnableAsync
-public class ServerApplication implements ApplicationRunner {
-
-
-    @Resource
-    private CommandHandler commandHandler;
+public class ServerApplication{
 
     public static void main(String[] args) {
         SpringApplication.run(ServerApplication.class);
-    }
-
-    public void start(){
-        final EventLoopGroup bossEventLoopGroup=new NioEventLoopGroup(2);
-        final EventLoopGroup workEventLoopGroup=new NioEventLoopGroup(8);
-        try {
-            ServerBootstrap serverBootstrap=new ServerBootstrap();
-            serverBootstrap.group(bossEventLoopGroup,workEventLoopGroup)
-                    .channel(NioServerSocketChannel.class)
-                    .childHandler(new ChannelInitializer<SocketChannel>() {
-                        @Override
-                        protected void initChannel(SocketChannel socketChannel) {
-                            ChannelPipeline pipeline = socketChannel.pipeline();
-                            pipeline.addLast(new IMTPDecoder());
-                            pipeline.addLast(new IMTPEncoder());
-                            pipeline.addLast(commandHandler);
-                        }
-                    });
-            ChannelFuture cf = serverBootstrap.bind("127.0.0.1", 2921).sync();
-            cf.addListener((ChannelFutureListener) channelFuture -> {
-                if (channelFuture.isSuccess()){
-                    System.out.println("ServerApplication started");
-                    //初始化上下文对象
-                    ChannelContextHolder.createChannelContext();
-                }
-            });
-            cf.channel().closeFuture().sync();
-        }catch (Exception e){
-            bossEventLoopGroup.shutdownGracefully();
-            workEventLoopGroup.shutdownGracefully();
-        }finally {
-            bossEventLoopGroup.shutdownGracefully();
-            workEventLoopGroup.shutdownGracefully();
-        }
-    }
-
-    @Async
-    @Override
-    public void run(ApplicationArguments args) {
-        start();
     }
 }

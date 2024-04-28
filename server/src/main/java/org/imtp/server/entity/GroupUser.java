@@ -3,12 +3,16 @@ package org.imtp.server.entity;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
+
+import java.util.Date;
 
 @Setter
 @Getter
-@TableName("u_group")
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@TableName("im_group_user")
 public class GroupUser {
 
     @TableId
@@ -19,5 +23,8 @@ public class GroupUser {
 
     @TableField("user_id")
     private Long userId;
+
+    @TableField("join_time")
+    private Date joinTime;
 
 }

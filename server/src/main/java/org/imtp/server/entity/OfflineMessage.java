@@ -3,11 +3,8 @@ package org.imtp.server.entity;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
-import org.imtp.common.packet.Packet;
-import org.imtp.server.enums.OfflineMsgEnum;
+import lombok.*;
+import org.imtp.server.idwork.IdGen;
 
 /**
  * @Description
@@ -17,42 +14,28 @@ import org.imtp.server.enums.OfflineMsgEnum;
 @Getter
 @Setter
 @Builder
-@TableName("o_msg")
+@NoArgsConstructor
+@AllArgsConstructor
+@TableName("im_offline_msg")
 public class OfflineMessage {
 
-
-    public OfflineMessage(){
-
-    }
-
-    public OfflineMessage(Packet packet, OfflineMsgEnum type, String msg){
-        this.sender = packet.getSender();
-        this.receiver = packet.getReceiver();
-        this.type = type.getType();
-        this.timestamp = System.currentTimeMillis();
-        this.status = OfflineMsgEnum.WAIT_PUSH.getType();
-        this.msg = msg;
+    public OfflineMessage(Long msgId,Long userId){
+        this.id = IdGen.genId();
+        this.msgId = msgId;
+        this.userId = userId;
+        this.state = false;
     }
 
     @TableId
     private Long id;
 
-    @TableField("sender")
-    private Long sender;
+    @TableField("msg_id")
+    private Long msgId;
 
-    @TableField("receiver")
-    private Long receiver;
+    @TableField("user_id")
+    private Long userId;
 
-    @TableField("timestamp")
-    private Long timestamp;
-
-    @TableField("type")
-    private Integer type;
-
-    @TableField("status")
-    private Integer status = OfflineMsgEnum.WAIT_PUSH.getType();
-
-    @TableField("msg")
-    private String msg;
+    @TableField("state")
+    private boolean state;
 
 }

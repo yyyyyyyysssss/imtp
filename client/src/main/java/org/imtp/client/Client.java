@@ -79,7 +79,6 @@ public class Client {
                     //初始化
                     ClientContextHolder.createClientContext(channelFuture.channel(), this.account.toString(),password);
                 } else {
-
                     System.out.println("连接失败");
                 }
             });

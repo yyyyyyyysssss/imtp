@@ -10,33 +10,27 @@ import java.util.Date;
 /**
  * @Description
  * @Author ys
- * @Date 2024/4/25 12:33
+ * @Date 2024/4/28 11:34
  */
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@TableName("im_user")
-public class User {
+@TableName("im_user_friend")
+public class UserFriend {
 
     @TableId
     private Long id;
 
-    @TableField("username")
-    private String username;
+    @TableField("user_id")
+    private Long userId;
 
-    @TableField("password")
-    private String password;
+    @TableField("friend_id")
+    private Long friendId;
 
-    @TableField("nickname")
-    private String nickname;
-
-    @TableField("gender")
-    private String gender;
-
-    @TableField("avatar")
-    private String avatar;
+    @TableField("state")
+    private boolean state;
 
     @TableField("create_time")
     private Date createTime;

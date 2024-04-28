@@ -5,5 +5,5 @@ import org.apache.ibatis.annotations.Mapper;
 import org.imtp.server.entity.OfflineMessage;
 
 @Mapper
-public interface HistoryMessageMapper extends BaseMapper<OfflineMessage> {
+public interface OfflineMessageMapper extends BaseMapper<OfflineMessage> {
 }

@@ -101,9 +101,9 @@ public class ConsoleView implements Observer,Runnable {
             }
             Packet packet;
             if(isGroupChat){
-                packet = new GroupChatMessage(msg,Long.parseLong(clientContext.user()),receiver);
+                packet = new GroupChatMessage(msg,clientContext.id(),receiver);
             }else {
-                packet = new PrivateChatMessage(msg,Long.parseLong(clientContext.user()),receiver);
+                packet = new PrivateChatMessage(msg,clientContext.id(),receiver);
             }
             controller.send(packet);
         }
