@@ -9,8 +9,6 @@ import io.netty.channel.Channel;
  */
 public abstract class AbstractClientChannelContext implements ClientContext{
 
-    private Long id;
-
     private Channel channel;
 
     public AbstractClientChannelContext(Channel channel){
@@ -18,22 +16,7 @@ public abstract class AbstractClientChannelContext implements ClientContext{
     }
 
     @Override
-    public Long id() {
-        return this.id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    @Override
     public Channel channel() {
         return this.channel;
-    }
-
-
-    @Override
-    public void setChannel(Channel channel) {
-        this.channel = channel;
     }
 }

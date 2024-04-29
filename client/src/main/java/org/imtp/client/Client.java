@@ -5,30 +5,35 @@ import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import lombok.extern.slf4j.Slf4j;
 import org.imtp.client.context.ClientContextHolder;
 import org.imtp.client.handler.ClientCmdHandlerHandler;
+import org.imtp.client.handler.LoginHandler;
 import org.imtp.common.codec.IMTPDecoder;
 import org.imtp.common.codec.IMTPEncoder;
+import org.imtp.common.packet.LoginRequest;
+import org.imtp.common.packet.Packet;
 
 /**
  * @Description
  * @Author ys
  * @Date 2024/4/8 14:39
  */
+@Slf4j
 public class Client {
 
-    private Long account;
+    private String account;
 
     private String password;
 
-    public Client(Long account, String password) {
+    public Client(String account, String password) {
         this.account = account;
         this.password = password;
     }
 
     public static void main(String[] args) {
         int length;
-        Long account = null;
+        String account = null;
         String password = null,p = null;
         char c;
         char[] cc;
@@ -40,7 +45,7 @@ public class Client {
                 }
                 switch ((c = cc[1])) {
                     case 'u':
-                        account = Long.parseLong(args[++i]);
+                        account = args[++i];
                         break;
                     case 'p':
                         password = args[++i];
@@ -70,16 +75,16 @@ public class Client {
                             ChannelPipeline pipeline = socketChannel.pipeline();
                             pipeline.addLast(new IMTPDecoder());
                             pipeline.addLast(new IMTPEncoder());
-                            pipeline.addLast(new ClientCmdHandlerHandler());
+                            pipeline.addLast(new LoginHandler());
                         }
                     });
             ChannelFuture connected = bootstrap.connect("127.0.0.1", 2921);
             connected.addListener((ChannelFutureListener) channelFuture -> {
                 if (channelFuture.isSuccess()) {
-                    //初始化
-                    ClientContextHolder.createClientContext(channelFuture.channel(), this.account.toString(),password);
+                    log.info("与服务器建立连接成功");
+                    channelFuture.channel().writeAndFlush(new LoginRequest(this.account,this.password));
                 } else {
-                    System.out.println("连接失败");
+                    log.warn("与服务器建立连接失败");
                 }
             });
             connected.channel().closeFuture().sync();

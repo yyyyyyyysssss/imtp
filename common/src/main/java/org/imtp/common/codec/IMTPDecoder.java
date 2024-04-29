@@ -3,9 +3,8 @@ package org.imtp.common.codec;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
-import org.imtp.common.enums.Command;
 import org.imtp.common.packet.*;
-import org.imtp.common.utils.CRC16Utils;
+import org.imtp.common.utils.CRC16Util;
 
 import java.util.List;
 
@@ -34,7 +33,7 @@ public class IMTPDecoder extends ByteToMessageDecoder {
         }
         byte[] data= new byte[header.getLength()];
         byteBuf.readBytes(data);
-        short verify = CRC16Utils.calculateCRC(data);
+        short verify = CRC16Util.calculateCRC(data);
         short receiveVerify = byteBuf.readShort();
         //校验位不相同则丢弃包
         if(verify != receiveVerify){

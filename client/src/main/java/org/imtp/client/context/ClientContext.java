@@ -12,11 +12,7 @@ public interface ClientContext {
     //客户端登录用户唯一标识
     Long id();
 
-    void setId(Long id);
-
     Channel channel();
-
-    void setChannel(Channel channel);
 
     String principal();
 

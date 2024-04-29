@@ -3,19 +3,14 @@ package org.imtp.server.handler;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.SimpleChannelInboundHandler;
-import jakarta.annotation.Resource;
 import org.imtp.common.enums.MessageState;
-import org.imtp.common.packet.DefaultMessageResponse;
+import org.imtp.common.packet.MessageStateResponse;
 import org.imtp.common.packet.PrivateChatMessage;
 import org.imtp.server.context.ChannelContextHolder;
 import org.imtp.server.entity.Message;
 import org.imtp.server.entity.OfflineMessage;
-import org.imtp.server.idwork.IdGen;
-import org.imtp.server.service.ChatService;
 import org.springframework.stereotype.Component;
 
-import java.util.Date;
 import java.util.List;
 
 
@@ -32,7 +27,7 @@ public class PrivateChatMessageHandler extends AbstractHandler<PrivateChatMessag
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, PrivateChatMessage privateChatMessage) {
         boolean tempOfflineFlag = false;
         //响应已送达报文
-        channelHandlerContext.channel().writeAndFlush(new DefaultMessageResponse(MessageState.DELIVERED, privateChatMessage.getHeader()));
+        channelHandlerContext.channel().writeAndFlush(new MessageStateResponse(MessageState.DELIVERED, privateChatMessage.getHeader()));
         //转发消息到目标用户
         Channel channel = ChannelContextHolder.createChannelContext().getChannel(privateChatMessage.getReceiver().toString());
         if (channel != null && channel.isActive()) {

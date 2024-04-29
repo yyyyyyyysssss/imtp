@@ -28,9 +28,6 @@ import java.net.SocketException;
 public class CommandHandler extends SimpleChannelInboundHandler<Packet> {
 
     @Resource
-    private LoginHandler loginHandler;
-
-    @Resource
     private PrivateChatMessageHandler privateChatMessageHandler;
 
     @Resource
@@ -43,9 +40,8 @@ public class CommandHandler extends SimpleChannelInboundHandler<Packet> {
             Command cmd = header.getCmd();
             ByteBuf byteBuf = Unpooled.wrappedBuffer(commandPacket.getBytes());
             switch (cmd) {
-                case LOGIN_REQ:
-                    packet = new LoginRequest(byteBuf, header);
-                    channelHandlerContext.pipeline().addLast(loginHandler).fireChannelRead(packet);
+                case PULL_FRIEND_REQ:
+                    packet = new PullFriendRequest(byteBuf,header);
                     break;
                 case PRIVATE_CHAT_MSG:
                     packet = new PrivateChatMessage(byteBuf, header);

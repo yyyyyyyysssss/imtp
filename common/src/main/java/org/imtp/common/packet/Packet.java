@@ -4,7 +4,7 @@ import io.netty.buffer.ByteBuf;
 import lombok.Getter;
 import lombok.Setter;
 import org.imtp.common.enums.Command;
-import org.imtp.common.utils.CRC16Utils;
+import org.imtp.common.utils.CRC16Util;
 
 /**
  * @Description
@@ -20,8 +20,8 @@ public abstract class Packet{
     //数据校验位占2个字节
     protected short verify;
 
-    public Packet(long sender, long receiver, Command command, int bodyLength){
-        this(new Header(sender,receiver,command,bodyLength));
+    public Packet(long sender, long receiver, Command command){
+        this(new Header(sender,receiver,command));
     }
 
     public Packet(Header header){
@@ -29,6 +29,8 @@ public abstract class Packet{
     }
 
     public void encodeAsByteBuf(ByteBuf byteBuf) {
+        int bodyLength = this.getBodyLength();
+        this.header.setLength(bodyLength);
         //编码消息头
         this.header.encodeAsByteBuf(byteBuf);
         //编码消息体
@@ -42,12 +44,14 @@ public abstract class Packet{
         //还原读写索引
         byteBuf.resetReaderIndex();
         //数据校验码
-        this.verify = CRC16Utils.calculateCRC(data);
+        this.verify = CRC16Util.calculateCRC(data);
         //写入数据校验位
         byteBuf.writeShort(verify);
     }
 
     public abstract void encodeBodyAsByteBuf(ByteBuf byteBuf);
+
+    public abstract int getBodyLength();
 
     public Long getSender(){
 
@@ -59,4 +63,9 @@ public abstract class Packet{
         return this.header.getReceiver();
     }
 
+
+    public Command getCommand(){
+
+        return this.header.getCmd();
+    }
 }

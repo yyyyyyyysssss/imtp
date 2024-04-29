@@ -3,17 +3,12 @@ package org.imtp.server.handler;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.SimpleChannelInboundHandler;
-import jakarta.annotation.Resource;
 import org.imtp.common.enums.MessageState;
-import org.imtp.common.packet.DefaultMessageResponse;
+import org.imtp.common.packet.MessageStateResponse;
 import org.imtp.common.packet.GroupChatMessage;
 import org.imtp.server.context.ChannelContextHolder;
 import org.imtp.server.entity.Message;
 import org.imtp.server.entity.OfflineMessage;
-import org.imtp.server.entity.User;
-import org.imtp.server.idwork.IdGen;
-import org.imtp.server.service.ChatService;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -45,7 +40,7 @@ public class GroupChatMessageHandler extends AbstractHandler<GroupChatMessage> {
         Message message = new Message(groupChatMessage);
         message.setContent(groupChatMessage.getMessage());
         //响应已送达报文
-        channelHandlerContext.channel().writeAndFlush(new DefaultMessageResponse(MessageState.DELIVERED,groupChatMessage.getHeader()));
+        channelHandlerContext.channel().writeAndFlush(new MessageStateResponse(MessageState.DELIVERED,groupChatMessage.getHeader()));
         //查询群组关联的用户并推送
         final List<OfflineMessage> offlineMessages = new ArrayList<>();
         List<Long> receiverUserIds = chatService.findUserIdByGroupId(groupChatMessage.getReceiver());

@@ -18,7 +18,7 @@ public class LoginRequest extends Packet{
     private String password;
 
     public LoginRequest(String username,String password) {
-        super(0, 0, Command.LOGIN_REQ, username.length() + password.length() + 8);
+        super(0, 0, Command.LOGIN_REQ);
         this.username = username;
         this.password = password;
     }
@@ -45,5 +45,10 @@ public class LoginRequest extends Packet{
         int pLen = this.password.length();
         byteBuf.writeInt(pLen);
         byteBuf.writeBytes(this.password.getBytes(StandardCharsets.UTF_8));
+    }
+
+    @Override
+    public int getBodyLength() {
+        return username.getBytes(StandardCharsets.UTF_8).length + password.getBytes(StandardCharsets.UTF_8).length + 8;
     }
 }

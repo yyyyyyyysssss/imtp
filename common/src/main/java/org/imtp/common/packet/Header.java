@@ -27,8 +27,8 @@ public class Header{
     //消息长度 占4个字节
     private int length;
 
-    public Header(long sender, long receiver, Command cmd, int length){
-        this(ProtocolVersion.VER1,sender,receiver,cmd,length);
+    public Header(long sender, long receiver, Command cmd){
+        this(ProtocolVersion.VER1,sender,receiver,cmd,0);
     }
 
     public Header(ByteBuf byteBuf){
@@ -83,4 +83,7 @@ public class Header{
         return 24;
     }
 
+    public void setLength(int length) {
+        this.length = length;
+    }
 }

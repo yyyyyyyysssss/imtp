@@ -11,11 +11,10 @@ import java.nio.charset.StandardCharsets;
  * @Author ys
  * @Date 2024/4/7 10:35
  */
-@Getter
 public class TextMessage extends Packet{
 
     //最大字符长度
-    protected final int MAX_CHAR_LENGTH = 1000;
+    protected final int MAX_CHAR_LENGTH =2048;
 
     protected String message;
 
@@ -27,7 +26,7 @@ public class TextMessage extends Packet{
     }
 
     public TextMessage(String message,long sender, long receiver, Command command) {
-        super(sender, receiver, command, message.getBytes(StandardCharsets.UTF_8).length);
+        super(sender, receiver, command);
         if(StringUtil.isNullOrEmpty(message) || StringUtil.length(message) > MAX_CHAR_LENGTH){
             throw new RuntimeException("messages cannot be empty or exceed the maximum length limit");
         }
@@ -39,6 +38,12 @@ public class TextMessage extends Packet{
         byteBuf.writeBytes(this.message.getBytes(StandardCharsets.UTF_8));
     }
 
+    @Override
+    public int getBodyLength() {
+        return this.message.getBytes(StandardCharsets.UTF_8).length;
+    }
 
-
+    public String getMessage() {
+        return message;
+    }
 }

@@ -26,4 +26,9 @@ public class CommandPacket extends Packet{
     public void encodeBodyAsByteBuf(ByteBuf byteBuf) {
         byteBuf.writeBytes(bytes);
     }
+
+    @Override
+    public int getBodyLength() {
+        return bytes.length;
+    }
 }

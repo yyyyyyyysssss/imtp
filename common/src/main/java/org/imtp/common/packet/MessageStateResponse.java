@@ -12,24 +12,29 @@ import org.imtp.common.enums.MessageState;
  * @Date 2024/4/8 15:05
  */
 @Getter
-public class DefaultMessageResponse extends Packet{
+public class MessageStateResponse extends Packet{
 
     private MessageState state;
 
-    public DefaultMessageResponse(ByteBuf byteBuf,Header header){
+    public MessageStateResponse(ByteBuf byteBuf, Header header){
         super(header);
         byte res = byteBuf.readByte();
         this.state = MessageState.find(res);
     }
 
-    public DefaultMessageResponse(MessageState state,Header header){
+    public MessageStateResponse(MessageState state, Header header){
         //服务器收到消息回复一个已送达响应给到客户端
-        super(0, header.getReceiver(), Command.MSG_RES, 1);
+        super(0, header.getReceiver(), Command.MSG_RES);
         this.state = state;
     }
 
     @Override
     public void encodeBodyAsByteBuf(ByteBuf byteBuf) {
         byteBuf.writeByte((byte)state.ordinal());
+    }
+
+    @Override
+    public int getBodyLength() {
+        return 1;
     }
 }
