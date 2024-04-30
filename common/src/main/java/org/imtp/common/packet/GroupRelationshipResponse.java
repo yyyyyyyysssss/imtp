@@ -37,7 +37,7 @@ public class GroupRelationshipResponse extends SystemTextMessage{
     }
 
     @Override
-    void encodeBodyAsByteBuf0(ByteBuf byteBuf) {
+    public void encodeBodyAsByteBuf0(ByteBuf byteBuf) {
 
     }
 

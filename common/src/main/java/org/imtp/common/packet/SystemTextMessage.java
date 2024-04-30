@@ -38,7 +38,7 @@ public abstract class SystemTextMessage extends Packet {
         encodeBodyAsByteBuf0(byteBuf);
     }
 
-    protected abstract void encodeBodyAsByteBuf0(ByteBuf byteBuf);
+    public abstract void encodeBodyAsByteBuf0(ByteBuf byteBuf);
 
     @Override
     public int getBodyLength() {
