@@ -2,7 +2,7 @@ package org.imtp.client.handler;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
-import org.imtp.common.packet.Packet;
+import org.imtp.common.packet.base.Packet;
 
 /**
  * @Description

@@ -10,9 +10,10 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.imtp.common.enums.Command;
 import org.imtp.common.packet.*;
+import org.imtp.common.packet.base.Header;
+import org.imtp.common.packet.base.Packet;
 import org.imtp.server.constant.ProjectConstant;
 import org.imtp.server.context.ChannelContextHolder;
-import org.imtp.server.service.ChatService;
 import org.springframework.stereotype.Component;
 
 import java.net.SocketException;
@@ -33,6 +34,15 @@ public class CommandHandler extends SimpleChannelInboundHandler<Packet> {
     @Resource
     private GroupChatMessageHandler groupChatMessageHandler;
 
+    @Resource
+    private UserFriendshipHandler userFriendshipHandler;
+
+    @Resource
+    private UserGroupRelationshipHandler userGroupRelationshipHandler;
+
+    @Resource
+    private OfflineMessageHandler offlineMessageHandler;
+
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, Packet packet) {
         if(packet instanceof CommandPacket commandPacket){
@@ -40,8 +50,17 @@ public class CommandHandler extends SimpleChannelInboundHandler<Packet> {
             Command cmd = header.getCmd();
             ByteBuf byteBuf = Unpooled.wrappedBuffer(commandPacket.getBytes());
             switch (cmd) {
-                case PULL_FRIEND_REQ:
-                    packet = new PullFriendRequest(byteBuf,header);
+                case FRIENDSHIP_REQ:
+                    packet = new FriendshipRequest(byteBuf,header);
+                    channelHandlerContext.pipeline().addLast(userFriendshipHandler).fireChannelRead(packet);
+                    break;
+                case GROUP_RELATIONSHIP_REQ:
+                    packet = new GroupRelationshipRequest(byteBuf,header);
+                    channelHandlerContext.pipeline().addLast(userGroupRelationshipHandler).fireChannelRead(packet);
+                    break;
+                case OFFLINE_MSG_REQ:
+                    packet = new OfflineMessageRequest(byteBuf,header);
+                    channelHandlerContext.pipeline().addLast(offlineMessageHandler).fireChannelRead(packet);
                     break;
                 case PRIVATE_CHAT_MSG:
                     packet = new PrivateChatMessage(byteBuf, header);

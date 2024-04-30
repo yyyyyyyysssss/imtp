@@ -1,4 +1,4 @@
-package org.imtp.common.packet;
+package org.imtp.common.packet.base;
 
 import io.netty.buffer.ByteBuf;
 import lombok.Getter;

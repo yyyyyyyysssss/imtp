@@ -4,6 +4,7 @@ import io.netty.buffer.ByteBuf;
 import lombok.Getter;
 import lombok.Setter;
 import org.imtp.common.enums.Command;
+import org.imtp.common.packet.base.Header;
 
 /**
  * @Description

@@ -3,6 +3,8 @@ package org.imtp.common.packet;
 import io.netty.buffer.ByteBuf;
 import lombok.Getter;
 import lombok.Setter;
+import org.imtp.common.packet.base.Header;
+import org.imtp.common.packet.base.Packet;
 
 /**
  * @Description
@@ -11,12 +13,12 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class CommandPacket extends Packet{
+public class CommandPacket extends Packet {
 
     private byte[] bytes;
 
 
-    public CommandPacket(Header header,byte[] bytes,short verify) {
+    public CommandPacket(Header header, byte[] bytes, short verify) {
         super(header);
         this.bytes = bytes;
         this.verify = verify;

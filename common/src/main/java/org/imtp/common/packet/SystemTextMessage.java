@@ -2,6 +2,8 @@ package org.imtp.common.packet;
 
 import io.netty.buffer.ByteBuf;
 import org.imtp.common.enums.Command;
+import org.imtp.common.packet.base.Header;
+import org.imtp.common.packet.base.Packet;
 
 import java.nio.charset.StandardCharsets;
 
@@ -10,7 +12,7 @@ import java.nio.charset.StandardCharsets;
  * @Author ys
  * @Date 2024/4/29 16:23
  */
-public abstract class SystemTextMessage extends Packet{
+public abstract class SystemTextMessage extends Packet {
 
     protected String text;
 
@@ -18,7 +20,7 @@ public abstract class SystemTextMessage extends Packet{
         super(sender, receiver, command);
     }
 
-    public SystemTextMessage(ByteBuf byteBuf,Header header) {
+    public SystemTextMessage(ByteBuf byteBuf, Header header) {
         super(header);
         if(header.getLength() == 0){
             return;
@@ -36,7 +38,7 @@ public abstract class SystemTextMessage extends Packet{
         encodeBodyAsByteBuf0(byteBuf);
     }
 
-    abstract void encodeBodyAsByteBuf0(ByteBuf byteBuf);
+    protected abstract void encodeBodyAsByteBuf0(ByteBuf byteBuf);
 
     @Override
     public int getBodyLength() {

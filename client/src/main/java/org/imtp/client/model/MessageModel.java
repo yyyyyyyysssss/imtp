@@ -1,7 +1,7 @@
 package org.imtp.client.model;
 
 
-import org.imtp.common.packet.Packet;
+import org.imtp.common.packet.base.Packet;
 
 public interface MessageModel {
 

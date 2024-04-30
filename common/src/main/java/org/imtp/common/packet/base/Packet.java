@@ -1,4 +1,4 @@
-package org.imtp.common.packet;
+package org.imtp.common.packet.base;
 
 import io.netty.buffer.ByteBuf;
 import lombok.Getter;
@@ -11,8 +11,6 @@ import org.imtp.common.utils.CRC16Util;
  * @Author ys
  * @Date 2023/4/2 13:49
  */
-@Getter
-@Setter
 public abstract class Packet{
 
     protected Header header;
@@ -52,6 +50,11 @@ public abstract class Packet{
     public abstract void encodeBodyAsByteBuf(ByteBuf byteBuf);
 
     public abstract int getBodyLength();
+
+    public Header getHeader(){
+
+        return this.header;
+    }
 
     public Long getSender(){
 

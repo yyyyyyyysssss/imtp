@@ -1,14 +1,16 @@
 package org.imtp.client.view;
 
-import org.imtp.client.context.ClientContext;
-import org.imtp.client.context.ClientContextHolder;
 import org.imtp.client.controller.Controller;
-import org.imtp.client.model.Observer;
+import org.imtp.client.enums.MessageType;
 import org.imtp.client.model.MessageModel;
-import org.imtp.common.packet.GroupChatMessage;
-import org.imtp.common.packet.Packet;
-import org.imtp.common.packet.PrivateChatMessage;
+import org.imtp.client.model.Observer;
+import org.imtp.common.packet.*;
+import org.imtp.common.packet.base.Packet;
+import org.imtp.common.packet.body.OfflineMessageInfo;
+import org.imtp.common.packet.body.UserFriendInfo;
+import org.imtp.common.packet.body.UserGroupInfo;
 
+import java.util.List;
 import java.util.Scanner;
 
 /**
@@ -34,6 +36,21 @@ public class ConsoleView implements Observer,Runnable {
     public void update() {
         Packet packet = messageModel.getMessage();
         switch (packet.getHeader().getCmd()){
+            case FRIENDSHIP_RES:
+                FriendshipResponse friendshipResponse = (FriendshipResponse)packet;
+                List<UserFriendInfo> userFriendInfos = friendshipResponse.getUserFriendInfos();
+                System.out.println(userFriendInfos);
+                break;
+            case GROUP_RELATIONSHIP_RES:
+                GroupRelationshipResponse groupRelationshipResponse = (GroupRelationshipResponse) packet;
+                List<UserGroupInfo> userGroupInfos = groupRelationshipResponse.getUserGroupInfos();
+                System.out.println(userGroupInfos);
+                break;
+            case OFFLINE_MSG_RES:
+                OfflineMessageResponse offlineMessageResponse = (OfflineMessageResponse) packet;
+                List<OfflineMessageInfo> offlineMessageInfos = offlineMessageResponse.getOfflineMessageInfos();
+                System.out.println(offlineMessageInfos);
+                break;
             case PRIVATE_CHAT_MSG :
                 PrivateChatMessage privateChatMessage = (PrivateChatMessage)packet;
                 System.out.println("用户["+ privateChatMessage.getSender() + "]:" + privateChatMessage.getMessage());
@@ -52,7 +69,6 @@ public class ConsoleView implements Observer,Runnable {
     }
 
     public void sendMessage() {
-        ClientContext clientContext = ClientContextHolder.clientContext();
         Scanner scanner = new Scanner(System.in);
         Long receiver = null;
         boolean isGroupChat;
@@ -97,15 +113,15 @@ public class ConsoleView implements Observer,Runnable {
                 continue;
             }
             if(receiver == null){
-                throw new RuntimeException("接收人不可为空");
+                System.out.println("接收人不可为空");
+                continue;
             }
-            Packet packet;
             if(isGroupChat){
-                packet = new GroupChatMessage(msg,clientContext.id(),receiver);
+                controller.send(msg,receiver, MessageType.GROUP);
             }else {
-                packet = new PrivateChatMessage(msg,clientContext.id(),receiver);
+                controller.send(msg,receiver, MessageType.PRIVATE);
             }
-            controller.send(packet);
+
         }
     }
 }

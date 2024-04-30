@@ -5,17 +5,19 @@ import lombok.Getter;
 @Getter
 public enum Command {
 
+    MSG_RES((byte) -1, "通用消息响应"),
 
     LOGIN_REQ((byte) 126,"登录请求"),
     LOGIN_RES((byte) -126,"登录响应"),
 
-    PULL_FRIEND_REQ((byte)125,"好友信息拉取"),
-    PULL_FRIEND_RES((byte)-125,"好友信息响应"),
+    FRIENDSHIP_REQ((byte)125,"用户好友关系信息拉取"),
+    FRIENDSHIP_RES((byte)-125,"用户好友关系信息响应"),
 
-    OFFLINE_MSG_REQ((byte)124,"离线消息拉取"),
-    OFFLINE_MSG_RES((byte)-124,"离线消息响应"),
+    GROUP_RELATIONSHIP_REQ((byte)124,"用户群组信息拉取"),
+    GROUP_RELATIONSHIP_RES((byte)-124,"用户群组信息响应"),
 
-    MSG_RES((byte) -1, "通用消息响应"),
+    OFFLINE_MSG_REQ((byte)123,"离线消息拉取"),
+    OFFLINE_MSG_RES((byte)-123,"离线消息响应"),
 
     PRIVATE_CHAT_MSG((byte) 1, "私聊"),
     GROUP_CHAT_MSG((byte) 2, "群聊"),

@@ -4,6 +4,8 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import org.imtp.common.packet.*;
+import org.imtp.common.packet.base.Header;
+import org.imtp.common.packet.base.Packet;
 import org.imtp.common.utils.CRC16Util;
 
 import java.util.List;

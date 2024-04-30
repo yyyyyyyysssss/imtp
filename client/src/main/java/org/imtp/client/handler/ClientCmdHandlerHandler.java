@@ -7,9 +7,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.imtp.client.context.ClientContextHolder;
 import org.imtp.client.controller.MessageController;
 import org.imtp.common.enums.Command;
-import org.imtp.common.enums.LoginState;
 import org.imtp.common.packet.*;
-import org.imtp.common.packet.body.UserInfo;
+import org.imtp.common.packet.base.Header;
+import org.imtp.common.packet.base.Packet;
 
 /**
  * @Description
@@ -21,6 +21,12 @@ public class ClientCmdHandlerHandler extends AbstractMessageModelHandler<Packet>
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) {
+        //发送拉取好友关系请求
+        ctx.channel().writeAndFlush(new FriendshipRequest(ClientContextHolder.clientContext().id()));
+        //拉取群组信息
+        ctx.channel().writeAndFlush(new GroupRelationshipRequest(ClientContextHolder.clientContext().id()));
+        //离线消息拉取
+        ctx.channel().writeAndFlush(new OfflineMessageRequest(ClientContextHolder.clientContext().id()));
         new MessageController(this);
     }
 
@@ -31,6 +37,15 @@ public class ClientCmdHandlerHandler extends AbstractMessageModelHandler<Packet>
         Command cmd = header.getCmd();
         ByteBuf byteBuf = Unpooled.wrappedBuffer(commandPacket.getBytes());
         switch (cmd){
+            case FRIENDSHIP_RES:
+                setMessage(new FriendshipResponse(byteBuf,header));
+                break;
+            case GROUP_RELATIONSHIP_RES:
+                setMessage(new GroupRelationshipResponse(byteBuf,header));
+                break;
+            case OFFLINE_MSG_RES:
+                setMessage(new OfflineMessageResponse(byteBuf,header));
+                break;
             case PRIVATE_CHAT_MSG :
                 setMessage(new PrivateChatMessage(byteBuf,header));
                 break;

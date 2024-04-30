@@ -4,6 +4,8 @@ import io.netty.buffer.ByteBuf;
 import lombok.Getter;
 import org.imtp.common.enums.Command;
 import org.imtp.common.enums.MessageState;
+import org.imtp.common.packet.base.Header;
+import org.imtp.common.packet.base.Packet;
 
 
 /**
@@ -12,7 +14,7 @@ import org.imtp.common.enums.MessageState;
  * @Date 2024/4/8 15:05
  */
 @Getter
-public class MessageStateResponse extends Packet{
+public class MessageStateResponse extends Packet {
 
     private MessageState state;
 

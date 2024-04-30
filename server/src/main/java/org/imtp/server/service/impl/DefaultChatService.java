@@ -52,20 +52,22 @@ public class DefaultChatService implements ChatService {
 
     @Override
     public List<User> findFriendByUserId(Long userId) {
-        Wrapper<UserFriend> userFriendQueryWrapper = new QueryWrapper<UserFriend>().eq("userId", userId);
+        Wrapper<UserFriend> userFriendQueryWrapper = new QueryWrapper<UserFriend>().eq("user_id", userId);
         List<UserFriend> userFriends = userFriendMapper.selectList(userFriendQueryWrapper);
         if (userFriends.isEmpty()){
             return List.of();
         }
         List<Long> friendIds = userFriends.stream().map(UserFriend::getFriendId).toList();
-        Wrapper<User> userQueryWrapper = new QueryWrapper<User>().in("id", friendIds);
+        Wrapper<User> userQueryWrapper = new QueryWrapper<User>()
+                .select("id","nickname","gender","avatar")
+                .in("id", friendIds);
         return userMapper.selectList(userQueryWrapper);
     }
 
     @Override
     public List<Long> findUserIdByGroupId(Long groupId) {
         Wrapper<GroupUser> groupQueryWrapper = new QueryWrapper<GroupUser>()
-                .select("userId").eq("groupId", groupId);
+                .select("user_id").eq("group_id", groupId);
         List<GroupUser> groupUsers = groupUserMapper.selectList(groupQueryWrapper);
         if(groupUsers.isEmpty()){
             return List.of();
@@ -79,13 +81,13 @@ public class DefaultChatService implements ChatService {
 
     @Override
     public List<Group> findGroupByUserId(Long userId) {
-        Wrapper<GroupUser> groupUserQueryWrapper = new QueryWrapper<GroupUser>().eq("userId", userId);
+        Wrapper<GroupUser> groupUserQueryWrapper = new QueryWrapper<GroupUser>().eq("user_id", userId);
         List<GroupUser> groupUsers = groupUserMapper.selectList(groupUserQueryWrapper);
         if(groupUsers.isEmpty()){
             return List.of();
         }
         List<Long> groupIds = groupUsers.stream().map(GroupUser::getGroupId).toList();
-        Wrapper<Group> groupQueryWrapper = new QueryWrapper<Group>().eq("id", groupIds);
+        Wrapper<Group> groupQueryWrapper = new QueryWrapper<Group>().in("id", groupIds);
         return groupMapper.selectList(groupQueryWrapper);
     }
 
@@ -101,13 +103,13 @@ public class DefaultChatService implements ChatService {
 
     @Override
     public List<Message> findOfflineMessageByUserId(Long userId) {
-        Wrapper<OfflineMessage> offlineMessageQueryWrapper = new QueryWrapper<OfflineMessage>().eq("userId", userId);
+        Wrapper<OfflineMessage> offlineMessageQueryWrapper = new QueryWrapper<OfflineMessage>().eq("user_id", userId);
         List<OfflineMessage> offlineMessages = offlineMessageMapper.selectList(offlineMessageQueryWrapper);
         if(offlineMessages.isEmpty()){
             return List.of();
         }
         List<Long> msgIds = offlineMessages.stream().map(OfflineMessage::getMsgId).toList();
-        Wrapper<Message> messageQueryWrapper = new QueryWrapper<Message>().eq("id", msgIds);
+        Wrapper<Message> messageQueryWrapper = new QueryWrapper<Message>().in("id", msgIds);
         return messageMapper.selectList(messageQueryWrapper);
     }
 

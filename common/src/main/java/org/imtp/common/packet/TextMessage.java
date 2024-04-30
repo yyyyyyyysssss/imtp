@@ -2,8 +2,10 @@ package org.imtp.common.packet;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.util.internal.StringUtil;
-import lombok.Getter;
 import org.imtp.common.enums.Command;
+import org.imtp.common.packet.base.Header;
+import org.imtp.common.packet.base.Packet;
+
 import java.nio.charset.StandardCharsets;
 
 /**
@@ -11,14 +13,14 @@ import java.nio.charset.StandardCharsets;
  * @Author ys
  * @Date 2024/4/7 10:35
  */
-public class TextMessage extends Packet{
+public class TextMessage extends Packet {
 
     //最大字符长度
     protected final int MAX_CHAR_LENGTH =2048;
 
     protected String message;
 
-    public TextMessage(ByteBuf byteBuf,Header header){
+    public TextMessage(ByteBuf byteBuf, Header header){
         super(header);
         byte[] bytes = new byte[header.getLength()];
         byteBuf.readBytes(bytes);

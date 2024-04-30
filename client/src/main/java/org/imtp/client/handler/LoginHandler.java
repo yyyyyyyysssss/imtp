@@ -8,6 +8,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.imtp.client.context.ClientContextHolder;
 import org.imtp.common.enums.LoginState;
 import org.imtp.common.packet.*;
+import org.imtp.common.packet.base.Header;
+import org.imtp.common.packet.base.Packet;
 import org.imtp.common.packet.body.UserInfo;
 
 /**
@@ -30,10 +32,6 @@ public class LoginHandler extends SimpleChannelInboundHandler<Packet> {
                 if(loginResponse.getLoginState().equals(LoginState.SUCCESS)){
                     log.info("登录成功");
                     UserInfo userInfo = loginResponse.getUserInfo();
-
-                    //TODO 拉取好友关系 拉取离线消息
-                    channelHandlerContext.channel().writeAndFlush(new PullFriendRequest(userInfo.getId()));
-
                     //初始化上下文对象
                     ClientContextHolder.createClientContext(channelHandlerContext.channel(), userInfo);
                     //添加业务命令处理器并移除自身

@@ -3,6 +3,8 @@ package org.imtp.common.packet;
 import io.netty.buffer.ByteBuf;
 import lombok.Getter;
 import org.imtp.common.enums.Command;
+import org.imtp.common.packet.base.Header;
+import org.imtp.common.packet.base.Packet;
 
 import java.nio.charset.StandardCharsets;
 
@@ -12,7 +14,7 @@ import java.nio.charset.StandardCharsets;
  * @Date 2024/4/9 15:57
  */
 @Getter
-public class LoginRequest extends Packet{
+public class LoginRequest extends Packet {
 
     private String username;
     private String password;
@@ -23,7 +25,7 @@ public class LoginRequest extends Packet{
         this.password = password;
     }
 
-    public LoginRequest(ByteBuf byteBuf,Header header) {
+    public LoginRequest(ByteBuf byteBuf, Header header) {
         super(header);
         //解码username
         int uLen = byteBuf.readInt();

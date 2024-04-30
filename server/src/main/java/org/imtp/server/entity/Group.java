@@ -21,11 +21,11 @@ public class Group {
     @TableField("name")
     private String name;
 
-    @TableField("createUserId")
-    private Long create_user_id;
+    @TableField("create_user_id")
+    private Long createUserId;
 
-    @TableField("createTime")
-    private Date create_time;
+    @TableField("create_time")
+    private Date createTime;
 
     @TableField("state")
     private Boolean state;

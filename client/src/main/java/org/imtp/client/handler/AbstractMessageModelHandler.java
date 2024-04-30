@@ -4,7 +4,7 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import org.imtp.client.context.ClientContextHolder;
 import org.imtp.client.model.Observer;
 import org.imtp.client.model.MessageModel;
-import org.imtp.common.packet.Packet;
+import org.imtp.common.packet.base.Packet;
 
 import java.util.ArrayList;
 import java.util.List;

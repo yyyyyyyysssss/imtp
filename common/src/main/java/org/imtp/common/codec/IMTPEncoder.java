@@ -3,7 +3,7 @@ package org.imtp.common.codec;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
-import org.imtp.common.packet.Packet;
+import org.imtp.common.packet.base.Packet;
 
 
 /**

@@ -4,6 +4,8 @@ import io.netty.buffer.ByteBuf;
 import lombok.Getter;
 import org.imtp.common.enums.Command;
 import org.imtp.common.enums.LoginState;
+import org.imtp.common.packet.base.Header;
+import org.imtp.common.packet.base.Packet;
 import org.imtp.common.packet.body.UserInfo;
 import org.imtp.common.utils.JsonUtil;
 
@@ -15,7 +17,7 @@ import java.nio.charset.StandardCharsets;
  * @Date 2024/4/9 16:23
  */
 @Getter
-public class LoginResponse extends Packet{
+public class LoginResponse extends Packet {
 
     private LoginState loginState;
 
@@ -31,7 +33,7 @@ public class LoginResponse extends Packet{
         this.userInfo = userInfo;
     }
 
-    public LoginResponse(ByteBuf byteBuf,Header header) {
+    public LoginResponse(ByteBuf byteBuf, Header header) {
         super(header);
         byte b = byteBuf.readByte();
         this.loginState = LoginState.find(b);

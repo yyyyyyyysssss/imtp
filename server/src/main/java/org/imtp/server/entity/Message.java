@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
-import org.imtp.common.packet.Packet;
+import org.imtp.common.packet.base.Packet;
 import org.imtp.server.idwork.IdGen;
 
 import java.util.Date;
