@@ -25,16 +25,6 @@ import java.util.Map;
 @ChannelHandler.Sharable
 public class GroupChatMessageHandler extends AbstractHandler<GroupChatMessage> {
 
-    //用于测试群组聊天
-    private static final Map<Long, List<Long>> testGroupChatMap = new HashMap<>();
-    static {
-        List<Long> list = new ArrayList<>();
-        list.add(147L);
-        list.add(258L);
-        list.add(369L);
-        testGroupChatMap.put(9527L,list);
-    }
-
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, GroupChatMessage groupChatMessage) {
         Message message = new Message(groupChatMessage);
