@@ -13,7 +13,7 @@ import org.imtp.common.packet.base.Header;
  */
 @Getter
 @Setter
-public class GroupChatMessage extends TextMessage{
+public class GroupChatMessage extends ChatTextMessage {
 
 
     public GroupChatMessage(ByteBuf byteBuf, Header header) {
@@ -21,6 +21,11 @@ public class GroupChatMessage extends TextMessage{
     }
 
     public GroupChatMessage(String message, long sender, long receiver) {
-        super(message, sender, receiver, Command.GROUP_CHAT_MSG);
+        super(message, sender, receiver, Command.GROUP_CHAT_MSG,true);
+    }
+
+    @Override
+    public void encodeBodyAsByteBuf0(ByteBuf byteBuf) {
+
     }
 }

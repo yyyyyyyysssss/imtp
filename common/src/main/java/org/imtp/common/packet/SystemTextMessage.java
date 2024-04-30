@@ -8,7 +8,7 @@ import org.imtp.common.packet.base.Packet;
 import java.nio.charset.StandardCharsets;
 
 /**
- * @Description
+ * @Description 系统消息抽象类
  * @Author ys
  * @Date 2024/4/29 16:23
  */

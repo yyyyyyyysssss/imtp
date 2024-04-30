@@ -18,8 +18,12 @@ public abstract class Packet{
     //数据校验位占2个字节
     protected short verify;
 
+    public Packet(long sender, long receiver, Command command,boolean groupFlag){
+        this(new Header(sender,receiver,command,groupFlag));
+    }
+
     public Packet(long sender, long receiver, Command command){
-        this(new Header(sender,receiver,command));
+        this(new Header(sender,receiver,command,false));
     }
 
     public Packet(Header header){
@@ -50,6 +54,12 @@ public abstract class Packet{
     public abstract void encodeBodyAsByteBuf(ByteBuf byteBuf);
 
     public abstract int getBodyLength();
+
+
+    public boolean isGroup(){
+
+        return this.header.isGroupFlag();
+    }
 
     public Header getHeader(){
 

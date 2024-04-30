@@ -27,8 +27,24 @@ public class Header{
     //消息长度 占4个字节
     private int length;
 
-    public Header(long sender, long receiver, Command cmd){
-        this(ProtocolVersion.VER1,sender,receiver,cmd,0);
+    //群聊标识位 取保留位从右往左的第0位 1:群聊 0:私聊
+    private boolean groupFlag;
+
+    public Header(long sender, long receiver, Command cmd,boolean groupFlag){
+        this(ProtocolVersion.VER1,sender,receiver,cmd,0,groupFlag);
+    }
+
+    public Header(ProtocolVersion ver, long sender, long receiver, Command cmd, int length){
+        this(ver,sender,receiver,cmd,length,true);
+    }
+
+    public Header(ProtocolVersion ver, long sender, long receiver, Command cmd, int length,boolean groupFlag){
+        this.ver = ver;
+        this.sender = sender;
+        this.receiver = receiver;
+        this.cmd = cmd;
+        this.length = length;
+        this.groupFlag = groupFlag;
     }
 
     public Header(ByteBuf byteBuf){
@@ -55,14 +71,26 @@ public class Header{
         }
 
         this.length = byteBuf.readInt();
+
+        //从右往左获取第0位的比特位 该位为群聊标识位
+        int bitValue = bitPosition(this.reserved, 0);
+        this.groupFlag = bitValue == 1;
     }
 
-    public Header(ProtocolVersion ver, long sender, long receiver, Command cmd, int length){
-        this.ver = ver;
-        this.sender = sender;
-        this.receiver = receiver;
-        this.cmd = cmd;
-        this.length = length;
+    //获取指定比特位的值
+    private int bitPosition(int num,int n){
+        int mask  = 1 << n;
+        return (num & mask) >> n;
+    }
+
+    private byte setBitValue(byte b,int n,byte v){
+        byte mask = (byte) (1 << n);
+        if(v == 1){
+            b = (byte) (b | mask);
+        }else {
+            b = (byte) (b & ~mask);
+        }
+        return b;
     }
 
     public void encodeAsByteBuf(ByteBuf byteBuf) {
@@ -73,7 +101,12 @@ public class Header{
         byteBuf.writeByte(this.ver.getVer());
         byteBuf.writeLong(this.sender);
         byteBuf.writeLong(this.receiver);
-        byteBuf.writeByte(this.reserved);
+        if(groupFlag){
+            byte b = setBitValue(this.reserved, 0, (byte) 1);
+            byteBuf.writeByte(b);
+        }else {
+            byteBuf.writeByte(this.reserved);
+        }
         byteBuf.writeByte(this.cmd.getCmdCode());
         byteBuf.writeInt(this.length);
     }

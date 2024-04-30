@@ -13,7 +13,7 @@ import org.imtp.common.packet.base.Header;
  */
 @Getter
 @Setter
-public class PrivateChatMessage extends TextMessage{
+public class PrivateChatMessage extends ChatTextMessage {
     public PrivateChatMessage(ByteBuf byteBuf, Header header) {
         super(byteBuf, header);
     }
@@ -21,4 +21,10 @@ public class PrivateChatMessage extends TextMessage{
     public PrivateChatMessage(String message, long sender, long receiver) {
         super(message, sender, receiver, Command.PRIVATE_CHAT_MSG);
     }
+
+    @Override
+    public void encodeBodyAsByteBuf0(ByteBuf byteBuf) {
+
+    }
+
 }

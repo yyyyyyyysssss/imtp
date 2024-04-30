@@ -9,7 +9,6 @@ import org.imtp.common.packet.base.Packet;
 import org.imtp.common.packet.body.OfflineMessageInfo;
 import org.imtp.common.packet.body.UserFriendInfo;
 import org.imtp.common.packet.body.UserGroupInfo;
-
 import java.util.List;
 import java.util.Scanner;
 
