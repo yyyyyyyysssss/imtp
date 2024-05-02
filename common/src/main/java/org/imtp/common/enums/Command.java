@@ -19,6 +19,8 @@ public enum Command {
     OFFLINE_MSG_REQ((byte)123,"离线消息拉取"),
     OFFLINE_MSG_RES((byte)-123,"离线消息响应"),
 
+    TEXT_MESSAGE((byte) 10,"文本消息"),
+
     PRIVATE_CHAT_MSG((byte) 1, "私聊"),
     GROUP_CHAT_MSG((byte) 2, "群聊"),
 

@@ -13,21 +13,21 @@ import java.nio.charset.StandardCharsets;
  * @Author ys
  * @Date 2024/4/7 10:35
  */
-public abstract class ChatTextMessage extends Packet {
+public abstract class AbstractTextMessage extends Packet {
 
     //最大字符长度
     protected final int MAX_CHAR_LENGTH =2048;
 
     protected String text;
 
-    public ChatTextMessage(ByteBuf byteBuf, Header header){
+    public AbstractTextMessage(ByteBuf byteBuf, Header header){
         super(header);
         byte[] bytes = new byte[header.getLength()];
         byteBuf.readBytes(bytes);
         this.text = new String(bytes, StandardCharsets.UTF_8);
     }
 
-    public ChatTextMessage(String message, long sender, long receiver, Command command,boolean groupFlag) {
+    public AbstractTextMessage(String message, long sender, long receiver, Command command, boolean groupFlag) {
         super(sender, receiver, command,groupFlag);
         if(StringUtil.isNullOrEmpty(message) || StringUtil.length(message) > MAX_CHAR_LENGTH){
             throw new RuntimeException("messages cannot be empty or exceed the maximum length limit");
@@ -35,7 +35,7 @@ public abstract class ChatTextMessage extends Packet {
         this.text = message;
     }
 
-    public ChatTextMessage(String message, long sender, long receiver, Command command) {
+    public AbstractTextMessage(String message, long sender, long receiver, Command command) {
         super(sender, receiver, command);
         if(StringUtil.isNullOrEmpty(message) || StringUtil.length(message) > MAX_CHAR_LENGTH){
             throw new RuntimeException("messages cannot be empty or exceed the maximum length limit");

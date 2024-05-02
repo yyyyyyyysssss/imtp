@@ -1,12 +1,11 @@
 package org.imtp.client.controller;
 
 import org.imtp.client.context.ClientContextHolder;
-import org.imtp.client.enums.MessageType;
 import org.imtp.client.model.MessageModel;
 import org.imtp.client.view.ConsoleView;
-import org.imtp.common.packet.GroupChatMessage;
+import org.imtp.common.enums.DeliveryMethod;
+import org.imtp.common.packet.TextMessage;
 import org.imtp.common.packet.base.Packet;
-import org.imtp.common.packet.PrivateChatMessage;
 
 /**
  * @Description 控制台发送消息
@@ -26,14 +25,14 @@ public class MessageController implements Controller {
     }
 
     @Override
-    public void send(String msg, long receiver, MessageType messageType) {
+    public void send(String msg, long receiver, DeliveryMethod deliveryMethod) {
         Packet packet;
-        switch (messageType){
-            case PRIVATE :
-                packet = new PrivateChatMessage(msg, ClientContextHolder.clientContext().id(),receiver);
+        switch (deliveryMethod){
+            case SINGLE :
+                packet = new TextMessage(msg,ClientContextHolder.clientContext().id(),receiver);
                 break;
             case GROUP:
-                packet = new GroupChatMessage(msg, ClientContextHolder.clientContext().id(),receiver);
+                packet = new TextMessage(msg, ClientContextHolder.clientContext().id(),receiver,true);
                 break;
             default:
                 throw new UnsupportedOperationException("未知的操作类型");

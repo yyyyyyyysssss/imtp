@@ -1,14 +1,18 @@
 package org.imtp.client.view;
 
 import org.imtp.client.controller.Controller;
-import org.imtp.client.enums.MessageType;
 import org.imtp.client.model.MessageModel;
 import org.imtp.client.model.Observer;
-import org.imtp.common.packet.*;
+import org.imtp.common.enums.DeliveryMethod;
+import org.imtp.common.packet.FriendshipResponse;
+import org.imtp.common.packet.GroupRelationshipResponse;
+import org.imtp.common.packet.OfflineMessageResponse;
+import org.imtp.common.packet.TextMessage;
 import org.imtp.common.packet.base.Packet;
 import org.imtp.common.packet.body.OfflineMessageInfo;
 import org.imtp.common.packet.body.UserFriendInfo;
 import org.imtp.common.packet.body.UserGroupInfo;
+
 import java.util.List;
 import java.util.Scanner;
 
@@ -50,13 +54,13 @@ public class ConsoleView implements Observer,Runnable {
                 List<OfflineMessageInfo> offlineMessageInfos = offlineMessageResponse.getOfflineMessageInfos();
                 System.out.println(offlineMessageInfos);
                 break;
-            case PRIVATE_CHAT_MSG :
-                PrivateChatMessage privateChatMessage = (PrivateChatMessage)packet;
-                System.out.println("用户["+ privateChatMessage.getSender() + "]:" + privateChatMessage.getMessage());
-                break;
-            case GROUP_CHAT_MSG:
-                GroupChatMessage groupChatMessage = (GroupChatMessage)packet;
-                System.out.println("*用户["+ groupChatMessage.getSender() + "]:" + groupChatMessage.getMessage());
+            case TEXT_MESSAGE:
+                TextMessage textMessage = (TextMessage) packet;
+                if(textMessage.isGroup()){
+                    System.out.println("*用户["+ textMessage.getSender() + "]:" + textMessage.getMessage());
+                }else {
+                    System.out.println("用户["+ textMessage.getSender() + "]:" + textMessage.getMessage());
+                }
                 break;
 
         }
@@ -116,9 +120,9 @@ public class ConsoleView implements Observer,Runnable {
                 continue;
             }
             if(isGroupChat){
-                controller.send(msg,receiver, MessageType.GROUP);
+                controller.send(msg,receiver, DeliveryMethod.GROUP);
             }else {
-                controller.send(msg,receiver, MessageType.PRIVATE);
+                controller.send(msg,receiver, DeliveryMethod.SINGLE);
             }
 
         }

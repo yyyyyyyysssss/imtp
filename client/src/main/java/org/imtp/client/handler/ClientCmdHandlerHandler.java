@@ -46,11 +46,8 @@ public class ClientCmdHandlerHandler extends AbstractMessageModelHandler<Packet>
             case OFFLINE_MSG_RES:
                 setMessage(new OfflineMessageResponse(byteBuf,header));
                 break;
-            case PRIVATE_CHAT_MSG :
-                setMessage(new PrivateChatMessage(byteBuf,header));
-                break;
-            case GROUP_CHAT_MSG:
-                setMessage(new GroupChatMessage(byteBuf,header));
+            case TEXT_MESSAGE:
+                setMessage(new TextMessage(byteBuf,header));
                 break;
             case MSG_RES:
                 MessageStateResponse response = new MessageStateResponse(byteBuf,header);

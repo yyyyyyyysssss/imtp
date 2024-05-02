@@ -1,9 +1,11 @@
 package org.imtp.server.entity;
 
+import com.baomidou.mybatisplus.annotation.EnumValue;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
+import org.imtp.common.enums.DeliveryMethod;
 import org.imtp.common.packet.base.Packet;
 import org.imtp.server.idwork.IdGen;
 
@@ -29,6 +31,11 @@ public class Message {
         this.receiverUserId = packet.getReceiver();
         this.type = (int)packet.getHeader().getCmd().getCmdCode();
         this.sendTime = new Date();
+        if(packet.isGroup()){
+            this.deliveryMethod = DeliveryMethod.GROUP;
+        }else {
+            this.deliveryMethod = DeliveryMethod.SINGLE;
+        }
     }
 
     @TableId
@@ -48,5 +55,9 @@ public class Message {
 
     @TableField("send_time")
     private Date sendTime;
+
+    @TableField("delivery_method")
+    @EnumValue
+    private DeliveryMethod deliveryMethod;
 
 }

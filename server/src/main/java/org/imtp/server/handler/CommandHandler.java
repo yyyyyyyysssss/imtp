@@ -29,10 +29,7 @@ import java.net.SocketException;
 public class CommandHandler extends SimpleChannelInboundHandler<Packet> {
 
     @Resource
-    private PrivateChatMessageHandler privateChatMessageHandler;
-
-    @Resource
-    private GroupChatMessageHandler groupChatMessageHandler;
+    private TextMessageHandler textMessageHandler;
 
     @Resource
     private UserFriendshipHandler userFriendshipHandler;
@@ -62,13 +59,9 @@ public class CommandHandler extends SimpleChannelInboundHandler<Packet> {
                     packet = new OfflineMessageRequest(byteBuf,header);
                     channelHandlerContext.pipeline().addLast(offlineMessageHandler).fireChannelRead(packet);
                     break;
-                case PRIVATE_CHAT_MSG:
-                    packet = new PrivateChatMessage(byteBuf, header);
-                    channelHandlerContext.pipeline().addLast(privateChatMessageHandler).fireChannelRead(packet);
-                    break;
-                case GROUP_CHAT_MSG:
-                    packet = new GroupChatMessage(byteBuf,header);
-                    channelHandlerContext.pipeline().addLast(groupChatMessageHandler).fireChannelRead(packet);
+                case TEXT_MESSAGE:
+                    packet = new TextMessage(byteBuf,header);
+                    channelHandlerContext.pipeline().addLast(textMessageHandler).fireChannelRead(packet);
                     break;
                 default:
                     throw new UnsupportedOperationException("不支持的操作");
