@@ -41,6 +41,11 @@ public class FriendshipResponse extends SystemTextMessage{
 
     }
 
+    @Override
+    public int getBodyLength0() {
+        return 0;
+    }
+
     public List<UserFriendInfo> getUserFriendInfos() {
         return userFriendInfos;
     }

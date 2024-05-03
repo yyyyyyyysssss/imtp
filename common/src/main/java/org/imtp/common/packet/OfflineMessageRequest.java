@@ -24,4 +24,9 @@ public class OfflineMessageRequest extends SystemTextMessage{
     public void encodeBodyAsByteBuf0(ByteBuf byteBuf) {
 
     }
+
+    @Override
+    public int getBodyLength0() {
+        return 0;
+    }
 }

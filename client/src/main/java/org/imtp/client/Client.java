@@ -10,6 +10,7 @@ import org.imtp.client.handler.LoginHandler;
 import org.imtp.common.codec.IMTPDecoder;
 import org.imtp.common.codec.IMTPEncoder;
 import org.imtp.common.packet.LoginRequest;
+import org.imtp.common.packet.body.LoginInfo;
 
 /**
  * @Description
@@ -79,7 +80,8 @@ public class Client {
             connected.addListener((ChannelFutureListener) channelFuture -> {
                 if (channelFuture.isSuccess()) {
                     log.info("与服务器建立连接成功");
-                    channelFuture.channel().writeAndFlush(new LoginRequest(this.account,this.password));
+                    LoginInfo loginInfo = new LoginInfo(this.account,this.password);
+                    channelFuture.channel().writeAndFlush(new LoginRequest(loginInfo));
                 } else {
                     log.warn("与服务器建立连接失败");
                 }

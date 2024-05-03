@@ -23,4 +23,9 @@ public class GroupRelationshipRequest extends SystemTextMessage{
     public void encodeBodyAsByteBuf0(ByteBuf byteBuf) {
 
     }
+
+    @Override
+    public int getBodyLength0() {
+        return 0;
+    }
 }

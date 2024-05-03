@@ -41,6 +41,11 @@ public class OfflineMessageResponse extends SystemTextMessage{
 
     }
 
+    @Override
+    public int getBodyLength0() {
+        return 0;
+    }
+
     public List<OfflineMessageInfo> getOfflineMessageInfos() {
         return offlineMessageInfos;
     }

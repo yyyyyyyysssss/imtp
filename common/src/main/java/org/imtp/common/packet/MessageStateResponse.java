@@ -14,15 +14,9 @@ import org.imtp.common.packet.base.Packet;
  * @Date 2024/4/8 15:05
  */
 @Getter
-public class MessageStateResponse extends Packet {
+public class MessageStateResponse extends SystemTextMessage {
 
     private MessageState state;
-
-    public MessageStateResponse(ByteBuf byteBuf, Header header){
-        super(header);
-        byte res = byteBuf.readByte();
-        this.state = MessageState.find(res);
-    }
 
     public MessageStateResponse(MessageState state, Header header){
         //服务器收到消息回复一个已送达响应给到客户端
@@ -30,13 +24,19 @@ public class MessageStateResponse extends Packet {
         this.state = state;
     }
 
+    public MessageStateResponse(ByteBuf byteBuf, Header header){
+        super(byteBuf,header);
+        byte res = byteBuf.readByte();
+        this.state = MessageState.find(res);
+    }
+
     @Override
-    public void encodeBodyAsByteBuf(ByteBuf byteBuf) {
+    public void encodeBodyAsByteBuf0(ByteBuf byteBuf) {
         byteBuf.writeByte((byte)state.ordinal());
     }
 
     @Override
-    public int getBodyLength() {
+    public int getBodyLength0() {
         return 1;
     }
 }

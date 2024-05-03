@@ -1,12 +1,12 @@
 package org.imtp.common.packet;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.util.internal.StringUtil;
 import lombok.Getter;
 import org.imtp.common.enums.Command;
 import org.imtp.common.packet.base.Header;
-import org.imtp.common.packet.base.Packet;
-
-import java.nio.charset.StandardCharsets;
+import org.imtp.common.packet.body.LoginInfo;
+import org.imtp.common.utils.JsonUtil;
 
 /**
  * @Description
@@ -14,43 +14,34 @@ import java.nio.charset.StandardCharsets;
  * @Date 2024/4/9 15:57
  */
 @Getter
-public class LoginRequest extends Packet {
+public class LoginRequest extends SystemTextMessage {
 
-    private String username;
-    private String password;
+    private LoginInfo loginInfo;
 
-    public LoginRequest(String username,String password) {
+    public LoginRequest(LoginInfo loginInfo) {
         super(0, 0, Command.LOGIN_REQ);
-        this.username = username;
-        this.password = password;
+        if (loginInfo == null){
+            throw new NullPointerException("loginInfo is null");
+        }
+        this.text = JsonUtil.toJSONString(loginInfo);
+
     }
 
     public LoginRequest(ByteBuf byteBuf, Header header) {
-        super(header);
-        //解码username
-        int uLen = byteBuf.readInt();
-        byte[] bytes = new byte[uLen];
-        byteBuf.readBytes(bytes);
-        this.username = new String(bytes, StandardCharsets.UTF_8);
-        //解码password
-        int pLen = byteBuf.readInt();
-        bytes = new byte[pLen];
-        byteBuf.readBytes(bytes);
-        this.password = new String(bytes, StandardCharsets.UTF_8);
+        super(byteBuf, header);
+        if(!StringUtil.isNullOrEmpty(this.text)){
+            this.loginInfo = JsonUtil.parseObject(this.text, LoginInfo.class);
+        }
+    }
+
+
+    @Override
+    public void encodeBodyAsByteBuf0(ByteBuf byteBuf) {
+
     }
 
     @Override
-    public void encodeBodyAsByteBuf(ByteBuf byteBuf) {
-        int uLen = this.username.length();
-        byteBuf.writeInt(uLen);
-        byteBuf.writeBytes(this.username.getBytes(StandardCharsets.UTF_8));
-        int pLen = this.password.length();
-        byteBuf.writeInt(pLen);
-        byteBuf.writeBytes(this.password.getBytes(StandardCharsets.UTF_8));
-    }
-
-    @Override
-    public int getBodyLength() {
-        return username.getBytes(StandardCharsets.UTF_8).length + password.getBytes(StandardCharsets.UTF_8).length + 8;
+    public int getBodyLength0() {
+        return 0;
     }
 }

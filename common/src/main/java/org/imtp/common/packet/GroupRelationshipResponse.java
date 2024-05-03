@@ -41,6 +41,11 @@ public class GroupRelationshipResponse extends SystemTextMessage{
 
     }
 
+    @Override
+    public int getBodyLength0() {
+        return 0;
+    }
+
     public List<UserGroupInfo> getUserGroupInfos() {
         return userGroupInfos;
     }

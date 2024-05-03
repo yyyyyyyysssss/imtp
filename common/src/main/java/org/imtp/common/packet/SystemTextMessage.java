@@ -25,7 +25,8 @@ public abstract class SystemTextMessage extends Packet {
         if(header.getLength() == 0){
             return;
         }
-        byte[] bytes = new byte[header.getLength()];
+        int textLength = header.getLength() - getBodyLength0();
+        byte[] bytes = new byte[textLength];
         byteBuf.readBytes(bytes);
         this.text = new String(bytes, StandardCharsets.UTF_8);
     }
@@ -38,10 +39,12 @@ public abstract class SystemTextMessage extends Packet {
         encodeBodyAsByteBuf0(byteBuf);
     }
 
-    public abstract void encodeBodyAsByteBuf0(ByteBuf byteBuf);
-
     @Override
     public int getBodyLength() {
-        return text == null ? 0 : this.text.getBytes(StandardCharsets.UTF_8).length;
+        return text == null ? getBodyLength0() : this.text.getBytes(StandardCharsets.UTF_8).length + getBodyLength0();
     }
+
+    public abstract void encodeBodyAsByteBuf0(ByteBuf byteBuf);
+
+    public abstract int getBodyLength0();
 }
