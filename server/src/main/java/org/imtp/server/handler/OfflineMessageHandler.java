@@ -37,6 +37,7 @@ public class OfflineMessageHandler extends AbstractHandler<OfflineMessageRequest
                     .type(message.getType())
                     .content(message.getContent())
                     .sendTime(message.getSendTime().getTime())
+                    .deliveryMethod(message.getDeliveryMethod())
                     .build();
             offlineMessageInfos.add(offlineMessageInfo);
         }

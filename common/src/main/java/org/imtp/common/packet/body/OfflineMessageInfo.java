@@ -1,6 +1,7 @@
 package org.imtp.common.packet.body;
 
 import lombok.*;
+import org.imtp.common.enums.DeliveryMethod;
 
 import java.util.Date;
 
@@ -28,6 +29,8 @@ public class OfflineMessageInfo {
 
     private Long sendTime;
 
+    private DeliveryMethod deliveryMethod;
+
     @Override
     public String toString() {
         return "OfflineMessageInfo{" +
@@ -37,6 +40,7 @@ public class OfflineMessageInfo {
                 ", type=" + type +
                 ", content='" + content + '\'' +
                 ", sendTime=" + sendTime +
+                ", deliveryMethod=" + deliveryMethod +
                 '}';
     }
 }

@@ -31,26 +31,16 @@ public class TextMessageHandler extends AbstractHandler<TextMessage> {
         channelHandlerContext.channel().writeAndFlush(new MessageStateResponse(MessageState.DELIVERED,textMessage.getHeader()));
 
         final List<OfflineMessage> offlineMessages = new ArrayList<>();
-        if(textMessage.isGroup()){
-            List<Long> receiverUserIds = chatService.findUserIdByGroupId(textMessage.getReceiver());
-            for(Long receiverUserId : receiverUserIds){
-                Channel channel = ChannelContextHolder.createChannelContext().getChannel(receiverUserId.toString());
-                if(channel != null && channel.isActive()){
-                    if(!receiverUserId.equals(textMessage.getSender())){
-                        channel.writeAndFlush(textMessage);
-                    }
-                }else {
-                    //记录消息，等待用户上线后推送
-                    OfflineMessage offlineMessage = new OfflineMessage(message.getId(),receiverUserId);
-                    offlineMessages.add(offlineMessage);
+        List<Long> receivers = getReceivers(textMessage);
+        for(Long receiver : receivers){
+            Channel channel = ChannelContextHolder.createChannelContext().getChannel(receiver.toString());
+            if(channel != null && channel.isActive()){
+                if(!receiver.equals(textMessage.getSender())){
+                    channel.writeAndFlush(textMessage);
                 }
-            }
-        }else {
-            Channel channel = ChannelContextHolder.createChannelContext().getChannel(textMessage.getReceiver().toString());
-            if (channel != null && channel.isActive()) {
-                channel.writeAndFlush(textMessage);
             }else {
-                OfflineMessage offlineMessage = new OfflineMessage(message.getId(),message.getReceiverUserId());
+                //记录消息，等待用户上线后推送
+                OfflineMessage offlineMessage = new OfflineMessage(message.getId(),receiver);
                 offlineMessages.add(offlineMessage);
             }
         }
