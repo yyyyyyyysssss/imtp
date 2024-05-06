@@ -18,15 +18,22 @@ import org.imtp.common.packet.body.LoginInfo;
  * @Date 2024/4/8 14:39
  */
 @Slf4j
-public class Client {
+public class Client implements Runnable{
 
     private String account;
 
     private String password;
 
-    public Client(String account, String password) {
+    private EventLoopGroup group;
+
+    private Channel channel;
+
+    private LoginHandler loginHandler;
+
+    public Client(String account, String password,LoginHandler loginHandler) {
         this.account = account;
         this.password = password;
+        this.loginHandler = loginHandler;
     }
 
     public static void main(String[] args) {
@@ -55,13 +62,16 @@ public class Client {
             }
         }
 
-        Client client = new Client(account,password);
+        Client client = new Client(account,password,new LoginHandler());
         client.start();
     }
 
 
     public void start() {
-        final EventLoopGroup group = new NioEventLoopGroup(1);
+        if(channel != null && channel.isActive()){
+            channel.close();
+        }
+        group = new NioEventLoopGroup(1);
         Bootstrap bootstrap = new Bootstrap();
         try {
             bootstrap.group(group)
@@ -73,13 +83,14 @@ public class Client {
                             ChannelPipeline pipeline = socketChannel.pipeline();
                             pipeline.addLast(new IMTPDecoder());
                             pipeline.addLast(new IMTPEncoder());
-                            pipeline.addLast(new LoginHandler());
+                            pipeline.addLast(loginHandler);
                         }
                     });
             ChannelFuture connected = bootstrap.connect("127.0.0.1", 2921);
             connected.addListener((ChannelFutureListener) channelFuture -> {
                 if (channelFuture.isSuccess()) {
                     log.info("与服务器建立连接成功");
+                    channel = channelFuture.channel();
                     LoginInfo loginInfo = new LoginInfo(this.account,this.password);
                     channelFuture.channel().writeAndFlush(new LoginRequest(loginInfo));
                 } else {
@@ -88,10 +99,15 @@ public class Client {
             });
             connected.channel().closeFuture().sync();
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            log.error("error:",e);
         } finally {
             group.shutdownGracefully();
+            log.info("stop client");
         }
     }
 
+    @Override
+    public void run() {
+        start();
+    }
 }

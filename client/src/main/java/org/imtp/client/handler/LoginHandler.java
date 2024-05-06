@@ -2,6 +2,7 @@ package org.imtp.client.handler;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import lombok.extern.slf4j.Slf4j;
@@ -18,7 +19,8 @@ import org.imtp.common.packet.body.UserInfo;
  * @Date 2024/4/29 16:43
  */
 @Slf4j
-public class LoginHandler extends SimpleChannelInboundHandler<Packet> {
+@ChannelHandler.Sharable
+public class LoginHandler extends AbstractMessageModelHandler<Packet> {
 
 
     @Override
@@ -29,8 +31,8 @@ public class LoginHandler extends SimpleChannelInboundHandler<Packet> {
         switch (packet.getCommand()){
             case LOGIN_RES :
                 LoginResponse loginResponse = new LoginResponse(byteBuf,header);
+                setMessage(loginResponse);
                 if(loginResponse.getLoginState().equals(LoginState.SUCCESS)){
-                    log.info("登录成功");
                     UserInfo userInfo = loginResponse.getUserInfo();
                     //初始化上下文对象
                     ClientContextHolder.createClientContext(channelHandlerContext.channel(), userInfo);
@@ -38,7 +40,6 @@ public class LoginHandler extends SimpleChannelInboundHandler<Packet> {
                     channelHandlerContext.pipeline().addLast(new ClientCmdHandlerHandler()).remove(this);
                     channelHandlerContext.pipeline().fireChannelActive();
                 }else {
-                    log.info("登录失败");
                     channelHandlerContext.channel().close();
                 }
                 break;

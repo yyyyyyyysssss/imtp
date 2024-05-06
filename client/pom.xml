@@ -28,6 +28,48 @@
             <version>${common.version}</version>
         </dependency>
 
+
+        <!-- https://mvnrepository.com/artifact/org.openjfx/javafx-controls -->
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-controls</artifactId>
+            <version>21.0.3</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.openjfx/javafx-fxml -->
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-fxml</artifactId>
+            <version>21.0.3</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-graphics</artifactId>
+            <version>21.0.3</version>
+            <classifier>win</classifier>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-graphics</artifactId>
+            <version>21.0.3</version>
+            <classifier>linux</classifier>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-graphics</artifactId>
+            <version>21.0.3</version>
+            <classifier>mac</classifier>
+            <scope>provided</scope>
+        </dependency>
+
+
+
+
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -50,7 +92,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>org.imtp.client.Client</mainClass>
+                            <mainClass>org.imtp.client.MainApp</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>
@@ -77,6 +119,16 @@
                     <target>${java.version}</target> <!-- depending on your project -->
                 </configuration>
             </plugin>
+
+            <plugin>
+                <groupId>org.openjfx</groupId>
+                <artifactId>javafx-maven-plugin</artifactId>
+                <version>0.0.8</version>
+                <configuration>
+                    <mainClass>org.imtp.client.MainApp</mainClass>
+                </configuration>
+            </plugin>
+
 
         </plugins>
 
