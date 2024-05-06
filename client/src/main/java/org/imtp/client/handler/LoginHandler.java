@@ -4,7 +4,6 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.SimpleChannelInboundHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.imtp.client.context.ClientContextHolder;
 import org.imtp.common.enums.LoginState;
@@ -20,7 +19,7 @@ import org.imtp.common.packet.body.UserInfo;
  */
 @Slf4j
 @ChannelHandler.Sharable
-public class LoginHandler extends AbstractMessageModelHandler<Packet> {
+public class LoginHandler extends AbstractModelHandler<Packet> {
 
 
     @Override
@@ -47,6 +46,5 @@ public class LoginHandler extends AbstractMessageModelHandler<Packet> {
                 throw new UnsupportedOperationException("当前不支持的操作");
         }
     }
-
 
 }

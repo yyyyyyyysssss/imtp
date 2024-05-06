@@ -1,6 +1,6 @@
 package org.imtp.client.controller;
 
-import org.imtp.common.enums.DeliveryMethod;
+import org.imtp.common.packet.base.Packet;
 
 /**
  * @Description
@@ -9,6 +9,6 @@ import org.imtp.common.enums.DeliveryMethod;
  */
 public interface Controller {
 
-    void send(String msg, long receiver, DeliveryMethod deliveryMethod);
+    void send(Packet packet);
 
 }

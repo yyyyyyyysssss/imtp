@@ -61,6 +61,7 @@ public abstract class Packet{
         return this.header.isGroupFlag();
     }
 
+
     public Header getHeader(){
 
         return this.header;

@@ -1,5 +1,6 @@
 package org.imtp.client.view;
 
+import org.imtp.client.context.ClientContextHolder;
 import org.imtp.client.controller.Controller;
 import org.imtp.client.model.MessageModel;
 import org.imtp.client.model.Observer;
@@ -36,8 +37,7 @@ public class ConsoleView implements Observer,Runnable {
     }
 
     @Override
-    public void update() {
-        Packet packet = messageModel.getMessage();
+    public void update(Packet packet) {
         switch (packet.getHeader().getCmd()){
             case FRIENDSHIP_RES:
                 FriendshipResponse friendshipResponse = (FriendshipResponse)packet;
@@ -120,9 +120,9 @@ public class ConsoleView implements Observer,Runnable {
                 continue;
             }
             if(isGroupChat){
-                controller.send(msg,receiver, DeliveryMethod.GROUP);
+                controller.send(new TextMessage(msg, ClientContextHolder.clientContext().id(), receiver));
             }else {
-                controller.send(msg,receiver, DeliveryMethod.SINGLE);
+                controller.send(new TextMessage(msg, ClientContextHolder.clientContext().id(), receiver,true));
             }
 
         }

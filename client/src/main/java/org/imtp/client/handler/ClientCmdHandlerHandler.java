@@ -17,7 +17,7 @@ import org.imtp.common.packet.base.Packet;
  * @Date 2024/4/8 14:53
  */
 @Slf4j
-public class ClientCmdHandlerHandler extends AbstractMessageModelHandler<Packet> {
+public class ClientCmdHandlerHandler extends AbstractModelHandler<Packet> {
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) {

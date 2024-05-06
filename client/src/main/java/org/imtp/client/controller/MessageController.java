@@ -25,18 +25,7 @@ public class MessageController implements Controller {
     }
 
     @Override
-    public void send(String msg, long receiver, DeliveryMethod deliveryMethod) {
-        Packet packet;
-        switch (deliveryMethod){
-            case SINGLE :
-                packet = new TextMessage(msg,ClientContextHolder.clientContext().id(),receiver);
-                break;
-            case GROUP:
-                packet = new TextMessage(msg, ClientContextHolder.clientContext().id(),receiver,true);
-                break;
-            default:
-                throw new UnsupportedOperationException("未知的操作类型");
-        }
+    public void send(Packet packet) {
         messageModel.sendMessage(packet);
     }
 }

@@ -16,15 +16,13 @@ import java.util.concurrent.locks.ReentrantLock;
  * @Author ys
  * @Date 2024/4/26 11:41
  */
-public abstract class AbstractMessageModelHandler<T> extends SimpleChannelInboundHandler<T> implements MessageModel {
+public abstract class AbstractModelHandler<T> extends SimpleChannelInboundHandler<T> implements MessageModel {
 
     private final Lock lock;
 
     private List<Observer> observers;
 
-    private Packet packet;
-
-    public AbstractMessageModelHandler(){
+    public AbstractModelHandler(){
         observers = new ArrayList<>();
         lock = new ReentrantLock();
     }
@@ -33,13 +31,7 @@ public abstract class AbstractMessageModelHandler<T> extends SimpleChannelInboun
     //有消息到达，则发布消息
     @Override
     public void setMessage(Packet packet) {
-        this.packet = packet;
-        this.notifyObservers();
-    }
-
-    @Override
-    public Packet getMessage() {
-        return this.packet;
+        this.notifyObservers(packet);
     }
 
     @Override
@@ -73,13 +65,13 @@ public abstract class AbstractMessageModelHandler<T> extends SimpleChannelInboun
     }
 
     @Override
-    public void notifyObservers() {
+    public void notifyObservers(Packet packet) {
         Object[] arrLocal;
         try {
             lock.lock();
             arrLocal = observers.toArray();
             for (int i = arrLocal.length-1; i >= 0 ; i--) {
-                ((Observer)arrLocal[i]).update();
+                ((Observer)arrLocal[i]).update(packet);
             }
         }finally {
             lock.unlock();
