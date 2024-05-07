@@ -30,15 +30,18 @@ public class LoginHandler extends AbstractMessageModelHandler<Packet> {
         switch (packet.getCommand()){
             case LOGIN_RES :
                 LoginResponse loginResponse = new LoginResponse(byteBuf,header);
-                publishMessage(loginResponse);
                 if(loginResponse.getLoginState().equals(LoginState.SUCCESS)){
                     UserInfo userInfo = loginResponse.getUserInfo();
                     //初始化上下文对象
                     ClientContextHolder.createClientContext(channelHandlerContext.channel(), userInfo);
                     //添加业务命令处理器并移除自身
-                    channelHandlerContext.pipeline().addLast(new ClientCmdHandlerHandler()).remove(this);
+                    ClientCmdHandlerHandler clientCmdHandlerHandler = new ClientCmdHandlerHandler();
+                    channelHandlerContext.pipeline().addLast(clientCmdHandlerHandler).remove(this);
+                    //将业务命令处理器引用发布到控制层
+                    notifyObservers(clientCmdHandlerHandler);
                     channelHandlerContext.pipeline().fireChannelActive();
                 }else {
+                    publishMessage(loginResponse);
                     channelHandlerContext.channel().close();
                 }
                 break;

@@ -1,5 +1,6 @@
 package org.imtp.client.controller;
 
+import io.netty.channel.ChannelInboundHandler;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.PasswordField;
@@ -34,6 +35,8 @@ public class LoginController implements Observer,Controller{
 
     private MessageModel messageModel;
 
+    private ChannelInboundHandler channelInboundHandler;
+
     public void login(ActionEvent actionEvent){
         String u = username.getText();
         String p = password.getText();
@@ -57,15 +60,15 @@ public class LoginController implements Observer,Controller{
 
     @Override
     public void update(Object object) {
-        if(object instanceof LoginResponse loginResponse){
-            if(loginResponse.getLoginState().equals(LoginState.SUCCESS)){
-                errorMsg.setVisible(false);
-                log.info("登录成功");
-            }else {
-                errorMsg.setText("用户名或密码错误!");
-                errorMsg.setVisible(true);
-                log.info("登录失败");
-            }
+        if(object instanceof LoginResponse){
+            errorMsg.setText("用户名或密码错误!");
+            errorMsg.setVisible(true);
+            log.info("登录失败");
+        }else if(object instanceof ChannelInboundHandler ch){
+            errorMsg.setVisible(false);
+            log.info("登录成功");
+            this.channelInboundHandler = ch;
+            //跳转聊天页面
         }else {
             throw new UnknownError("未知错误");
         }

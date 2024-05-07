@@ -13,4 +13,6 @@ public interface Model {
 
     void notifyObservers(Object object);
 
+
+
 }
