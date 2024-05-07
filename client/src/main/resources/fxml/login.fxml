@@ -14,7 +14,7 @@
 
 <StackPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="320.0" prefWidth="480.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.imtp.client.controller.LoginController">
    <children>
-      <VBox alignment="CENTER" prefHeight="250.0" prefWidth="392.0" StackPane.alignment="CENTER">
+      <VBox alignment="CENTER" prefHeight="359.0" prefWidth="400.0" StackPane.alignment="CENTER">
          <children>
             <HBox alignment="CENTER" prefHeight="141.0" prefWidth="480.0">
                <children>

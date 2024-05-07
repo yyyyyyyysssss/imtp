@@ -27,7 +27,7 @@ public class MainApp extends Application {
     }
 
     @Override
-    public void stop() throws Exception {
+    public void stop() {
         System.exit(0);
     }
 }

@@ -37,6 +37,7 @@ CREATE TABLE `im_msg`  (
                            `type` int(0) NULL DEFAULT NULL COMMENT '消息类型',
                            `content` varchar(2048) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '消息内容',
                            `send_time` datetime(0) NULL DEFAULT NULL COMMENT '发送时间',
+                            `delivery_method` varchar(12) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '投递方式',
                            PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 

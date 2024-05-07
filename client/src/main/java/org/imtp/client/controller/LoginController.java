@@ -56,8 +56,8 @@ public class LoginController implements Observer,Controller{
     }
 
     @Override
-    public void update(Packet packet) {
-        if(packet instanceof LoginResponse loginResponse){
+    public void update(Object object) {
+        if(object instanceof LoginResponse loginResponse){
             if(loginResponse.getLoginState().equals(LoginState.SUCCESS)){
                 errorMsg.setVisible(false);
                 log.info("登录成功");

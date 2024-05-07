@@ -37,7 +37,8 @@ public class ConsoleView implements Observer,Runnable {
     }
 
     @Override
-    public void update(Packet packet) {
+    public void update(Object object) {
+        Packet packet = (Packet)object;
         switch (packet.getHeader().getCmd()){
             case FRIENDSHIP_RES:
                 FriendshipResponse friendshipResponse = (FriendshipResponse)packet;

@@ -19,7 +19,7 @@ import org.imtp.common.packet.body.UserInfo;
  */
 @Slf4j
 @ChannelHandler.Sharable
-public class LoginHandler extends AbstractModelHandler<Packet> {
+public class LoginHandler extends AbstractMessageModelHandler<Packet> {
 
 
     @Override
@@ -30,7 +30,7 @@ public class LoginHandler extends AbstractModelHandler<Packet> {
         switch (packet.getCommand()){
             case LOGIN_RES :
                 LoginResponse loginResponse = new LoginResponse(byteBuf,header);
-                setMessage(loginResponse);
+                publishMessage(loginResponse);
                 if(loginResponse.getLoginState().equals(LoginState.SUCCESS)){
                     UserInfo userInfo = loginResponse.getUserInfo();
                     //初始化上下文对象

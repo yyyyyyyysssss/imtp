@@ -6,6 +6,7 @@ import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
 import org.imtp.client.context.ClientContextHolder;
 import org.imtp.client.controller.MessageController;
+import org.imtp.client.model.Model;
 import org.imtp.common.enums.Command;
 import org.imtp.common.packet.*;
 import org.imtp.common.packet.base.Header;
@@ -17,7 +18,8 @@ import org.imtp.common.packet.base.Packet;
  * @Date 2024/4/8 14:53
  */
 @Slf4j
-public class ClientCmdHandlerHandler extends AbstractModelHandler<Packet> {
+public class ClientCmdHandlerHandler extends AbstractMessageModelHandler<Packet> {
+
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) {
@@ -38,16 +40,16 @@ public class ClientCmdHandlerHandler extends AbstractModelHandler<Packet> {
         ByteBuf byteBuf = Unpooled.wrappedBuffer(commandPacket.getBytes());
         switch (cmd){
             case FRIENDSHIP_RES:
-                setMessage(new FriendshipResponse(byteBuf,header));
+                publishMessage(new FriendshipResponse(byteBuf,header));
                 break;
             case GROUP_RELATIONSHIP_RES:
-                setMessage(new GroupRelationshipResponse(byteBuf,header));
+                publishMessage(new GroupRelationshipResponse(byteBuf,header));
                 break;
             case OFFLINE_MSG_RES:
-                setMessage(new OfflineMessageResponse(byteBuf,header));
+                publishMessage(new OfflineMessageResponse(byteBuf,header));
                 break;
             case TEXT_MESSAGE:
-                setMessage(new TextMessage(byteBuf,header));
+                publishMessage(new TextMessage(byteBuf,header));
                 break;
             case MSG_RES:
                 MessageStateResponse response = new MessageStateResponse(byteBuf,header);

@@ -1,10 +1,4 @@
-package org.imtp.client.handler;
-
-import io.netty.channel.SimpleChannelInboundHandler;
-import org.imtp.client.context.ClientContextHolder;
-import org.imtp.client.model.Observer;
-import org.imtp.client.model.MessageModel;
-import org.imtp.common.packet.base.Packet;
+package org.imtp.client.model;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,31 +6,19 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * @Description 消息发布
+ * @Description
  * @Author ys
- * @Date 2024/4/26 11:41
+ * @Date 2024/5/7 13:03
  */
-public abstract class AbstractModelHandler<T> extends SimpleChannelInboundHandler<T> implements MessageModel {
+public abstract class AbstractModel implements Model{
 
     private final Lock lock;
 
     private List<Observer> observers;
 
-    public AbstractModelHandler(){
+    public AbstractModel(){
         observers = new ArrayList<>();
         lock = new ReentrantLock();
-    }
-
-
-    //有消息到达，则发布消息
-    @Override
-    public void setMessage(Packet packet) {
-        this.notifyObservers(packet);
-    }
-
-    @Override
-    public void sendMessage(Packet packet) {
-        ClientContextHolder.clientContext().channel().writeAndFlush(packet);
     }
 
     @Override
@@ -65,13 +47,13 @@ public abstract class AbstractModelHandler<T> extends SimpleChannelInboundHandle
     }
 
     @Override
-    public void notifyObservers(Packet packet) {
+    public void notifyObservers(Object object) {
         Object[] arrLocal;
         try {
             lock.lock();
             arrLocal = observers.toArray();
             for (int i = arrLocal.length-1; i >= 0 ; i--) {
-                ((Observer)arrLocal[i]).update(packet);
+                ((Observer)arrLocal[i]).update(object);
             }
         }finally {
             lock.unlock();
