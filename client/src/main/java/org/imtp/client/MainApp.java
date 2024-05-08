@@ -21,6 +21,7 @@ public class MainApp extends Application {
     public void start(Stage stage) throws Exception {
         Parent parent = FXMLLoader.load(getClass().getResource("/fxml/login.fxml"));
         Scene scene = new Scene(parent);
+
         stage.setTitle("登录页");
         stage.setScene(scene);
         stage.show();
