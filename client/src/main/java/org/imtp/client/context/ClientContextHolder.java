@@ -18,6 +18,12 @@ public class ClientContextHolder {
     //使用lock  为后续虚拟线程做准备
     private static final Lock lock = new ReentrantLock();
 
+
+    public static ClientContext createClientContext(Channel channel){
+
+        return createClientContext(channel,null);
+    }
+
     public static ClientContext createClientContext(Channel channel, UserInfo userInfo){
         if(clientContext == null){
             try {

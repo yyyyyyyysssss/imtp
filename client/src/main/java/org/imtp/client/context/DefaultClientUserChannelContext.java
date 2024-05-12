@@ -32,4 +32,8 @@ public class DefaultClientUserChannelContext extends AbstractClientChannelContex
     public String credentials() {
         return this.userInfo.getPassword();
     }
+
+    public void setUserInfo(UserInfo userInfo) {
+        this.userInfo = userInfo;
+    }
 }

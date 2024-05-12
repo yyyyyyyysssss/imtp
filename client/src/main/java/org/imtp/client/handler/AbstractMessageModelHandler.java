@@ -78,4 +78,18 @@ public abstract class AbstractMessageModelHandler<T> extends SimpleChannelInboun
         }
     }
 
+    @Override
+    public void pullFriendship() {
+        throw new UnsupportedOperationException("pullFriendship");
+    }
+
+    @Override
+    public void pullGroupRelationship() {
+        throw new UnsupportedOperationException("pullFriendship");
+    }
+
+    @Override
+    public void pullOfflineMessage() {
+        throw new UnsupportedOperationException("pullFriendship");
+    }
 }

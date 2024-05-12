@@ -34,6 +34,9 @@ public class ConsoleView implements Observer,Runnable {
         this.messageModel = messageModel;
         this.controller = controller;
         messageModel.registerObserver(this);
+        messageModel.pullFriendship();
+        messageModel.pullGroupRelationship();
+        messageModel.pullOfflineMessage();
     }
 
     @Override

@@ -1,18 +1,17 @@
 package org.imtp.client.controller;
 
-import io.netty.channel.ChannelInboundHandler;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import lombok.extern.slf4j.Slf4j;
 import org.imtp.client.Client;
+import org.imtp.client.constant.FXMLResourceConstant;
 import org.imtp.client.handler.LoginHandler;
 import org.imtp.client.model.MessageModel;
-import org.imtp.client.model.Observer;
-import org.imtp.common.enums.LoginState;
+import org.imtp.common.packet.LoginRequest;
 import org.imtp.common.packet.LoginResponse;
-import org.imtp.common.packet.base.Packet;
+import org.imtp.common.packet.body.LoginInfo;
 
 /**
  * @Description
@@ -20,7 +19,7 @@ import org.imtp.common.packet.base.Packet;
  * @Date 2024/5/6 16:46
  */
 @Slf4j
-public class LoginController implements Observer,Controller{
+public class LoginController extends AbstractController{
 
     @FXML
     private TextField username;
@@ -33,9 +32,12 @@ public class LoginController implements Observer,Controller{
 
     private Client client;
 
-    private MessageModel messageModel;
-
-    private ChannelInboundHandler channelInboundHandler;
+    @Override
+    protected void init0() {
+        client = new Client((LoginHandler) messageModel);
+        //启动netty
+        new Thread(client).start();
+    }
 
     public void login(ActionEvent actionEvent){
         String u = username.getText();
@@ -46,36 +48,23 @@ public class LoginController implements Observer,Controller{
             errorMsg.setVisible(true);
             return;
         }
-        if(client == null){
-            messageModel = new LoginHandler();
-            client = new Client(u,p,(LoginHandler) messageModel);
-            messageModel.registerObserver(this);
-            new Thread(client).start();
-        }else {
-            client.setAccount(u);
-            client.setPassword(p);
-            new Thread(client).start();
-        }
+        LoginInfo loginInfo = new LoginInfo(u,p);
+        send(new LoginRequest(loginInfo));
     }
 
     @Override
     public void update(Object object) {
-        if(object instanceof LoginResponse){
+        LoginResponse loginResponse = (LoginResponse) object;
+        if(loginResponse.loginSuccess()){
+            errorMsg.setVisible(false);
+            log.info("登录成功");
+            MessageModel nextModel = messageModel.getNextModel();
+            //跳转聊天页面
+            switchScene(FXMLResourceConstant.CHAT_FML,"聊天页",nextModel);
+        }else{
             errorMsg.setText("用户名或密码错误!");
             errorMsg.setVisible(true);
             log.info("登录失败");
-        }else if(object instanceof ChannelInboundHandler ch){
-            errorMsg.setVisible(false);
-            log.info("登录成功");
-            this.channelInboundHandler = ch;
-            //跳转聊天页面
-        }else {
-            throw new UnknownError("未知错误");
         }
-    }
-
-    @Override
-    public void send(Packet packet) {
-        messageModel.sendMessage(packet);
     }
 }

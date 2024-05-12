@@ -30,6 +30,10 @@ public class Client implements Runnable{
 
     private LoginHandler loginHandler;
 
+    public Client(LoginHandler loginHandler) {
+        this(null,null,loginHandler);
+    }
+
     public Client(String account, String password,LoginHandler loginHandler) {
         this.account = account;
         this.password = password;
@@ -61,7 +65,6 @@ public class Client implements Runnable{
 
             }
         }
-
         Client client = new Client(account,password,new LoginHandler());
         client.start();
     }
@@ -90,9 +93,11 @@ public class Client implements Runnable{
             connected.addListener((ChannelFutureListener) channelFuture -> {
                 if (channelFuture.isSuccess()) {
                     log.info("与服务器建立连接成功");
-                    channel = channelFuture.channel();
-                    LoginInfo loginInfo = new LoginInfo(this.account,this.password);
-                    channelFuture.channel().writeAndFlush(new LoginRequest(loginInfo));
+                    if (account != null && password != null) {
+                        channel = channelFuture.channel();
+                        LoginInfo loginInfo = new LoginInfo(this.account,this.password);
+                        channelFuture.channel().writeAndFlush(new LoginRequest(loginInfo));
+                    }
                 } else {
                     log.warn("与服务器建立连接失败");
                 }

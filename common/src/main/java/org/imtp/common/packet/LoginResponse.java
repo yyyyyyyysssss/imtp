@@ -52,4 +52,9 @@ public class LoginResponse extends SystemTextMessage {
     public int getBodyLength0() {
         return 1;
     }
+
+    public boolean loginSuccess() {
+        return loginState == LoginState.SUCCESS;
+    }
+
 }

@@ -5,8 +5,8 @@ import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
 import org.imtp.client.context.ClientContextHolder;
-import org.imtp.client.controller.MessageController;
-import org.imtp.client.model.Model;
+import org.imtp.client.controller.ConsoleController;
+import org.imtp.client.model.MessageModel;
 import org.imtp.common.enums.Command;
 import org.imtp.common.packet.*;
 import org.imtp.common.packet.base.Header;
@@ -23,13 +23,7 @@ public class ClientCmdHandlerHandler extends AbstractMessageModelHandler<Packet>
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) {
-        //发送拉取好友关系请求
-        ctx.channel().writeAndFlush(new FriendshipRequest(ClientContextHolder.clientContext().id()));
-        //拉取群组信息
-        ctx.channel().writeAndFlush(new GroupRelationshipRequest(ClientContextHolder.clientContext().id()));
-        //离线消息拉取
-        ctx.channel().writeAndFlush(new OfflineMessageRequest(ClientContextHolder.clientContext().id()));
-        new MessageController(this);
+//        new ConsoleController(this);
     }
 
     @Override
@@ -57,5 +51,25 @@ public class ClientCmdHandlerHandler extends AbstractMessageModelHandler<Packet>
             default:
                 throw new UnsupportedOperationException("不支持的操作");
         }
+    }
+
+    @Override
+    public MessageModel getNextModel() {
+        return this;
+    }
+
+    @Override
+    public void pullFriendship() {
+        ClientContextHolder.clientContext().channel().writeAndFlush(new FriendshipRequest(ClientContextHolder.clientContext().id()));
+    }
+
+    @Override
+    public void pullGroupRelationship() {
+        ClientContextHolder.clientContext().channel().writeAndFlush(new GroupRelationshipRequest(ClientContextHolder.clientContext().id()));
+    }
+
+    @Override
+    public void pullOfflineMessage() {
+        ClientContextHolder.clientContext().channel().writeAndFlush(new OfflineMessageRequest(ClientContextHolder.clientContext().id()));
     }
 }
