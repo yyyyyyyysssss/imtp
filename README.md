@@ -2,94 +2,59 @@
 <table class="MsoTableGrid" border="1" cellspacing="0" cellpadding="0" width="614" style="width:460.45pt;border-collapse:collapse;border:none;mso-border-alt:
  solid windowtext .5pt;mso-yfti-tbllook:1184;mso-padding-alt:0cm 5.4pt 0cm 5.4pt">
  <tbody><tr style="mso-yfti-irow:0;mso-yfti-firstrow:yes">
-  <td width="226" colspan="8" style="width:169.85pt;border:solid windowtext 1.0pt;
+  <td width="229" colspan="2" style="width:172.1pt;border:solid windowtext 1.0pt;
   mso-border-alt:solid windowtext .5pt;padding:0cm 5.4pt 0cm 5.4pt">
   <p class="MsoNormal" align="center" style="text-align:center"><span class="GramE">魔数</span><span lang="EN-US">1 byte</span></p>
   </td>
-  <td width="145" style="width:109.0pt;border:solid windowtext 1.0pt;border-left:
+  <td width="144" style="width:108.1pt;border:solid windowtext 1.0pt;border-left:
   none;mso-border-left-alt:solid windowtext .5pt;mso-border-alt:solid windowtext .5pt;
   padding:0cm 5.4pt 0cm 5.4pt">
   <p class="MsoNormal" align="center" style="text-align:center">协议版本<span lang="EN-US">1 byte</span></p>
   </td>
-  <td width="114" style="width:85.15pt;border:solid windowtext 1.0pt;border-left:
+  <td width="113" style="width:84.55pt;border:solid windowtext 1.0pt;border-left:
   none;mso-border-left-alt:solid windowtext .5pt;mso-border-alt:solid windowtext .5pt;
   padding:0cm 5.4pt 0cm 5.4pt">
   <p class="MsoNormal" align="center" style="text-align:center">发送端标识<span lang="EN-US">8 byte</span></p>
   </td>
-  <td width="129" style="width:96.45pt;border:solid windowtext 1.0pt;border-left:
+  <td width="128" style="width:95.7pt;border:solid windowtext 1.0pt;border-left:
   none;mso-border-left-alt:solid windowtext .5pt;mso-border-alt:solid windowtext .5pt;
   padding:0cm 5.4pt 0cm 5.4pt">
   <p class="MsoNormal" align="center" style="text-align:center">接收端标识<span lang="EN-US">8 byte</span></p>
   </td>
  </tr>
- <tr style="mso-yfti-irow:1">
-  <td width="28" style="width:21.3pt;border:solid windowtext 1.0pt;border-top:
+ <tr style="mso-yfti-irow:1;height:63.2pt">
+  <td width="199" style="width:149.55pt;border:solid windowtext 1.0pt;border-top:
   none;mso-border-top-alt:solid windowtext .5pt;mso-border-alt:solid windowtext .5pt;
-  padding:0cm 5.4pt 0cm 5.4pt">
-  <p class="MsoNormal" align="center" style="text-align:center"><span class="GramE">保留位</span></p>
+  padding:0cm 5.4pt 0cm 5.4pt;height:63.2pt">
+  <p class="MsoNormal" align="center" style="text-align:center">保留<span lang="EN-US">7
+  bit</span></p>
   </td>
-  <td width="28" style="width:21.3pt;border-top:none;border-left:none;border-bottom:
-  solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;mso-border-top-alt:
-  solid windowtext .5pt;mso-border-left-alt:solid windowtext .5pt;mso-border-alt:
-  solid windowtext .5pt;padding:0cm 5.4pt 0cm 5.4pt">
-  <p class="MsoNormal" align="center" style="text-align:center"><span class="GramE">保留位</span></p>
-  </td>
-  <td width="28" style="width:21.3pt;border-top:none;border-left:none;border-bottom:
-  solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;mso-border-top-alt:
-  solid windowtext .5pt;mso-border-left-alt:solid windowtext .5pt;mso-border-alt:
-  solid windowtext .5pt;padding:0cm 5.4pt 0cm 5.4pt">
-  <p class="MsoNormal" align="center" style="text-align:center"><span class="GramE">保留位</span></p>
-  </td>
-  <td width="28" style="width:21.3pt;border-top:none;border-left:none;border-bottom:
-  solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;mso-border-top-alt:
-  solid windowtext .5pt;mso-border-left-alt:solid windowtext .5pt;mso-border-alt:
-  solid windowtext .5pt;padding:0cm 5.4pt 0cm 5.4pt">
-  <p class="MsoNormal" align="center" style="text-align:center"><span class="GramE">保留位</span></p>
-  </td>
-  <td width="28" style="width:21.3pt;border-top:none;border-left:none;border-bottom:
-  solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;mso-border-top-alt:
-  solid windowtext .5pt;mso-border-left-alt:solid windowtext .5pt;mso-border-alt:
-  solid windowtext .5pt;padding:0cm 5.4pt 0cm 5.4pt">
-  <p class="MsoNormal" align="center" style="text-align:center"><span class="GramE">保留位</span></p>
-  </td>
-  <td width="28" style="width:21.3pt;border-top:none;border-left:none;border-bottom:
-  solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;mso-border-top-alt:
-  solid windowtext .5pt;mso-border-left-alt:solid windowtext .5pt;mso-border-alt:
-  solid windowtext .5pt;padding:0cm 5.4pt 0cm 5.4pt">
-  <p class="MsoNormal" align="center" style="text-align:center"><span class="GramE">保留位</span></p>
-  </td>
-  <td width="29" style="width:21.75pt;border-top:none;border-left:none;
+  <td width="30" style="width:22.55pt;border-top:none;border-left:none;
   border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
   mso-border-top-alt:solid windowtext .5pt;mso-border-left-alt:solid windowtext .5pt;
-  mso-border-alt:solid windowtext .5pt;padding:0cm 5.4pt 0cm 5.4pt">
-  <p class="MsoNormal" align="center" style="text-align:center"><span class="GramE">保留位</span></p>
-  </td>
-  <td width="27" style="width:20.3pt;border-top:none;border-left:none;border-bottom:
-  solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;mso-border-top-alt:
-  solid windowtext .5pt;mso-border-left-alt:solid windowtext .5pt;mso-border-alt:
-  solid windowtext .5pt;padding:0cm 5.4pt 0cm 5.4pt">
+  mso-border-alt:solid windowtext .5pt;padding:0cm 5.4pt 0cm 5.4pt;height:63.2pt">
   <p class="MsoNormal" align="center" style="text-align:center"><span class="GramE">群标志位</span><span lang="EN-US">1 bit</span></p>
   </td>
-  <td width="259" colspan="2" style="width:194.15pt;border-top:none;border-left:
+  <td width="257" colspan="2" style="width:192.65pt;border-top:none;border-left:
   none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
   mso-border-top-alt:solid windowtext .5pt;mso-border-left-alt:solid windowtext .5pt;
-  mso-border-alt:solid windowtext .5pt;padding:0cm 5.4pt 0cm 5.4pt">
+  mso-border-alt:solid windowtext .5pt;padding:0cm 5.4pt 0cm 5.4pt;height:63.2pt">
   <p class="MsoNormal" align="center" style="text-align:center">业务指令<span lang="EN-US">1 byte</span></p>
   </td>
-  <td width="129" style="width:96.45pt;border-top:none;border-left:none;
+  <td width="128" style="width:95.7pt;border-top:none;border-left:none;
   border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
   mso-border-top-alt:solid windowtext .5pt;mso-border-left-alt:solid windowtext .5pt;
-  mso-border-alt:solid windowtext .5pt;padding:0cm 5.4pt 0cm 5.4pt">
+  mso-border-alt:solid windowtext .5pt;padding:0cm 5.4pt 0cm 5.4pt;height:63.2pt">
   <p class="MsoNormal" align="center" style="text-align:center">数据长度<span lang="EN-US">4 byte</span></p>
   </td>
  </tr>
  <tr style="mso-yfti-irow:2;mso-yfti-lastrow:yes">
-  <td width="485" colspan="10" style="width:364.0pt;border:solid windowtext 1.0pt;
+  <td width="486" colspan="4" style="width:364.75pt;border:solid windowtext 1.0pt;
   border-top:none;mso-border-top-alt:solid windowtext .5pt;mso-border-alt:solid windowtext .5pt;
   padding:0cm 5.4pt 0cm 5.4pt">
   <p class="MsoNormal" align="center" style="text-align:center">数据内容<span lang="EN-US">(</span>长度不定<span lang="EN-US">)</span></p>
   </td>
-  <td width="129" style="width:96.45pt;border-top:none;border-left:none;
+  <td width="128" style="width:95.7pt;border-top:none;border-left:none;
   border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
   mso-border-top-alt:solid windowtext .5pt;mso-border-left-alt:solid windowtext .5pt;
   mso-border-alt:solid windowtext .5pt;padding:0cm 5.4pt 0cm 5.4pt">
@@ -98,13 +63,7 @@
  </tr>
  <!--[if !supportMisalignedColumns]-->
  <tr height="0">
-  <td width="28" style="border:none"></td>
-  <td width="28" style="border:none"></td>
-  <td width="28" style="border:none"></td>
-  <td width="28" style="border:none"></td>
-  <td width="28" style="border:none"></td>
-  <td width="28" style="border:none"></td>
-  <td width="29" style="border:none"></td>
+  <td width="199" style="border:none"></td>
   <td width="30" style="border:none"></td>
   <td width="144" style="border:none"></td>
   <td width="113" style="border:none"></td>
