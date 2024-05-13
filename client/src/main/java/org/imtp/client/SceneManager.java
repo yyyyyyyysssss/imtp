@@ -1,8 +1,10 @@
 package org.imtp.client;
 
 import javafx.application.Platform;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.JavaFXBuilderFactory;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -38,6 +40,7 @@ public class SceneManager {
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
+            ObservableList<Node> childrenUnmodifiable = parent.getChildrenUnmodifiable();
             Controller controller = fxmlLoader.getController();
             controller.init(messageModel);
             controller.setSceneManager(this);
