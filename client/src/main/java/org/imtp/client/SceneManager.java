@@ -49,6 +49,7 @@ public class SceneManager {
             stage.setTitle(title);
             stage.setScene(scene);
             stage.centerOnScreen();
+            stage.setResizable(false);
             stage.show();
         });
     }

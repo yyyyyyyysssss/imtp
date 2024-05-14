@@ -104,14 +104,23 @@ public class ChatController extends AbstractController{
                             //TODO 时间处理 当天、本周、本月、本年、某年
                             Label timeLabel = new Label("2024/5/9");
                             timeLabel.setStyle("-fx-text-fill: Grey");
+                            Region topRegion = new Region();
+                            HBox.setHgrow(topRegion, Priority.ALWAYS);
+                            HBox topHbox = new HBox(nameLabel,topRegion,timeLabel);
+                            topHbox.setPrefWidth(180);
+                            topHbox.setMaxWidth(180);
 
-                            Region region = new Region();
-                            HBox.setHgrow(region, Priority.ALWAYS);
 
-                            HBox rHbox = new HBox(nameLabel,region,timeLabel);
-                            rHbox.setPrefWidth(180);
+                            Label lastChatLabel = new Label("好，我也是安全稳健很快就2后即可撒海雕健康和4321");
+                            lastChatLabel.setStyle("-fx-padding: 10 0 0 5;-fx-text-fill: Grey");
+                            Region bottomRegion = new Region();
+                            HBox.setHgrow(bottomRegion, Priority.ALWAYS);
+                            HBox bottomHbox = new HBox(lastChatLabel,bottomRegion,new Label());
+                            bottomHbox.setPrefWidth(180);
+                            bottomHbox.setMaxWidth(180);
+                            bottomHbox.setAlignment(Pos.BOTTOM_CENTER);
 
-                            VBox vBox = new VBox(rHbox,new Label());
+                            VBox vBox = new VBox(topHbox,bottomHbox);
                             vBox.setFillWidth(true);
 
                             HBox hBox = new HBox(imageView,vBox);
