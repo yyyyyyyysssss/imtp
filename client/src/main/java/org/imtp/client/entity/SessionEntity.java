@@ -11,6 +11,8 @@ public class SessionEntity {
 
     private String name;
 
+    private String avatar;
+
     private Long receiverId;
 
     private Long timestamp;
@@ -20,6 +22,7 @@ public class SessionEntity {
         return "SessionEntity{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
+                ", avatar='" + avatar + '\'' +
                 ", receiverId=" + receiverId +
                 ", timestamp=" + timestamp +
                 '}';

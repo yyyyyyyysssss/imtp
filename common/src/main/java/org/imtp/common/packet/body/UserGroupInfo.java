@@ -19,11 +19,14 @@ public class UserGroupInfo {
 
     private String groupName;
 
+    private String avatar;
+
     @Override
     public String toString() {
         return "UserGroupInfo{" +
                 "id=" + id +
                 ", groupName='" + groupName + '\'' +
+                ", avatar='" + avatar + '\'' +
                 '}';
     }
 }

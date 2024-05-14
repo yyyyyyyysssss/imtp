@@ -5,13 +5,22 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
 import javafx.util.Callback;
 import lombok.extern.slf4j.Slf4j;
 import org.imtp.client.entity.SessionEntity;
+import org.imtp.client.util.ResourceUtils;
 import org.imtp.common.packet.FriendshipResponse;
 import org.imtp.common.packet.GroupRelationshipResponse;
 import org.imtp.common.packet.OfflineMessageResponse;
@@ -21,6 +30,7 @@ import org.imtp.common.packet.body.OfflineMessageInfo;
 import org.imtp.common.packet.body.UserFriendInfo;
 import org.imtp.common.packet.body.UserGroupInfo;
 
+import java.net.URL;
 import java.util.List;
 import java.util.Random;
 
@@ -82,10 +92,32 @@ public class ChatController extends AbstractController{
                     protected void updateItem(SessionEntity sessionEntity, boolean b) {
                         super.updateItem(sessionEntity,b);
                         if(sessionEntity != null){
-                            setId(sessionEntity.getId().toString());
-                            setText(sessionEntity.getName());
+                            //TODO 临时头像测试···
+                            String url = ResourceUtils.classPathResource("image/tmp.jpg").toExternalForm();
+                            ImageView imageView = new ImageView(url);
+                            imageView.setFitHeight(40);
+                            imageView.setFitWidth(40);
+                            //名称
+                            Label nameLabel = new Label(sessionEntity.getName());
+                            nameLabel.setAlignment(Pos.CENTER_LEFT);
+                            nameLabel.setStyle("-fx-padding: 0 0 0 10");
+                            //时间
+                            Label timeLabel = new Label("17:43");
+                            nameLabel.setAlignment(Pos.CENTER_RIGHT);
+
+                            HBox rHbox = new HBox(nameLabel,timeLabel);
+                            HBox.setHgrow(nameLabel, Priority.ALWAYS);
+                            HBox.setHgrow(timeLabel,Priority.ALWAYS);
+
+                            VBox vBox = new VBox(rHbox,new Label());
+                            vBox.setFillWidth(true);
+
+                            HBox hBox = new HBox(imageView,vBox);
+                            hBox.setFillHeight(true);
+
+                            setGraphic(hBox);
                         }else {
-                            setText(null);
+                            setGraphic(null);
                         }
                     }
                 };
@@ -93,7 +125,9 @@ public class ChatController extends AbstractController{
         });
         ObservableList<SessionEntity> sessionEntityObservableList = FXCollections.observableArrayList(sessionEntities);
         listView.setItems(sessionEntityObservableList);
-
+        //默认选中第一项
+        listView.getSelectionModel().selectFirst();
+        listView.setStyle("-fx-selection-bar: lightgrey;");
         //设置鼠标监听
         listView.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
@@ -108,6 +142,7 @@ public class ChatController extends AbstractController{
         SessionEntity sessionEntity = new SessionEntity();
         sessionEntity.setId(new Random().nextLong());
         sessionEntity.setName(userFriendInfo.getNickname());
+        sessionEntity.setAvatar(userFriendInfo.getAvatar());
         sessionEntity.setReceiverId(userFriendInfo.getId());
         sessionEntity.setTimestamp(System.currentTimeMillis());
         return sessionEntity;
@@ -117,6 +152,7 @@ public class ChatController extends AbstractController{
         SessionEntity sessionEntity = new SessionEntity();
         sessionEntity.setId(new Random().nextLong());
         sessionEntity.setName(userGroupInfo.getGroupName());
+        sessionEntity.setAvatar(userGroupInfo.getAvatar());
         sessionEntity.setReceiverId(userGroupInfo.getId());
         sessionEntity.setTimestamp(System.currentTimeMillis());
         return sessionEntity;
