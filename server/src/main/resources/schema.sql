@@ -82,4 +82,17 @@ CREATE TABLE `im_user_friend`  (
                                    INDEX `user_id_idx`(`user_id`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 
+-- ----------------------------
+-- Table structure for im_user_session
+-- ----------------------------
+DROP TABLE IF EXISTS `im_user_session`;
+CREATE TABLE `im_user_session`  (
+                                    `id` bigint NOT NULL,
+                                    `user_id` bigint NULL DEFAULT NULL COMMENT '关联用户id',
+                                    `receiver_id` bigint NULL DEFAULT NULL COMMENT '接收人id',
+                                    `created_time` datetime(0) NULL DEFAULT NULL COMMENT '创建时间',
+                                    PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+
+
 SET FOREIGN_KEY_CHECKS = 1;
