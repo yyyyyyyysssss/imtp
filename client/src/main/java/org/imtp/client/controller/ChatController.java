@@ -16,6 +16,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.util.Callback;
 import lombok.extern.slf4j.Slf4j;
@@ -99,15 +100,16 @@ public class ChatController extends AbstractController{
                             imageView.setFitWidth(40);
                             //名称
                             Label nameLabel = new Label(sessionEntity.getName());
-                            nameLabel.setAlignment(Pos.CENTER_LEFT);
-                            nameLabel.setStyle("-fx-padding: 0 0 0 10");
-                            //时间
-                            Label timeLabel = new Label("17:43");
-                            nameLabel.setAlignment(Pos.CENTER_RIGHT);
+                            nameLabel.setStyle("-fx-padding: 0 0 0 5;");
+                            //TODO 时间处理 当天、本周、本月、本年、某年
+                            Label timeLabel = new Label("2024/5/9");
+                            timeLabel.setStyle("-fx-text-fill: Grey");
 
-                            HBox rHbox = new HBox(nameLabel,timeLabel);
-                            HBox.setHgrow(nameLabel, Priority.ALWAYS);
-                            HBox.setHgrow(timeLabel,Priority.ALWAYS);
+                            Region region = new Region();
+                            HBox.setHgrow(region, Priority.ALWAYS);
+
+                            HBox rHbox = new HBox(nameLabel,region,timeLabel);
+                            rHbox.setPrefWidth(180);
 
                             VBox vBox = new VBox(rHbox,new Label());
                             vBox.setFillWidth(true);
