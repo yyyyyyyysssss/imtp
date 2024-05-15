@@ -17,4 +17,6 @@ public interface Controller {
 
     void init(MessageModel messageModel);
 
+    void initData(Object object);
+
 }

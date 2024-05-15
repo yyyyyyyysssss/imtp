@@ -6,6 +6,8 @@ import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
@@ -18,8 +20,10 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.util.Callback;
 import lombok.extern.slf4j.Slf4j;
+import org.imtp.client.constant.FXMLResourceConstant;
 import org.imtp.client.entity.SessionEntity;
 import org.imtp.client.util.ResourceUtils;
+import org.imtp.client.util.Tuple2;
 import org.imtp.common.packet.FriendshipResponse;
 import org.imtp.common.packet.GroupRelationshipResponse;
 import org.imtp.common.packet.OfflineMessageResponse;
@@ -90,40 +94,15 @@ public class ChatController extends AbstractController{
                     protected void updateItem(SessionEntity sessionEntity, boolean b) {
                         super.updateItem(sessionEntity,b);
                         if(sessionEntity != null){
-                            //TODO 临时头像测试···
+                            Tuple2<Node, Controller> tuple2 = loadNodeByPath(FXMLResourceConstant.USER_SESSION_ITEM_FML);
+                            //临时头像测试
                             String url = ResourceUtils.classPathResource("/img/tmp.jpg").toExternalForm();
-                            ImageView imageView = new ImageView(url);
-                            imageView.setFitHeight(40);
-                            imageView.setFitWidth(40);
-                            //名称
-                            Label nameLabel = new Label(sessionEntity.getName());
-                            nameLabel.setStyle("-fx-padding: 0 0 0 5;");
-                            //TODO 时间处理 当天、本周、本月、本年、某年
-                            Label timeLabel = new Label("2024/5/9");
-                            timeLabel.setStyle("-fx-text-fill: Grey");
-                            Region topRegion = new Region();
-                            HBox.setHgrow(topRegion, Priority.ALWAYS);
-                            HBox topHbox = new HBox(nameLabel,topRegion,timeLabel);
-                            topHbox.setPrefWidth(180);
-                            topHbox.setMaxWidth(180);
-
-
-                            Label lastChatLabel = new Label("好，我也是安全稳健很快就2后即可撒海雕健康和4321");
-                            lastChatLabel.setStyle("-fx-padding: 10 0 0 5;-fx-text-fill: Grey");
-                            Region bottomRegion = new Region();
-                            HBox.setHgrow(bottomRegion, Priority.ALWAYS);
-                            HBox bottomHbox = new HBox(lastChatLabel,bottomRegion,new Label());
-                            bottomHbox.setPrefWidth(180);
-                            bottomHbox.setMaxWidth(180);
-                            bottomHbox.setAlignment(Pos.BOTTOM_CENTER);
-
-                            VBox vBox = new VBox(topHbox,bottomHbox);
-                            vBox.setFillWidth(true);
-
-                            HBox hBox = new HBox(imageView,vBox);
-                            hBox.setFillHeight(true);
-
-                            setGraphic(hBox);
+                            sessionEntity.setAvatar(url);
+                            sessionEntity.setLastMsg("好的吧");
+                            Node node = tuple2.getV1();
+                            Controller controller = tuple2.getV2();
+                            controller.initData(sessionEntity);
+                            setGraphic(node);
                         }else {
                             setGraphic(null);
                         }

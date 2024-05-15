@@ -15,6 +15,8 @@ public class SessionEntity {
 
     private Long receiverId;
 
+    private String lastMsg;
+
     private Long timestamp;
 
     @Override
@@ -24,6 +26,7 @@ public class SessionEntity {
                 ", name='" + name + '\'' +
                 ", avatar='" + avatar + '\'' +
                 ", receiverId=" + receiverId +
+                ", lastMsg='" + lastMsg + '\'' +
                 ", timestamp=" + timestamp +
                 '}';
     }

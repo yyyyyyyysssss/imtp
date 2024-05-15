@@ -40,10 +40,9 @@ public class SceneManager {
             try {
                 parent = fxmlLoader.load();
             } catch (IOException e) {
-                log.error(fxmlPath+"文件加载异常:",e);
+                log.error("{}文件加载异常:", fxmlPath, e);
                 throw new RuntimeException(e);
             }
-            ObservableList<Node> childrenUnmodifiable = parent.getChildrenUnmodifiable();
             Controller controller = fxmlLoader.getController();
             controller.init(messageModel);
             controller.setSceneManager(this);

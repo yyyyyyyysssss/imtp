@@ -36,4 +36,9 @@ public class ConsoleController implements Controller {
     public void init(MessageModel messageModel) {
         this.messageModel = messageModel;
     }
+
+    @Override
+    public void initData(Object object) {
+
+    }
 }
