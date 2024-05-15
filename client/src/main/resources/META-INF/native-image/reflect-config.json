@@ -1,0 +1,580 @@
+[
+{
+  "name":"ch.qos.logback.classic.BasicConfigurator",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"ch.qos.logback.classic.joran.SerializedModelConfigurator",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"ch.qos.logback.classic.util.DefaultJoranConfigurator",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"com.fasterxml.jackson.databind.ext.Java7SupportImpl",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"com.sun.glass.ui.Screen"
+},
+{
+  "name":"com.sun.javafx.font.directwrite.DWFactory",
+  "methods":[{"name":"getFactory","parameterTypes":[] }]
+},
+{
+  "name":"com.sun.javafx.logging.PrintLogger",
+  "methods":[{"name":"createInstance","parameterTypes":[] }]
+},
+{
+  "name":"com.sun.javafx.logging.jfr.JFRPulseLogger",
+  "methods":[{"name":"createInstance","parameterTypes":[] }]
+},
+{
+  "name":"com.sun.javafx.reflect.Trampoline",
+  "methods":[{"name":"invoke","parameterTypes":["java.lang.reflect.Method","java.lang.Object","java.lang.Object[]"] }]
+},
+{
+  "name":"com.sun.javafx.scene.control.skin.Utils",
+  "methods":[{"name":"getResource","parameterTypes":["java.lang.String"] }]
+},
+{
+  "name":"com.sun.javafx.tk.quantum.QuantumToolkit",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"com.sun.prism.GraphicsPipeline",
+  "methods":[{"name":"getFontFactory","parameterTypes":[] }, {"name":"getPipeline","parameterTypes":[] }]
+},
+{
+  "name":"com.sun.prism.shader.FillPgram_Color_Loader",
+  "methods":[{"name":"loadShader","parameterTypes":["com.sun.prism.ps.ShaderFactory","java.io.InputStream"] }]
+},
+{
+  "name":"com.sun.prism.shader.FillPgram_LinearGradient_PAD_Loader",
+  "methods":[{"name":"loadShader","parameterTypes":["com.sun.prism.ps.ShaderFactory","java.io.InputStream"] }]
+},
+{
+  "name":"com.sun.prism.shader.Solid_TextureFirstPassLCD_Loader",
+  "methods":[{"name":"loadShader","parameterTypes":["com.sun.prism.ps.ShaderFactory","java.io.InputStream"] }]
+},
+{
+  "name":"com.sun.prism.shader.Solid_TextureRGB_Loader",
+  "methods":[{"name":"loadShader","parameterTypes":["com.sun.prism.ps.ShaderFactory","java.io.InputStream"] }]
+},
+{
+  "name":"com.sun.prism.shader.Solid_TextureSecondPassLCD_Loader",
+  "methods":[{"name":"loadShader","parameterTypes":["com.sun.prism.ps.ShaderFactory","java.io.InputStream"] }]
+},
+{
+  "name":"com.sun.prism.shader.Texture_Color_Loader",
+  "methods":[{"name":"loadShader","parameterTypes":["com.sun.prism.ps.ShaderFactory","java.io.InputStream"] }]
+},
+{
+  "name":"com.sun.prism.shader.Texture_LinearGradient_PAD_Loader",
+  "methods":[{"name":"loadShader","parameterTypes":["com.sun.prism.ps.ShaderFactory","java.io.InputStream"] }]
+},
+{
+  "name":"com.sun.scenario.effect.impl.prism.PrRenderer",
+  "methods":[{"name":"createRenderer","parameterTypes":["com.sun.scenario.effect.FilterContext"] }]
+},
+{
+  "name":"com.sun.scenario.effect.impl.prism.ps.PPSLinearConvolveShadowPeer",
+  "methods":[{"name":"<init>","parameterTypes":["com.sun.scenario.effect.FilterContext","com.sun.scenario.effect.impl.Renderer","java.lang.String"] }]
+},
+{
+  "name":"com.sun.scenario.effect.impl.prism.ps.PPSRenderer",
+  "methods":[{"name":"createRenderer","parameterTypes":["com.sun.scenario.effect.FilterContext"] }]
+},
+{
+  "name":"com.sun.xml.internal.stream.XMLInputFactoryImpl",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"io.netty.buffer.AbstractByteBufAllocator",
+  "queryAllDeclaredMethods":true
+},
+{
+  "name":"io.netty.buffer.AbstractReferenceCountedByteBuf",
+  "fields":[{"name":"refCnt"}]
+},
+{
+  "name":"io.netty.channel.AbstractChannelHandlerContext",
+  "fields":[{"name":"handlerState"}]
+},
+{
+  "name":"io.netty.channel.ChannelHandlerAdapter",
+  "methods":[{"name":"exceptionCaught","parameterTypes":["io.netty.channel.ChannelHandlerContext","java.lang.Throwable"] }]
+},
+{
+  "name":"io.netty.channel.ChannelInboundHandlerAdapter",
+  "methods":[{"name":"channelActive","parameterTypes":["io.netty.channel.ChannelHandlerContext"] }, {"name":"channelInactive","parameterTypes":["io.netty.channel.ChannelHandlerContext"] }, {"name":"channelRead","parameterTypes":["io.netty.channel.ChannelHandlerContext","java.lang.Object"] }, {"name":"channelReadComplete","parameterTypes":["io.netty.channel.ChannelHandlerContext"] }, {"name":"channelRegistered","parameterTypes":["io.netty.channel.ChannelHandlerContext"] }, {"name":"channelUnregistered","parameterTypes":["io.netty.channel.ChannelHandlerContext"] }, {"name":"channelWritabilityChanged","parameterTypes":["io.netty.channel.ChannelHandlerContext"] }, {"name":"exceptionCaught","parameterTypes":["io.netty.channel.ChannelHandlerContext","java.lang.Throwable"] }, {"name":"userEventTriggered","parameterTypes":["io.netty.channel.ChannelHandlerContext","java.lang.Object"] }]
+},
+{
+  "name":"io.netty.channel.ChannelInitializer",
+  "methods":[{"name":"channelRegistered","parameterTypes":["io.netty.channel.ChannelHandlerContext"] }, {"name":"exceptionCaught","parameterTypes":["io.netty.channel.ChannelHandlerContext","java.lang.Throwable"] }]
+},
+{
+  "name":"io.netty.channel.ChannelOutboundBuffer",
+  "fields":[{"name":"totalPendingSize"}, {"name":"unwritable"}]
+},
+{
+  "name":"io.netty.channel.ChannelOutboundHandlerAdapter",
+  "methods":[{"name":"bind","parameterTypes":["io.netty.channel.ChannelHandlerContext","java.net.SocketAddress","io.netty.channel.ChannelPromise"] }, {"name":"close","parameterTypes":["io.netty.channel.ChannelHandlerContext","io.netty.channel.ChannelPromise"] }, {"name":"connect","parameterTypes":["io.netty.channel.ChannelHandlerContext","java.net.SocketAddress","java.net.SocketAddress","io.netty.channel.ChannelPromise"] }, {"name":"deregister","parameterTypes":["io.netty.channel.ChannelHandlerContext","io.netty.channel.ChannelPromise"] }, {"name":"disconnect","parameterTypes":["io.netty.channel.ChannelHandlerContext","io.netty.channel.ChannelPromise"] }, {"name":"flush","parameterTypes":["io.netty.channel.ChannelHandlerContext"] }, {"name":"read","parameterTypes":["io.netty.channel.ChannelHandlerContext"] }]
+},
+{
+  "name":"io.netty.channel.DefaultChannelConfig",
+  "fields":[{"name":"autoRead"}, {"name":"writeBufferWaterMark"}]
+},
+{
+  "name":"io.netty.channel.DefaultChannelPipeline",
+  "fields":[{"name":"estimatorHandle"}]
+},
+{
+  "name":"io.netty.channel.DefaultChannelPipeline$HeadContext",
+  "methods":[{"name":"bind","parameterTypes":["io.netty.channel.ChannelHandlerContext","java.net.SocketAddress","io.netty.channel.ChannelPromise"] }, {"name":"channelActive","parameterTypes":["io.netty.channel.ChannelHandlerContext"] }, {"name":"channelInactive","parameterTypes":["io.netty.channel.ChannelHandlerContext"] }, {"name":"channelRead","parameterTypes":["io.netty.channel.ChannelHandlerContext","java.lang.Object"] }, {"name":"channelReadComplete","parameterTypes":["io.netty.channel.ChannelHandlerContext"] }, {"name":"channelRegistered","parameterTypes":["io.netty.channel.ChannelHandlerContext"] }, {"name":"channelUnregistered","parameterTypes":["io.netty.channel.ChannelHandlerContext"] }, {"name":"channelWritabilityChanged","parameterTypes":["io.netty.channel.ChannelHandlerContext"] }, {"name":"close","parameterTypes":["io.netty.channel.ChannelHandlerContext","io.netty.channel.ChannelPromise"] }, {"name":"connect","parameterTypes":["io.netty.channel.ChannelHandlerContext","java.net.SocketAddress","java.net.SocketAddress","io.netty.channel.ChannelPromise"] }, {"name":"deregister","parameterTypes":["io.netty.channel.ChannelHandlerContext","io.netty.channel.ChannelPromise"] }, {"name":"disconnect","parameterTypes":["io.netty.channel.ChannelHandlerContext","io.netty.channel.ChannelPromise"] }, {"name":"exceptionCaught","parameterTypes":["io.netty.channel.ChannelHandlerContext","java.lang.Throwable"] }, {"name":"flush","parameterTypes":["io.netty.channel.ChannelHandlerContext"] }, {"name":"read","parameterTypes":["io.netty.channel.ChannelHandlerContext"] }, {"name":"userEventTriggered","parameterTypes":["io.netty.channel.ChannelHandlerContext","java.lang.Object"] }, {"name":"write","parameterTypes":["io.netty.channel.ChannelHandlerContext","java.lang.Object","io.netty.channel.ChannelPromise"] }]
+},
+{
+  "name":"io.netty.channel.DefaultChannelPipeline$TailContext",
+  "methods":[{"name":"channelActive","parameterTypes":["io.netty.channel.ChannelHandlerContext"] }, {"name":"channelInactive","parameterTypes":["io.netty.channel.ChannelHandlerContext"] }, {"name":"channelRead","parameterTypes":["io.netty.channel.ChannelHandlerContext","java.lang.Object"] }, {"name":"channelReadComplete","parameterTypes":["io.netty.channel.ChannelHandlerContext"] }, {"name":"channelRegistered","parameterTypes":["io.netty.channel.ChannelHandlerContext"] }, {"name":"channelUnregistered","parameterTypes":["io.netty.channel.ChannelHandlerContext"] }, {"name":"channelWritabilityChanged","parameterTypes":["io.netty.channel.ChannelHandlerContext"] }, {"name":"exceptionCaught","parameterTypes":["io.netty.channel.ChannelHandlerContext","java.lang.Throwable"] }, {"name":"userEventTriggered","parameterTypes":["io.netty.channel.ChannelHandlerContext","java.lang.Object"] }]
+},
+{
+  "name":"io.netty.channel.SimpleChannelInboundHandler",
+  "methods":[{"name":"channelRead","parameterTypes":["io.netty.channel.ChannelHandlerContext","java.lang.Object"] }]
+},
+{
+  "name":"io.netty.channel.socket.nio.NioSocketChannel",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"io.netty.handler.codec.ByteToMessageDecoder",
+  "methods":[{"name":"channelInactive","parameterTypes":["io.netty.channel.ChannelHandlerContext"] }, {"name":"channelRead","parameterTypes":["io.netty.channel.ChannelHandlerContext","java.lang.Object"] }, {"name":"channelReadComplete","parameterTypes":["io.netty.channel.ChannelHandlerContext"] }, {"name":"userEventTriggered","parameterTypes":["io.netty.channel.ChannelHandlerContext","java.lang.Object"] }]
+},
+{
+  "name":"io.netty.handler.codec.MessageToByteEncoder",
+  "methods":[{"name":"write","parameterTypes":["io.netty.channel.ChannelHandlerContext","java.lang.Object","io.netty.channel.ChannelPromise"] }]
+},
+{
+  "name":"io.netty.util.DefaultAttributeMap",
+  "fields":[{"name":"attributes"}]
+},
+{
+  "name":"io.netty.util.Recycler$DefaultHandle",
+  "fields":[{"name":"state"}]
+},
+{
+  "name":"io.netty.util.ReferenceCountUtil",
+  "queryAllDeclaredMethods":true
+},
+{
+  "name":"io.netty.util.concurrent.DefaultPromise",
+  "fields":[{"name":"result"}]
+},
+{
+  "name":"io.netty.util.concurrent.SingleThreadEventExecutor",
+  "fields":[{"name":"state"}, {"name":"threadProperties"}]
+},
+{
+  "name":"io.netty.util.internal.shaded.org.jctools.queues.BaseMpscLinkedArrayQueueColdProducerFields",
+  "fields":[{"name":"producerLimit"}]
+},
+{
+  "name":"io.netty.util.internal.shaded.org.jctools.queues.BaseMpscLinkedArrayQueueConsumerFields",
+  "fields":[{"name":"consumerIndex"}]
+},
+{
+  "name":"io.netty.util.internal.shaded.org.jctools.queues.BaseMpscLinkedArrayQueueProducerFields",
+  "fields":[{"name":"producerIndex"}]
+},
+{
+  "name":"io.netty.util.internal.shaded.org.jctools.queues.MpscArrayQueueConsumerIndexField",
+  "fields":[{"name":"consumerIndex"}]
+},
+{
+  "name":"io.netty.util.internal.shaded.org.jctools.queues.MpscArrayQueueProducerIndexField",
+  "fields":[{"name":"producerIndex"}]
+},
+{
+  "name":"io.netty.util.internal.shaded.org.jctools.queues.MpscArrayQueueProducerLimitField",
+  "fields":[{"name":"producerLimit"}]
+},
+{
+  "name":"java.io.FilePermission"
+},
+{
+  "name":"java.lang.Character",
+  "methods":[{"name":"isIdeographic","parameterTypes":["int"] }]
+},
+{
+  "name":"java.lang.Class",
+  "methods":[{"name":"forName","parameterTypes":["java.lang.Module","java.lang.String"] }, {"name":"getModule","parameterTypes":[] }]
+},
+{
+  "name":"java.lang.Module",
+  "methods":[{"name":"getDescriptor","parameterTypes":[] }, {"name":"getLayer","parameterTypes":[] }, {"name":"getName","parameterTypes":[] }, {"name":"getResourceAsStream","parameterTypes":["java.lang.String"] }]
+},
+{
+  "name":"java.lang.ModuleLayer",
+  "methods":[{"name":"boot","parameterTypes":[] }, {"name":"findModule","parameterTypes":["java.lang.String"] }]
+},
+{
+  "name":"java.lang.ProcessHandle",
+  "methods":[{"name":"current","parameterTypes":[] }, {"name":"pid","parameterTypes":[] }]
+},
+{
+  "name":"java.lang.RuntimePermission"
+},
+{
+  "name":"java.lang.Thread",
+  "fields":[{"name":"threadLocalRandomProbe"}]
+},
+{
+  "name":"java.net.NetPermission"
+},
+{
+  "name":"java.net.SocketPermission"
+},
+{
+  "name":"java.net.URLPermission",
+  "methods":[{"name":"<init>","parameterTypes":["java.lang.String","java.lang.String"] }]
+},
+{
+  "name":"java.nio.Bits",
+  "fields":[{"name":"MAX_MEMORY"}, {"name":"UNALIGNED"}]
+},
+{
+  "name":"java.nio.Buffer",
+  "fields":[{"name":"address"}]
+},
+{
+  "name":"java.nio.ByteBuffer",
+  "methods":[{"name":"alignedSlice","parameterTypes":["int"] }, {"name":"order","parameterTypes":["java.nio.ByteOrder"] }]
+},
+{
+  "name":"java.nio.ByteOrder",
+  "methods":[{"name":"nativeOrder","parameterTypes":[] }]
+},
+{
+  "name":"java.nio.DirectByteBuffer",
+  "methods":[{"name":"<init>","parameterTypes":["long","long"] }]
+},
+{
+  "name":"java.nio.channels.spi.SelectorProvider",
+  "methods":[{"name":"openSocketChannel","parameterTypes":["java.net.ProtocolFamily"] }]
+},
+{
+  "name":"java.security.AllPermission"
+},
+{
+  "name":"java.security.SecureRandomParameters"
+},
+{
+  "name":"java.security.SecurityPermission"
+},
+{
+  "name":"java.util.PropertyPermission"
+},
+{
+  "name":"java.util.concurrent.atomic.AtomicBoolean",
+  "fields":[{"name":"value"}]
+},
+{
+  "name":"java.util.concurrent.atomic.AtomicReference",
+  "fields":[{"name":"value"}]
+},
+{
+  "name":"java.util.concurrent.atomic.Striped64",
+  "fields":[{"name":"base"}, {"name":"cellsBusy"}]
+},
+{
+  "name":"javafx.fxml.FXMLLoader"
+},
+{
+  "name":"javafx.geometry.Pos",
+  "methods":[{"name":"valueOf","parameterTypes":["java.lang.String"] }]
+},
+{
+  "name":"javafx.scene.Camera"
+},
+{
+  "name":"javafx.scene.Group"
+},
+{
+  "name":"javafx.scene.Node",
+  "queryAllDeclaredMethods":true,
+  "methods":[{"name":"getId","parameterTypes":[] }, {"name":"setFocusTraversable","parameterTypes":["boolean"] }, {"name":"setId","parameterTypes":["java.lang.String"] }, {"name":"setStyle","parameterTypes":["java.lang.String"] }, {"name":"setVisible","parameterTypes":["boolean"] }]
+},
+{
+  "name":"javafx.scene.ParallelCamera"
+},
+{
+  "name":"javafx.scene.Parent",
+  "queryAllDeclaredMethods":true
+},
+{
+  "name":"javafx.scene.Scene"
+},
+{
+  "name":"javafx.scene.control.Button",
+  "queryAllDeclaredMethods":true,
+  "queryAllPublicConstructors":true,
+  "methods":[{"name":"<init>","parameterTypes":[] }, {"name":"setDefaultButton","parameterTypes":["boolean"] }]
+},
+{
+  "name":"javafx.scene.control.ButtonBase",
+  "queryAllDeclaredMethods":true,
+  "methods":[{"name":"setOnAction","parameterTypes":["javafx.event.EventHandler"] }]
+},
+{
+  "name":"javafx.scene.control.Control",
+  "queryAllDeclaredMethods":true
+},
+{
+  "name":"javafx.scene.control.Label",
+  "queryAllDeclaredMethods":true,
+  "queryAllPublicConstructors":true,
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"javafx.scene.control.Labeled",
+  "queryAllDeclaredMethods":true,
+  "methods":[{"name":"setAlignment","parameterTypes":["javafx.geometry.Pos"] }, {"name":"setFont","parameterTypes":["javafx.scene.text.Font"] }, {"name":"setMnemonicParsing","parameterTypes":["boolean"] }, {"name":"setText","parameterTypes":["java.lang.String"] }, {"name":"setTextAlignment","parameterTypes":["javafx.scene.text.TextAlignment"] }]
+},
+{
+  "name":"javafx.scene.control.ListView",
+  "queryAllDeclaredMethods":true,
+  "queryAllPublicConstructors":true,
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"javafx.scene.control.PasswordField",
+  "queryAllDeclaredMethods":true,
+  "queryAllPublicConstructors":true,
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"javafx.scene.control.TextArea",
+  "queryAllDeclaredMethods":true,
+  "queryAllPublicConstructors":true,
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"javafx.scene.control.TextField",
+  "queryAllDeclaredMethods":true,
+  "queryAllPublicConstructors":true,
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"javafx.scene.control.TextInputControl",
+  "queryAllDeclaredMethods":true,
+  "methods":[{"name":"setEditable","parameterTypes":["boolean"] }, {"name":"setFont","parameterTypes":["javafx.scene.text.Font"] }]
+},
+{
+  "name":"javafx.scene.effect.Effect"
+},
+{
+  "name":"javafx.scene.image.Image"
+},
+{
+  "name":"javafx.scene.image.ImageView"
+},
+{
+  "name":"javafx.scene.layout.ColumnConstraints",
+  "queryAllDeclaredMethods":true,
+  "queryAllPublicConstructors":true,
+  "methods":[{"name":"<init>","parameterTypes":[] }, {"name":"setHgrow","parameterTypes":["javafx.scene.layout.Priority"] }, {"name":"setMaxWidth","parameterTypes":["double"] }, {"name":"setMinWidth","parameterTypes":["double"] }, {"name":"setPrefWidth","parameterTypes":["double"] }]
+},
+{
+  "name":"javafx.scene.layout.ConstraintsBase",
+  "queryAllDeclaredMethods":true
+},
+{
+  "name":"javafx.scene.layout.GridPane",
+  "queryAllDeclaredMethods":true,
+  "queryAllPublicConstructors":true,
+  "methods":[{"name":"<init>","parameterTypes":[] }, {"name":"getColumnConstraints","parameterTypes":[] }, {"name":"getColumnIndex","parameterTypes":["javafx.scene.Node"] }, {"name":"getColumnIndex","parameterTypes":["javafx.scene.Parent"] }, {"name":"getColumnIndex","parameterTypes":["javafx.scene.control.Button"] }, {"name":"getColumnIndex","parameterTypes":["javafx.scene.control.ButtonBase"] }, {"name":"getColumnIndex","parameterTypes":["javafx.scene.control.Control"] }, {"name":"getColumnIndex","parameterTypes":["javafx.scene.control.Labeled"] }, {"name":"getColumnIndex","parameterTypes":["javafx.scene.control.PasswordField"] }, {"name":"getColumnIndex","parameterTypes":["javafx.scene.control.Skinnable"] }, {"name":"getColumnIndex","parameterTypes":["javafx.scene.control.TextField"] }, {"name":"getColumnIndex","parameterTypes":["javafx.scene.control.TextInputControl"] }, {"name":"getColumnIndex","parameterTypes":["javafx.scene.layout.GridPane"] }, {"name":"getColumnIndex","parameterTypes":["javafx.scene.layout.Pane"] }, {"name":"getColumnIndex","parameterTypes":["javafx.scene.layout.Region"] }, {"name":"getRowConstraints","parameterTypes":[] }, {"name":"getRowIndex","parameterTypes":["javafx.scene.Node"] }, {"name":"getRowIndex","parameterTypes":["javafx.scene.Parent"] }, {"name":"getRowIndex","parameterTypes":["javafx.scene.control.Button"] }, {"name":"getRowIndex","parameterTypes":["javafx.scene.control.ButtonBase"] }, {"name":"getRowIndex","parameterTypes":["javafx.scene.control.Control"] }, {"name":"getRowIndex","parameterTypes":["javafx.scene.control.Label"] }, {"name":"getRowIndex","parameterTypes":["javafx.scene.control.Labeled"] }, {"name":"getRowIndex","parameterTypes":["javafx.scene.control.PasswordField"] }, {"name":"getRowIndex","parameterTypes":["javafx.scene.control.Skinnable"] }, {"name":"getRowIndex","parameterTypes":["javafx.scene.control.TextArea"] }, {"name":"getRowIndex","parameterTypes":["javafx.scene.control.TextField"] }, {"name":"getRowIndex","parameterTypes":["javafx.scene.control.TextInputControl"] }, {"name":"getRowIndex","parameterTypes":["javafx.scene.layout.HBox"] }, {"name":"getRowIndex","parameterTypes":["javafx.scene.layout.Pane"] }, {"name":"getRowIndex","parameterTypes":["javafx.scene.layout.Region"] }, {"name":"isColumnIndex","parameterTypes":["javafx.scene.Parent"] }, {"name":"isColumnIndex","parameterTypes":["javafx.scene.control.Button"] }, {"name":"isColumnIndex","parameterTypes":["javafx.scene.control.ButtonBase"] }, {"name":"isColumnIndex","parameterTypes":["javafx.scene.control.Control"] }, {"name":"isColumnIndex","parameterTypes":["javafx.scene.control.Labeled"] }, {"name":"isColumnIndex","parameterTypes":["javafx.scene.control.PasswordField"] }, {"name":"isColumnIndex","parameterTypes":["javafx.scene.control.Skinnable"] }, {"name":"isColumnIndex","parameterTypes":["javafx.scene.control.TextField"] }, {"name":"isColumnIndex","parameterTypes":["javafx.scene.control.TextInputControl"] }, {"name":"isColumnIndex","parameterTypes":["javafx.scene.layout.GridPane"] }, {"name":"isColumnIndex","parameterTypes":["javafx.scene.layout.Pane"] }, {"name":"isColumnIndex","parameterTypes":["javafx.scene.layout.Region"] }, {"name":"isRowIndex","parameterTypes":["javafx.scene.Parent"] }, {"name":"isRowIndex","parameterTypes":["javafx.scene.control.Button"] }, {"name":"isRowIndex","parameterTypes":["javafx.scene.control.ButtonBase"] }, {"name":"isRowIndex","parameterTypes":["javafx.scene.control.Control"] }, {"name":"isRowIndex","parameterTypes":["javafx.scene.control.Label"] }, {"name":"isRowIndex","parameterTypes":["javafx.scene.control.Labeled"] }, {"name":"isRowIndex","parameterTypes":["javafx.scene.control.PasswordField"] }, {"name":"isRowIndex","parameterTypes":["javafx.scene.control.Skinnable"] }, {"name":"isRowIndex","parameterTypes":["javafx.scene.control.TextArea"] }, {"name":"isRowIndex","parameterTypes":["javafx.scene.control.TextField"] }, {"name":"isRowIndex","parameterTypes":["javafx.scene.control.TextInputControl"] }, {"name":"isRowIndex","parameterTypes":["javafx.scene.layout.HBox"] }, {"name":"isRowIndex","parameterTypes":["javafx.scene.layout.Pane"] }, {"name":"isRowIndex","parameterTypes":["javafx.scene.layout.Region"] }, {"name":"setAlignment","parameterTypes":["javafx.geometry.Pos"] }, {"name":"setColumnIndex","parameterTypes":["java.lang.Object","java.lang.String"] }, {"name":"setColumnIndex","parameterTypes":["javafx.css.Styleable","java.lang.String"] }, {"name":"setColumnIndex","parameterTypes":["javafx.event.EventTarget","java.lang.String"] }, {"name":"setColumnIndex","parameterTypes":["javafx.scene.Node","java.lang.Integer"] }, {"name":"setColumnIndex","parameterTypes":["javafx.scene.Node","java.lang.String"] }, {"name":"setColumnIndex","parameterTypes":["javafx.scene.Parent","java.lang.Integer"] }, {"name":"setColumnIndex","parameterTypes":["javafx.scene.Parent","java.lang.String"] }, {"name":"setColumnIndex","parameterTypes":["javafx.scene.control.Button","java.lang.Integer"] }, {"name":"setColumnIndex","parameterTypes":["javafx.scene.control.Button","java.lang.String"] }, {"name":"setColumnIndex","parameterTypes":["javafx.scene.control.ButtonBase","java.lang.Integer"] }, {"name":"setColumnIndex","parameterTypes":["javafx.scene.control.ButtonBase","java.lang.String"] }, {"name":"setColumnIndex","parameterTypes":["javafx.scene.control.Control","java.lang.Integer"] }, {"name":"setColumnIndex","parameterTypes":["javafx.scene.control.Control","java.lang.String"] }, {"name":"setColumnIndex","parameterTypes":["javafx.scene.control.Labeled","java.lang.Integer"] }, {"name":"setColumnIndex","parameterTypes":["javafx.scene.control.Labeled","java.lang.String"] }, {"name":"setColumnIndex","parameterTypes":["javafx.scene.control.PasswordField","java.lang.Integer"] }, {"name":"setColumnIndex","parameterTypes":["javafx.scene.control.PasswordField","java.lang.String"] }, {"name":"setColumnIndex","parameterTypes":["javafx.scene.control.Skinnable","java.lang.Integer"] }, {"name":"setColumnIndex","parameterTypes":["javafx.scene.control.Skinnable","java.lang.String"] }, {"name":"setColumnIndex","parameterTypes":["javafx.scene.control.TextField","java.lang.Integer"] }, {"name":"setColumnIndex","parameterTypes":["javafx.scene.control.TextField","java.lang.String"] }, {"name":"setColumnIndex","parameterTypes":["javafx.scene.control.TextInputControl","java.lang.Integer"] }, {"name":"setColumnIndex","parameterTypes":["javafx.scene.control.TextInputControl","java.lang.String"] }, {"name":"setColumnIndex","parameterTypes":["javafx.scene.layout.GridPane","java.lang.Integer"] }, {"name":"setColumnIndex","parameterTypes":["javafx.scene.layout.GridPane","java.lang.String"] }, {"name":"setColumnIndex","parameterTypes":["javafx.scene.layout.Pane","java.lang.Integer"] }, {"name":"setColumnIndex","parameterTypes":["javafx.scene.layout.Pane","java.lang.String"] }, {"name":"setColumnIndex","parameterTypes":["javafx.scene.layout.Region","java.lang.Integer"] }, {"name":"setColumnIndex","parameterTypes":["javafx.scene.layout.Region","java.lang.String"] }, {"name":"setHgap","parameterTypes":["double"] }, {"name":"setRowIndex","parameterTypes":["java.lang.Object","java.lang.String"] }, {"name":"setRowIndex","parameterTypes":["javafx.css.Styleable","java.lang.String"] }, {"name":"setRowIndex","parameterTypes":["javafx.event.EventTarget","java.lang.String"] }, {"name":"setRowIndex","parameterTypes":["javafx.scene.Node","java.lang.Integer"] }, {"name":"setRowIndex","parameterTypes":["javafx.scene.Node","java.lang.String"] }, {"name":"setRowIndex","parameterTypes":["javafx.scene.Parent","java.lang.Integer"] }, {"name":"setRowIndex","parameterTypes":["javafx.scene.Parent","java.lang.String"] }, {"name":"setRowIndex","parameterTypes":["javafx.scene.control.Button","java.lang.Integer"] }, {"name":"setRowIndex","parameterTypes":["javafx.scene.control.Button","java.lang.String"] }, {"name":"setRowIndex","parameterTypes":["javafx.scene.control.ButtonBase","java.lang.Integer"] }, {"name":"setRowIndex","parameterTypes":["javafx.scene.control.ButtonBase","java.lang.String"] }, {"name":"setRowIndex","parameterTypes":["javafx.scene.control.Control","java.lang.Integer"] }, {"name":"setRowIndex","parameterTypes":["javafx.scene.control.Control","java.lang.String"] }, {"name":"setRowIndex","parameterTypes":["javafx.scene.control.Label","java.lang.Integer"] }, {"name":"setRowIndex","parameterTypes":["javafx.scene.control.Label","java.lang.String"] }, {"name":"setRowIndex","parameterTypes":["javafx.scene.control.Labeled","java.lang.Integer"] }, {"name":"setRowIndex","parameterTypes":["javafx.scene.control.Labeled","java.lang.String"] }, {"name":"setRowIndex","parameterTypes":["javafx.scene.control.PasswordField","java.lang.Integer"] }, {"name":"setRowIndex","parameterTypes":["javafx.scene.control.PasswordField","java.lang.String"] }, {"name":"setRowIndex","parameterTypes":["javafx.scene.control.Skinnable","java.lang.Integer"] }, {"name":"setRowIndex","parameterTypes":["javafx.scene.control.Skinnable","java.lang.String"] }, {"name":"setRowIndex","parameterTypes":["javafx.scene.control.TextArea","java.lang.Integer"] }, {"name":"setRowIndex","parameterTypes":["javafx.scene.control.TextArea","java.lang.String"] }, {"name":"setRowIndex","parameterTypes":["javafx.scene.control.TextField","java.lang.Integer"] }, {"name":"setRowIndex","parameterTypes":["javafx.scene.control.TextField","java.lang.String"] }, {"name":"setRowIndex","parameterTypes":["javafx.scene.control.TextInputControl","java.lang.Integer"] }, {"name":"setRowIndex","parameterTypes":["javafx.scene.control.TextInputControl","java.lang.String"] }, {"name":"setRowIndex","parameterTypes":["javafx.scene.layout.HBox","java.lang.Integer"] }, {"name":"setRowIndex","parameterTypes":["javafx.scene.layout.HBox","java.lang.String"] }, {"name":"setRowIndex","parameterTypes":["javafx.scene.layout.Pane","java.lang.Integer"] }, {"name":"setRowIndex","parameterTypes":["javafx.scene.layout.Pane","java.lang.String"] }, {"name":"setRowIndex","parameterTypes":["javafx.scene.layout.Region","java.lang.Integer"] }, {"name":"setRowIndex","parameterTypes":["javafx.scene.layout.Region","java.lang.String"] }, {"name":"setVgap","parameterTypes":["double"] }]
+},
+{
+  "name":"javafx.scene.layout.HBox",
+  "queryAllDeclaredMethods":true,
+  "queryAllPublicConstructors":true,
+  "methods":[{"name":"<init>","parameterTypes":[] }, {"name":"setAlignment","parameterTypes":["javafx.geometry.Pos"] }]
+},
+{
+  "name":"javafx.scene.layout.Pane",
+  "queryAllDeclaredMethods":true,
+  "queryAllPublicConstructors":true,
+  "methods":[{"name":"<init>","parameterTypes":[] }, {"name":"getChildren","parameterTypes":[] }]
+},
+{
+  "name":"javafx.scene.layout.Priority",
+  "methods":[{"name":"valueOf","parameterTypes":["java.lang.String"] }]
+},
+{
+  "name":"javafx.scene.layout.Region",
+  "queryAllDeclaredMethods":true,
+  "methods":[{"name":"setMaxHeight","parameterTypes":["double"] }, {"name":"setMaxWidth","parameterTypes":["double"] }, {"name":"setMinHeight","parameterTypes":["double"] }, {"name":"setMinWidth","parameterTypes":["double"] }, {"name":"setPrefHeight","parameterTypes":["double"] }, {"name":"setPrefWidth","parameterTypes":["double"] }]
+},
+{
+  "name":"javafx.scene.layout.RowConstraints",
+  "queryAllDeclaredMethods":true,
+  "queryAllPublicConstructors":true,
+  "methods":[{"name":"<init>","parameterTypes":[] }, {"name":"setMaxHeight","parameterTypes":["double"] }, {"name":"setMinHeight","parameterTypes":["double"] }, {"name":"setPrefHeight","parameterTypes":["double"] }, {"name":"setVgrow","parameterTypes":["javafx.scene.layout.Priority"] }]
+},
+{
+  "name":"javafx.scene.layout.StackPane",
+  "queryAllDeclaredMethods":true,
+  "queryAllPublicConstructors":true,
+  "methods":[{"name":"<init>","parameterTypes":[] }, {"name":"getAlignment","parameterTypes":["javafx.scene.Node"] }, {"name":"getAlignment","parameterTypes":["javafx.scene.Parent"] }, {"name":"getAlignment","parameterTypes":["javafx.scene.layout.Pane"] }, {"name":"getAlignment","parameterTypes":["javafx.scene.layout.Region"] }, {"name":"getAlignment","parameterTypes":["javafx.scene.layout.VBox"] }, {"name":"isAlignment","parameterTypes":["javafx.scene.Parent"] }, {"name":"isAlignment","parameterTypes":["javafx.scene.layout.Pane"] }, {"name":"isAlignment","parameterTypes":["javafx.scene.layout.Region"] }, {"name":"isAlignment","parameterTypes":["javafx.scene.layout.VBox"] }, {"name":"setAlignment","parameterTypes":["java.lang.Object","java.lang.String"] }, {"name":"setAlignment","parameterTypes":["javafx.css.Styleable","java.lang.String"] }, {"name":"setAlignment","parameterTypes":["javafx.event.EventTarget","java.lang.String"] }, {"name":"setAlignment","parameterTypes":["javafx.scene.Node","java.lang.String"] }, {"name":"setAlignment","parameterTypes":["javafx.scene.Node","javafx.geometry.Pos"] }, {"name":"setAlignment","parameterTypes":["javafx.scene.Parent","java.lang.String"] }, {"name":"setAlignment","parameterTypes":["javafx.scene.Parent","javafx.geometry.Pos"] }, {"name":"setAlignment","parameterTypes":["javafx.scene.layout.Pane","java.lang.String"] }, {"name":"setAlignment","parameterTypes":["javafx.scene.layout.Pane","javafx.geometry.Pos"] }, {"name":"setAlignment","parameterTypes":["javafx.scene.layout.Region","java.lang.String"] }, {"name":"setAlignment","parameterTypes":["javafx.scene.layout.Region","javafx.geometry.Pos"] }, {"name":"setAlignment","parameterTypes":["javafx.scene.layout.VBox","java.lang.String"] }, {"name":"setAlignment","parameterTypes":["javafx.scene.layout.VBox","javafx.geometry.Pos"] }]
+},
+{
+  "name":"javafx.scene.layout.VBox",
+  "queryAllDeclaredMethods":true,
+  "queryAllPublicConstructors":true,
+  "methods":[{"name":"<init>","parameterTypes":[] }, {"name":"setAlignment","parameterTypes":["javafx.geometry.Pos"] }]
+},
+{
+  "name":"javafx.scene.shape.LineTo"
+},
+{
+  "name":"javafx.scene.shape.MoveTo"
+},
+{
+  "name":"javafx.scene.shape.Path"
+},
+{
+  "name":"javafx.scene.shape.PathElement"
+},
+{
+  "name":"javafx.scene.shape.Rectangle"
+},
+{
+  "name":"javafx.scene.shape.SVGPath"
+},
+{
+  "name":"javafx.scene.shape.Shape"
+},
+{
+  "name":"javafx.scene.text.Font"
+},
+{
+  "name":"javafx.scene.text.Text"
+},
+{
+  "name":"javafx.scene.text.TextAlignment",
+  "methods":[{"name":"valueOf","parameterTypes":["java.lang.String"] }]
+},
+{
+  "name":"javafx.scene.transform.Transform"
+},
+{
+  "name":"javafx.scene.web.WebView"
+},
+{
+  "name":"javafx.stage.PopupWindow"
+},
+{
+  "name":"javafx.stage.Stage"
+},
+{
+  "name":"javafx.stage.Window"
+},
+{
+  "name":"javax.smartcardio.CardPermission"
+},
+{
+  "name":"jdk.internal.misc.Unsafe",
+  "methods":[{"name":"getUnsafe","parameterTypes":[] }]
+},
+{
+  "name":"org.imtp.client.Client$1"
+},
+{
+  "name":"org.imtp.client.MainApp",
+  "methods":[{"name":"<init>","parameterTypes":[] }, {"name":"main","parameterTypes":["java.lang.String[]"] }]
+},
+{
+  "name":"org.imtp.client.controller.AbstractController",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true
+},
+{
+  "name":"org.imtp.client.controller.ChatController",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"org.imtp.client.controller.LoginController",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "methods":[{"name":"<init>","parameterTypes":[] }, {"name":"login","parameterTypes":["javafx.event.ActionEvent"] }]
+},
+{
+  "name":"org.imtp.client.handler.ClientCmdHandlerHandler",
+  "methods":[{"name":"channelActive","parameterTypes":["io.netty.channel.ChannelHandlerContext"] }]
+},
+{
+  "name":"org.imtp.client.handler.LoginHandler",
+  "methods":[{"name":"channelActive","parameterTypes":["io.netty.channel.ChannelHandlerContext"] }]
+},
+{
+  "name":"org.imtp.common.codec.IMTPDecoder"
+},
+{
+  "name":"org.imtp.common.codec.IMTPEncoder"
+},
+{
+  "name":"org.imtp.common.packet.body.LoginInfo",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[{"name":"getPassword","parameterTypes":[] }, {"name":"getUsername","parameterTypes":[] }]
+},
+{
+  "name":"org.imtp.common.packet.body.UserFriendInfo",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[{"name":"<init>","parameterTypes":[] }, {"name":"setAvatar","parameterTypes":["java.lang.String"] }, {"name":"setGender","parameterTypes":["java.lang.String"] }, {"name":"setId","parameterTypes":["java.lang.Long"] }, {"name":"setNickname","parameterTypes":["java.lang.String"] }]
+},
+{
+  "name":"org.imtp.common.packet.body.UserGroupInfo",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[{"name":"<init>","parameterTypes":[] }, {"name":"setAvatar","parameterTypes":["java.lang.String"] }, {"name":"setGroupName","parameterTypes":["java.lang.String"] }, {"name":"setId","parameterTypes":["java.lang.Long"] }]
+},
+{
+  "name":"org.imtp.common.packet.body.UserInfo",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[{"name":"<init>","parameterTypes":[] }, {"name":"setAvatar","parameterTypes":["java.lang.String"] }, {"name":"setGender","parameterTypes":["java.lang.String"] }, {"name":"setId","parameterTypes":["java.lang.Long"] }, {"name":"setNickname","parameterTypes":["java.lang.String"] }, {"name":"setPassword","parameterTypes":["java.lang.String"] }, {"name":"setUsername","parameterTypes":["java.lang.String"] }]
+},
+{
+  "name":"sun.misc.Unsafe",
+  "fields":[{"name":"theUnsafe"}],
+  "methods":[{"name":"copyMemory","parameterTypes":["java.lang.Object","long","java.lang.Object","long","long"] }, {"name":"getAndAddLong","parameterTypes":["java.lang.Object","long","long"] }, {"name":"getAndSetObject","parameterTypes":["java.lang.Object","long","java.lang.Object"] }, {"name":"invokeCleaner","parameterTypes":["java.nio.ByteBuffer"] }, {"name":"storeFence","parameterTypes":[] }]
+},
+{
+  "name":"sun.nio.ch.SelectorImpl",
+  "fields":[{"name":"publicSelectedKeys"}, {"name":"selectedKeys"}]
+},
+{
+  "name":"sun.security.provider.DRBG",
+  "methods":[{"name":"<init>","parameterTypes":["java.security.SecureRandomParameters"] }]
+},
+{
+  "name":"sun.security.provider.MD5",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"sun.security.provider.SHA",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"sun.security.provider.SHA2$SHA256",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+}
+]

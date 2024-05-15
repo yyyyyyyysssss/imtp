@@ -22,6 +22,7 @@
         <javafx.plugin.version>0.0.8</javafx.plugin.version>
         <gluonfx.plugin.version>1.0.22</gluonfx.plugin.version>
         <gluonfx.plugin.version>1.0.22</gluonfx.plugin.version>
+        <lombok.version>1.18.30</lombok.version>
     </properties>
 
     <dependencies>
@@ -69,78 +70,84 @@
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
+                <includes>
+                    <include>**/*.*</include>
+                </includes>
+                <filtering>false</filtering>
+            </resource>
+            <resource>
+                <directory>src/main/java</directory>
+                <includes>
+                    <include>**/*.*</include>
+                </includes>
+                <excludes>
+                    <exclude>**/*.java</exclude>
+                </excludes>
+                <filtering>false</filtering>
             </resource>
         </resources>
         <finalName>imtp-client</finalName>
         <plugins>
 
-            <!-- 使用maven-assembly-plugin插件打包 -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <version>3.2.0</version>
-                <configuration>
-                    <archive>
-                        <manifest>
-                            <mainClass>org.imtp.client.Launcher</mainClass>
-                        </manifest>
-                    </archive>
-                    <descriptorRefs>
-                        <descriptorRef>jar-with-dependencies</descriptorRef>
-                    </descriptorRefs>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>make-assembly</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.8.1</version>
+                <version>3.11.0</version>
                 <configuration>
                     <source>${java.version}</source> <!-- depending on your project -->
                     <target>${java.version}</target> <!-- depending on your project -->
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>${lombok.version}</version>
+                        </path>
+                    </annotationProcessorPaths>
                 </configuration>
             </plugin>
 
-<!--            <plugin>-->
-<!--                <groupId>org.openjfx</groupId>-->
-<!--                <artifactId>javafx-maven-plugin</artifactId>-->
-<!--                <version>${javafx.plugin.version}</version>-->
-<!--                <configuration>-->
-<!--                    <mainClass>org.imtp.client.MainApp</mainClass>-->
-<!--                </configuration>-->
-<!--            </plugin>-->
+            <plugin>
+                <groupId>org.openjfx</groupId>
+                <artifactId>javafx-maven-plugin</artifactId>
+                <version>${javafx.plugin.version}</version>
+                <configuration>
+                    <mainClass>org.imtp.client.MainApp</mainClass>
+                </configuration>
+            </plugin>
 
             <!-- 本地镜像打包           -->
-<!--            <plugin>-->
-<!--                <groupId>com.gluonhq</groupId>-->
-<!--                <artifactId>gluonfx-maven-plugin</artifactId>-->
-<!--                <version>${gluonfx.plugin.version}</version>-->
-<!--                <configuration>-->
-<!--                    <mainClass>org.imtp.client.Launcher</mainClass>-->
-<!--                    <attachList>-->
-<!--                        <list>display</list>-->
-<!--                        <list>lifecycle</list>-->
-<!--                        <list>statusbar</list>-->
-<!--                        <list>storage</list>-->
-<!--                    </attachList>-->
-<!--                    <nativeImageArgs>-->
-<!--                        <nativeImageArg>-H:TraceClassInitialization=true</nativeImageArg>-->
-<!--                        <nativeImageArg>&#45;&#45;initialize-at-build-time=ch.qos.logback.core.pattern.parser.Parser,ch.qos.logback.core.util.StatusPrinter,ch.qos.logback.core.util.Loader,org.slf4j.impl.StaticLoggerBinder,org.slf4j.LoggerFactory,ch.qos.logback.classic.Logger,ch.qos.logback.core.spi.AppenderAttachableImpl,ch.qos.logback.core.status.StatusBase,ch.qos.logback.classic.Level,ch.qos.logback.core.status.InfoStatus,ch.qos.logback.classic.PatternLayout,ch.qos.logback.core.CoreConstants</nativeImageArg>-->
-<!--                        <nativeImageArg>&#45;&#45;trace-class-initialization=ch.qos.logback.classic.Level,ch.qos.logback.core.util.Loader,ch.qos.logback.core.util.StatusPrinter,ch.qos.logback.core.CoreConstants,ch.qos.logback.classic.Logger,ch.qos.logback.core.pattern.parser.Parser</nativeImageArg>-->
-<!--                        <nativeImageArg>&#45;&#45;initialize-at-run-time=io.netty.channel.AbstractChannel</nativeImageArg>-->
-<!--                    </nativeImageArgs>-->
-<!--                </configuration>-->
-<!--            </plugin>-->
+            <plugin>
+                <groupId>com.gluonhq</groupId>
+                <artifactId>gluonfx-maven-plugin</artifactId>
+                <version>${gluonfx.plugin.version}</version>
+                <configuration>
+                    <mainClass>org.imtp.client.MainApp</mainClass>
+                    <attachList>
+                        <list>display</list>
+                        <list>lifecycle</list>
+                        <list>statusbar</list>
+                        <list>storage</list>
+                    </attachList>
+                    <nativeImageArgs>
+                        <nativeImageArg>-H:TraceClassInitialization=true</nativeImageArg>
+                        <nativeImageArg>--initialize-at-build-time=ch.qos.logback.core.pattern.parser.Parser,ch.qos.logback.core.util.StatusPrinter,ch.qos.logback.core.util.Loader,org.slf4j.impl.StaticLoggerBinder,org.slf4j.LoggerFactory,ch.qos.logback.classic.Logger,ch.qos.logback.core.spi.AppenderAttachableImpl,ch.qos.logback.core.status.StatusBase,ch.qos.logback.classic.Level,ch.qos.logback.core.status.InfoStatus,ch.qos.logback.classic.PatternLayout,ch.qos.logback.core.CoreConstants</nativeImageArg>
+                        <nativeImageArg>--trace-class-initialization=ch.qos.logback.classic.Level,ch.qos.logback.core.util.Loader,ch.qos.logback.core.util.StatusPrinter,ch.qos.logback.core.CoreConstants,ch.qos.logback.classic.Logger,ch.qos.logback.core.pattern.parser.Parser</nativeImageArg>
+                        <nativeImageArg>--initialize-at-run-time=io.netty.channel.AbstractChannel</nativeImageArg>
+                    </nativeImageArgs>
+                    <reflectionList>
+                        <list>org.imtp.client.controller.LoginController</list>
+                        <list>org.imtp.client.controller.ChatController</list>
+                        <list>org.imtp.client.controller.HomeController</list>
+                    </reflectionList>
+                    <bundlesList>
+                        <list>com.sun.glass.ui.win</list>
+                    </bundlesList>
+                    <linkerArgs>
+                        <arg>management_ext.lib</arg>
+                        <arg>psapi.lib</arg>
+                    </linkerArgs>
+                </configuration>
+            </plugin>
 
 
         </plugins>
@@ -148,46 +155,41 @@
     </build>
 
     <profiles>
+        <!--  jar方式运行      -->
         <profile>
-            <id>native</id>
+            <id>jar</id>
             <build>
                 <plugins>
                     <plugin>
-                        <groupId>org.graalvm.buildtools</groupId>
-                        <artifactId>native-maven-plugin</artifactId>
-                        <configuration>
-                            <mainClass>org.imtp.client.MainApp</mainClass>
-                            <imageName>${project.artifactId}</imageName>
-                            <metadataRepository>
-                                <enabled>true</enabled>
-                            </metadataRepository>
-                            <!-- 开启快速构建模式  -->
-                            <quickBuild>true</quickBuild>
-                            <buildArgs>
-                                <!-- 开启G1垃圾收集器  目前只有linux平台支持 -->
-                                <!--                                <buildArg>&#45;&#45;gc=G1</buildArg>-->
-                                <!-- 在映像构建过程中显示异常堆栈跟踪 -->
-                                <buildArg>-H:+ReportExceptionStackTraces</buildArg>
-                                <!-- 添加构建报告 -->
-                                <buildArg>-H:+BuildReport</buildArg>
-                                <buildArg>-H:TraceClassInitialization=true</buildArg>
-                                <buildArg>--initialize-at-build-time=ch.qos.logback.core.pattern.parser.Parser,ch.qos.logback.core.util.StatusPrinter,ch.qos.logback.core.util.Loader,org.slf4j.impl.StaticLoggerBinder,org.slf4j.LoggerFactory,ch.qos.logback.classic.Logger,ch.qos.logback.core.spi.AppenderAttachableImpl,ch.qos.logback.core.status.StatusBase,ch.qos.logback.classic.Level,ch.qos.logback.core.status.InfoStatus,ch.qos.logback.classic.PatternLayout,ch.qos.logback.core.CoreConstants</buildArg>
-                                <buildArg>--trace-class-initialization=ch.qos.logback.classic.Level,ch.qos.logback.core.util.Loader,ch.qos.logback.core.util.StatusPrinter,ch.qos.logback.core.CoreConstants,ch.qos.logback.classic.Logger,ch.qos.logback.core.pattern.parser.Parser</buildArg>
-                                <buildArg>--initialize-at-run-time=io.netty.channel.AbstractChannel</buildArg>
-                            </buildArgs>
-                        </configuration>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-shade-plugin</artifactId>
+                        <version>3.2.1</version>
                         <executions>
-                            <!-- 在打包阶段在当前jvm中执行native编译 不会创建（fork）一个新的JVM来运行编译器 -->
                             <execution>
-                                <id>build-native</id>
-                                <goals>
-                                    <goal>compile-no-fork</goal>
-                                </goals>
                                 <phase>package</phase>
+                                <goals>
+                                    <goal>shade</goal>
+                                </goals>
+                                <configuration>
+                                    <createDependencyReducedPom>false</createDependencyReducedPom>
+                                    <transformers>
+                                        <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                            <mainClass>org.imtp.client.Launcher</mainClass>
+                                        </transformer>
+                                    </transformers>
+                                    <filters>
+                                        <filter>
+                                            <artifact>*:*</artifact>
+                                            <excludes>
+                                                <exclude>module-info.class</exclude>
+                                                <exclude>META-INF/versions/**</exclude>
+                                            </excludes>
+                                        </filter>
+                                    </filters>
+                                </configuration>
                             </execution>
                         </executions>
                     </plugin>
-
                 </plugins>
             </build>
         </profile>

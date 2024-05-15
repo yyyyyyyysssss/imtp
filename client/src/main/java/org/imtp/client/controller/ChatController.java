@@ -5,13 +5,11 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
@@ -31,7 +29,6 @@ import org.imtp.common.packet.body.OfflineMessageInfo;
 import org.imtp.common.packet.body.UserFriendInfo;
 import org.imtp.common.packet.body.UserGroupInfo;
 
-import java.net.URL;
 import java.util.List;
 import java.util.Random;
 
@@ -94,7 +91,7 @@ public class ChatController extends AbstractController{
                         super.updateItem(sessionEntity,b);
                         if(sessionEntity != null){
                             //TODO 临时头像测试···
-                            String url = ResourceUtils.classPathResource("image/tmp.jpg").toExternalForm();
+                            String url = ResourceUtils.classPathResource("/img/tmp.jpg").toExternalForm();
                             ImageView imageView = new ImageView(url);
                             imageView.setFitHeight(40);
                             imageView.setFitWidth(40);

@@ -8,6 +8,7 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import lombok.extern.slf4j.Slf4j;
 import org.imtp.client.controller.Controller;
 import org.imtp.client.model.MessageModel;
 import org.imtp.client.util.ResourceUtils;
@@ -15,6 +16,7 @@ import org.imtp.client.util.ResourceUtils;
 import java.io.IOException;
 import java.net.URL;
 
+@Slf4j
 public class SceneManager {
 
     private Stage stage;
@@ -38,6 +40,7 @@ public class SceneManager {
             try {
                 parent = fxmlLoader.load();
             } catch (IOException e) {
+                log.error(fxmlPath+"文件加载异常:",e);
                 throw new RuntimeException(e);
             }
             ObservableList<Node> childrenUnmodifiable = parent.getChildrenUnmodifiable();
