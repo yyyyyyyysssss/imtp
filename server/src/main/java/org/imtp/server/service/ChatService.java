@@ -1,5 +1,6 @@
 package org.imtp.server.service;
 
+import org.imtp.common.packet.body.UserSessionInfo;
 import org.imtp.server.entity.Group;
 import org.imtp.server.entity.Message;
 import org.imtp.server.entity.OfflineMessage;
@@ -29,5 +30,8 @@ public interface ChatService {
 
     //根据用户id查询该用户的离线消息
     List<Message> findOfflineMessageByUserId(Long userId);
+
+    //根据用户id查询会话
+    List<UserSessionInfo> findUserSessionByUserId(Long userId);
 
 }

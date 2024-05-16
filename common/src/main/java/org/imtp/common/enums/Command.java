@@ -17,6 +17,9 @@ public enum Command {
     OFFLINE_MSG_REQ((byte)123,"离线消息拉取"),
     OFFLINE_MSG_RES((byte)-123,"离线消息响应"),
 
+    USER_SESSION_REQ((byte)122,"用户会话拉取"),
+    USER_SESSION_RES((byte)-122,"用户会话响应"),
+
     TEXT_MESSAGE((byte) 1,"文本"),
     VOICE_MESSAGE((byte) 2,"语音"),
     MEME_MESSAGE((byte) 3,"表情包"),

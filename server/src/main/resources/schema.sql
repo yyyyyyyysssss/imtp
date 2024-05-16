@@ -10,6 +10,7 @@ CREATE TABLE `im_group`  (
                              `name` varchar(48) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '群名称',
                              `create_user_id` bigint(0) NULL DEFAULT NULL COMMENT '创建人id',
                              `create_time` datetime(0) NULL DEFAULT NULL COMMENT '创建时间',
+                             `avatar` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '头像',
                              `state` tinyint(1) NULL DEFAULT NULL COMMENT '群组状态 0  已解散 1 正常',
                              PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
@@ -86,13 +87,13 @@ CREATE TABLE `im_user_friend`  (
 -- Table structure for im_user_session
 -- ----------------------------
 DROP TABLE IF EXISTS `im_user_session`;
-CREATE TABLE `im_user_session`  (
-                                    `id` bigint NOT NULL,
-                                    `user_id` bigint NULL DEFAULT NULL COMMENT '关联用户id',
-                                    `receiver_id` bigint NULL DEFAULT NULL COMMENT '接收人id',
-                                    `created_time` datetime(0) NULL DEFAULT NULL COMMENT '创建时间',
-                                    PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+CREATE TABLE `im_user_session` (
+                                   `id` bigint NOT NULL,
+                                   `user_id` bigint DEFAULT NULL COMMENT '用户id',
+                                   `last_msg_id` bigint DEFAULT NULL COMMENT '关联最后一条消息id',
+                                   `receiver_user_id` bigint DEFAULT NULL COMMENT '接收人id',
+                                   PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC;
 
 
 SET FOREIGN_KEY_CHECKS = 1;

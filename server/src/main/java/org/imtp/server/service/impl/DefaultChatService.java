@@ -4,14 +4,14 @@ import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.imtp.common.packet.body.UserSessionInfo;
 import org.imtp.server.entity.*;
 import org.imtp.server.mapper.*;
 import org.imtp.server.service.ChatService;
 import org.imtp.server.service.OfflineMessageService;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -43,6 +43,9 @@ public class DefaultChatService implements ChatService {
 
     @Resource
     private OfflineMessageService offlineMessageService;
+
+    @Resource
+    private UserSessionMapper userSessionMapper;
 
     @Override
     public User findByUsername(String username) {
@@ -118,5 +121,53 @@ public class DefaultChatService implements ChatService {
         return messageMapper.selectList(messageQueryWrapper);
     }
 
+    @Override
+    public List<UserSessionInfo> findUserSessionByUserId(Long userId) {
+        Wrapper<UserSession> userSessionQueryWrapper = new QueryWrapper<UserSession>()
+                .in("user_id", userId);
+        List<UserSession> userSessions = userSessionMapper.selectList(userSessionQueryWrapper);
+        if (userSessions.isEmpty()){
+            return List.of();
+        }
+        Set<Long> receiverUserIds = new HashSet<>();
+        Set<Long> msgIds = new HashSet<>();
+        for (UserSession userSession : userSessions){
+            receiverUserIds.add(userSession.getReceiverUserId());
+            msgIds.add(userSession.getLastMsgId());
+        }
+        List<User> users = userMapper.selectBatchIds(receiverUserIds);
+        Map<Long, User> userIdMap = users.stream().collect(Collectors.toMap(User::getId, a -> a));
 
+        List<Group> groups = groupMapper.selectBatchIds(receiverUserIds);
+        Map<Long, Group> groupMap = groups.stream().collect(Collectors.toMap(Group::getId, a -> a));
+
+        List<Message> messages = messageMapper.selectBatchIds(msgIds);
+        Map<Long, Message> messageIdMap = messages.stream().collect(Collectors.toMap(Message::getId, a -> a));
+        List<UserSessionInfo> userSessionInfos = new ArrayList<>();
+        UserSessionInfo userSessionInfo;
+        for (UserSession userSession : userSessions){
+            userSessionInfo = new UserSessionInfo();
+            userSessionInfo.setId(userSession.getId());
+            userSessionInfo.setReceiverUserId(userSession.getReceiverUserId());
+
+            User user;
+            if ((user = userIdMap.get(userSession.getReceiverUserId())) != null){
+                userSessionInfo.setName(user.getNickname());
+                userSessionInfo.setAvatar(user.getAvatar());
+            }else {
+                Group group = groupMap.get(userSession.getReceiverUserId());
+                userSessionInfo.setName(group.getName());
+                userSessionInfo.setAvatar(group.getAvatar());
+            }
+
+            Message message = messageIdMap.get(userSession.getLastMsgId());
+            userSessionInfo.setLastMsgType(message.getType());
+            userSessionInfo.setLastMsgContent(message.getContent());
+            userSessionInfo.setLastMsgTime(message.getSendTime().getTime());
+
+            userSessionInfos.add(userSessionInfo);
+        }
+
+        return userSessionInfos;
+    }
 }

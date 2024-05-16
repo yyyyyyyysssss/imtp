@@ -24,6 +24,9 @@ public class Group {
     @TableField("create_user_id")
     private Long createUserId;
 
+    @TableField("avatar")
+    private String avatar;
+
     @TableField("create_time")
     private Date createTime;
 
