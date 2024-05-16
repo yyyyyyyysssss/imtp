@@ -48,19 +48,4 @@ public abstract class AbstractController implements Controller, Observer {
     protected void switchScene(String fxmlPath,String title,MessageModel messageModel){
         this.sceneManager.setScene(fxmlPath,title,messageModel);
     }
-
-    protected Tuple2<Node,Controller> loadNodeByPath(String path){
-        URL url = ResourceUtils.classPathResource(path);
-        FXMLLoader fxmlLoader = new FXMLLoader();
-        fxmlLoader.setLocation(url);
-        fxmlLoader.setBuilderFactory(new JavaFXBuilderFactory());
-        Node node = null;
-        try {
-            node = fxmlLoader.load();
-        } catch (IOException e) {
-            log.error("{}文件加载异常:", path, e);
-        }
-        Controller controller = fxmlLoader.getController();
-        return new Tuple2<>(node,controller);
-    }
 }

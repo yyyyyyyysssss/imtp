@@ -7,13 +7,13 @@
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 
-<HBox prefWidth="230.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+<HBox prefWidth="205.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="org.imtp.client.controller.UserSessionItemController">
     <children>
         <ImageView fx:id="sessionImg" fitHeight="40.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true"/>
-        <VBox prefHeight="40.0" prefWidth="180.0">
+        <VBox prefHeight="40.0" prefWidth="165.0">
             <children>
-                <HBox prefWidth="180.0">
+                <HBox prefWidth="165.0">
                     <children>
                         <Label fx:id="nameLabel">
                             <padding>
@@ -22,14 +22,11 @@
                         </Label>
                         <Region HBox.hgrow="ALWAYS"/>
                         <Label fx:id="timeLabel" style="-fx-text-fill: Grey">
-                            <padding>
-                                <Insets right="2.0"/>
-                            </padding>
                         </Label>
                     </children>
                 </HBox>
-                <Region prefWidth="180.0" VBox.vgrow="ALWAYS"/>
-                <HBox prefWidth="180.0">
+                <Region prefWidth="165.0" VBox.vgrow="ALWAYS"/>
+                <HBox prefWidth="165.0">
                     <children>
                         <Label fx:id="lastMsg" style="-fx-text-fill: Grey">
                             <padding>
@@ -38,9 +35,6 @@
                         </Label>
                         <Region HBox.hgrow="ALWAYS"/>
                         <Label fx:id="isAlert" style="-fx-text-fill: Grey">
-                            <padding>
-                                <Insets right="2.0"/>
-                            </padding>
                         </Label>
                     </children>
                 </HBox>

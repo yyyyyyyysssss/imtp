@@ -5,25 +5,11 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.geometry.Pos;
-import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
-import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
-import javafx.scene.layout.VBox;
-import javafx.util.Callback;
 import lombok.extern.slf4j.Slf4j;
-import org.imtp.client.constant.FXMLResourceConstant;
 import org.imtp.client.entity.SessionEntity;
-import org.imtp.client.util.ResourceUtils;
-import org.imtp.client.util.Tuple2;
 import org.imtp.common.packet.FriendshipResponse;
 import org.imtp.common.packet.GroupRelationshipResponse;
 import org.imtp.common.packet.OfflineMessageResponse;
@@ -86,30 +72,7 @@ public class ChatController extends AbstractController{
     }
 
     private void setListView(List<SessionEntity> sessionEntities){
-        listView.setCellFactory(new Callback<ListView<SessionEntity>, ListCell<SessionEntity>>() {
-            @Override
-            public ListCell<SessionEntity> call(ListView<SessionEntity> sessionEntityListView) {
-                return new ListCell<>(){
-                    @Override
-                    protected void updateItem(SessionEntity sessionEntity, boolean b) {
-                        super.updateItem(sessionEntity,b);
-                        if(sessionEntity != null){
-                            Tuple2<Node, Controller> tuple2 = loadNodeByPath(FXMLResourceConstant.USER_SESSION_ITEM_FML);
-                            //临时头像测试
-                            String url = ResourceUtils.classPathResource("/img/tmp.jpg").toExternalForm();
-                            sessionEntity.setAvatar(url);
-                            sessionEntity.setLastMsg("好的吧");
-                            Node node = tuple2.getV1();
-                            Controller controller = tuple2.getV2();
-                            controller.initData(sessionEntity);
-                            setGraphic(node);
-                        }else {
-                            setGraphic(null);
-                        }
-                    }
-                };
-            }
-        });
+        listView.setCellFactory(c -> new UserSessionListCell());
         ObservableList<SessionEntity> sessionEntityObservableList = FXCollections.observableArrayList(sessionEntities);
         listView.setItems(sessionEntityObservableList);
         //默认选中第一项
@@ -120,7 +83,7 @@ public class ChatController extends AbstractController{
             @Override
             public void handle(MouseEvent mouseEvent) {
                 SessionEntity sessionEntity = listView.getSelectionModel().getSelectedItem();
-                System.out.println(sessionEntity);
+                sessionEntityObservableList.addLast(sessionEntity);
             }
         });
     }
