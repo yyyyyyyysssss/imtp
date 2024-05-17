@@ -112,7 +112,7 @@ public class ChatController extends AbstractController{
         sessionEntity.setAvatar(userSessionInfo.getAvatar());
         sessionEntity.setReceiverId(userSessionInfo.getId());
         sessionEntity.setTimestamp(userSessionInfo.getLastMsgTime());
-//        sessionEntity.setLastMsgType(userSessionInfo.getLastMsgType());
+        sessionEntity.setLastMsgType(userSessionInfo.getLastMsgType());
         sessionEntity.setLastMsg(userSessionInfo.getLastMsgContent());
         return sessionEntity;
     }
