@@ -15,6 +15,8 @@ public class SessionEntity {
 
     private Long receiverId;
 
+    private Integer lastMsgType;
+
     private String lastMsg;
 
     private Long timestamp;
@@ -26,6 +28,7 @@ public class SessionEntity {
                 ", name='" + name + '\'' +
                 ", avatar='" + avatar + '\'' +
                 ", receiverId=" + receiverId +
+                ", lastMsgType=" + lastMsgType +
                 ", lastMsg='" + lastMsg + '\'' +
                 ", timestamp=" + timestamp +
                 '}';

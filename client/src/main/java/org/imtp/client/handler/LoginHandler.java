@@ -66,4 +66,24 @@ public class LoginHandler extends AbstractMessageModelHandler<Packet> {
     public MessageModel getNextModel() {
         return this.clientCmdHandlerHandler;
     }
+
+    @Override
+    public void pullFriendship() {
+        throw new UnsupportedOperationException("pullFriendship");
+    }
+
+    @Override
+    public void pullGroupRelationship() {
+        throw new UnsupportedOperationException("pullGroupRelationship");
+    }
+
+    @Override
+    public void pullOfflineMessage() {
+        throw new UnsupportedOperationException("pullOfflineMessage");
+    }
+
+    @Override
+    public void pullUserSession() {
+        throw new UnsupportedOperationException("pullUserSession");
+    }
 }

@@ -29,7 +29,7 @@ public class Message {
         this.id = IdGen.genId();
         this.senderUserId = packet.getSender();
         this.receiverUserId = packet.getReceiver();
-        this.type = (int)packet.getHeader().getCmd().getCmdCode();
+        this.type = (int) packet.getHeader().getCmd().getCmdCode();
         this.sendTime = new Date();
         if(packet.isGroup()){
             this.deliveryMethod = DeliveryMethod.GROUP;

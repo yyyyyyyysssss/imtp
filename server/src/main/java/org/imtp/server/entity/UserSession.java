@@ -1,8 +1,10 @@
 package org.imtp.server.entity;
 
+import com.baomidou.mybatisplus.annotation.EnumValue;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
+import org.imtp.common.enums.DeliveryMethod;
 
 /**
  * @Description
@@ -14,7 +16,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@TableName("im_user")
+@TableName("im_user_session")
 public class UserSession {
 
     @TableField
@@ -28,5 +30,9 @@ public class UserSession {
 
     @TableField("last_msg_id")
     private Long lastMsgId;
+
+    @TableField("delivery_method")
+    @EnumValue
+    private DeliveryMethod deliveryMethod;
 
 }

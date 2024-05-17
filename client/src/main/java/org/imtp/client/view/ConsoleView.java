@@ -4,7 +4,6 @@ import org.imtp.client.context.ClientContextHolder;
 import org.imtp.client.controller.Controller;
 import org.imtp.client.model.MessageModel;
 import org.imtp.client.model.Observer;
-import org.imtp.common.enums.DeliveryMethod;
 import org.imtp.common.packet.FriendshipResponse;
 import org.imtp.common.packet.GroupRelationshipResponse;
 import org.imtp.common.packet.OfflineMessageResponse;
@@ -88,7 +87,8 @@ public class ConsoleView implements Observer,Runnable {
             isSend = true;
             String s = scanner.nextLine();
             String[] args = s.split(" ");
-            for (int i = 0; i < args.length; i++) {
+            int len = args.length;
+            a:for (int i = 0; i < args.length; i++) {
                 p = args[i];
                 if((cc = p.toCharArray())[0] != '-'){
                     msg = args[i];
@@ -97,13 +97,24 @@ public class ConsoleView implements Observer,Runnable {
                 for (int j = 1; j < cc.length; j++) {
                     switch ((c = cc[j])){
                         case 'r':
-                            receiver = Long.parseLong(args[++i]);
+                            if(++i != len){
+                                receiver = Long.parseLong(args[i]);
+                            }else {
+                                System.out.println("接收人不可为空");
+                                break a;
+                            }
                             break;
                         case 'g':
                             isGroupChat = true;
                             break;
                         case 't':
-                            msg = args[++i];
+                            if(++i != len){
+                                msg = args[i];
+                            }else {
+                                System.out.println("消息不可为空");
+                                break a;
+                            }
+                            break ;
                         case 'h':
                             System.out.println("可选操作:");
                             System.out.println("    -r 消息接收人(对方账号)*");
@@ -119,14 +130,18 @@ public class ConsoleView implements Observer,Runnable {
             if(!isSend){
                 continue;
             }
+            if (msg == null){
+                System.out.println("消息不可为空");
+                continue;
+            }
             if(receiver == null){
                 System.out.println("接收人不可为空");
                 continue;
             }
             if(isGroupChat){
-                controller.send(new TextMessage(msg, ClientContextHolder.clientContext().id(), receiver));
-            }else {
                 controller.send(new TextMessage(msg, ClientContextHolder.clientContext().id(), receiver,true));
+            }else {
+                controller.send(new TextMessage(msg, ClientContextHolder.clientContext().id(), receiver,false));
             }
 
         }

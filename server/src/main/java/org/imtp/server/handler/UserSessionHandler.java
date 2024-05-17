@@ -27,7 +27,7 @@ public class UserSessionHandler extends AbstractHandler<UserSessionRequest>{
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, UserSessionRequest userSessionRequest) {
         List<UserSessionInfo> userSessionInfos = chatService.findUserSessionByUserId(userSessionRequest.getSender());
         if(userSessionInfos.isEmpty()){
-            channelHandlerContext.channel().writeAndFlush(new UserSessionRequest(userSessionRequest.getSender()));
+            channelHandlerContext.channel().writeAndFlush(new UserSessionResponse(userSessionRequest.getSender()));
             return;
         }
         channelHandlerContext.channel().writeAndFlush(new UserSessionResponse(userSessionRequest.getSender(),userSessionInfos));

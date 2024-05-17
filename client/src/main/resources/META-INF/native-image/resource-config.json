@@ -5,6 +5,9 @@
         "pattern": "client:\\Qfxml/*.fxml\\E"
       },
       {
+        "pattern": "client:\\Qcss/*.css\\E"
+      },
+      {
         "pattern": "client:\\Qimg/*.jpg\\E"
       },
       {

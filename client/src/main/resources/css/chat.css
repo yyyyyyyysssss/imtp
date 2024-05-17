@@ -5,3 +5,7 @@
 .list-view .scroll-bar:horizontal{
     -fx-scale-x: 0;
 }
+
+.user-session-listview{
+    -fx-padding: 1px;
+}

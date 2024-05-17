@@ -92,6 +92,7 @@ CREATE TABLE `im_user_session` (
                                    `user_id` bigint DEFAULT NULL COMMENT '用户id',
                                    `last_msg_id` bigint DEFAULT NULL COMMENT '关联最后一条消息id',
                                    `receiver_user_id` bigint DEFAULT NULL COMMENT '接收人id',
+                                   `delivery_method` varchar(12) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '投递方式',
                                    PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC;
 

@@ -3,8 +3,6 @@ package org.imtp.common.packet.body;
 import lombok.*;
 import org.imtp.common.enums.DeliveryMethod;
 
-import java.util.Date;
-
 /**
  * @Description
  * @Author ys

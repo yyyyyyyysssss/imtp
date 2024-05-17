@@ -4,6 +4,10 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import org.imtp.client.context.ClientContextHolder;
 import org.imtp.client.model.Observer;
 import org.imtp.client.model.MessageModel;
+import org.imtp.common.packet.FriendshipRequest;
+import org.imtp.common.packet.GroupRelationshipRequest;
+import org.imtp.common.packet.OfflineMessageRequest;
+import org.imtp.common.packet.UserSessionRequest;
 import org.imtp.common.packet.base.Packet;
 
 import java.util.ArrayList;
@@ -80,16 +84,21 @@ public abstract class AbstractMessageModelHandler<T> extends SimpleChannelInboun
 
     @Override
     public void pullFriendship() {
-        throw new UnsupportedOperationException("pullFriendship");
+        ClientContextHolder.clientContext().channel().writeAndFlush(new FriendshipRequest(ClientContextHolder.clientContext().id()));
     }
 
     @Override
     public void pullGroupRelationship() {
-        throw new UnsupportedOperationException("pullFriendship");
+        ClientContextHolder.clientContext().channel().writeAndFlush(new GroupRelationshipRequest(ClientContextHolder.clientContext().id()));
     }
 
     @Override
     public void pullOfflineMessage() {
-        throw new UnsupportedOperationException("pullFriendship");
+        ClientContextHolder.clientContext().channel().writeAndFlush(new OfflineMessageRequest(ClientContextHolder.clientContext().id()));
+    }
+
+    @Override
+    public void pullUserSession() {
+        ClientContextHolder.clientContext().channel().writeAndFlush(new UserSessionRequest(ClientContextHolder.clientContext().id()));
     }
 }

@@ -23,7 +23,7 @@ public class ClientCmdHandlerHandler extends AbstractMessageModelHandler<Packet>
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) {
-//        new ConsoleController(this);
+        new ConsoleController(this);
     }
 
     @Override
@@ -42,6 +42,9 @@ public class ClientCmdHandlerHandler extends AbstractMessageModelHandler<Packet>
             case OFFLINE_MSG_RES:
                 publishMessage(new OfflineMessageResponse(byteBuf,header));
                 break;
+            case USER_SESSION_RES:
+                publishMessage(new UserSessionResponse(byteBuf,header));
+                break;
             case TEXT_MESSAGE:
                 publishMessage(new TextMessage(byteBuf,header));
                 break;
@@ -56,20 +59,5 @@ public class ClientCmdHandlerHandler extends AbstractMessageModelHandler<Packet>
     @Override
     public MessageModel getNextModel() {
         return this;
-    }
-
-    @Override
-    public void pullFriendship() {
-        ClientContextHolder.clientContext().channel().writeAndFlush(new FriendshipRequest(ClientContextHolder.clientContext().id()));
-    }
-
-    @Override
-    public void pullGroupRelationship() {
-        ClientContextHolder.clientContext().channel().writeAndFlush(new GroupRelationshipRequest(ClientContextHolder.clientContext().id()));
-    }
-
-    @Override
-    public void pullOfflineMessage() {
-        ClientContextHolder.clientContext().channel().writeAndFlush(new OfflineMessageRequest(ClientContextHolder.clientContext().id()));
     }
 }

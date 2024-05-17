@@ -40,6 +40,9 @@ public class CommandHandler extends SimpleChannelInboundHandler<Packet> {
     @Resource
     private OfflineMessageHandler offlineMessageHandler;
 
+    @Resource
+    private UserSessionHandler userSessionHandler;
+
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, Packet packet) {
         if(packet instanceof CommandPacket commandPacket){
@@ -58,6 +61,10 @@ public class CommandHandler extends SimpleChannelInboundHandler<Packet> {
                 case OFFLINE_MSG_REQ:
                     packet = new OfflineMessageRequest(byteBuf,header);
                     channelHandlerContext.pipeline().addLast(offlineMessageHandler).fireChannelRead(packet);
+                    break;
+                case USER_SESSION_REQ:
+                    packet = new UserSessionRequest(byteBuf,header);
+                    channelHandlerContext.pipeline().addLast(userSessionHandler).fireChannelRead(packet);
                     break;
                 case TEXT_MESSAGE:
                     packet = new TextMessage(byteBuf,header);

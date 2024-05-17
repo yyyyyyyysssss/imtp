@@ -11,6 +11,8 @@ public interface MessageModel extends Model{
 
     void pullOfflineMessage();
 
+    void pullUserSession();
+
     void publishMessage(Packet packet);
 
     void sendMessage(Packet packet);

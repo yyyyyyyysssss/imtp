@@ -10,14 +10,12 @@ import javafx.scene.control.TextArea;
 import javafx.scene.input.MouseEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.imtp.client.entity.SessionEntity;
-import org.imtp.common.packet.FriendshipResponse;
-import org.imtp.common.packet.GroupRelationshipResponse;
-import org.imtp.common.packet.OfflineMessageResponse;
-import org.imtp.common.packet.TextMessage;
+import org.imtp.common.packet.*;
 import org.imtp.common.packet.base.Packet;
 import org.imtp.common.packet.body.OfflineMessageInfo;
 import org.imtp.common.packet.body.UserFriendInfo;
 import org.imtp.common.packet.body.UserGroupInfo;
+import org.imtp.common.packet.body.UserSessionInfo;
 
 import java.util.List;
 import java.util.Random;
@@ -33,9 +31,10 @@ public class ChatController extends AbstractController{
 
     @Override
     protected void init0() {
-        messageModel.pullFriendship();
-        messageModel.pullGroupRelationship();
+//        messageModel.pullFriendship();
+//        messageModel.pullGroupRelationship();
         messageModel.pullOfflineMessage();
+        messageModel.pullUserSession();
     }
 
     @Override
@@ -60,6 +59,14 @@ public class ChatController extends AbstractController{
                 List<OfflineMessageInfo> offlineMessageInfos = offlineMessageResponse.getOfflineMessageInfos();
                 System.out.println(offlineMessageInfos);
                 break;
+            case USER_SESSION_RES:
+                UserSessionResponse userSessionResponse = (UserSessionResponse)packet;
+                List<UserSessionInfo> userSessionInfos = userSessionResponse.getUserSessionInfos();
+                if(userSessionInfos != null && !userSessionInfos.isEmpty()){
+                    List<SessionEntity> sessionEntities = userSessionInfos.stream().map(this::convertSessionEntity).toList();
+                    setListView(sessionEntities);
+                }
+                break;
             case TEXT_MESSAGE:
                 TextMessage textMessage = (TextMessage) packet;
                 if(textMessage.isGroup()){
@@ -83,7 +90,7 @@ public class ChatController extends AbstractController{
             @Override
             public void handle(MouseEvent mouseEvent) {
                 SessionEntity sessionEntity = listView.getSelectionModel().getSelectedItem();
-                sessionEntityObservableList.addLast(sessionEntity);
+//                sessionEntityObservableList.addLast(sessionEntity);
             }
         });
     }
@@ -98,13 +105,15 @@ public class ChatController extends AbstractController{
         return sessionEntity;
     }
 
-    private SessionEntity convertSessionEntity(UserGroupInfo userGroupInfo){
+    private SessionEntity convertSessionEntity(UserSessionInfo userSessionInfo){
         SessionEntity sessionEntity = new SessionEntity();
         sessionEntity.setId(new Random().nextLong());
-        sessionEntity.setName(userGroupInfo.getGroupName());
-        sessionEntity.setAvatar(userGroupInfo.getAvatar());
-        sessionEntity.setReceiverId(userGroupInfo.getId());
-        sessionEntity.setTimestamp(System.currentTimeMillis());
+        sessionEntity.setName(userSessionInfo.getName());
+        sessionEntity.setAvatar(userSessionInfo.getAvatar());
+        sessionEntity.setReceiverId(userSessionInfo.getId());
+        sessionEntity.setTimestamp(userSessionInfo.getLastMsgTime());
+//        sessionEntity.setLastMsgType(userSessionInfo.getLastMsgType());
+        sessionEntity.setLastMsg(userSessionInfo.getLastMsgContent());
         return sessionEntity;
     }
 
