@@ -10,6 +10,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.input.MouseEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.imtp.client.entity.SessionEntity;
+import org.imtp.client.util.ResourceUtils;
 import org.imtp.common.packet.*;
 import org.imtp.common.packet.base.Packet;
 import org.imtp.common.packet.body.OfflineMessageInfo;
@@ -109,7 +110,19 @@ public class ChatController extends AbstractController{
         SessionEntity sessionEntity = new SessionEntity();
         sessionEntity.setId(new Random().nextLong());
         sessionEntity.setName(userSessionInfo.getName());
-        sessionEntity.setAvatar(userSessionInfo.getAvatar());
+        String url;
+        String avatar;
+        if((avatar = userSessionInfo.getAvatar()) == null){
+            url = ResourceUtils.classPathResource("/img/tmp.jpg").toExternalForm();
+        }else {
+            if(avatar.startsWith("classpath:")){
+                avatar = avatar.replace("classpath:","");
+                url = ResourceUtils.classPathResource(avatar).toExternalForm();
+            }else {
+                url = ResourceUtils.classPathResource("/img/tmp.jpg").toExternalForm();
+            }
+        }
+        sessionEntity.setAvatar(url);
         sessionEntity.setReceiverId(userSessionInfo.getId());
         sessionEntity.setTimestamp(userSessionInfo.getLastMsgTime());
         sessionEntity.setLastMsgType(userSessionInfo.getLastMsgType());

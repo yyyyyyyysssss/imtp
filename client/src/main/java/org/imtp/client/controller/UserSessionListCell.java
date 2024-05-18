@@ -30,15 +30,6 @@ public class UserSessionListCell extends ListCell<SessionEntity> {
             setGraphic(null);
             setText(null);
         }else {
-            String url;
-            if(sessionEntity.getAvatar() == null){
-                url = ResourceUtils.classPathResource("/img/tmp.jpg").toExternalForm();
-            }else {
-                log.info("img path: {}",sessionEntity.getAvatar());
-                url = ResourceUtils.classPathResource(sessionEntity.getAvatar()).toExternalForm();
-            }
-
-            sessionEntity.setAvatar(url);
             controller.initData(sessionEntity);
             setGraphic(hBox);
         }

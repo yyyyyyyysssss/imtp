@@ -7,6 +7,7 @@ import javafx.scene.control.TextField;
 import lombok.extern.slf4j.Slf4j;
 import org.imtp.client.Client;
 import org.imtp.client.constant.FXMLResourceConstant;
+import org.imtp.client.context.ClientContextHolder;
 import org.imtp.client.handler.LoginHandler;
 import org.imtp.client.model.MessageModel;
 import org.imtp.common.packet.LoginRequest;
