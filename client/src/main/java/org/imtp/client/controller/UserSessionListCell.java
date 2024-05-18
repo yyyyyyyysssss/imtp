@@ -3,12 +3,14 @@ package org.imtp.client.controller;
 import javafx.scene.Node;
 import javafx.scene.control.ListCell;
 import javafx.scene.layout.HBox;
+import lombok.extern.slf4j.Slf4j;
 import org.imtp.client.constant.FXMLResourceConstant;
 import org.imtp.client.entity.SessionEntity;
 import org.imtp.client.util.FXMLLoadUtils;
 import org.imtp.client.util.ResourceUtils;
 import org.imtp.client.util.Tuple2;
 
+@Slf4j
 public class UserSessionListCell extends ListCell<SessionEntity> {
 
     private HBox hBox;
@@ -28,7 +30,14 @@ public class UserSessionListCell extends ListCell<SessionEntity> {
             setGraphic(null);
             setText(null);
         }else {
-            String url = ResourceUtils.classPathResource("/img/tmp.jpg").toExternalForm();
+            String url;
+            if(sessionEntity.getAvatar() == null){
+                url = ResourceUtils.classPathResource("/img/tmp.jpg").toExternalForm();
+            }else {
+                log.info("img path: {}",sessionEntity.getAvatar());
+                url = ResourceUtils.classPathResource(sessionEntity.getAvatar()).toExternalForm();
+            }
+
             sessionEntity.setAvatar(url);
             controller.initData(sessionEntity);
             setGraphic(hBox);
