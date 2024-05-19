@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
+<Pane prefHeight="700.0" prefWidth="900.0" stylesheets="@../css/UserSession.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.imtp.client.controller.UserSessionController">
+    <children>
+        <HBox prefHeight="700.0" prefWidth="900.0">
+            <children>
+                <VBox prefHeight="700.0" prefWidth="230.0">
+                    <children>
+                        <ListView fx:id="listView" prefHeight="700.0" prefWidth="230.0" styleClass="user-session-listview" />
+                    </children>
+                </VBox>
+                <Pane prefHeight="700.0" prefWidth="670.0" fx:id="chatPane"/>
+            </children>
+        </HBox>
+    </children>
+</Pane>

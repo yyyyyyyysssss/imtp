@@ -7,7 +7,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.imtp.client.constant.FXMLResourceConstant;
 import org.imtp.client.entity.SessionEntity;
 import org.imtp.client.util.FXMLLoadUtils;
-import org.imtp.client.util.ResourceUtils;
 import org.imtp.client.util.Tuple2;
 
 @Slf4j

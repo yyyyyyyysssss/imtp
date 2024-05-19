@@ -1,18 +1,14 @@
 package org.imtp.client.controller;
 
-import javafx.fxml.FXMLLoader;
-import javafx.fxml.JavaFXBuilderFactory;
 import javafx.scene.Node;
 import lombok.extern.slf4j.Slf4j;
 import org.imtp.client.SceneManager;
+import org.imtp.client.constant.FXMLResourceConstant;
 import org.imtp.client.model.MessageModel;
 import org.imtp.client.model.Observer;
-import org.imtp.client.util.ResourceUtils;
+import org.imtp.client.util.FXMLLoadUtils;
 import org.imtp.client.util.Tuple2;
 import org.imtp.common.packet.base.Packet;
-
-import java.io.IOException;
-import java.net.URL;
 
 @Slf4j
 public abstract class AbstractController implements Controller, Observer {
@@ -48,4 +44,12 @@ public abstract class AbstractController implements Controller, Observer {
     protected void switchScene(String fxmlPath,String title,MessageModel messageModel){
         this.sceneManager.setScene(fxmlPath,title,messageModel);
     }
+
+    protected Tuple2<Node, Controller> loadNodeAndController(String fxmlPath){
+        Tuple2<Node, Controller> tuple2 = FXMLLoadUtils.loadFxmlAndControl(fxmlPath);
+        Controller controller = tuple2.getV2();
+        controller.init(messageModel);
+        return tuple2;
+    }
+
 }
