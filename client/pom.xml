@@ -136,9 +136,10 @@
                     </nativeImageArgs>
                     <reflectionList>
                         <list>org.imtp.client.controller.LoginController</list>
-                        <list>org.imtp.client.controller.UserSessionController</list>
                         <list>org.imtp.client.controller.HomeController</list>
+                        <list>org.imtp.client.controller.UserSessionController</list>
                         <list>org.imtp.client.controller.UserSessionItemController</list>
+                        <list>org.imtp.client.controller.ChatController</list>
                     </reflectionList>
                     <bundlesList>
                         <list>com.sun.glass.ui.win</list>
