@@ -2,6 +2,7 @@ package org.imtp.client.entity;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.imtp.common.enums.DeliveryMethod;
 import org.imtp.common.enums.MessageType;
 
 @Getter
@@ -14,9 +15,11 @@ public class SessionEntity {
 
     private String avatar;
 
-    private Long receiverId;
+    private Long receiverUserId;
 
     private MessageType lastMsgType;
+
+    private DeliveryMethod deliveryMethod;
 
     private String lastMsg;
 
@@ -28,8 +31,9 @@ public class SessionEntity {
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", avatar='" + avatar + '\'' +
-                ", receiverId=" + receiverId +
+                ", receiverUserId=" + receiverUserId +
                 ", lastMsgType=" + lastMsgType +
+                ", deliveryMethod=" + deliveryMethod +
                 ", lastMsg='" + lastMsg + '\'' +
                 ", timestamp=" + timestamp +
                 '}';

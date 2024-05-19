@@ -117,10 +117,11 @@ public class UserSessionController extends AbstractController{
             url = ResourceUtils.classPathResource(avatar).toExternalForm();
         }
         sessionEntity.setAvatar(url);
-        sessionEntity.setReceiverId(userSessionInfo.getId());
+        sessionEntity.setReceiverUserId(userSessionInfo.getReceiverUserId());
         sessionEntity.setTimestamp(userSessionInfo.getLastMsgTime());
         sessionEntity.setLastMsgType(userSessionInfo.getLastMsgType());
         sessionEntity.setLastMsg(userSessionInfo.getLastMsgContent());
+        sessionEntity.setDeliveryMethod(userSessionInfo.getDeliveryMethod());
         return sessionEntity;
     }
 

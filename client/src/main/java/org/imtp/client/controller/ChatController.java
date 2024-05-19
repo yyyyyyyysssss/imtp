@@ -8,7 +8,9 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
 import javafx.scene.input.MouseEvent;
 import lombok.extern.slf4j.Slf4j;
+import org.imtp.client.context.ClientContextHolder;
 import org.imtp.client.entity.SessionEntity;
+import org.imtp.common.enums.DeliveryMethod;
 import org.imtp.common.packet.TextMessage;
 import org.imtp.common.packet.base.Packet;
 
@@ -32,10 +34,15 @@ public class ChatController extends AbstractController{
         inputText.setOnKeyPressed(keyEvent -> {
             switch (keyEvent.getCode()){
                 case ENTER :
+                    int caretPosition = inputText.getCaretPosition();
                     keyEvent.consume();
                     if(keyEvent.isShiftDown()){
                         inputText.appendText(System.lineSeparator());
                     }else {
+                        //去除末尾的换行符
+                        String text = inputText.getText();
+                        text =  text.substring(0,caretPosition-1);
+                        inputText.setText(text);
                         sendMessage();
                     }
                     break;
@@ -57,11 +64,17 @@ public class ChatController extends AbstractController{
 
     private void sendMessage(){
         String text = inputText.getText();
-        if (text.isEmpty() || text.trim().replaceAll("\n","").isEmpty()){
+        if (text.isEmpty()){
             inputText.clear();
             return;
         }
-        System.out.println(text);
+        Packet packet;
+        if (sessionEntity.getDeliveryMethod().equals(DeliveryMethod.SINGLE)){
+            packet = new TextMessage(text, ClientContextHolder.clientContext().id(), sessionEntity.getReceiverUserId());
+        }else {
+            packet = new TextMessage(text, ClientContextHolder.clientContext().id(), sessionEntity.getReceiverUserId(),true);
+        }
+        send(packet);
         inputText.clear();
     }
 
