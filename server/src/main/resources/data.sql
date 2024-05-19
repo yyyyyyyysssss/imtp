@@ -17,3 +17,11 @@ INSERT INTO `im_user_friend` VALUES (5, 3, 1, 1, '2024-04-30 13:06:42');
 INSERT INTO `im_group_user`(`id`, `group_id`, `user_id`, `join_time`) VALUES (1, 1, 1, '2024-04-30 13:07:35');
 INSERT INTO `im_group_user`(`id`, `group_id`, `user_id`, `join_time`) VALUES (2, 1, 2, '2024-04-30 13:07:43');
 INSERT INTO `im_group_user`(`id`, `group_id`, `user_id`, `join_time`) VALUES (3, 1, 3, '2024-04-30 13:07:51');
+
+
+-- 初始会话,用于测试
+INSERT INTO `im_user_session`(`id`, `user_id`, `last_msg_id`, `receiver_user_id`, `delivery_method`) VALUES (1, 1, 1977600293847040, 2, 'SINGLE');
+INSERT INTO `im_user_session`(`id`, `user_id`, `last_msg_id`, `receiver_user_id`, `delivery_method`) VALUES (2, 1, 2875645314138112, 3, 'SINGLE');
+INSERT INTO `im_user_session`(`id`, `user_id`, `last_msg_id`, `receiver_user_id`, `delivery_method`) VALUES (3, 1, 1971606382272512, 1, 'GROUP');
+INSERT INTO `im_user_session`(`id`, `user_id`, `last_msg_id`, `receiver_user_id`, `delivery_method`) VALUES (4, 1, 1971606382272512, 1, 'SINGLE');
+
