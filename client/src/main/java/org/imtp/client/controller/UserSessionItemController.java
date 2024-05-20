@@ -1,5 +1,6 @@
 package org.imtp.client.controller;
 
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
@@ -33,11 +34,13 @@ public class UserSessionItemController extends AbstractController{
     @Override
     public void initData(Object object) {
         if(object instanceof SessionEntity sessionEntity){
-            sessionImg.setImage(new Image(sessionEntity.getAvatar()));
-            nameLabel.setText(sessionEntity.getName());
-            timeLabel.setText("23:34");
-            lastMsg.setText(sessionEntity.getLastMsg());
-//            isAlert.setText();
+            Platform.runLater(() -> {
+                sessionImg.setImage(new Image(sessionEntity.getAvatar()));
+                nameLabel.setText(sessionEntity.getName());
+                timeLabel.setText("23:34");
+                lastMsg.setText(sessionEntity.getLastMsg());
+            });
+
         }
     }
 

@@ -1,24 +1,34 @@
 package org.imtp.client.controller;
 
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
 import javafx.scene.input.MouseEvent;
 import lombok.extern.slf4j.Slf4j;
+import org.imtp.client.constant.FXMLResourceConstant;
 import org.imtp.client.context.ClientContextHolder;
+import org.imtp.client.entity.ChatItemEntity;
 import org.imtp.client.entity.SessionEntity;
+import org.imtp.client.util.FXMLLoadUtils;
+import org.imtp.client.util.Tuple2;
 import org.imtp.common.enums.DeliveryMethod;
+import org.imtp.common.enums.MessageType;
 import org.imtp.common.packet.TextMessage;
 import org.imtp.common.packet.base.Packet;
+
+import java.util.List;
 
 @Slf4j
 public class ChatController extends AbstractController{
 
     @FXML
-    private ListView<?> chatListView;
+    private ListView<ChatItemEntity> chatListView;
 
     @FXML
     private TextArea inputText;
@@ -55,6 +65,7 @@ public class ChatController extends AbstractController{
                 sendMessage();
             }
         });
+        chatListView.setCellFactory(c -> new ChatItemListCell());
     }
 
     @Override
@@ -84,13 +95,23 @@ public class ChatController extends AbstractController{
         switch (packet.getHeader().getCmd()){
             case TEXT_MESSAGE:
                 TextMessage textMessage = (TextMessage) packet;
-                if(textMessage.isGroup()){
-                    System.out.println("*用户["+ textMessage.getSender() + "]:" + textMessage.getMessage());
-                }else {
-                    System.out.println("用户["+ textMessage.getSender() + "]:" + textMessage.getMessage());
-                }
+                ChatItemEntity chatItemEntity = new ChatItemEntity();
+                chatItemEntity.setAvatar(sessionEntity.getAvatar());
+                chatItemEntity.setMessageType(MessageType.findMessageTypeByValue((int) textMessage.getCommand().getCmdCode()));
+                chatItemEntity.setContent(textMessage.getMessage());
+                addChatItem(chatItemEntity);
                 break;
         }
+    }
+
+    private void setListView(List<ChatItemEntity> chatItemEntities){
+        ObservableList<ChatItemEntity> chatItemEntityObservableList = FXCollections.observableArrayList(chatItemEntities);
+        chatListView.setItems(chatItemEntityObservableList);
+    }
+
+    private void addChatItem(ChatItemEntity chatItemEntity){
+        ObservableList<ChatItemEntity> items = chatListView.getItems();
+        items.addLast(chatItemEntity);
     }
 
 }

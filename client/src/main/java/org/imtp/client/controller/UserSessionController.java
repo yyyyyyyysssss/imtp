@@ -39,6 +39,27 @@ public class UserSessionController extends AbstractController{
     protected void init0() {
         messageModel.pullUserSession();
         chatNodeMap = new HashMap<>();
+        //会话框设置
+        listView.setCellFactory(c -> new UserSessionListCell());
+        listView.setStyle("-fx-selection-bar: lightgrey;");
+        //设置鼠标监听
+        listView.setOnMouseClicked(mouseEvent -> {
+            SessionEntity sessionEntity = listView.getSelectionModel().getSelectedItem();
+            Node node;
+            if((node = chatNodeMap.get(sessionEntity.getId())) == null){
+                Tuple2<Node, Controller> tuple2 = loadNodeAndController(FXMLResourceConstant.CHAT_FML);
+                Controller controller = tuple2.getV2();
+                controller.initData(sessionEntity);
+
+                node = tuple2.getV1();
+                chatNodeMap.put(sessionEntity.getId(), node);
+            }
+            ObservableList<Node> children = chatPane.getChildren();
+            if (!children.isEmpty()){
+                children.removeLast();
+            }
+            children.addLast(node);
+        });
     }
 
     @Override
@@ -68,40 +89,12 @@ public class UserSessionController extends AbstractController{
                     setListView(sessionEntities);
                 }
                 break;
-            case TEXT_MESSAGE:
-                TextMessage textMessage = (TextMessage) packet;
-                if(textMessage.isGroup()){
-                    System.out.println("*用户["+ textMessage.getSender() + "]:" + textMessage.getMessage());
-                }else {
-                    System.out.println("用户["+ textMessage.getSender() + "]:" + textMessage.getMessage());
-                }
-                break;
         }
     }
 
     private void setListView(List<SessionEntity> sessionEntities){
-        listView.setCellFactory(c -> new UserSessionListCell());
         ObservableList<SessionEntity> sessionEntityObservableList = FXCollections.observableArrayList(sessionEntities);
         listView.setItems(sessionEntityObservableList);
-        listView.setStyle("-fx-selection-bar: lightgrey;");
-        //设置鼠标监听
-        listView.setOnMouseClicked(mouseEvent -> {
-            SessionEntity sessionEntity = listView.getSelectionModel().getSelectedItem();
-            Node node;
-            if((node = chatNodeMap.get(sessionEntity.getId())) == null){
-                Tuple2<Node, Controller> tuple2 = loadNodeAndController(FXMLResourceConstant.CHAT_FML);
-                Controller controller = tuple2.getV2();
-                controller.initData(sessionEntity);
-
-                node = tuple2.getV1();
-                chatNodeMap.put(sessionEntity.getId(), node);
-            }
-            ObservableList<Node> children = chatPane.getChildren();
-            if (!children.isEmpty()){
-                children.removeLast();
-            }
-            children.addLast(node);
-        });
     }
 
     private SessionEntity convertSessionEntity(UserSessionInfo userSessionInfo){

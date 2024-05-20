@@ -10,7 +10,8 @@ public interface  FXMLResourceConstant {
 
     String USER_SESSION_ITEM_FML = BASE + "/UserSessionItem.fxml";
 
-
     String CHAT_FML = BASE + "/Chat.fxml";
+
+    String CHAT_ITEM_FML = BASE + "/ChatItem.fxml";
 
 }
