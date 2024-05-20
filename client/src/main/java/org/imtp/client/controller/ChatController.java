@@ -92,6 +92,9 @@ public class ChatController extends AbstractController{
     @Override
     public void update(Object object) {
         Packet packet = (Packet)object;
+        if (!packet.getSender().equals(sessionEntity.getReceiverUserId())){
+            return;
+        }
         switch (packet.getHeader().getCmd()){
             case TEXT_MESSAGE:
                 TextMessage textMessage = (TextMessage) packet;

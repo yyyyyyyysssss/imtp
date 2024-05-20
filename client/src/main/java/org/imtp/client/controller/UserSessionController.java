@@ -1,6 +1,7 @@
 package org.imtp.client.controller;
 
 
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -93,8 +94,27 @@ public class UserSessionController extends AbstractController{
     }
 
     private void setListView(List<SessionEntity> sessionEntities){
-        ObservableList<SessionEntity> sessionEntityObservableList = FXCollections.observableArrayList(sessionEntities);
-        listView.setItems(sessionEntityObservableList);
+        Platform.runLater(() -> {
+            ObservableList<SessionEntity> sessionEntityObservableList = listView.getItems();
+            for (SessionEntity sessionEntity : sessionEntities) {
+                Node node;
+                if((node = chatNodeMap.get(sessionEntity.getId())) == null){
+                    Tuple2<Node, Controller> tuple2 = loadNodeAndController(FXMLResourceConstant.CHAT_FML);
+                    Controller controller = tuple2.getV2();
+                    controller.initData(sessionEntity);
+
+                    node = tuple2.getV1();
+                    chatNodeMap.put(sessionEntity.getId(), node);
+                }
+                ObservableList<Node> children = chatPane.getChildren();
+                if (!children.isEmpty()){
+                    children.removeLast();
+                }
+                children.addLast(node);
+
+                sessionEntityObservableList.addLast(sessionEntity);
+            }
+        });
     }
 
     private SessionEntity convertSessionEntity(UserSessionInfo userSessionInfo){

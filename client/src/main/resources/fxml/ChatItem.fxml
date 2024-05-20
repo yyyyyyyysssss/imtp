@@ -4,10 +4,10 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.HBox?>
 
-<HBox alignment="CENTER_LEFT" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="40.0"
+<HBox fx:id="chatItemHBox" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
       xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.imtp.client.controller.ChatItemController">
    <children>
       <ImageView fx:id="chatItemImageView" fitHeight="40.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true" />
-      <Label fx:id="chatItemLabel" text="Label" wrapText="true" maxWidth="400.0" />
+      <Label fx:id="chatItemLabel" wrapText="true" maxWidth="100"/>
    </children>
 </HBox>
