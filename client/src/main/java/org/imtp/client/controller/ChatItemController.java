@@ -1,8 +1,11 @@
 package org.imtp.client.controller;
 
 import javafx.application.Platform;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -37,11 +40,20 @@ public class ChatItemController extends AbstractController{
     public void initData(Object object) {
         if (object instanceof ChatItemEntity chatItemEntity){
             Platform.runLater(() -> {
+                chatItemImageView.setImage(new Image(chatItemEntity.getAvatar()));
+                chatItemLabel.setText(chatItemEntity.getContent());
+                ObservableList<Node> children = chatItemHBox.getChildren();
+                children.clear();
                 if (!chatItemEntity.isSelf()){
-                    chatItemImageView.setImage(new Image(chatItemEntity.getAvatar()));
-                    chatItemLabel.setText(chatItemEntity.getContent());
+                    chatItemHBox.setPadding(new Insets(0,0,0,0));
+                    chatItemHBox.setAlignment(null);
+                    children.add(chatItemImageView);
+                    children.add(chatItemLabelHBox);
                 }else {
-
+                    chatItemHBox.setPadding(new Insets(0,20,0,0));
+                    chatItemHBox.setAlignment(Pos.CENTER_RIGHT);
+                    children.add(chatItemLabelHBox);
+                    children.add(chatItemImageView);
                 }
             });
         }

@@ -1,6 +1,7 @@
 package org.imtp.client.controller;
 
 
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
@@ -85,8 +86,11 @@ public class ChatController extends AbstractController{
         }else {
             packet = new TextMessage(text, ClientContextHolder.clientContext().id(), sessionEntity.getReceiverUserId(),true);
         }
-
         send(packet);
+        ChatItemEntity selfChatItemEntity = ChatItemEntity.createSelfChatItemEntity();
+        selfChatItemEntity.setContent(text);
+        selfChatItemEntity.setMessageType(MessageType.findMessageTypeByValue((int) packet.getCommand().getCmdCode()));
+        addChatItem(selfChatItemEntity);
         inputText.clear();
     }
 
@@ -111,12 +115,18 @@ public class ChatController extends AbstractController{
 
     private void setListView(List<ChatItemEntity> chatItemEntities){
         ObservableList<ChatItemEntity> chatItemEntityObservableList = FXCollections.observableArrayList(chatItemEntities);
-        chatListView.setItems(chatItemEntityObservableList);
+        Platform.runLater(() -> {
+            chatListView.setItems(chatItemEntityObservableList);
+        });
     }
 
     private void addChatItem(ChatItemEntity chatItemEntity){
         ObservableList<ChatItemEntity> items = chatListView.getItems();
         items.addLast(chatItemEntity);
+        int size = items.size();
+        Platform.runLater(() -> {
+            chatListView.scrollTo(size - 1);
+        });
     }
 
 }
