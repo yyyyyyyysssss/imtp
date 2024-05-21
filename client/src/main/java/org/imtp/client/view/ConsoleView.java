@@ -86,6 +86,10 @@ public class ConsoleView implements Observer,Runnable {
             isGroupChat = false;
             isSend = true;
             String s = scanner.nextLine();
+            if (s == null || s.isEmpty()){
+                System.out.println("消息不可为空");
+                continue;
+            }
             String[] args = s.split(" ");
             int len = args.length;
             a:for (int i = 0; i < args.length; i++) {

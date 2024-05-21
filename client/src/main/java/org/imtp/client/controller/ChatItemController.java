@@ -1,8 +1,6 @@
 package org.imtp.client.controller;
 
 import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
@@ -22,6 +20,9 @@ public class ChatItemController extends AbstractController{
     private HBox chatItemHBox;
 
     @FXML
+    private HBox chatItemLabelHBox;
+
+    @FXML
     private ImageView chatItemImageView;
 
     @FXML
@@ -36,15 +37,12 @@ public class ChatItemController extends AbstractController{
     public void initData(Object object) {
         if (object instanceof ChatItemEntity chatItemEntity){
             Platform.runLater(() -> {
-                chatItemImageView.setImage(new Image(chatItemEntity.getAvatar()));
-                chatItemLabel.setText(chatItemEntity.getContent());
-                double maxWidth = chatItemLabel.getMaxWidth();
-                chatItemLabel.widthProperty().addListener((observableValue, oldVal, newVal) -> {
-                    if (newVal.doubleValue() <= maxWidth){
+                if (!chatItemEntity.isSelf()){
+                    chatItemImageView.setImage(new Image(chatItemEntity.getAvatar()));
+                    chatItemLabel.setText(chatItemEntity.getContent());
+                }else {
 
-                    }
-                });
-                chatItemHBox.setAlignment(Pos.CENTER_LEFT);
+                }
             });
         }
     }

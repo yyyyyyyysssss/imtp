@@ -9,6 +9,8 @@ import javafx.scene.Node;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.Pane;
 import lombok.extern.slf4j.Slf4j;
+import org.imtp.client.component.ClassPathImageUrl;
+import org.imtp.client.component.ImageUrl;
 import org.imtp.client.constant.FXMLResourceConstant;
 import org.imtp.client.entity.SessionEntity;
 import org.imtp.client.util.ResourceUtils;
@@ -36,8 +38,12 @@ public class UserSessionController extends AbstractController{
 
     private Map<Long,Node> chatNodeMap;
 
+    private ImageUrl imageUrl;
+
     @Override
     protected void init0() {
+        imageUrl = new ClassPathImageUrl();
+
         messageModel.pullUserSession();
         chatNodeMap = new HashMap<>();
         //会话框设置
@@ -97,21 +103,11 @@ public class UserSessionController extends AbstractController{
         Platform.runLater(() -> {
             ObservableList<SessionEntity> sessionEntityObservableList = listView.getItems();
             for (SessionEntity sessionEntity : sessionEntities) {
-                Node node;
-                if((node = chatNodeMap.get(sessionEntity.getId())) == null){
-                    Tuple2<Node, Controller> tuple2 = loadNodeAndController(FXMLResourceConstant.CHAT_FML);
-                    Controller controller = tuple2.getV2();
-                    controller.initData(sessionEntity);
-
-                    node = tuple2.getV1();
-                    chatNodeMap.put(sessionEntity.getId(), node);
-                }
-                ObservableList<Node> children = chatPane.getChildren();
-                if (!children.isEmpty()){
-                    children.removeLast();
-                }
-                children.addLast(node);
-
+                Tuple2<Node, Controller> tuple2 = loadNodeAndController(FXMLResourceConstant.CHAT_FML);
+                Node node = tuple2.getV1();
+                Controller controller = tuple2.getV2();
+                controller.initData(sessionEntity);
+                chatNodeMap.put(sessionEntity.getId(), node);
                 sessionEntityObservableList.addLast(sessionEntity);
             }
         });
@@ -121,14 +117,7 @@ public class UserSessionController extends AbstractController{
         SessionEntity sessionEntity = new SessionEntity();
         sessionEntity.setId(new Random().nextLong());
         sessionEntity.setName(userSessionInfo.getName());
-        String url;
-        String avatar;
-        if((avatar = userSessionInfo.getAvatar()) == null || !avatar.startsWith("classpath:")){
-            url = ResourceUtils.classPathResource("/img/tmp.jpg").toExternalForm();
-        }else {
-            avatar = avatar.replace("classpath:","");
-            url = ResourceUtils.classPathResource(avatar).toExternalForm();
-        }
+        String url = imageUrl.loadUrl(userSessionInfo.getAvatar());
         sessionEntity.setAvatar(url);
         sessionEntity.setReceiverUserId(userSessionInfo.getReceiverUserId());
         sessionEntity.setTimestamp(userSessionInfo.getLastMsgTime());

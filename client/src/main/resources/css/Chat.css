@@ -6,6 +6,10 @@
     -fx-scale-x: 0;
 }
 
+.list-cell{
+
+}
+
 .send-button{
     -fx-background-color: #00AC6A;
     -fx-font-size: 14px;

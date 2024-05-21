@@ -85,6 +85,7 @@ public class ChatController extends AbstractController{
         }else {
             packet = new TextMessage(text, ClientContextHolder.clientContext().id(), sessionEntity.getReceiverUserId(),true);
         }
+
         send(packet);
         inputText.clear();
     }
@@ -99,6 +100,7 @@ public class ChatController extends AbstractController{
             case TEXT_MESSAGE:
                 TextMessage textMessage = (TextMessage) packet;
                 ChatItemEntity chatItemEntity = new ChatItemEntity();
+                chatItemEntity.setSelf(false);
                 chatItemEntity.setAvatar(sessionEntity.getAvatar());
                 chatItemEntity.setMessageType(MessageType.findMessageTypeByValue((int) textMessage.getCommand().getCmdCode()));
                 chatItemEntity.setContent(textMessage.getMessage());
