@@ -7,7 +7,7 @@ import org.imtp.client.util.ResourceUtils;
  * @Author ys
  * @Date 2024/5/21 14:04
  */
-public class ClassPathImageUrl implements ImageUrl{
+public class ClassPathImageUrlParse implements ImageUrlParse {
 
     private final String prefix = "classpath:";
 

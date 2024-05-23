@@ -1,6 +1,6 @@
 package org.imtp.client.component;
 
-public interface ImageUrl {
+public interface ImageUrlParse {
 
     String loadUrl(String originalUrl);
 

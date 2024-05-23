@@ -4,8 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.imtp.client.component.ClassPathImageUrl;
-import org.imtp.client.context.ClientContext;
+import org.imtp.client.component.ClassPathImageUrlParse;
 import org.imtp.client.context.ClientContextHolder;
 import org.imtp.client.context.DefaultClientUserChannelContext;
 import org.imtp.common.enums.MessageType;
@@ -35,7 +34,7 @@ public class ChatItemEntity {
         chatItemEntity.setSelf(true);
         DefaultClientUserChannelContext clientContext = (DefaultClientUserChannelContext)ClientContextHolder.clientContext();
         String at = clientContext.getUserInfo().getAvatar();
-        chatItemEntity.setAvatar(new ClassPathImageUrl().loadUrl(at));
+        chatItemEntity.setAvatar(new ClassPathImageUrlParse().loadUrl(at));
 
         return chatItemEntity;
     }

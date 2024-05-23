@@ -31,6 +31,6 @@ public enum MessageType {
                 return messageType;
             }
         }
-        return null;
+        throw new IllegalArgumentException("No such messageType: " + value);
     }
 }

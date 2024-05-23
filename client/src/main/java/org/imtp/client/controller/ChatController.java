@@ -72,6 +72,7 @@ public class ChatController extends AbstractController{
     @Override
     public void initData(Object object) {
         this.sessionEntity = (SessionEntity) object;
+        addChatItem(sessionEntity);
     }
 
     private void sendMessage(){
@@ -118,6 +119,15 @@ public class ChatController extends AbstractController{
         Platform.runLater(() -> {
             chatListView.setItems(chatItemEntityObservableList);
         });
+    }
+
+    private void addChatItem(SessionEntity sessionEntity){
+        ChatItemEntity chatItemEntity = new ChatItemEntity();
+        chatItemEntity.setSelf(false);
+        chatItemEntity.setAvatar(sessionEntity.getAvatar());
+        chatItemEntity.setMessageType(sessionEntity.getLastMsgType());
+        chatItemEntity.setContent(sessionEntity.getLastMsg());
+        addChatItem(chatItemEntity);
     }
 
     private void addChatItem(ChatItemEntity chatItemEntity){
