@@ -5,6 +5,8 @@ import lombok.Setter;
 import org.imtp.common.enums.DeliveryMethod;
 import org.imtp.common.enums.MessageType;
 
+import java.util.Objects;
+
 @Getter
 @Setter
 public class SessionEntity {
@@ -37,5 +39,18 @@ public class SessionEntity {
                 ", lastMsg='" + lastMsg + '\'' +
                 ", timestamp=" + timestamp +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (object == null || getClass() != object.getClass()) return false;
+        SessionEntity that = (SessionEntity) object;
+        return Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }

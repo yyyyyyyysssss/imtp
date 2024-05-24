@@ -41,4 +41,9 @@ public class ConsoleController implements Controller {
     public void initData(Object object) {
 
     }
+
+    @Override
+    public void updateData(Object object) {
+
+    }
 }

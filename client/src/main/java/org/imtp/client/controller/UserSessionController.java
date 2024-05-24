@@ -2,16 +2,25 @@ package org.imtp.client.controller;
 
 
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.event.EventHandler;
+import javafx.event.EventType;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
+import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.Pane;
+import javafx.util.Callback;
 import lombok.extern.slf4j.Slf4j;
 import org.imtp.client.component.ClassPathImageUrlParse;
 import org.imtp.client.component.ImageUrlParse;
 import org.imtp.client.constant.FXMLResourceConstant;
 import org.imtp.client.entity.SessionEntity;
+import org.imtp.client.event.LoginEvent;
+import org.imtp.client.event.UserSessionEvent;
 import org.imtp.client.util.Tuple2;
 import org.imtp.common.enums.DeliveryMethod;
 import org.imtp.common.enums.MessageType;
@@ -36,7 +45,11 @@ public class UserSessionController extends AbstractController{
     @FXML
     private ListView<SessionEntity> listView;
 
+    //会话与聊天框的对应关系
     private Map<Long,Node> userSessionNodeMap;
+
+    //会话与会话项数据对应关系
+    private Map<Long,SessionEntity> userSessionEntityMap;
 
     private ImageUrlParse imageUrlParse;
 
@@ -50,6 +63,7 @@ public class UserSessionController extends AbstractController{
         imageUrlParse = new ClassPathImageUrlParse();
 
         userSessionNodeMap = new HashMap<>();
+        userSessionEntityMap = new HashMap<>();
 
         userFriendInfoMap = new HashMap<>();
         userGroupInfoMap = new HashMap<>();
@@ -62,12 +76,7 @@ public class UserSessionController extends AbstractController{
             SessionEntity sessionEntity = listView.getSelectionModel().getSelectedItem();
             Node node;
             if((node = userSessionNodeMap.get(sessionEntity.getReceiverUserId())) == null){
-                Tuple2<Node, Controller> tuple2 = loadNodeAndController(FXMLResourceConstant.CHAT_FML);
-                Controller controller = tuple2.getV2();
-                controller.initData(sessionEntity);
-
-                node = tuple2.getV1();
-                userSessionNodeMap.put(sessionEntity.getReceiverUserId(), node);
+                addUserSessionChat(sessionEntity);
             }
             ObservableList<Node> children = chatPane.getChildren();
             if (!children.isEmpty()){
@@ -76,8 +85,12 @@ public class UserSessionController extends AbstractController{
             children.addLast(node);
         });
 
+        //拉取用户会话
         messageModel.pullUserSession();
+        //拉取用户好友关系
         messageModel.pullFriendship();
+        //拉取用户群组关系
+        messageModel.pullGroupRelationship();
     }
 
     @Override
@@ -118,10 +131,17 @@ public class UserSessionController extends AbstractController{
             case TEXT_MESSAGE:
                 Long sender = packet.getSender();
                 Node node = userSessionNodeMap.get(sender);
+                TextMessage textMessage = (TextMessage) packet;
                 if (node == null){
-                    TextMessage textMessage = (TextMessage) packet;
                     SessionEntity sessionEntity = createUserSessionByPacket(textMessage);
+                    //添加会话项
                     addUserSessionNode(sessionEntity);
+                    //添加会话关联的聊天框
+                    addUserSessionChat(sessionEntity);
+                }else {
+                    SessionEntity sessionEntity = userSessionEntityMap.get(sender);
+                    sessionEntity.setLastMsg(textMessage.getMessage());
+                    updateUserSessionNode(sessionEntity);
                 }
                 break;
         }
@@ -129,25 +149,49 @@ public class UserSessionController extends AbstractController{
 
     private void setListView(List<SessionEntity> sessionEntities){
         Platform.runLater(() -> {
-            ObservableList<SessionEntity> sessionEntityObservableList = listView.getItems();
             for (SessionEntity sessionEntity : sessionEntities) {
-                Tuple2<Node, Controller> tuple2 = loadNodeAndController(FXMLResourceConstant.CHAT_FML);
-                Node node = tuple2.getV1();
-                Controller controller = tuple2.getV2();
-                controller.initData(sessionEntity);
-                userSessionNodeMap.put(sessionEntity.getReceiverUserId(), node);
-                sessionEntityObservableList.addLast(sessionEntity);
+                //添加会话项
+                addUserSessionNode(sessionEntity);
+                //创建会话关联的聊天框
+                addUserSessionChat(sessionEntity);
             }
         });
     }
 
     private void addUserSessionNode(SessionEntity sessionEntity){
+        addUserSessionNode(sessionEntity,false);
+    }
+
+    private void addUserSessionNode(SessionEntity sessionEntity,boolean selected){
+        listView.getItems().addFirst(sessionEntity);
+        if (selected){
+            listView.getSelectionModel().select(sessionEntity);
+        }
+        userSessionEntityMap.put(sessionEntity.getReceiverUserId(),sessionEntity);
+    }
+
+    private void updateUserSessionNode(SessionEntity sessionEntity){
+        SessionEntity selectedItem = listView.getSelectionModel().getSelectedItem();
+        ObservableList<SessionEntity> listViewItems = listView.getItems();
+        listViewItems.remove(sessionEntity);
+        if (selectedItem != null && selectedItem.getId().equals(sessionEntity.getId())){
+            addUserSessionNode(sessionEntity,true);
+        }else {
+            addUserSessionNode(sessionEntity);
+        }
+
+    }
+
+    private void addUserSessionChat(SessionEntity sessionEntity){
         Tuple2<Node, Controller> tuple2 = loadNodeAndController(FXMLResourceConstant.CHAT_FML);
         Controller controller = tuple2.getV2();
         controller.initData(sessionEntity);
         Node node = tuple2.getV1();
+        //注册发送消息事件，将其置顶
+        node.addEventHandler(UserSessionEvent.SEND_MESSAGE, sessionEvent -> {
+            updateUserSessionNode(sessionEvent.getSessionEntity());
+        });
         userSessionNodeMap.put(sessionEntity.getReceiverUserId(), node);
-        listView.getItems().addLast(sessionEntity);
     }
 
     private SessionEntity convertSessionEntity(UserSessionInfo userSessionInfo){

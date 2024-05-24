@@ -19,4 +19,6 @@ public interface Controller {
 
     void initData(Object object);
 
+    void updateData(Object object);
+
 }

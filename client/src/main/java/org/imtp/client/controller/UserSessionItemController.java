@@ -34,13 +34,7 @@ public class UserSessionItemController extends AbstractController{
     @Override
     public void initData(Object object) {
         if(object instanceof SessionEntity sessionEntity){
-            Platform.runLater(() -> {
-                sessionImg.setImage(new Image(sessionEntity.getAvatar()));
-                nameLabel.setText(sessionEntity.getName());
-                timeLabel.setText("23:34");
-                lastMsg.setText(sessionEntity.getLastMsg());
-            });
-
+            setData(sessionEntity);
         }
     }
 
@@ -50,5 +44,13 @@ public class UserSessionItemController extends AbstractController{
     }
 
 
+    private void setData(SessionEntity sessionEntity){
+        Platform.runLater(() -> {
+            sessionImg.setImage(new Image(sessionEntity.getAvatar()));
+            nameLabel.setText(sessionEntity.getName());
+            timeLabel.setText("23:34");
+            lastMsg.setText(sessionEntity.getLastMsg());
+        });
+    }
 
 }

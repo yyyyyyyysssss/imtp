@@ -1,6 +1,7 @@
 package org.imtp.client.controller;
 
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import lombok.extern.slf4j.Slf4j;
 import org.imtp.client.SceneManager;
 import org.imtp.client.constant.FXMLResourceConstant;
@@ -19,6 +20,11 @@ public abstract class AbstractController implements Controller, Observer {
 
     @Override
     public void initData(Object object) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public void updateData(Object object) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
@@ -50,6 +56,16 @@ public abstract class AbstractController implements Controller, Observer {
         Controller controller = tuple2.getV2();
         controller.init(messageModel);
         return tuple2;
+    }
+
+    //根据节点获取最近的控制器
+    protected Controller getController(Node node){
+        Controller controller = null;
+        do {
+            controller = (Controller) node.getUserData();
+            node = node.getParent();
+        }while (controller == null && node != null);
+        return controller;
     }
 
 }

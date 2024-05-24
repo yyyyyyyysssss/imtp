@@ -6,18 +6,16 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.VBox;
 import lombok.extern.slf4j.Slf4j;
-import org.imtp.client.constant.FXMLResourceConstant;
 import org.imtp.client.context.ClientContextHolder;
 import org.imtp.client.entity.ChatItemEntity;
 import org.imtp.client.entity.SessionEntity;
-import org.imtp.client.util.FXMLLoadUtils;
-import org.imtp.client.util.Tuple2;
+import org.imtp.client.event.UserSessionEvent;
 import org.imtp.common.enums.DeliveryMethod;
 import org.imtp.common.enums.MessageType;
 import org.imtp.common.packet.TextMessage;
@@ -27,6 +25,9 @@ import java.util.List;
 
 @Slf4j
 public class ChatController extends AbstractController{
+
+    @FXML
+    private VBox chatVbox;
 
     @FXML
     private ListView<ChatItemEntity> chatListView;
@@ -92,6 +93,9 @@ public class ChatController extends AbstractController{
         selfChatItemEntity.setContent(text);
         selfChatItemEntity.setMessageType(MessageType.findMessageTypeByValue((int) packet.getCommand().getCmdCode()));
         addChatItem(selfChatItemEntity);
+
+        chatVbox.fireEvent(new UserSessionEvent(UserSessionEvent.SEND_MESSAGE,sessionEntity));
+
         inputText.clear();
     }
 
