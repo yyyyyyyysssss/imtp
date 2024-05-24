@@ -55,7 +55,7 @@ public class ChatController extends AbstractController{
                         String text = inputText.getText();
                         text =  text.substring(0,caretPosition-1);
                         inputText.setText(text);
-                        sendMessage();
+                        sendTextMessage();
                     }
                     break;
             }
@@ -64,7 +64,7 @@ public class ChatController extends AbstractController{
         sendButton.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent mouseEvent) {
-                sendMessage();
+                sendTextMessage();
             }
         });
         chatListView.setCellFactory(c -> new ChatItemListCell());
@@ -76,7 +76,7 @@ public class ChatController extends AbstractController{
         addChatItem(sessionEntity);
     }
 
-    private void sendMessage(){
+    private void sendTextMessage(){
         String text = inputText.getText();
         if (text.isEmpty()){
             inputText.clear();
@@ -94,6 +94,8 @@ public class ChatController extends AbstractController{
         selfChatItemEntity.setMessageType(MessageType.findMessageTypeByValue((int) packet.getCommand().getCmdCode()));
         addChatItem(selfChatItemEntity);
 
+        sessionEntity.setLastMsgType(MessageType.TEXT_MESSAGE);
+        sessionEntity.setLastMsg(text);
         chatVbox.fireEvent(new UserSessionEvent(UserSessionEvent.SEND_MESSAGE,sessionEntity));
 
         inputText.clear();
@@ -120,9 +122,7 @@ public class ChatController extends AbstractController{
 
     private void setListView(List<ChatItemEntity> chatItemEntities){
         ObservableList<ChatItemEntity> chatItemEntityObservableList = FXCollections.observableArrayList(chatItemEntities);
-        Platform.runLater(() -> {
-            chatListView.setItems(chatItemEntityObservableList);
-        });
+        chatListView.setItems(chatItemEntityObservableList);
     }
 
     private void addChatItem(SessionEntity sessionEntity){
@@ -138,9 +138,7 @@ public class ChatController extends AbstractController{
         ObservableList<ChatItemEntity> items = chatListView.getItems();
         items.addLast(chatItemEntity);
         int size = items.size();
-        Platform.runLater(() -> {
-            chatListView.scrollTo(size - 1);
-        });
+        chatListView.scrollTo(size - 1);
     }
 
 }

@@ -74,7 +74,7 @@ public class Client implements Runnable{
         if(channel != null && channel.isActive()){
             channel.close();
         }
-        group = new NioEventLoopGroup(1);
+        group = new NioEventLoopGroup();
         Bootstrap bootstrap = new Bootstrap();
         try {
             bootstrap.group(group)

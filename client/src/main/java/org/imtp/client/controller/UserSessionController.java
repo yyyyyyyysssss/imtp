@@ -1,25 +1,16 @@
 package org.imtp.client.controller;
 
 
-import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
-import javafx.event.EventHandler;
-import javafx.event.EventType;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
-import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.Pane;
-import javafx.util.Callback;
 import lombok.extern.slf4j.Slf4j;
 import org.imtp.client.component.ClassPathImageUrlParse;
 import org.imtp.client.component.ImageUrlParse;
 import org.imtp.client.constant.FXMLResourceConstant;
 import org.imtp.client.entity.SessionEntity;
-import org.imtp.client.event.LoginEvent;
 import org.imtp.client.event.UserSessionEvent;
 import org.imtp.client.util.Tuple2;
 import org.imtp.common.enums.DeliveryMethod;
@@ -45,14 +36,12 @@ public class UserSessionController extends AbstractController{
     @FXML
     private ListView<SessionEntity> listView;
 
-    //会话与聊天框的对应关系
-    private Map<Long,Node> userSessionNodeMap;
-
-    //会话与会话项数据对应关系
-    private Map<Long,SessionEntity> userSessionEntityMap;
-
     private ImageUrlParse imageUrlParse;
 
+    //会话与聊天框的对应关系
+    private Map<Long,Node> userSessionNodeMap;
+    //会话与会话项数据对应关系
+    private Map<Long,SessionEntity> userSessionEntityMap;
     //用户好友缓存
     private Map<Long,UserFriendInfo> userFriendInfoMap;
     //用户群组
@@ -64,19 +53,17 @@ public class UserSessionController extends AbstractController{
 
         userSessionNodeMap = new HashMap<>();
         userSessionEntityMap = new HashMap<>();
-
         userFriendInfoMap = new HashMap<>();
         userGroupInfoMap = new HashMap<>();
 
         //会话框设置
         listView.setCellFactory(c -> new UserSessionListCell());
-        listView.setStyle("-fx-selection-bar: lightgrey;");
         //设置鼠标监听
         listView.setOnMouseClicked(mouseEvent -> {
             SessionEntity sessionEntity = listView.getSelectionModel().getSelectedItem();
             Node node;
             if((node = userSessionNodeMap.get(sessionEntity.getReceiverUserId())) == null){
-                addUserSessionChat(sessionEntity);
+                addChat(sessionEntity);
             }
             ObservableList<Node> children = chatPane.getChildren();
             if (!children.isEmpty()){
@@ -137,7 +124,7 @@ public class UserSessionController extends AbstractController{
                     //添加会话项
                     addUserSessionNode(sessionEntity);
                     //添加会话关联的聊天框
-                    addUserSessionChat(sessionEntity);
+                    addChat(sessionEntity);
                 }else {
                     SessionEntity sessionEntity = userSessionEntityMap.get(sender);
                     sessionEntity.setLastMsg(textMessage.getMessage());
@@ -148,14 +135,12 @@ public class UserSessionController extends AbstractController{
     }
 
     private void setListView(List<SessionEntity> sessionEntities){
-        Platform.runLater(() -> {
-            for (SessionEntity sessionEntity : sessionEntities) {
-                //添加会话项
-                addUserSessionNode(sessionEntity);
-                //创建会话关联的聊天框
-                addUserSessionChat(sessionEntity);
-            }
-        });
+        for (SessionEntity sessionEntity : sessionEntities) {
+            //添加会话项
+            addUserSessionNode(sessionEntity);
+            //创建会话关联的聊天框
+            addChat(sessionEntity);
+        }
     }
 
     private void addUserSessionNode(SessionEntity sessionEntity){
@@ -182,7 +167,8 @@ public class UserSessionController extends AbstractController{
 
     }
 
-    private void addUserSessionChat(SessionEntity sessionEntity){
+    //添加会话关联的聊天框
+    private void addChat(SessionEntity sessionEntity){
         Tuple2<Node, Controller> tuple2 = loadNodeAndController(FXMLResourceConstant.CHAT_FML);
         Controller controller = tuple2.getV2();
         controller.initData(sessionEntity);

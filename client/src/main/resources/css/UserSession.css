@@ -8,4 +8,5 @@
 
 .user-session-listview{
     -fx-padding: 1px;
+    -fx-selection-bar: lightgrey;
 }
