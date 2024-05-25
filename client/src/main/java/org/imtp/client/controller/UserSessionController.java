@@ -47,20 +47,22 @@ public class UserSessionController extends AbstractController{
     //用户群组
     private Map<Long,UserGroupInfo> userGroupInfoMap;
 
-    @Override
-    protected void init0() {
+    @FXML
+    public void initialize(){
         imageUrlParse = new ClassPathImageUrlParse();
 
         userSessionNodeMap = new HashMap<>();
         userSessionEntityMap = new HashMap<>();
         userFriendInfoMap = new HashMap<>();
         userGroupInfoMap = new HashMap<>();
-
         //会话框设置
         listView.setCellFactory(c -> new UserSessionListCell());
         //设置鼠标监听
         listView.setOnMouseClicked(mouseEvent -> {
             SessionEntity sessionEntity = listView.getSelectionModel().getSelectedItem();
+            if (sessionEntity == null){
+                return;
+            }
             Node node;
             if((node = userSessionNodeMap.get(sessionEntity.getReceiverUserId())) == null){
                 addChat(sessionEntity);
@@ -71,7 +73,10 @@ public class UserSessionController extends AbstractController{
             }
             children.addLast(node);
         });
+    }
 
+    @Override
+    protected void init0() {
         //拉取用户会话
         messageModel.pullUserSession();
         //拉取用户好友关系

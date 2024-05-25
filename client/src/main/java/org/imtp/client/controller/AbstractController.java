@@ -1,10 +1,8 @@
 package org.imtp.client.controller;
 
 import javafx.scene.Node;
-import javafx.scene.Parent;
 import lombok.extern.slf4j.Slf4j;
 import org.imtp.client.SceneManager;
-import org.imtp.client.constant.FXMLResourceConstant;
 import org.imtp.client.model.MessageModel;
 import org.imtp.client.model.Observer;
 import org.imtp.client.util.FXMLLoadUtils;

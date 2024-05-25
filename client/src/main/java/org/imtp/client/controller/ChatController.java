@@ -40,8 +40,8 @@ public class ChatController extends AbstractController{
 
     private SessionEntity sessionEntity;
 
-    @Override
-    protected void init0() {
+    @FXML
+    public void initialize(){
         inputText.setWrapText(true);
         inputText.setOnKeyPressed(keyEvent -> {
             switch (keyEvent.getCode()){
@@ -68,6 +68,11 @@ public class ChatController extends AbstractController{
             }
         });
         chatListView.setCellFactory(c -> new ChatItemListCell());
+    }
+
+    @Override
+    protected void init0() {
+
     }
 
     @Override

@@ -1,43 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.ListView?>
-<?import javafx.scene.control.TextArea?>
-<?import javafx.scene.layout.*?>
-<HBox prefHeight="700.0" prefWidth="950.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<HBox prefHeight="700.0" prefWidth="950.0" stylesheets="@../css/Home.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.imtp.client.controller.HomeController">
     <children>
-        <ListView fx:id="homeListView" prefHeight="700.0" prefWidth="50.0"/>
-        <GridPane prefHeight="700.0" prefWidth="900.0">
-            <columnConstraints>
-                <ColumnConstraints hgrow="SOMETIMES" maxWidth="230.0" minWidth="230.0" prefWidth="230.0"/>
-                <ColumnConstraints hgrow="SOMETIMES" maxWidth="670.0" minWidth="670.0" prefWidth="670.0"/>
-            </columnConstraints>
-            <rowConstraints>
-                <RowConstraints maxHeight="700.0" minHeight="700.0" prefHeight="700.0" vgrow="SOMETIMES"/>
-                <RowConstraints maxHeight="0.0" minHeight="0.0" prefHeight="0.0" vgrow="SOMETIMES"/>
-            </rowConstraints>
-            <children>
-                <VBox prefHeight="700.0" prefWidth="230.0">
-                    <children>
-                        <ListView fx:id="chatListView" prefHeight="700.0" prefWidth="230.0"/>
-                    </children>
-                </VBox>
-                <GridPane prefHeight="700.0" prefWidth="670.0" GridPane.columnIndex="1">
-                    <columnConstraints>
-                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="670.0" minWidth="670.0" prefWidth="670.0"/>
-                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="0.0" minWidth="0.0" prefWidth="0.0"/>
-                    </columnConstraints>
-                    <rowConstraints>
-                        <RowConstraints maxHeight="470.0" minHeight="470.0" prefHeight="470.0" vgrow="SOMETIMES"/>
-                        <RowConstraints maxHeight="30.0" minHeight="30.0" prefHeight="30.0" vgrow="SOMETIMES"/>
-                        <RowConstraints maxHeight="200.0" minHeight="200.0" prefHeight="200.0" vgrow="SOMETIMES"/>
-                    </rowConstraints>
-                    <children>
-                        <TextArea fx:id="inputText" prefHeight="220.0" prefWidth="670.0" GridPane.rowIndex="2"/>
-                        <HBox prefHeight="30.0" prefWidth="670.0" GridPane.rowIndex="1"/>
-                    </children>
-                </GridPane>
-            </children>
-        </GridPane>
+        <VBox fx:id="homeVbox" prefHeight="700.0" prefWidth="50.0">
+         <children>
+            <VBox alignment="TOP_CENTER" prefHeight="300.0" prefWidth="50.0">
+               <children>
+                  <ImageView fx:id="homeAvatarImageView" fitHeight="40.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true">
+                     <VBox.margin>
+                        <Insets top="10.0" />
+                     </VBox.margin></ImageView>
+                  <VBox alignment="TOP_CENTER" prefWidth="50.0">
+                     <children>
+                        <ImageView fx:id="homeChatImageView" fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true" />
+                        <ImageView fx:id="homeFriendImageView" fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
+                           <VBox.margin>
+                              <Insets top="10.0" />
+                           </VBox.margin></ImageView>
+                     </children>
+                     <padding>
+                        <Insets top="20.0" />
+                     </padding>
+                  </VBox>
+               </children>
+            </VBox>
+            <Region prefHeight="100.0" prefWidth="50.0" />
+            <VBox prefHeight="300.0" prefWidth="50.0" />
+         </children></VBox>
+        <Pane fx:id="homePane">
+        </Pane>
     </children>
 </HBox>
-

@@ -60,8 +60,8 @@ public class LoginController extends AbstractController{
             errorMsg.setVisible(false);
             log.info("登录成功");
             MessageModel nextModel = messageModel.getNextModel();
-            //跳转聊天页面
-            switchScene(FXMLResourceConstant.USER_SESSION_FML,"聊天页",nextModel);
+            //跳转主页
+            switchScene(FXMLResourceConstant.HOME_FXML,"聊天页",nextModel);
         }else{
             errorMsg.setText("用户名或密码错误!");
             errorMsg.setVisible(true);
