@@ -30,7 +30,7 @@ public class UserFriendshipHandler extends AbstractHandler<FriendshipRequest>{
         }
         List<UserFriendInfo> userFriendInfos = new ArrayList<>();
         for (User user : users){
-            UserFriendInfo userFriendInfo = UserFriendInfo.builder().id(user.getId()).nickname(user.getNickname()).gender(user.getGender()).avatar(user.getAvatar()).build();
+            UserFriendInfo userFriendInfo = UserFriendInfo.builder().id(user.getId()).nickname(user.getNickname()).account(user.getUsername()).gender(user.getGender()).avatar(user.getAvatar()).build();
             userFriendInfos.add(userFriendInfo);
         }
         channelHandlerContext.channel().writeAndFlush(new FriendshipResponse(friendshipRequest.getSender(),userFriendInfos));

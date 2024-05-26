@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
+
+<HBox alignment="CENTER" prefHeight="700.0" prefWidth="670.0" stylesheets="@../css/UserFriendDetails.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.imtp.client.controller.UserFriendDetailsController">
+    <children>
+      <VBox alignment="TOP_CENTER" prefHeight="200.0" prefWidth="300.0">
+         <children>
+            <HBox prefHeight="100.0" prefWidth="200.0">
+               <children>
+                    <ImageView fx:id="friendDetailsImg" fitHeight="100.0" fitWidth="100.0" pickOnBounds="true" preserveRatio="true" />
+                  <VBox alignment="CENTER_LEFT" prefHeight="200.0" prefWidth="100.0">
+                     <children>
+                        <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0">
+                           <children>
+                              <Label fx:id="friendName" text="Label" />
+                              <ImageView fx:id="friendGender" fitHeight="15.0" fitWidth="15.0" pickOnBounds="true" preserveRatio="true">
+                                 <HBox.margin>
+                                    <Insets left="10.0" />
+                                 </HBox.margin></ImageView>
+                           </children>
+                        </HBox>
+                        <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0">
+                           <children>
+                              <Label style="-fx-text-fill: grey" text="账号：" />
+                              <Label fx:id="friendNo" style="-fx-text-fill: grey" text="Label" />
+                           </children>
+                        </HBox>
+                     </children>
+                     <padding>
+                        <Insets left="10.0" />
+                     </padding>
+                  </VBox>
+               </children>
+               <VBox.margin>
+                  <Insets top="100.0" />
+               </VBox.margin>
+            </HBox>
+            <Separator prefWidth="200.0">
+               <padding>
+                  <Insets top="20.0" />
+               </padding></Separator>
+            <HBox alignment="CENTER">
+               <children>
+                  <Pane fx:id="friendSendMessagePane">
+                     <children>
+                        <ImageView fx:id="friendSendMessage" fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true" />
+                        <Label text="发消息" style="-fx-text-fill: #9AA5BE">
+                           <padding>
+                              <Insets top="32.0" />
+                           </padding>
+                        </Label>
+                     </children>
+                  </Pane>
+               </children>
+               <VBox.margin>
+                  <Insets top="20.0" />
+               </VBox.margin></HBox>
+         </children>
+      </VBox>
+    </children>
+</HBox>

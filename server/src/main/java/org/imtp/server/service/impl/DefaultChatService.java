@@ -64,7 +64,7 @@ public class DefaultChatService implements ChatService {
         }
         List<Long> friendIds = userFriends.stream().map(UserFriend::getFriendId).toList();
         Wrapper<User> userQueryWrapper = new QueryWrapper<User>()
-                .select("id","nickname","gender","avatar")
+                .select("id","nickname","username", "gender","avatar")
                 .in("id", friendIds);
         return userMapper.selectList(userQueryWrapper);
     }

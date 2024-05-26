@@ -1,9 +1,11 @@
 package org.imtp.server.entity;
 
+import com.baomidou.mybatisplus.annotation.EnumValue;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
+import org.imtp.common.enums.Gender;
 
 import java.util.Date;
 
@@ -33,7 +35,8 @@ public class User {
     private String nickname;
 
     @TableField("gender")
-    private String gender;
+    @EnumValue
+    private Gender gender;
 
     @TableField("avatar")
     private String avatar;

@@ -34,11 +34,11 @@ public class HomeController extends AbstractController{
     private ImageView homeAvatarImageView;
 
     @FXML
-    private ImageView homeChatImageView;
+    private ImageView homeSessionImageView;
 
-    private Image chatIconImage;
+    private Image sessionIconImage;
 
-    private Image chatIconSelectedImage;
+    private Image sessionIconSelectedImage;
 
     @FXML
     private ImageView homeFriendImageView;
@@ -52,7 +52,13 @@ public class HomeController extends AbstractController{
     @FXML
     private Pane homePane;
 
-    private Node chatNode;
+    private Node sessionNode;
+
+    private Controller sessionController;
+
+    private Node friendNode;
+
+    private Controller friendController;
 
     @FXML
     public void initialize(){
@@ -65,50 +71,56 @@ public class HomeController extends AbstractController{
         homeAvatarImageView.setImage(new Image(avatarUrl));
         //初始化聊天图标
         URL chatIconUrl = ResourceUtils.classPathResource("/img/home_chat_icon.png");
-        this.chatIconImage = new Image(chatIconUrl.toExternalForm());
+        this.sessionIconImage = new Image(chatIconUrl.toExternalForm());
         URL chatIconSelectedUrl = ResourceUtils.classPathResource("/img/home_chat_icon_selected.png");
-        this.chatIconSelectedImage = new Image(chatIconSelectedUrl.toExternalForm());
+        this.sessionIconSelectedImage = new Image(chatIconSelectedUrl.toExternalForm());
         //初始化好友图标
         URL friendIconurl = ResourceUtils.classPathResource("/img/home_friend_icon.png");
         this.friendIconImage = new Image(friendIconurl.toExternalForm());
         URL friendIconSelectedurl = ResourceUtils.classPathResource("/img/home_friend_icon_selected.png");
         this.friendIconSelectedImage = new Image(friendIconSelectedurl.toExternalForm());
         //设置默认图标
-        homeChatImageView.setImage(chatIconImage);
+        homeSessionImageView.setImage(sessionIconSelectedImage);
         homeFriendImageView.setImage(friendIconImage);
 
 
-        homeChatImageView.setOnMouseClicked(mouseEvent -> {
-            homeChatImageView.setImage(chatIconSelectedImage);
+        homeSessionImageView.setOnMouseClicked(mouseEvent -> {
+            homeSessionImageView.setImage(sessionIconSelectedImage);
             homeFriendImageView.setImage(friendIconImage);
 
             ObservableList<Node> children = homePane.getChildren();
             if (!children.isEmpty()){
                 children.removeLast();
             }
-            children.add(chatNode);
+            children.add(sessionNode);
         });
 
         homeFriendImageView.setOnMouseClicked(mouseEvent -> {
-            homeChatImageView.setImage(chatIconImage);
+            homeSessionImageView.setImage(sessionIconImage);
             homeFriendImageView.setImage(friendIconSelectedImage);
 
             ObservableList<Node> children = homePane.getChildren();
             if (!children.isEmpty()){
                 children.removeLast();
             }
-            //TODO
-
+            children.add(friendNode);
         });
 
     }
 
     @Override
     protected void init0() {
-        Tuple2<Node, Controller> tuple2 = loadNodeAndController(FXMLResourceConstant.USER_SESSION_FML);
-        this.chatNode = tuple2.getV1();
+        Tuple2<Node, Controller> chatTuple2 = loadNodeAndController(FXMLResourceConstant.USER_SESSION_FML);
+        this.sessionNode = chatTuple2.getV1();
+        this.sessionController = chatTuple2.getV2();
+
+        Tuple2<Node, Controller> friendTuple2 = loadNodeAndController(FXMLResourceConstant.USER_FRIEND_FML);
+        this.friendNode = friendTuple2.getV1();
+        this.friendController = friendTuple2.getV2();
+
+        //设置默认组件
         ObservableList<Node> children = homePane.getChildren();
-        children.add(chatNode);
+        children.add(sessionNode);
     }
 
     @Override

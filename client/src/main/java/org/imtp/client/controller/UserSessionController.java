@@ -39,7 +39,7 @@ public class UserSessionController extends AbstractController{
     private ImageUrlParse imageUrlParse;
 
     //会话与聊天框的对应关系
-    private Map<Long,Node> userSessionNodeMap;
+    private Map<Long,Node> userSessionChatNodeMap;
     //会话与会话项数据对应关系
     private Map<Long,SessionEntity> userSessionEntityMap;
     //用户好友缓存
@@ -51,7 +51,7 @@ public class UserSessionController extends AbstractController{
     public void initialize(){
         imageUrlParse = new ClassPathImageUrlParse();
 
-        userSessionNodeMap = new HashMap<>();
+        userSessionChatNodeMap = new HashMap<>();
         userSessionEntityMap = new HashMap<>();
         userFriendInfoMap = new HashMap<>();
         userGroupInfoMap = new HashMap<>();
@@ -64,8 +64,8 @@ public class UserSessionController extends AbstractController{
                 return;
             }
             Node node;
-            if((node = userSessionNodeMap.get(sessionEntity.getReceiverUserId())) == null){
-                addChat(sessionEntity);
+            if((node = userSessionChatNodeMap.get(sessionEntity.getReceiverUserId())) == null){
+                node = addChatNode(sessionEntity);
             }
             ObservableList<Node> children = chatPane.getChildren();
             if (!children.isEmpty()){
@@ -122,16 +122,20 @@ public class UserSessionController extends AbstractController{
                 break;
             case TEXT_MESSAGE:
                 Long sender = packet.getSender();
-                Node node = userSessionNodeMap.get(sender);
+                SessionEntity sessionEntity = userSessionEntityMap.get(sender);
                 TextMessage textMessage = (TextMessage) packet;
-                if (node == null){
-                    SessionEntity sessionEntity = createUserSessionByPacket(textMessage);
+                if (sessionEntity == null){
+                    sessionEntity = createUserSessionByPacket(textMessage);
                     //添加会话项
                     addUserSessionNode(sessionEntity);
                     //添加会话关联的聊天框
-                    addChat(sessionEntity);
+                    addChatNode(sessionEntity);
                 }else {
-                    SessionEntity sessionEntity = userSessionEntityMap.get(sender);
+                    if (userSessionChatNodeMap.get(sender) ==null){
+                        //添加会话关联的聊天框
+                        addChatNode(sessionEntity);
+                    }
+                    sessionEntity = userSessionEntityMap.get(sender);
                     sessionEntity.setLastMsg(textMessage.getMessage());
                     updateUserSessionNode(sessionEntity);
                 }
@@ -143,8 +147,6 @@ public class UserSessionController extends AbstractController{
         for (SessionEntity sessionEntity : sessionEntities) {
             //添加会话项
             addUserSessionNode(sessionEntity);
-            //创建会话关联的聊天框
-            addChat(sessionEntity);
         }
     }
 
@@ -173,7 +175,7 @@ public class UserSessionController extends AbstractController{
     }
 
     //添加会话关联的聊天框
-    private void addChat(SessionEntity sessionEntity){
+    private Node addChatNode(SessionEntity sessionEntity){
         Tuple2<Node, Controller> tuple2 = loadNodeAndController(FXMLResourceConstant.CHAT_FML);
         Controller controller = tuple2.getV2();
         controller.initData(sessionEntity);
@@ -182,7 +184,8 @@ public class UserSessionController extends AbstractController{
         node.addEventHandler(UserSessionEvent.SEND_MESSAGE, sessionEvent -> {
             updateUserSessionNode(sessionEvent.getSessionEntity());
         });
-        userSessionNodeMap.put(sessionEntity.getReceiverUserId(), node);
+        userSessionChatNodeMap.put(sessionEntity.getReceiverUserId(), node);
+        return node;
     }
 
     private SessionEntity convertSessionEntity(UserSessionInfo userSessionInfo){

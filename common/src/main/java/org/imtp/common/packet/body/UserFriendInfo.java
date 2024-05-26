@@ -1,6 +1,7 @@
 package org.imtp.common.packet.body;
 
 import lombok.*;
+import org.imtp.common.enums.Gender;
 
 /**
  * @Description
@@ -17,9 +18,11 @@ public class UserFriendInfo {
 
     private Long id;
 
+    private String account;
+
     private String nickname;
 
-    private String gender;
+    private Gender gender;
 
     private String avatar;
 
@@ -27,8 +30,9 @@ public class UserFriendInfo {
     public String toString() {
         return "UserFriendInfo{" +
                 "id=" + id +
+                ", account='" + account + '\'' +
                 ", nickname='" + nickname + '\'' +
-                ", gender='" + gender + '\'' +
+                ", gender=" + gender +
                 ", avatar='" + avatar + '\'' +
                 '}';
     }

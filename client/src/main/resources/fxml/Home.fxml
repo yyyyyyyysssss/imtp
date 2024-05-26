@@ -19,7 +19,7 @@
                      </VBox.margin></ImageView>
                   <VBox alignment="TOP_CENTER" prefWidth="50.0">
                      <children>
-                        <ImageView fx:id="homeChatImageView" fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true" />
+                        <ImageView fx:id="homeSessionImageView" fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true" />
                         <ImageView fx:id="homeFriendImageView" fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
                            <VBox.margin>
                               <Insets top="10.0" />
