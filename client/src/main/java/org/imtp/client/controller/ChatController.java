@@ -78,7 +78,9 @@ public class ChatController extends AbstractController{
     @Override
     public void initData(Object object) {
         this.sessionEntity = (SessionEntity) object;
-        addChatItem(sessionEntity);
+        if (sessionEntity != null && sessionEntity.getLastMsg() != null){
+            addChatItem(sessionEntity);
+        }
     }
 
     private void sendTextMessage(){

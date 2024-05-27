@@ -13,8 +13,10 @@ import org.imtp.client.component.ImageUrlParse;
 import org.imtp.client.constant.FXMLResourceConstant;
 import org.imtp.client.context.ClientContextHolder;
 import org.imtp.client.context.DefaultClientUserChannelContext;
+import org.imtp.client.event.UserFriendEvent;
 import org.imtp.client.util.ResourceUtils;
 import org.imtp.client.util.Tuple2;
+import org.imtp.common.packet.body.UserFriendInfo;
 import org.imtp.common.packet.body.UserInfo;
 
 import java.net.URL;
@@ -106,7 +108,9 @@ public class HomeController extends AbstractController{
 
         //相互引用对方
         friendController.setUserSessionController(sessionController);
+        friendController.setHomeController(this);
         sessionController.setUserFriendController(friendController);
+        sessionController.setHomeController(this);
 
         //设置默认组件
         ObservableList<Node> children = homePane.getChildren();
@@ -118,7 +122,7 @@ public class HomeController extends AbstractController{
 
     }
 
-    private void switchUserSession(){
+    public void switchUserSession(){
         homeSessionImageView.setImage(sessionIconSelectedImage);
         homeFriendImageView.setImage(friendIconImage);
 
@@ -129,7 +133,7 @@ public class HomeController extends AbstractController{
         children.add(sessionNode);
     }
 
-    private void switchUserFriend(){
+    public void switchUserFriend(){
         homeSessionImageView.setImage(sessionIconImage);
         homeFriendImageView.setImage(friendIconSelectedImage);
 

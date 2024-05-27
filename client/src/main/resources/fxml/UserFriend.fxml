@@ -4,7 +4,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
-<Pane prefHeight="700.0" prefWidth="900.0" stylesheets="@../css/UserFriend.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.imtp.client.controller.UserFriendController">
+<Pane fx:id="userFriendPane" prefHeight="700.0" prefWidth="900.0" stylesheets="@../css/UserFriend.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.imtp.client.controller.UserFriendController">
     <children>
         <HBox prefHeight="700.0" prefWidth="900.0">
             <children>

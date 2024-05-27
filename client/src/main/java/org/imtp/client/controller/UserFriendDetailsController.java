@@ -6,11 +6,14 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import lombok.extern.slf4j.Slf4j;
 import org.imtp.client.component.ClassPathImageUrlParse;
 import org.imtp.client.component.ImageUrlParse;
+import org.imtp.client.constant.Callback;
 import org.imtp.client.entity.FriendEntity;
+import org.imtp.client.event.UserFriendEvent;
 import org.imtp.client.util.ResourceUtils;
 import org.imtp.common.enums.Gender;
 
@@ -18,6 +21,9 @@ import java.net.URL;
 
 @Slf4j
 public class UserFriendDetailsController extends AbstractController{
+
+    @FXML
+    private HBox userFriendDetailsHbox;
 
     @FXML
     private ImageView friendDetailsImg;
@@ -37,11 +43,15 @@ public class UserFriendDetailsController extends AbstractController{
     @FXML
     private Pane friendSendMessagePane;
 
+    private FriendEntity friendEntity;
+
     private Image genderMaleImage;
 
     private Image genderFemaleImage;
 
     private Image sendMessageImage;
+
+    private Callback<Long> callback;
 
     @FXML
     public void initialize(){
@@ -57,9 +67,16 @@ public class UserFriendDetailsController extends AbstractController{
 
         friendSendMessage.setImage(sendMessageImage);
 
+        UserFriendDetailsController that = this;
+
         friendSendMessagePane.setOnMouseClicked(mouseEvent -> {
-            log.info("clicked on friend send message");
+            callback.callback(friendEntity.getId());
         });
+    }
+
+
+    public void setCallback(Callback<Long> callback) {
+        this.callback = callback;
     }
 
     @Override
@@ -70,6 +87,7 @@ public class UserFriendDetailsController extends AbstractController{
     @Override
     public void initData(Object object) {
         if(object instanceof FriendEntity friendEntity){
+            this.friendEntity = friendEntity;
             setData(friendEntity);
         }
     }

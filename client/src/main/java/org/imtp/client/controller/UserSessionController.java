@@ -36,6 +36,8 @@ public class UserSessionController extends AbstractController{
     @FXML
     private ListView<SessionEntity> listView;
 
+    private HomeController homeController;
+
     private UserFriendController userFriendController;
 
     private ImageUrlParse imageUrlParse;
@@ -59,15 +61,7 @@ public class UserSessionController extends AbstractController{
             if (sessionEntity == null){
                 return;
             }
-            Node node;
-            if((node = userSessionChatNodeMap.get(sessionEntity.getReceiverUserId())) == null){
-                node = addChatNode(sessionEntity);
-            }
-            ObservableList<Node> children = chatPane.getChildren();
-            if (!children.isEmpty()){
-                children.removeLast();
-            }
-            children.addLast(node);
+            showChatNode(sessionEntity);
         });
     }
 
@@ -122,6 +116,26 @@ public class UserSessionController extends AbstractController{
         this.userFriendController = userFriendController;
     }
 
+    public void setHomeController(HomeController homeController) {
+        this.homeController = homeController;
+    }
+
+    private void showChatNode(SessionEntity sessionEntity){
+        Node node;
+        if((node = userSessionChatNodeMap.get(sessionEntity.getReceiverUserId())) == null){
+            node = addChatNode(sessionEntity);
+        }
+        showChatNode(node);
+    }
+
+    private void showChatNode(Node node){
+        ObservableList<Node> children = chatPane.getChildren();
+        if (!children.isEmpty()){
+            children.removeLast();
+        }
+        children.addLast(node);
+    }
+
     private void setListView(List<SessionEntity> sessionEntities){
         for (SessionEntity sessionEntity : sessionEntities) {
             //添加会话项
@@ -141,16 +155,44 @@ public class UserSessionController extends AbstractController{
         userSessionEntityMap.put(sessionEntity.getReceiverUserId(),sessionEntity);
     }
 
+    public void addUserSessionAndChatNode(UserFriendInfo userFriendInfo){
+        if (userFriendInfo == null){
+            throw new NullPointerException("userFriendInfo is null");
+        }
+        SessionEntity sessionEntity = userSessionEntityMap.get(userFriendInfo.getId());
+        Node node = null;
+        if (sessionEntity == null){
+            SessionEntity se = createUserSessionByUserFriendInfo(userFriendInfo);
+            addUserSessionNode(se,true,true);
+            //添加会话关联的聊天框
+            node = addChatNode(se);
+        }else {
+            if ((node = userSessionChatNodeMap.get(userFriendInfo.getId())) ==null){
+                //添加会话关联的聊天框
+                node = addChatNode(sessionEntity);
+            }
+            updateUserSessionNode(sessionEntity,true);
+        }
+        showChatNode(node);
+    }
+
     private void updateUserSessionNode(SessionEntity sessionEntity){
+        updateUserSessionNode(sessionEntity,false);
+    }
+
+    private void updateUserSessionNode(SessionEntity sessionEntity,boolean selected){
         SessionEntity selectedItem = listView.getSelectionModel().getSelectedItem();
         ObservableList<SessionEntity> listViewItems = listView.getItems();
         listViewItems.remove(sessionEntity);
-        if (selectedItem != null && selectedItem.getId().equals(sessionEntity.getId())){
+        if (selected){
             addUserSessionNode(sessionEntity,true,true);
         }else {
-            addUserSessionNode(sessionEntity,true,false);
+            if (selectedItem != null && selectedItem.getId().equals(sessionEntity.getId())){
+                addUserSessionNode(sessionEntity,true,true);
+            }else {
+                addUserSessionNode(sessionEntity,true,false);
+            }
         }
-
     }
 
     //添加会话关联的聊天框
@@ -178,6 +220,18 @@ public class UserSessionController extends AbstractController{
         sessionEntity.setLastMsgType(userSessionInfo.getLastMsgType());
         sessionEntity.setLastMsg(userSessionInfo.getLastMsgContent());
         sessionEntity.setDeliveryMethod(userSessionInfo.getDeliveryMethod());
+        return sessionEntity;
+    }
+
+
+    private SessionEntity createUserSessionByUserFriendInfo(UserFriendInfo userFriendInfo){
+        SessionEntity sessionEntity = new SessionEntity();
+        sessionEntity.setId(new Random().nextLong());
+        sessionEntity.setReceiverUserId(userFriendInfo.getId());
+        sessionEntity.setName(userFriendInfo.getNickname());
+        String url = imageUrlParse.loadUrl(userFriendInfo.getAvatar());
+        sessionEntity.setAvatar(url);
+        sessionEntity.setDeliveryMethod(DeliveryMethod.SINGLE);
         return sessionEntity;
     }
 
