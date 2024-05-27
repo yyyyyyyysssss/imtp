@@ -45,15 +45,17 @@ public class ChatItemController extends AbstractController{
                 ObservableList<Node> children = chatItemHBox.getChildren();
                 children.clear();
                 if (!chatItemEntity.isSelf()){
-                    chatItemHBox.setPadding(new Insets(0,0,0,20));
+                    chatItemHBox.setPadding(new Insets(0,0,0,0));
                     chatItemHBox.setAlignment(Pos.CENTER_LEFT);
                     children.add(chatItemImageView);
                     children.add(chatItemLabelHBox);
+                    HBox.setMargin(chatItemLabelHBox,new Insets(0,0,0,10));
                 }else {
                     chatItemHBox.setPadding(new Insets(0,20,0,0));
                     chatItemHBox.setAlignment(Pos.CENTER_RIGHT);
                     children.add(chatItemLabelHBox);
                     children.add(chatItemImageView);
+                    HBox.setMargin(chatItemLabelHBox,new Insets(0,10,0,0));
                 }
             });
         }

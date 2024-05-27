@@ -54,11 +54,11 @@ public class HomeController extends AbstractController{
 
     private Node sessionNode;
 
-    private Controller sessionController;
+    private UserSessionController sessionController;
 
     private Node friendNode;
 
-    private Controller friendController;
+    private UserFriendController friendController;
 
     @FXML
     public void initialize(){
@@ -85,25 +85,11 @@ public class HomeController extends AbstractController{
 
 
         homeSessionImageView.setOnMouseClicked(mouseEvent -> {
-            homeSessionImageView.setImage(sessionIconSelectedImage);
-            homeFriendImageView.setImage(friendIconImage);
-
-            ObservableList<Node> children = homePane.getChildren();
-            if (!children.isEmpty()){
-                children.removeLast();
-            }
-            children.add(sessionNode);
+            switchUserSession();
         });
 
         homeFriendImageView.setOnMouseClicked(mouseEvent -> {
-            homeSessionImageView.setImage(sessionIconImage);
-            homeFriendImageView.setImage(friendIconSelectedImage);
-
-            ObservableList<Node> children = homePane.getChildren();
-            if (!children.isEmpty()){
-                children.removeLast();
-            }
-            children.add(friendNode);
+            switchUserFriend();
         });
 
     }
@@ -112,11 +98,15 @@ public class HomeController extends AbstractController{
     protected void init0() {
         Tuple2<Node, Controller> chatTuple2 = loadNodeAndController(FXMLResourceConstant.USER_SESSION_FML);
         this.sessionNode = chatTuple2.getV1();
-        this.sessionController = chatTuple2.getV2();
+        this.sessionController = (UserSessionController) chatTuple2.getV2();
 
         Tuple2<Node, Controller> friendTuple2 = loadNodeAndController(FXMLResourceConstant.USER_FRIEND_FML);
         this.friendNode = friendTuple2.getV1();
-        this.friendController = friendTuple2.getV2();
+        this.friendController = (UserFriendController) friendTuple2.getV2();
+
+        //相互引用对方
+        friendController.setUserSessionController(sessionController);
+        sessionController.setUserFriendController(friendController);
 
         //设置默认组件
         ObservableList<Node> children = homePane.getChildren();
@@ -127,4 +117,27 @@ public class HomeController extends AbstractController{
     public void update(Object object) {
 
     }
+
+    private void switchUserSession(){
+        homeSessionImageView.setImage(sessionIconSelectedImage);
+        homeFriendImageView.setImage(friendIconImage);
+
+        ObservableList<Node> children = homePane.getChildren();
+        if (!children.isEmpty()){
+            children.removeLast();
+        }
+        children.add(sessionNode);
+    }
+
+    private void switchUserFriend(){
+        homeSessionImageView.setImage(sessionIconImage);
+        homeFriendImageView.setImage(friendIconSelectedImage);
+
+        ObservableList<Node> children = homePane.getChildren();
+        if (!children.isEmpty()){
+            children.removeLast();
+        }
+        children.add(friendNode);
+    }
+
 }

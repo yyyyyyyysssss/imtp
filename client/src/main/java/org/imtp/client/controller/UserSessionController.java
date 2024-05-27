@@ -36,16 +36,14 @@ public class UserSessionController extends AbstractController{
     @FXML
     private ListView<SessionEntity> listView;
 
+    private UserFriendController userFriendController;
+
     private ImageUrlParse imageUrlParse;
 
     //会话与聊天框的对应关系
     private Map<Long,Node> userSessionChatNodeMap;
     //会话与会话项数据对应关系
     private Map<Long,SessionEntity> userSessionEntityMap;
-    //用户好友缓存
-    private Map<Long,UserFriendInfo> userFriendInfoMap;
-    //用户群组
-    private Map<Long,UserGroupInfo> userGroupInfoMap;
 
     @FXML
     public void initialize(){
@@ -53,8 +51,6 @@ public class UserSessionController extends AbstractController{
 
         userSessionChatNodeMap = new HashMap<>();
         userSessionEntityMap = new HashMap<>();
-        userFriendInfoMap = new HashMap<>();
-        userGroupInfoMap = new HashMap<>();
         //会话框设置
         listView.setCellFactory(c -> new UserSessionListCell());
         //设置鼠标监听
@@ -79,34 +75,12 @@ public class UserSessionController extends AbstractController{
     protected void init0() {
         //拉取用户会话
         messageModel.pullUserSession();
-        //拉取用户好友关系
-        messageModel.pullFriendship();
-        //拉取用户群组关系
-        messageModel.pullGroupRelationship();
     }
 
     @Override
     public void update(Object object) {
         Packet packet = (Packet)object;
         switch (packet.getHeader().getCmd()){
-            case FRIENDSHIP_RES:
-                FriendshipResponse friendshipResponse = (FriendshipResponse)packet;
-                List<UserFriendInfo> userFriendInfos = friendshipResponse.getUserFriendInfos();
-                if (!userFriendInfos.isEmpty()){
-                    for (UserFriendInfo userFriendInfo : userFriendInfos){
-                        userFriendInfoMap.put(userFriendInfo.getId(), userFriendInfo);
-                    }
-                }
-                break;
-            case GROUP_RELATIONSHIP_RES:
-                GroupRelationshipResponse groupRelationshipResponse = (GroupRelationshipResponse) packet;
-                List<UserGroupInfo> userGroupInfos = groupRelationshipResponse.getUserGroupInfos();
-                if (!userGroupInfos.isEmpty()){
-                    for (UserGroupInfo userGroupInfo : userGroupInfos){
-                        userGroupInfoMap.put(userGroupInfo.getId(), userGroupInfo);
-                    }
-                }
-                break;
             case OFFLINE_MSG_RES:
                 OfflineMessageResponse offlineMessageResponse = (OfflineMessageResponse) packet;
                 List<OfflineMessageInfo> offlineMessageInfos = offlineMessageResponse.getOfflineMessageInfos();
@@ -127,7 +101,7 @@ public class UserSessionController extends AbstractController{
                 if (sessionEntity == null){
                     sessionEntity = createUserSessionByPacket(textMessage);
                     //添加会话项
-                    addUserSessionNode(sessionEntity);
+                    addUserSessionNode(sessionEntity,true,false);
                     //添加会话关联的聊天框
                     addChatNode(sessionEntity);
                 }else {
@@ -143,19 +117,24 @@ public class UserSessionController extends AbstractController{
         }
     }
 
+
+    public void setUserFriendController(UserFriendController userFriendController) {
+        this.userFriendController = userFriendController;
+    }
+
     private void setListView(List<SessionEntity> sessionEntities){
         for (SessionEntity sessionEntity : sessionEntities) {
             //添加会话项
-            addUserSessionNode(sessionEntity);
+            addUserSessionNode(sessionEntity,false,false);
         }
     }
 
-    private void addUserSessionNode(SessionEntity sessionEntity){
-        addUserSessionNode(sessionEntity,false);
-    }
-
-    private void addUserSessionNode(SessionEntity sessionEntity,boolean selected){
-        listView.getItems().addFirst(sessionEntity);
+    private void addUserSessionNode(SessionEntity sessionEntity,boolean addFirst, boolean selected){
+        if (addFirst){
+            listView.getItems().addFirst(sessionEntity);
+        }else {
+            listView.getItems().add(sessionEntity);
+        }
         if (selected){
             listView.getSelectionModel().select(sessionEntity);
         }
@@ -167,9 +146,9 @@ public class UserSessionController extends AbstractController{
         ObservableList<SessionEntity> listViewItems = listView.getItems();
         listViewItems.remove(sessionEntity);
         if (selectedItem != null && selectedItem.getId().equals(sessionEntity.getId())){
-            addUserSessionNode(sessionEntity,true);
+            addUserSessionNode(sessionEntity,true,true);
         }else {
-            addUserSessionNode(sessionEntity);
+            addUserSessionNode(sessionEntity,true,false);
         }
 
     }
@@ -208,13 +187,13 @@ public class UserSessionController extends AbstractController{
         Long sender = packet.getSender();
         sessionEntity.setReceiverUserId(sender);
         if(packet.isGroup()){
-            UserGroupInfo userGroupInfo = userGroupInfoMap.get(sender);
+            UserGroupInfo userGroupInfo = userFriendController.findUserGroupInfo(sender);
             sessionEntity.setName(userGroupInfo.getGroupName());
             String url = imageUrlParse.loadUrl(userGroupInfo.getAvatar());
             sessionEntity.setAvatar(url);
             sessionEntity.setDeliveryMethod(DeliveryMethod.GROUP);
         }else {
-            UserFriendInfo userFriendInfo = userFriendInfoMap.get(sender);
+            UserFriendInfo userFriendInfo = userFriendController.findUserFriendInfo(sender);
             sessionEntity.setName(userFriendInfo.getNickname());
             String url = imageUrlParse.loadUrl(userFriendInfo.getAvatar());
             sessionEntity.setAvatar(url);

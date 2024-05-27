@@ -12,8 +12,10 @@ import org.imtp.client.constant.FXMLResourceConstant;
 import org.imtp.client.entity.FriendEntity;
 import org.imtp.client.util.Tuple2;
 import org.imtp.common.packet.FriendshipResponse;
+import org.imtp.common.packet.GroupRelationshipResponse;
 import org.imtp.common.packet.base.Packet;
 import org.imtp.common.packet.body.UserFriendInfo;
+import org.imtp.common.packet.body.UserGroupInfo;
 
 import java.util.HashMap;
 import java.util.List;
@@ -28,17 +30,26 @@ public class UserFriendController extends AbstractController{
     @FXML
     private Pane friendPane;
 
+    private UserSessionController userSessionController;
+
     private ImageUrlParse imageUrlParse;
 
     private Map<Long,Node> userFriendNodeMap;
+
+    //用户好友缓存
+    private Map<Long,UserFriendInfo> userFriendInfoMap;
+    //用户群组
+    private Map<Long, UserGroupInfo> userGroupInfoMap;
 
     @FXML
     public void initialize(){
         imageUrlParse = new ClassPathImageUrlParse();
         userFriendNodeMap = new HashMap<>();
 
-        friendListView.setCellFactory(c -> new UserFriendListCell());
+        userFriendInfoMap = new HashMap<>();
+        userGroupInfoMap = new HashMap<>();
 
+        friendListView.setCellFactory(c -> new UserFriendListCell());
         friendListView.setOnMouseClicked(mouseEvent -> {
             FriendEntity friendEntity = friendListView.getSelectionModel().getSelectedItem();
             if (friendEntity == null){
@@ -57,9 +68,16 @@ public class UserFriendController extends AbstractController{
 
     }
 
+    public void setUserSessionController(UserSessionController userSessionController) {
+        this.userSessionController = userSessionController;
+    }
+
     @Override
     protected void init0() {
-        this.messageModel.pullFriendship();
+        //拉取用户好友关系
+        messageModel.pullFriendship();
+        //拉取用户群组关系
+        messageModel.pullGroupRelationship();
     }
 
     @Override
@@ -69,20 +87,33 @@ public class UserFriendController extends AbstractController{
             case FRIENDSHIP_RES:
                 FriendshipResponse friendshipResponse = (FriendshipResponse)packet;
                 List<UserFriendInfo> userFriendInfos = friendshipResponse.getUserFriendInfos();
-                log.info("userFriendInfos: {}", userFriendInfos);
                 if (!userFriendInfos.isEmpty()){
-                    List<FriendEntity> friendEntities = userFriendInfos.stream().map(this::convertFriendEntity).toList();
-                    setListView(friendEntities);
+                    for (UserFriendInfo userFriendInfo : userFriendInfos){
+                        setListView(convertFriendEntity(userFriendInfo));
+                        userFriendInfoMap.put(userFriendInfo.getId(), userFriendInfo);
+                    }
+                }
+                break;
+            case GROUP_RELATIONSHIP_RES:
+                GroupRelationshipResponse groupRelationshipResponse = (GroupRelationshipResponse) packet;
+                List<UserGroupInfo> userGroupInfos = groupRelationshipResponse.getUserGroupInfos();
+                if (!userGroupInfos.isEmpty()){
+                    for (UserGroupInfo userGroupInfo : userGroupInfos){
+                        userGroupInfoMap.put(userGroupInfo.getId(), userGroupInfo);
+                    }
                 }
                 break;
         }
     }
 
-
     private void setListView(List<FriendEntity> friendEntities){
         for (FriendEntity friendEntity : friendEntities){
-            addUserFriendNode(friendEntity);
+            setListView(friendEntity);
         }
+    }
+
+    private void setListView(FriendEntity friendEntity){
+        addUserFriendNode(friendEntity);
     }
 
     private void addUserFriendNode(FriendEntity friendEntity){
@@ -94,6 +125,16 @@ public class UserFriendController extends AbstractController{
         if (selected){
             friendListView.getSelectionModel().select(friendEntity);
         }
+    }
+
+    public UserFriendInfo findUserFriendInfo(Long id){
+
+        return userFriendInfoMap.get(id);
+    }
+
+    public UserGroupInfo findUserGroupInfo(Long id){
+
+        return userGroupInfoMap.get(id);
     }
 
     //添加好友关联的详情

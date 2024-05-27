@@ -45,7 +45,7 @@ public abstract class AbstractController implements Controller, Observer {
         this.sceneManager = sceneManager;
     }
 
-    protected void switchScene(String fxmlPath,String title,MessageModel messageModel){
+    protected void skipScene(String fxmlPath,String title,MessageModel messageModel){
         this.sceneManager.setScene(fxmlPath,title,messageModel);
     }
 
