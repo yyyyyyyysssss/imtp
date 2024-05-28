@@ -34,6 +34,7 @@ module client{
     requires io.netty.codec.stomp;
 
     exports org.imtp.client;
+    exports org.imtp.client.component;
     exports org.imtp.client.constant;
     exports org.imtp.client.context;
     exports org.imtp.client.controller;

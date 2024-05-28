@@ -140,6 +140,10 @@
                         <list>org.imtp.client.controller.UserSessionController</list>
                         <list>org.imtp.client.controller.UserSessionItemController</list>
                         <list>org.imtp.client.controller.ChatController</list>
+                        <list>org.imtp.client.controller.ChatItemController</list>
+                        <list>org.imtp.client.controller.UserFriendController</list>
+                        <list>org.imtp.client.controller.UserFriendItemController</list>
+                        <list>org.imtp.client.controller.UserFriendDetailsController</list>
                     </reflectionList>
                     <bundlesList>
                         <list>com.sun.glass.ui.win</list>

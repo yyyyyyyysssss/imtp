@@ -11,6 +11,9 @@
         "pattern": "client:\\Qimg/*.jpg\\E"
       },
       {
+        "pattern": "client:\\Qimg/*.png\\E"
+      },
+      {
         "pattern": "\\QMETA-INF/fonts.mf\\E"
       },
       {
