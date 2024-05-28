@@ -1,4 +1,4 @@
-package org.imtp.server.idwork;
+package org.imtp.common.idwork;
 
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -41,11 +41,11 @@ public class SnowflakeIdWorker {
 
     private Lock lock = new ReentrantLock();
 
-    public SnowflakeIdWorker(long workerId){
+    public SnowflakeIdWorker(WorkIdService workIdService){
+        this.workerId = workIdService.getWorkId();
         if (workerId > maxWorkerId || workerId < 0) {
             throw new IllegalArgumentException(String.format("workerId can't be greater than %d or less than 0", maxWorkerId));
         }
-        this.workerId = workerId;
     }
 
     public synchronized long nextId(){

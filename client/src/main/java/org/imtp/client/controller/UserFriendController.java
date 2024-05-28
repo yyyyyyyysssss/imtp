@@ -11,7 +11,6 @@ import org.imtp.client.component.ImageUrlParse;
 import org.imtp.client.constant.Callback;
 import org.imtp.client.constant.FXMLResourceConstant;
 import org.imtp.client.entity.FriendEntity;
-import org.imtp.client.event.UserFriendEvent;
 import org.imtp.client.util.Tuple2;
 import org.imtp.common.packet.FriendshipResponse;
 import org.imtp.common.packet.GroupRelationshipResponse;

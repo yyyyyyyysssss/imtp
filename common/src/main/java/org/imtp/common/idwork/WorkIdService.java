@@ -1,4 +1,4 @@
-package org.imtp.server.idwork;
+package org.imtp.common.idwork;
 
 public interface WorkIdService {
 

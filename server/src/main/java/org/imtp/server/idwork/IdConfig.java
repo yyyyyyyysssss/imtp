@@ -1,5 +1,8 @@
 package org.imtp.server.idwork;
 
+import org.imtp.common.idwork.RandomWorkIdService;
+import org.imtp.common.idwork.SnowflakeIdWorker;
+import org.imtp.common.idwork.WorkIdService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -21,7 +24,7 @@ public class IdConfig {
     @Bean
     public SnowflakeIdWorker snowflakeIdWorker(WorkIdService workIdService){
 
-        return new SnowflakeIdWorker(workIdService.getWorkId());
+        return new SnowflakeIdWorker(workIdService);
     }
 
 }

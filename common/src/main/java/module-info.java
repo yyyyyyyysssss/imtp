@@ -18,4 +18,5 @@ module common {
     exports org.imtp.common.packet.base;
     exports org.imtp.common.packet.body;
     exports org.imtp.common.utils;
+    exports org.imtp.common.idwork;
 }

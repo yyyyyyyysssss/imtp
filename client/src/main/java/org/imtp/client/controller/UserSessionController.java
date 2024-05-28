@@ -198,7 +198,7 @@ public class UserSessionController extends AbstractController{
     //添加会话关联的聊天框
     private Node addChatNode(SessionEntity sessionEntity){
         Tuple2<Node, Controller> tuple2 = loadNodeAndController(FXMLResourceConstant.CHAT_FML);
-        Controller controller = tuple2.getV2();
+        ChatController controller = (ChatController)tuple2.getV2();
         controller.initData(sessionEntity);
         Node node = tuple2.getV1();
         //注册发送消息事件，将其置顶

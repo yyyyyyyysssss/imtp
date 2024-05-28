@@ -7,6 +7,7 @@ import lombok.Setter;
 import org.imtp.client.component.ClassPathImageUrlParse;
 import org.imtp.client.context.ClientContextHolder;
 import org.imtp.client.context.DefaultClientUserChannelContext;
+import org.imtp.client.idwork.IdGen;
 import org.imtp.common.enums.MessageType;
 
 /**
@@ -21,6 +22,8 @@ import org.imtp.common.enums.MessageType;
 public class ChatItemEntity {
 
 
+    private Long id;
+
     private boolean self;
 
     private String avatar;
@@ -29,8 +32,23 @@ public class ChatItemEntity {
 
     private MessageType messageType;
 
+    private Integer sent;
+
+    public void doSending(){
+        this.sent = 1;
+    }
+
+    public void doSentSuccessfully(){
+        this.sent = 2;
+    }
+
+    public void doSentFailure(){
+        this.sent = 3;
+    }
+
     public static ChatItemEntity createSelfChatItemEntity(){
         ChatItemEntity chatItemEntity = new ChatItemEntity();
+        chatItemEntity.setId(IdGen.genId());
         chatItemEntity.setSelf(true);
         DefaultClientUserChannelContext clientContext = (DefaultClientUserChannelContext)ClientContextHolder.clientContext();
         String at = clientContext.getUserInfo().getAvatar();

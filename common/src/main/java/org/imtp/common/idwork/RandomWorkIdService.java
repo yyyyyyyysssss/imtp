@@ -1,4 +1,4 @@
-package org.imtp.server.idwork;
+package org.imtp.common.idwork;
 
 import java.util.Random;
 
@@ -7,7 +7,7 @@ import java.util.Random;
  * @Author ys
  * @Date 2024/4/28 11:13
  */
-public class RandomWorkIdService implements WorkIdService{
+public class RandomWorkIdService implements WorkIdService {
 
     @Override
     public long getWorkId() {
