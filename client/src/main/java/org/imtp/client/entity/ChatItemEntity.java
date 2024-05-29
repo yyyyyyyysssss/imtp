@@ -1,5 +1,7 @@
 package org.imtp.client.entity;
 
+import javafx.beans.property.*;
+import javafx.scene.image.Image;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,6 +23,7 @@ import org.imtp.common.enums.MessageType;
 @NoArgsConstructor
 public class ChatItemEntity {
 
+    private final ObjectProperty<Image> image = new SimpleObjectProperty<>();
 
     private Long id;
 
@@ -32,19 +35,20 @@ public class ChatItemEntity {
 
     private MessageType messageType;
 
-    private Integer sent;
 
-    public void doSending(){
-        this.sent = 1;
+
+    public ObjectProperty<Image> imageProperty() {
+        return image;
     }
 
-    public void doSentSuccessfully(){
-        this.sent = 2;
+    public void setImage(Image image) {
+        this.image.set(image);
     }
 
-    public void doSentFailure(){
-        this.sent = 3;
+    public Image getImage() {
+        return image.get();
     }
+
 
     public static ChatItemEntity createSelfChatItemEntity(){
         ChatItemEntity chatItemEntity = new ChatItemEntity();

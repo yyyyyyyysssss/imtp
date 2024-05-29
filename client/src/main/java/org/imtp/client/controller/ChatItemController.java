@@ -82,6 +82,8 @@ public class ChatItemController extends AbstractController{
                     chatItemHBox.setAlignment(Pos.CENTER_RIGHT);
                     ObservableList<Node> cd = chatItemLabelHBox.getChildren();
                     cd.clear();
+                    chatItemEntity.imageProperty().bindBidirectional(sendingImageView.imageProperty());
+                    cd.add(sendingImageView);
                     cd.add(chatItemLabel);
                     children.add(chatItemLabelHBox);
                     children.add(chatItemImageView);

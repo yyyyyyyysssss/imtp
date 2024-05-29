@@ -13,6 +13,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
+import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
@@ -22,11 +23,13 @@ import org.imtp.client.entity.ChatItemEntity;
 import org.imtp.client.entity.SessionEntity;
 import org.imtp.client.event.UserSessionEvent;
 import org.imtp.client.idwork.IdGen;
+import org.imtp.client.util.ResourceUtils;
 import org.imtp.common.enums.DeliveryMethod;
 import org.imtp.common.enums.MessageType;
 import org.imtp.common.packet.TextMessage;
 import org.imtp.common.packet.base.Packet;
 
+import java.net.URL;
 import java.util.List;
 
 @Slf4j
@@ -46,8 +49,13 @@ public class ChatController extends AbstractController{
 
     private SessionEntity sessionEntity;
 
+    private Image sendFailureImage;
+
     @FXML
     public void initialize(){
+        URL sendFailImageUrl = ResourceUtils.classPathResource("/img/send_fail.png");
+        sendFailureImage = new Image(sendFailImageUrl.toExternalForm());
+
         inputText.setWrapText(true);
         inputText.setOnKeyPressed(keyEvent -> {
             switch (keyEvent.getCode()){
@@ -110,6 +118,15 @@ public class ChatController extends AbstractController{
         sessionEntity.setLastMsg(text);
         chatVbox.fireEvent(new UserSessionEvent(UserSessionEvent.SEND_MESSAGE,sessionEntity));
         send(packet);
+
+//        Timeline timeline = new Timeline();
+//        KeyFrame keyFrame = new KeyFrame(Duration.seconds(3), event -> {
+//            selfChatItemEntity.imageProperty().set(null);
+//        });
+//        timeline.getKeyFrames().add(keyFrame);
+//        timeline.setCycleCount(1);
+//        timeline.play();
+
         inputText.clear();
     }
 
