@@ -1,6 +1,5 @@
 package org.imtp.server.handler;
 
-import io.netty.channel.Channel;
 import io.netty.channel.SimpleChannelInboundHandler;
 import jakarta.annotation.Resource;
 import org.imtp.common.packet.base.Packet;

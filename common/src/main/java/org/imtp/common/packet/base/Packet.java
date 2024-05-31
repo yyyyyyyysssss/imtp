@@ -82,4 +82,9 @@ public abstract class Packet{
 
         return this.header.getCmd();
     }
+
+    public Long realSender(){
+        return this.isGroup() ? this.getReceiver() : this.getSender();
+    }
+
 }

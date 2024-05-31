@@ -28,7 +28,7 @@ public class TextMessageHandler extends AbstractHandler<TextMessage> {
         Message message = new Message(textMessage);
         message.setContent(textMessage.getMessage());
         //响应已送达报文
-        channelHandlerContext.channel().writeAndFlush(new MessageStateResponse(MessageState.DELIVERED,textMessage.getHeader()));
+        channelHandlerContext.channel().writeAndFlush(new MessageStateResponse(MessageState.DELIVERED,textMessage));
 
         final List<OfflineMessage> offlineMessages = new ArrayList<>();
         List<Long> receivers = getReceivers(textMessage);

@@ -44,8 +44,6 @@ public class UserFriendController extends AbstractController implements Callback
 
     //用户好友缓存
     private Map<Long,UserFriendInfo> userFriendInfoMap;
-    //用户群组
-    private Map<Long, UserGroupInfo> userGroupInfoMap;
 
     @FXML
     public void initialize(){
@@ -53,7 +51,6 @@ public class UserFriendController extends AbstractController implements Callback
         userFriendNodeMap = new HashMap<>();
 
         userFriendInfoMap = new HashMap<>();
-        userGroupInfoMap = new HashMap<>();
 
         friendListView.setCellFactory(c -> new UserFriendListCell());
         friendListView.setOnMouseClicked(mouseEvent -> {
@@ -86,8 +83,6 @@ public class UserFriendController extends AbstractController implements Callback
     protected void init0() {
         //拉取用户好友关系
         messageModel.pullFriendship();
-        //拉取用户群组关系
-        messageModel.pullGroupRelationship();
     }
 
     @Override
@@ -101,15 +96,6 @@ public class UserFriendController extends AbstractController implements Callback
                     for (UserFriendInfo userFriendInfo : userFriendInfos){
                         setListView(convertFriendEntity(userFriendInfo));
                         userFriendInfoMap.put(userFriendInfo.getId(), userFriendInfo);
-                    }
-                }
-                break;
-            case GROUP_RELATIONSHIP_RES:
-                GroupRelationshipResponse groupRelationshipResponse = (GroupRelationshipResponse) packet;
-                List<UserGroupInfo> userGroupInfos = groupRelationshipResponse.getUserGroupInfos();
-                if (!userGroupInfos.isEmpty()){
-                    for (UserGroupInfo userGroupInfo : userGroupInfos){
-                        userGroupInfoMap.put(userGroupInfo.getId(), userGroupInfo);
                     }
                 }
                 break;
@@ -140,11 +126,6 @@ public class UserFriendController extends AbstractController implements Callback
     public UserFriendInfo findUserFriendInfo(Long id){
 
         return userFriendInfoMap.get(id);
-    }
-
-    public UserGroupInfo findUserGroupInfo(Long id){
-
-        return userGroupInfoMap.get(id);
     }
 
     //添加好友关联的详情

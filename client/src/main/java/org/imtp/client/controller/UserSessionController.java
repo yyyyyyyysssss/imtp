@@ -40,6 +40,8 @@ public class UserSessionController extends AbstractController{
 
     private UserFriendController userFriendController;
 
+    private UserGroupController userGroupController;
+
     private ImageUrlParse imageUrlParse;
 
     //会话与聊天框的对应关系
@@ -89,7 +91,7 @@ public class UserSessionController extends AbstractController{
                 }
                 break;
             case TEXT_MESSAGE:
-                Long sender = packet.getSender();
+                Long sender = packet.realSender();
                 SessionEntity sessionEntity = userSessionEntityMap.get(sender);
                 TextMessage textMessage = (TextMessage) packet;
                 if (sessionEntity == null){
@@ -103,7 +105,6 @@ public class UserSessionController extends AbstractController{
                         //添加会话关联的聊天框
                         addChatNode(sessionEntity);
                     }
-                    sessionEntity = userSessionEntityMap.get(sender);
                     sessionEntity.setLastMsg(textMessage.getMessage());
                     updateUserSessionNode(sessionEntity);
                 }
@@ -114,6 +115,10 @@ public class UserSessionController extends AbstractController{
 
     public void setUserFriendController(UserFriendController userFriendController) {
         this.userFriendController = userFriendController;
+    }
+
+    public void setUserGroupController(UserGroupController userGroupController) {
+        this.userGroupController = userGroupController;
     }
 
     public void setHomeController(HomeController homeController) {
@@ -153,6 +158,27 @@ public class UserSessionController extends AbstractController{
             listView.getSelectionModel().select(sessionEntity);
         }
         userSessionEntityMap.put(sessionEntity.getReceiverUserId(),sessionEntity);
+    }
+
+    public void addUserSessionAndChatNode(UserGroupInfo userGroupInfo){
+        if (userGroupInfo == null){
+            throw new NullPointerException("userGroupInfo is null");
+        }
+        SessionEntity sessionEntity = userSessionEntityMap.get(userGroupInfo.getId());
+        Node node = null;
+        if (sessionEntity == null){
+            SessionEntity se = createUserSessionByUserGroupInfo(userGroupInfo);
+            addUserSessionNode(se,true,true);
+            //添加会话关联的聊天框
+            node = addChatNode(se);
+        }else {
+            if ((node = userSessionChatNodeMap.get(userGroupInfo.getId())) ==null){
+                //添加会话关联的聊天框
+                node = addChatNode(sessionEntity);
+            }
+            updateUserSessionNode(sessionEntity,true);
+        }
+        showChatNode(node);
     }
 
     public void addUserSessionAndChatNode(UserFriendInfo userFriendInfo){
@@ -235,18 +261,30 @@ public class UserSessionController extends AbstractController{
         return sessionEntity;
     }
 
+    private SessionEntity createUserSessionByUserGroupInfo(UserGroupInfo userGroupInfo){
+        SessionEntity sessionEntity = new SessionEntity();
+        sessionEntity.setId(new Random().nextLong());
+        sessionEntity.setReceiverUserId(userGroupInfo.getId());
+        sessionEntity.setName(userGroupInfo.getGroupName());
+        String url = imageUrlParse.loadUrl(userGroupInfo.getAvatar());
+        sessionEntity.setAvatar(url);
+        sessionEntity.setDeliveryMethod(DeliveryMethod.GROUP);
+        return sessionEntity;
+    }
+
     private SessionEntity createUserSessionByPacket(Packet packet){
         SessionEntity sessionEntity = new SessionEntity();
         sessionEntity.setId(new Random().nextLong());
-        Long sender = packet.getSender();
+        Long sender = packet.realSender();
         sessionEntity.setReceiverUserId(sender);
         if(packet.isGroup()){
-            UserGroupInfo userGroupInfo = userFriendController.findUserGroupInfo(sender);
+            UserGroupInfo userGroupInfo = userGroupController.findUserGroupInfo(sender);
             sessionEntity.setName(userGroupInfo.getGroupName());
             String url = imageUrlParse.loadUrl(userGroupInfo.getAvatar());
             sessionEntity.setAvatar(url);
             sessionEntity.setDeliveryMethod(DeliveryMethod.GROUP);
         }else {
+            sessionEntity.setReceiverUserId(sender);
             UserFriendInfo userFriendInfo = userFriendController.findUserFriendInfo(sender);
             sessionEntity.setName(userFriendInfo.getNickname());
             String url = imageUrlParse.loadUrl(userFriendInfo.getAvatar());

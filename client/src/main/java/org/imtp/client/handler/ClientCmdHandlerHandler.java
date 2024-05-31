@@ -11,6 +11,7 @@ import org.imtp.common.enums.Command;
 import org.imtp.common.packet.*;
 import org.imtp.common.packet.base.Header;
 import org.imtp.common.packet.base.Packet;
+import org.imtp.common.utils.JsonUtil;
 
 /**
  * @Description
@@ -49,7 +50,7 @@ public class ClientCmdHandlerHandler extends AbstractMessageModelHandler<Packet>
                 publishMessage(new TextMessage(byteBuf,header));
                 break;
             case MSG_RES:
-                MessageStateResponse response = new MessageStateResponse(byteBuf,header);
+                publishMessage(new MessageStateResponse(byteBuf,header));
                 break;
             default:
                 throw new UnsupportedOperationException("不支持的操作");

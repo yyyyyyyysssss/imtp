@@ -18,25 +18,30 @@ public class MessageStateResponse extends SystemTextMessage {
 
     private MessageState state;
 
-    public MessageStateResponse(MessageState state, Header header){
+    private Long ackId;
+
+    public MessageStateResponse(MessageState state,AbstractTextMessage message){
         //服务器收到消息回复一个已送达响应给到客户端
-        super(0, header.getReceiver(), Command.MSG_RES);
+        super(0, message.getHeader().getReceiver(), Command.MSG_RES);
         this.state = state;
+        this.ackId = message.getAckId();
     }
 
     public MessageStateResponse(ByteBuf byteBuf, Header header){
         super(byteBuf,header);
         byte res = byteBuf.readByte();
         this.state = MessageState.find(res);
+        this.ackId = byteBuf.readLong();
     }
 
     @Override
     public void encodeBodyAsByteBuf0(ByteBuf byteBuf) {
         byteBuf.writeByte((byte)state.ordinal());
+        byteBuf.writeLong(ackId);
     }
 
     @Override
     public int getBodyLength0() {
-        return 1;
+        return 9;
     }
 }

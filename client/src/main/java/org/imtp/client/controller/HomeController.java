@@ -49,6 +49,13 @@ public class HomeController extends AbstractController{
 
     private Image friendIconSelectedImage;
 
+    @FXML
+    private ImageView homeGroupImageView;
+
+    private Image groupIconImage;
+
+    private Image groupIconSelectedImage;
+
     private ImageUrlParse imageUrlParse;
 
     @FXML
@@ -61,6 +68,10 @@ public class HomeController extends AbstractController{
     private Node friendNode;
 
     private UserFriendController friendController;
+
+    private Node groupNode;
+
+    private UserGroupController groupController;
 
     @FXML
     public void initialize(){
@@ -81,9 +92,15 @@ public class HomeController extends AbstractController{
         this.friendIconImage = new Image(friendIconurl.toExternalForm());
         URL friendIconSelectedurl = ResourceUtils.classPathResource("/img/home_friend_icon_selected.png");
         this.friendIconSelectedImage = new Image(friendIconSelectedurl.toExternalForm());
+        //初始化好友图标
+        URL groupIconurl = ResourceUtils.classPathResource("/img/home_group_icon.png");
+        this.groupIconImage = new Image(groupIconurl.toExternalForm());
+        URL groupIconSelectedurl = ResourceUtils.classPathResource("/img/home_group_icon_selected.png");
+        this.groupIconSelectedImage = new Image(groupIconSelectedurl.toExternalForm());
         //设置默认图标
         homeSessionImageView.setImage(sessionIconSelectedImage);
         homeFriendImageView.setImage(friendIconImage);
+        homeGroupImageView.setImage(groupIconImage);
 
 
         homeSessionImageView.setOnMouseClicked(mouseEvent -> {
@@ -92,6 +109,10 @@ public class HomeController extends AbstractController{
 
         homeFriendImageView.setOnMouseClicked(mouseEvent -> {
             switchUserFriend();
+        });
+
+        homeGroupImageView.setOnMouseClicked(mouseEvent -> {
+            switchUserGroup();
         });
 
     }
@@ -106,11 +127,20 @@ public class HomeController extends AbstractController{
         this.friendNode = friendTuple2.getV1();
         this.friendController = (UserFriendController) friendTuple2.getV2();
 
-        //相互引用对方
+        Tuple2<Node, Controller> groupTuple2 = loadNodeAndController(FXMLResourceConstant.USER_GROUP_FML);
+        this.groupNode = groupTuple2.getV1();
+        this.groupController = (UserGroupController) groupTuple2.getV2();
+
+        //引用
+        sessionController.setUserFriendController(friendController);
+        sessionController.setUserGroupController(groupController);
+        sessionController.setHomeController(this);
+
         friendController.setUserSessionController(sessionController);
         friendController.setHomeController(this);
-        sessionController.setUserFriendController(friendController);
-        sessionController.setHomeController(this);
+
+        groupController.setUserSessionController(sessionController);
+        groupController.setHomeController(this);
 
         //设置默认组件
         ObservableList<Node> children = homePane.getChildren();
@@ -125,6 +155,7 @@ public class HomeController extends AbstractController{
     public void switchUserSession(){
         homeSessionImageView.setImage(sessionIconSelectedImage);
         homeFriendImageView.setImage(friendIconImage);
+        homeGroupImageView.setImage(groupIconImage);
 
         ObservableList<Node> children = homePane.getChildren();
         if (!children.isEmpty()){
@@ -134,14 +165,27 @@ public class HomeController extends AbstractController{
     }
 
     public void switchUserFriend(){
-        homeSessionImageView.setImage(sessionIconImage);
         homeFriendImageView.setImage(friendIconSelectedImage);
+        homeSessionImageView.setImage(sessionIconImage);
+        homeGroupImageView.setImage(groupIconImage);
 
         ObservableList<Node> children = homePane.getChildren();
         if (!children.isEmpty()){
             children.removeLast();
         }
         children.add(friendNode);
+    }
+
+    public void switchUserGroup(){
+        homeGroupImageView.setImage(groupIconSelectedImage);
+        homeSessionImageView.setImage(sessionIconImage);
+        homeFriendImageView.setImage(friendIconImage);
+
+        ObservableList<Node> children = homePane.getChildren();
+        if (!children.isEmpty()){
+            children.removeLast();
+        }
+        children.add(groupNode);
     }
 
 }

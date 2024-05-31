@@ -26,11 +26,15 @@ import org.imtp.client.idwork.IdGen;
 import org.imtp.client.util.ResourceUtils;
 import org.imtp.common.enums.DeliveryMethod;
 import org.imtp.common.enums.MessageType;
+import org.imtp.common.packet.MessageStateResponse;
 import org.imtp.common.packet.TextMessage;
 import org.imtp.common.packet.base.Packet;
 
 import java.net.URL;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
 public class ChatController extends AbstractController{
@@ -49,12 +53,21 @@ public class ChatController extends AbstractController{
 
     private SessionEntity sessionEntity;
 
+    private Image sendingImage;
+
     private Image sendFailureImage;
+
+    private Map<Long,ChatItemEntity> ackChatItemEntityMap;
 
     @FXML
     public void initialize(){
         URL sendFailImageUrl = ResourceUtils.classPathResource("/img/send_fail.png");
         sendFailureImage = new Image(sendFailImageUrl.toExternalForm());
+
+        URL sendingImageUrl = ResourceUtils.classPathResource("/img/sending.gif");
+        sendingImage = new Image(sendingImageUrl.toExternalForm());
+
+        ackChatItemEntityMap = new ConcurrentHashMap<>();
 
         inputText.setWrapText(true);
         inputText.setOnKeyPressed(keyEvent -> {
@@ -103,29 +116,25 @@ public class ChatController extends AbstractController{
             inputText.clear();
             return;
         }
+        Long ackId = IdGen.genId();
         Packet packet;
         if (sessionEntity.getDeliveryMethod().equals(DeliveryMethod.SINGLE)){
-            packet = new TextMessage(text, ClientContextHolder.clientContext().id(), sessionEntity.getReceiverUserId());
+            packet = new TextMessage(text, ClientContextHolder.clientContext().id(), sessionEntity.getReceiverUserId(),ackId);
         }else {
-            packet = new TextMessage(text, ClientContextHolder.clientContext().id(), sessionEntity.getReceiverUserId(),true);
+            packet = new TextMessage(text, ClientContextHolder.clientContext().id(), sessionEntity.getReceiverUserId(),ackId,true);
         }
         ChatItemEntity selfChatItemEntity = ChatItemEntity.createSelfChatItemEntity();
         selfChatItemEntity.setContent(text);
         selfChatItemEntity.setMessageType(MessageType.findMessageTypeByValue((int) packet.getCommand().getCmdCode()));
+        selfChatItemEntity.setImage(sendingImage);
         addChatItem(selfChatItemEntity);
+
+        ackChatItemEntityMap.put(ackId,selfChatItemEntity);
 
         sessionEntity.setLastMsgType(MessageType.TEXT_MESSAGE);
         sessionEntity.setLastMsg(text);
         chatVbox.fireEvent(new UserSessionEvent(UserSessionEvent.SEND_MESSAGE,sessionEntity));
         send(packet);
-
-//        Timeline timeline = new Timeline();
-//        KeyFrame keyFrame = new KeyFrame(Duration.seconds(3), event -> {
-//            selfChatItemEntity.imageProperty().set(null);
-//        });
-//        timeline.getKeyFrames().add(keyFrame);
-//        timeline.setCycleCount(1);
-//        timeline.play();
 
         inputText.clear();
     }
@@ -133,7 +142,7 @@ public class ChatController extends AbstractController{
     @Override
     public void update(Object object) {
         Packet packet = (Packet)object;
-        if (!packet.getSender().equals(sessionEntity.getReceiverUserId())){
+        if (packet.getSender() != 0 && !packet.realSender().equals(sessionEntity.getReceiverUserId())){
             return;
         }
         switch (packet.getHeader().getCmd()){
@@ -145,6 +154,19 @@ public class ChatController extends AbstractController{
                 chatItemEntity.setMessageType(MessageType.findMessageTypeByValue((int) textMessage.getCommand().getCmdCode()));
                 chatItemEntity.setContent(textMessage.getMessage());
                 addChatItem(chatItemEntity);
+                break;
+            case MSG_RES:
+                MessageStateResponse messageStateResponse = (MessageStateResponse) packet;
+                log.info("{},{}",messageStateResponse.getState(),messageStateResponse.getAckId());
+                ChatItemEntity cie = ackChatItemEntityMap.get(messageStateResponse.getAckId());
+                if (cie != null){
+                    switch (messageStateResponse.getState()){
+                        case DELIVERED :
+                            cie.imageProperty().set(null);
+                            ackChatItemEntityMap.remove(messageStateResponse.getAckId());
+                            break;
+                    }
+                }
                 break;
         }
     }

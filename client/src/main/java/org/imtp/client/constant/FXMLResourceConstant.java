@@ -18,6 +18,12 @@ public interface  FXMLResourceConstant {
 
     String USER_FRIEND_DETAILS_FML = BASE + "/UserFriendDetails.fxml";
 
+    String USER_GROUP_FML = BASE + "/UserGroup.fxml";
+
+    String USER_GROUP_ITEM_FML = BASE + "/UserGroupItem.fxml";
+
+    String USER_GROUP_DETAILS_FML = BASE + "/UserGroupDetails.fxml";
+
     String CHAT_FML = BASE + "/Chat.fxml";
 
     String CHAT_ITEM_FML = BASE + "/ChatItem.fxml";

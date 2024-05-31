@@ -2,6 +2,7 @@ package org.imtp.client.view;
 
 import org.imtp.client.context.ClientContextHolder;
 import org.imtp.client.controller.Controller;
+import org.imtp.client.idwork.IdGen;
 import org.imtp.client.model.MessageModel;
 import org.imtp.client.model.Observer;
 import org.imtp.common.packet.FriendshipResponse;
@@ -143,9 +144,9 @@ public class ConsoleView implements Observer,Runnable {
                 continue;
             }
             if(isGroupChat){
-                controller.send(new TextMessage(msg, ClientContextHolder.clientContext().id(), receiver,true));
+                controller.send(new TextMessage(msg, ClientContextHolder.clientContext().id(), receiver, IdGen.genId(),true));
             }else {
-                controller.send(new TextMessage(msg, ClientContextHolder.clientContext().id(), receiver,false));
+                controller.send(new TextMessage(msg, ClientContextHolder.clientContext().id(), receiver,IdGen.genId(),false));
             }
 
         }

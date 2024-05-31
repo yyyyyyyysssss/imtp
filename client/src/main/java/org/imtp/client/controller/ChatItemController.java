@@ -11,9 +11,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import org.imtp.client.entity.ChatItemEntity;
-import org.imtp.client.util.ResourceUtils;
-
-import java.net.URL;
 
 /**
  * @Description
@@ -34,27 +31,14 @@ public class ChatItemController extends AbstractController{
     @FXML
     private Label chatItemLabel;
 
-    private ImageView sendingImageView;
-
-    private ImageView sendFailImageView;
+    private ImageView imageView;
 
 
     @FXML
     public void initialize(){
-        sendingImageView = new ImageView();
-        sendingImageView.setFitWidth(15);
-        sendingImageView.setFitHeight(15);
-        URL sendingImageUrl = ResourceUtils.classPathResource("/img/sending.gif");
-        sendingImageView.setImage(new Image(sendingImageUrl.toExternalForm()));
-
-        sendFailImageView = new ImageView();
-        sendFailImageView.setFitWidth(15);
-        sendFailImageView.setFitHeight(15);
-        URL sendFailImageUrl = ResourceUtils.classPathResource("/img/send_fail.png");
-        sendFailImageView.setImage(new Image(sendFailImageUrl.toExternalForm()));
-
-
-
+        imageView = new ImageView();
+        imageView.setFitWidth(15);
+        imageView.setFitHeight(15);
     }
 
 
@@ -82,8 +66,9 @@ public class ChatItemController extends AbstractController{
                     chatItemHBox.setAlignment(Pos.CENTER_RIGHT);
                     ObservableList<Node> cd = chatItemLabelHBox.getChildren();
                     cd.clear();
-                    chatItemEntity.imageProperty().bindBidirectional(sendingImageView.imageProperty());
-                    cd.add(sendingImageView);
+                    imageView.setImage(chatItemEntity.getImage());
+                    chatItemEntity.imageProperty().bindBidirectional(imageView.imageProperty());
+                    cd.add(imageView);
                     cd.add(chatItemLabel);
                     children.add(chatItemLabelHBox);
                     children.add(chatItemImageView);

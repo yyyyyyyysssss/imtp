@@ -24,6 +24,10 @@
                            <VBox.margin>
                               <Insets top="10.0" />
                            </VBox.margin></ImageView>
+                         <ImageView fx:id="homeGroupImageView" fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
+                             <VBox.margin>
+                                 <Insets top="10.0" />
+                             </VBox.margin></ImageView>
                      </children>
                      <padding>
                         <Insets top="20.0" />
