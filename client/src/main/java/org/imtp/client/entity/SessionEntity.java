@@ -27,6 +27,10 @@ public class SessionEntity {
 
     private Long timestamp;
 
+    private Long lastSendMsgUserId;
+
+    private String lastUserAvatar;
+
     @Override
     public String toString() {
         return "SessionEntity{" +
@@ -38,6 +42,8 @@ public class SessionEntity {
                 ", deliveryMethod=" + deliveryMethod +
                 ", lastMsg='" + lastMsg + '\'' +
                 ", timestamp=" + timestamp +
+                ", lastSendMsgUserId=" + lastSendMsgUserId +
+                ", lastUserAvatar='" + lastUserAvatar + '\'' +
                 '}';
     }
 

@@ -14,6 +14,7 @@ import org.imtp.client.entity.GroupEntity;
 import org.imtp.client.util.Tuple2;
 import org.imtp.common.packet.GroupRelationshipResponse;
 import org.imtp.common.packet.base.Packet;
+import org.imtp.common.packet.body.UserFriendInfo;
 import org.imtp.common.packet.body.UserGroupInfo;
 
 import java.util.HashMap;
@@ -43,11 +44,17 @@ public class UserGroupController extends AbstractController implements Callback<
     //用户群组
     private Map<Long, UserGroupInfo> userGroupInfoMap;
 
+    //群组关联带用户
+    private Map<String, UserFriendInfo> groupUserInfoMap;
+
+    private final String groupUserSeparator = "-";
+
     @FXML
     public void initialize(){
         imageUrlParse = new ClassPathImageUrlParse();
         userGroupNodeMap = new HashMap<>();
         userGroupInfoMap = new HashMap<>();
+        groupUserInfoMap = new HashMap<>();
 
         groupListView.setCellFactory(c -> new UserGroupListCell());
         groupListView.setOnMouseClicked(mouseEvent -> {
@@ -93,6 +100,12 @@ public class UserGroupController extends AbstractController implements Callback<
                     for (UserGroupInfo userGroupInfo : userGroupInfos){
                         setListView(convertFriendEntity(userGroupInfo));
                         userGroupInfoMap.put(userGroupInfo.getId(), userGroupInfo);
+
+                        List<UserFriendInfo> groupUserInfos = userGroupInfo.getGroupUserInfos();
+                        for (UserFriendInfo groupUserInfo : groupUserInfos){
+                            String key = userGroupInfo.getId() + groupUserSeparator + groupUserInfo.getId();
+                            groupUserInfoMap.put(key,groupUserInfo);
+                        }
                     }
                 }
                 break;
@@ -120,9 +133,14 @@ public class UserGroupController extends AbstractController implements Callback<
         }
     }
 
-    public UserGroupInfo findUserGroupInfo(Long id){
+    public UserGroupInfo findUserGroupInfo(Long groupId){
 
-        return userGroupInfoMap.get(id);
+        return userGroupInfoMap.get(groupId);
+    }
+
+    public UserFriendInfo findGroupUserInfo(Long groupId, Long userId){
+        String key = groupId + groupUserSeparator + userId;
+        return groupUserInfoMap.get(key);
     }
 
     //添加好友关联的详情

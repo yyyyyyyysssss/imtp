@@ -1,13 +1,9 @@
 package org.imtp.client.controller;
 
 
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
 import javafx.application.Platform;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -16,9 +12,12 @@ import javafx.scene.control.TextArea;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
-import javafx.util.Duration;
 import lombok.extern.slf4j.Slf4j;
+import org.imtp.client.component.ClassPathImageUrlParse;
+import org.imtp.client.component.ImageUrlParse;
+import org.imtp.client.context.ClientContext;
 import org.imtp.client.context.ClientContextHolder;
+import org.imtp.client.context.DefaultClientUserChannelContext;
 import org.imtp.client.entity.ChatItemEntity;
 import org.imtp.client.entity.SessionEntity;
 import org.imtp.client.event.UserSessionEvent;
@@ -29,9 +28,8 @@ import org.imtp.common.enums.MessageType;
 import org.imtp.common.packet.MessageStateResponse;
 import org.imtp.common.packet.TextMessage;
 import org.imtp.common.packet.base.Packet;
-
+import org.imtp.common.packet.body.UserFriendInfo;
 import java.net.URL;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -59,8 +57,16 @@ public class ChatController extends AbstractController{
 
     private Map<Long,ChatItemEntity> ackChatItemEntityMap;
 
+    private UserFriendController userFriendController;
+
+    private UserGroupController userGroupController;
+
+    private ImageUrlParse imageUrlParse;
+
     @FXML
     public void initialize(){
+        imageUrlParse = new ClassPathImageUrlParse();
+
         URL sendFailImageUrl = ResourceUtils.classPathResource("/img/send_fail.png");
         sendFailureImage = new Image(sendFailImageUrl.toExternalForm());
 
@@ -100,6 +106,14 @@ public class ChatController extends AbstractController{
     @Override
     protected void init0() {
 
+    }
+
+    public void setUserFriendController(UserFriendController userFriendController) {
+        this.userFriendController = userFriendController;
+    }
+
+    public void setUserGroupController(UserGroupController userGroupController) {
+        this.userGroupController = userGroupController;
     }
 
     @Override
@@ -150,7 +164,13 @@ public class ChatController extends AbstractController{
                 TextMessage textMessage = (TextMessage) packet;
                 ChatItemEntity chatItemEntity = new ChatItemEntity();
                 chatItemEntity.setSelf(false);
-                chatItemEntity.setAvatar(sessionEntity.getAvatar());
+                if (textMessage.isGroup()){
+                    UserFriendInfo groupUserInfo = userGroupController.findGroupUserInfo(textMessage.getReceiver(), textMessage.getSender());
+                    String imageUrl = imageUrlParse.loadUrl(groupUserInfo.getAvatar());
+                    chatItemEntity.setAvatar(imageUrl);
+                }else {
+                    chatItemEntity.setAvatar(sessionEntity.getAvatar());
+                }
                 chatItemEntity.setMessageType(MessageType.findMessageTypeByValue((int) textMessage.getCommand().getCmdCode()));
                 chatItemEntity.setContent(textMessage.getMessage());
                 addChatItem(chatItemEntity);
@@ -179,8 +199,13 @@ public class ChatController extends AbstractController{
     private void addChatItem(SessionEntity sessionEntity){
         ChatItemEntity chatItemEntity = new ChatItemEntity();
         chatItemEntity.setId(IdGen.genId());
-        chatItemEntity.setSelf(false);
-        chatItemEntity.setAvatar(sessionEntity.getAvatar());
+        String imageUrl = imageUrlParse.loadUrl(sessionEntity.getLastUserAvatar());
+        chatItemEntity.setAvatar(imageUrl);
+        if (ClientContextHolder.clientContext().id().equals(sessionEntity.getLastSendMsgUserId())){
+            chatItemEntity.setSelf(true);
+        }else {
+            chatItemEntity.setSelf(false);
+        }
         chatItemEntity.setMessageType(sessionEntity.getLastMsgType());
         chatItemEntity.setContent(sessionEntity.getLastMsg());
         addChatItem(chatItemEntity);
@@ -189,11 +214,10 @@ public class ChatController extends AbstractController{
     private void addChatItem(ChatItemEntity chatItemEntity){
         Platform.runLater(() -> {
             ObservableList<ChatItemEntity> items = chatListView.getItems();
+            int index = items.size();
             items.addLast(chatItemEntity);
-            int size = items.size();
-            chatListView.scrollTo(size - 1);
+            chatListView.scrollTo(index);
         });
-
     }
 
 }

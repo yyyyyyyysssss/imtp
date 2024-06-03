@@ -2,6 +2,8 @@ package org.imtp.common.packet.body;
 
 import lombok.*;
 
+import java.util.List;
+
 /**
  * @Description
  * @Author ys
@@ -21,12 +23,15 @@ public class UserGroupInfo {
 
     private String avatar;
 
+    private List<UserFriendInfo> groupUserInfos;
+
     @Override
     public String toString() {
         return "UserGroupInfo{" +
                 "id=" + id +
                 ", groupName='" + groupName + '\'' +
                 ", avatar='" + avatar + '\'' +
+                ", groupUserInfos=" + groupUserInfos +
                 '}';
     }
 }

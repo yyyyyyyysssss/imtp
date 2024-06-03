@@ -145,6 +145,8 @@ public class UserSessionController extends AbstractController{
         for (SessionEntity sessionEntity : sessionEntities) {
             //添加会话项
             addUserSessionNode(sessionEntity,false,false);
+            //添加会话关联的聊天框
+            addChatNode(sessionEntity);
         }
     }
 
@@ -225,6 +227,8 @@ public class UserSessionController extends AbstractController{
     private Node addChatNode(SessionEntity sessionEntity){
         Tuple2<Node, Controller> tuple2 = loadNodeAndController(FXMLResourceConstant.CHAT_FML);
         ChatController controller = (ChatController)tuple2.getV2();
+        controller.setUserFriendController(userFriendController);
+        controller.setUserGroupController(userGroupController);
         controller.initData(sessionEntity);
         Node node = tuple2.getV1();
         //注册发送消息事件，将其置顶
@@ -246,6 +250,8 @@ public class UserSessionController extends AbstractController{
         sessionEntity.setLastMsgType(userSessionInfo.getLastMsgType());
         sessionEntity.setLastMsg(userSessionInfo.getLastMsgContent());
         sessionEntity.setDeliveryMethod(userSessionInfo.getDeliveryMethod());
+        sessionEntity.setLastSendMsgUserId(userSessionInfo.getLastSendMsgUserId());
+        sessionEntity.setLastUserAvatar(userSessionInfo.getLastUserAvatar());
         return sessionEntity;
     }
 

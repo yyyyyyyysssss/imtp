@@ -23,15 +23,10 @@ public class UserFriendshipHandler extends AbstractHandler<FriendshipRequest>{
 
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, FriendshipRequest friendshipRequest) {
-        List<User> users = chatService.findFriendByUserId(friendshipRequest.getSender());
-        if(users.isEmpty()){
+        List<UserFriendInfo> userFriendInfos = chatService.findFriendByUserId(friendshipRequest.getSender());
+        if(userFriendInfos.isEmpty()){
             channelHandlerContext.channel().writeAndFlush(new FriendshipResponse(friendshipRequest.getSender()));
             return;
-        }
-        List<UserFriendInfo> userFriendInfos = new ArrayList<>();
-        for (User user : users){
-            UserFriendInfo userFriendInfo = UserFriendInfo.builder().id(user.getId()).nickname(user.getNickname()).account(user.getUsername()).gender(user.getGender()).avatar(user.getAvatar()).build();
-            userFriendInfos.add(userFriendInfo);
         }
         channelHandlerContext.channel().writeAndFlush(new FriendshipResponse(friendshipRequest.getSender(),userFriendInfos));
     }

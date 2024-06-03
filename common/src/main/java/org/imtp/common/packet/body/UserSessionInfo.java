@@ -32,4 +32,8 @@ public class UserSessionInfo {
 
     private Long lastMsgTime;
 
+    private Long lastSendMsgUserId;
+
+    private String lastUserAvatar;
+
 }

@@ -6,6 +6,8 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.imtp.common.enums.DeliveryMethod;
 import org.imtp.common.enums.MessageType;
+import org.imtp.common.packet.body.UserFriendInfo;
+import org.imtp.common.packet.body.UserGroupInfo;
 import org.imtp.common.packet.body.UserSessionInfo;
 import org.imtp.server.entity.*;
 import org.imtp.server.mapper.*;
@@ -56,17 +58,24 @@ public class DefaultChatService implements ChatService {
     }
 
     @Override
-    public List<User> findFriendByUserId(Long userId) {
+    public List<UserFriendInfo> findFriendByUserId(Long userId) {
         Wrapper<UserFriend> userFriendQueryWrapper = new QueryWrapper<UserFriend>().eq("user_id", userId);
         List<UserFriend> userFriends = userFriendMapper.selectList(userFriendQueryWrapper);
         if (userFriends.isEmpty()){
             return List.of();
         }
-        List<Long> friendIds = userFriends.stream().map(UserFriend::getFriendId).toList();
+        List<Long> friendIds = userFriends.stream().map(UserFriend::getFriendId).collect(Collectors.toList());
+        friendIds.add(userId);
         Wrapper<User> userQueryWrapper = new QueryWrapper<User>()
                 .select("id","nickname","username", "gender","avatar")
                 .in("id", friendIds);
-        return userMapper.selectList(userQueryWrapper);
+        List<User> users = userMapper.selectList(userQueryWrapper);
+        List<UserFriendInfo> userFriendInfos = new ArrayList<>();
+        for (User user : users){
+            UserFriendInfo userFriendInfo = UserFriendInfo.builder().id(user.getId()).nickname(user.getNickname()).account(user.getUsername()).gender(user.getGender()).avatar(user.getAvatar()).build();
+            userFriendInfos.add(userFriendInfo);
+        }
+        return userFriendInfos;
     }
 
     @Override
@@ -85,7 +94,7 @@ public class DefaultChatService implements ChatService {
     }
 
     @Override
-    public List<Group> findGroupByUserId(Long userId) {
+    public List<UserGroupInfo> findGroupByUserId(Long userId) {
         Wrapper<GroupUser> groupUserQueryWrapper = new QueryWrapper<GroupUser>()
                 .eq("user_id", userId);
         List<GroupUser> groupUsers = groupUserMapper.selectList(groupUserQueryWrapper);
@@ -96,7 +105,36 @@ public class DefaultChatService implements ChatService {
         Wrapper<Group> groupQueryWrapper = new QueryWrapper<Group>()
                 .eq("state",true)
                 .in("id", groupIds);
-        return groupMapper.selectList(groupQueryWrapper);
+        List<Group> groups = groupMapper.selectList(groupQueryWrapper);
+        List<Long> ids = groups.stream().map(Group::getId).toList();
+        QueryWrapper<GroupUser> queryWrapper = new QueryWrapper<GroupUser>()
+                .select("user_id","group_id")
+                .in("group_id", ids);
+        List<GroupUser> gus = groupUserMapper.selectList(queryWrapper);
+        List<Long> userIds = gus.stream().map(GroupUser::getUserId).distinct().toList();
+        Wrapper<User> userQueryWrapper = new QueryWrapper<User>()
+                .select("id","nickname","avatar").in("id", userIds);
+        List<User> users = userMapper.selectList(userQueryWrapper);
+
+
+        Map<Long, List<GroupUser>> groupUserMap = gus.stream().collect(Collectors.groupingBy(GroupUser::getGroupId));
+        Map<Long, User> userMap = users.stream().collect(Collectors.toMap(User::getId, a -> a));
+
+        List<UserGroupInfo> userGroupInfos = new ArrayList<>();
+        for (Group group : groups){
+            Long id = group.getId();
+            UserGroupInfo groupInfo = UserGroupInfo.builder().id(id).groupName(group.getName()).build();
+            List<GroupUser> guList = groupUserMap.get(id);
+            List<UserFriendInfo> groupUserInfos = new ArrayList<>();
+            for (GroupUser groupUser : guList){
+                User user = userMap.get(groupUser.getUserId());
+                UserFriendInfo userFriendInfo = UserFriendInfo.builder().id(user.getId()).nickname(user.getNickname()).account(user.getUsername()).gender(user.getGender()).avatar(user.getAvatar()).build();
+                groupUserInfos.add(userFriendInfo);
+            }
+            groupInfo.setGroupUserInfos(groupUserInfos);
+            userGroupInfos.add(groupInfo);
+        }
+        return userGroupInfos;
     }
 
     @Override
@@ -143,19 +181,23 @@ public class DefaultChatService implements ChatService {
 
             msgIds.add(userSession.getLastMsgId());
         }
-        Map<Long, User> userIdMap = null;
-        if (!userIds.isEmpty()){
-            List<User> users = userMapper.selectBatchIds(userIds);
-            userIdMap = users.stream().collect(Collectors.toMap(User::getId, a -> a));
-        }
         Map<Long, Group> groupMap = null;
         if (!groupIds.isEmpty()){
             List<Group> groups = groupMapper.selectBatchIds(groupIds);
             groupMap = groups.stream().collect(Collectors.toMap(Group::getId, a -> a));
         }
-
         List<Message> messages = messageMapper.selectBatchIds(msgIds);
-        Map<Long, Message> messageIdMap = messages.stream().collect(Collectors.toMap(Message::getId, a -> a));
+        Map<Long, Message> messageIdMap = new HashMap<>();
+        for (Message message : messages){
+            userIds.add(message.getSenderUserId());
+            messageIdMap.put(message.getId(),message);
+        }
+        Map<Long, User> userIdMap = null;
+        if (!userIds.isEmpty()){
+            List<User> users = userMapper.selectBatchIds(userIds);
+            userIdMap = users.stream().collect(Collectors.toMap(User::getId, a -> a));
+        }
+
         List<UserSessionInfo> userSessionInfos = new ArrayList<>();
         UserSessionInfo userSessionInfo;
         for (UserSession userSession : userSessions){
@@ -180,7 +222,9 @@ public class DefaultChatService implements ChatService {
             userSessionInfo.setLastMsgContent(message.getContent());
             userSessionInfo.setLastMsgTime(message.getSendTime().getTime());
             userSessionInfo.setDeliveryMethod(message.getDeliveryMethod());
-
+            userSessionInfo.setLastSendMsgUserId(message.getSenderUserId());
+            User user = Optional.ofNullable(userIdMap).map(m -> m.get(message.getSenderUserId())).orElse(new User());
+            userSessionInfo.setLastUserAvatar(user.getAvatar());
             userSessionInfos.add(userSessionInfo);
         }
 

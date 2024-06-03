@@ -23,16 +23,11 @@ public class UserGroupRelationshipHandler extends AbstractHandler<GroupRelations
 
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, GroupRelationshipRequest pullFriendRequest) {
-        List<Group> groups = chatService.findGroupByUserId(pullFriendRequest.getSender());
-        if(groups.isEmpty()){
+        List<UserGroupInfo> groupInfos = chatService.findGroupByUserId(pullFriendRequest.getSender());
+        if(groupInfos.isEmpty()){
             channelHandlerContext.channel().writeAndFlush(new GroupRelationshipResponse(pullFriendRequest.getSender()));
             return;
         }
-        List<UserGroupInfo> userGroupInfos = new ArrayList<>();
-        for (Group group : groups){
-            UserGroupInfo groupInfo = UserGroupInfo.builder().id(group.getId()).groupName(group.getName()).build();
-            userGroupInfos.add(groupInfo);
-        }
-        channelHandlerContext.channel().writeAndFlush(new GroupRelationshipResponse(pullFriendRequest.getSender(),userGroupInfos));
+        channelHandlerContext.channel().writeAndFlush(new GroupRelationshipResponse(pullFriendRequest.getSender(),groupInfos));
     }
 }
