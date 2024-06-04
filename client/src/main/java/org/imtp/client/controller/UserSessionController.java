@@ -42,8 +42,6 @@ public class UserSessionController extends AbstractController{
 
     private UserGroupController userGroupController;
 
-    private ImageUrlParse imageUrlParse;
-
     //会话与聊天框的对应关系
     private Map<Long,Node> userSessionChatNodeMap;
     //会话与会话项数据对应关系
@@ -51,8 +49,6 @@ public class UserSessionController extends AbstractController{
 
     @FXML
     public void initialize(){
-        imageUrlParse = new ClassPathImageUrlParse();
-
         userSessionChatNodeMap = new HashMap<>();
         userSessionEntityMap = new HashMap<>();
         //会话框设置
@@ -243,7 +239,7 @@ public class UserSessionController extends AbstractController{
         SessionEntity sessionEntity = new SessionEntity();
         sessionEntity.setId(new Random().nextLong());
         sessionEntity.setName(userSessionInfo.getName());
-        String url = imageUrlParse.loadUrl(userSessionInfo.getAvatar());
+        String url = loadImageUrl(userSessionInfo.getAvatar());
         sessionEntity.setAvatar(url);
         sessionEntity.setReceiverUserId(userSessionInfo.getReceiverUserId());
         sessionEntity.setTimestamp(userSessionInfo.getLastMsgTime());
@@ -261,7 +257,7 @@ public class UserSessionController extends AbstractController{
         sessionEntity.setId(new Random().nextLong());
         sessionEntity.setReceiverUserId(userFriendInfo.getId());
         sessionEntity.setName(userFriendInfo.getNickname());
-        String url = imageUrlParse.loadUrl(userFriendInfo.getAvatar());
+        String url = loadImageUrl(userFriendInfo.getAvatar());
         sessionEntity.setAvatar(url);
         sessionEntity.setDeliveryMethod(DeliveryMethod.SINGLE);
         return sessionEntity;
@@ -272,7 +268,7 @@ public class UserSessionController extends AbstractController{
         sessionEntity.setId(new Random().nextLong());
         sessionEntity.setReceiverUserId(userGroupInfo.getId());
         sessionEntity.setName(userGroupInfo.getGroupName());
-        String url = imageUrlParse.loadUrl(userGroupInfo.getAvatar());
+        String url = loadImageUrl(userGroupInfo.getAvatar());
         sessionEntity.setAvatar(url);
         sessionEntity.setDeliveryMethod(DeliveryMethod.GROUP);
         return sessionEntity;
@@ -286,16 +282,18 @@ public class UserSessionController extends AbstractController{
         if(packet.isGroup()){
             UserGroupInfo userGroupInfo = userGroupController.findUserGroupInfo(sender);
             sessionEntity.setName(userGroupInfo.getGroupName());
-            String url = imageUrlParse.loadUrl(userGroupInfo.getAvatar());
-            sessionEntity.setAvatar(url);
+            sessionEntity.setAvatar(loadImageUrl(userGroupInfo.getAvatar()));
             sessionEntity.setDeliveryMethod(DeliveryMethod.GROUP);
+            UserFriendInfo groupUserInfo = userGroupController.findGroupUserInfo(packet.getReceiver(), packet.getSender());
+            sessionEntity.setLastUserAvatar(loadImageUrl(groupUserInfo.getAvatar()));
         }else {
             sessionEntity.setReceiverUserId(sender);
             UserFriendInfo userFriendInfo = userFriendController.findUserFriendInfo(sender);
             sessionEntity.setName(userFriendInfo.getNickname());
-            String url = imageUrlParse.loadUrl(userFriendInfo.getAvatar());
+            String url = loadImageUrl(userFriendInfo.getAvatar());
             sessionEntity.setAvatar(url);
             sessionEntity.setDeliveryMethod(DeliveryMethod.SINGLE);
+            sessionEntity.setLastUserAvatar(url);
         }
         MessageType messageType = MessageType.findMessageTypeByValue((int) packet.getCommand().getCmdCode());
         sessionEntity.setLastMsgType(messageType);

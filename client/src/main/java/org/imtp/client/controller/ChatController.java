@@ -61,12 +61,9 @@ public class ChatController extends AbstractController{
 
     private UserGroupController userGroupController;
 
-    private ImageUrlParse imageUrlParse;
 
     @FXML
     public void initialize(){
-        imageUrlParse = new ClassPathImageUrlParse();
-
         URL sendFailImageUrl = ResourceUtils.classPathResource("/img/send_fail.png");
         sendFailureImage = new Image(sendFailImageUrl.toExternalForm());
 
@@ -166,7 +163,7 @@ public class ChatController extends AbstractController{
                 chatItemEntity.setSelf(false);
                 if (textMessage.isGroup()){
                     UserFriendInfo groupUserInfo = userGroupController.findGroupUserInfo(textMessage.getReceiver(), textMessage.getSender());
-                    String imageUrl = imageUrlParse.loadUrl(groupUserInfo.getAvatar());
+                    String imageUrl = loadImageUrl(groupUserInfo.getAvatar());
                     chatItemEntity.setAvatar(imageUrl);
                 }else {
                     chatItemEntity.setAvatar(sessionEntity.getAvatar());
@@ -199,7 +196,7 @@ public class ChatController extends AbstractController{
     private void addChatItem(SessionEntity sessionEntity){
         ChatItemEntity chatItemEntity = new ChatItemEntity();
         chatItemEntity.setId(IdGen.genId());
-        String imageUrl = imageUrlParse.loadUrl(sessionEntity.getLastUserAvatar());
+        String imageUrl = loadImageUrl(sessionEntity.getLastUserAvatar());
         chatItemEntity.setAvatar(imageUrl);
         if (ClientContextHolder.clientContext().id().equals(sessionEntity.getLastSendMsgUserId())){
             chatItemEntity.setSelf(true);

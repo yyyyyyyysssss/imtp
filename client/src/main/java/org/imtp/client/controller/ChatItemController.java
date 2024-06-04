@@ -10,6 +10,7 @@ import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import org.imtp.client.entity.ChatItemEntity;
 
 /**
@@ -24,6 +25,9 @@ public class ChatItemController extends AbstractController{
 
     @FXML
     private HBox chatItemLabelHBox;
+
+    @FXML
+    private VBox chatItemVBox;
 
     @FXML
     private ImageView chatItemImageView;
@@ -55,22 +59,26 @@ public class ChatItemController extends AbstractController{
                 chatItemLabel.setText(chatItemEntity.getContent());
                 ObservableList<Node> children = chatItemHBox.getChildren();
                 children.clear();
+                ObservableList<Node> chatItemVBoxChildren = chatItemVBox.getChildren();
+                chatItemVBoxChildren.clear();
                 if (!chatItemEntity.isSelf()){
                     chatItemHBox.setPadding(new Insets(0,0,0,0));
                     chatItemHBox.setAlignment(Pos.CENTER_LEFT);
+                    chatItemVBoxChildren.add(chatItemLabelHBox);
                     children.add(chatItemImageView);
-                    children.add(chatItemLabelHBox);
+                    children.add(chatItemVBox);
                     HBox.setMargin(chatItemLabelHBox,new Insets(0,0,0,10));
                 }else {
+                    imageView.setImage(chatItemEntity.getImage());
+                    chatItemEntity.imageProperty().bindBidirectional(imageView.imageProperty());
                     chatItemHBox.setPadding(new Insets(0,20,0,0));
                     chatItemHBox.setAlignment(Pos.CENTER_RIGHT);
                     ObservableList<Node> cd = chatItemLabelHBox.getChildren();
                     cd.clear();
-                    imageView.setImage(chatItemEntity.getImage());
-                    chatItemEntity.imageProperty().bindBidirectional(imageView.imageProperty());
                     cd.add(imageView);
                     cd.add(chatItemLabel);
-                    children.add(chatItemLabelHBox);
+                    chatItemVBoxChildren.add(chatItemLabelHBox);
+                    children.add(chatItemVBox);
                     children.add(chatItemImageView);
                     HBox.setMargin(chatItemLabelHBox,new Insets(0,10,0,0));
                 }

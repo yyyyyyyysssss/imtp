@@ -38,8 +38,6 @@ public class UserFriendController extends AbstractController implements Callback
 
     private UserSessionController userSessionController;
 
-    private ImageUrlParse imageUrlParse;
-
     private Map<Long,Node> userFriendNodeMap;
 
     //用户好友缓存
@@ -47,9 +45,7 @@ public class UserFriendController extends AbstractController implements Callback
 
     @FXML
     public void initialize(){
-        imageUrlParse = new ClassPathImageUrlParse();
         userFriendNodeMap = new HashMap<>();
-
         userFriendInfoMap = new HashMap<>();
 
         friendListView.setCellFactory(c -> new UserFriendListCell());
@@ -152,7 +148,7 @@ public class UserFriendController extends AbstractController implements Callback
         friendEntity.setName(userFriendInfo.getNickname());
         friendEntity.setAccount(userFriendInfo.getAccount());
         friendEntity.setGender(userFriendInfo.getGender());
-        String url = imageUrlParse.loadUrl(userFriendInfo.getAvatar());
+        String url = loadImageUrl(userFriendInfo.getAvatar());
         friendEntity.setAvatar(url);
         return friendEntity;
     }

@@ -3,6 +3,8 @@ package org.imtp.client.controller;
 import javafx.scene.Node;
 import lombok.extern.slf4j.Slf4j;
 import org.imtp.client.SceneManager;
+import org.imtp.client.component.ClassPathImageUrlParse;
+import org.imtp.client.component.ImageUrlParse;
 import org.imtp.client.constant.Callback;
 import org.imtp.client.model.MessageModel;
 import org.imtp.client.model.Observer;
@@ -10,12 +12,19 @@ import org.imtp.client.util.FXMLLoadUtils;
 import org.imtp.client.util.Tuple2;
 import org.imtp.common.packet.base.Packet;
 
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
 @Slf4j
 public abstract class AbstractController implements Controller, Observer {
 
     protected MessageModel messageModel;
 
     protected SceneManager sceneManager;
+
+    private ImageUrlParse imageUrlParse;
+
+    private final Lock lock = new ReentrantLock();
 
     @Override
     public void initData(Object object) {
@@ -57,14 +66,18 @@ public abstract class AbstractController implements Controller, Observer {
         return tuple2;
     }
 
-    //根据节点获取最近的控制器
-    protected Controller getController(Node node){
-        Controller controller = null;
-        do {
-            controller = (Controller) node.getUserData();
-            node = node.getParent();
-        }while (controller == null && node != null);
-        return controller;
+    protected String loadImageUrl(String originalImageUrl){
+        if (imageUrlParse == null){
+            try {
+                lock.lock();
+                if (imageUrlParse == null){
+                    imageUrlParse = new ClassPathImageUrlParse();
+                }
+            }finally {
+                lock.unlock();
+            }
+        }
+        return imageUrlParse.loadUrl(originalImageUrl);
     }
 
 }

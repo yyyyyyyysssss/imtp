@@ -37,8 +37,6 @@ public class UserGroupController extends AbstractController implements Callback<
 
     private UserSessionController userSessionController;
 
-    private ImageUrlParse imageUrlParse;
-
     private Map<Long,Node> userGroupNodeMap;
 
     //用户群组
@@ -51,7 +49,6 @@ public class UserGroupController extends AbstractController implements Callback<
 
     @FXML
     public void initialize(){
-        imageUrlParse = new ClassPathImageUrlParse();
         userGroupNodeMap = new HashMap<>();
         userGroupInfoMap = new HashMap<>();
         groupUserInfoMap = new HashMap<>();
@@ -165,7 +162,7 @@ public class UserGroupController extends AbstractController implements Callback<
         GroupEntity groupEntity = new GroupEntity();
         groupEntity.setId(userGroupInfo.getId());
         groupEntity.setName(userGroupInfo.getGroupName());
-        String url = imageUrlParse.loadUrl(userGroupInfo.getAvatar());
+        String url = loadImageUrl(userGroupInfo.getAvatar());
         groupEntity.setAvatar(url);
         return groupEntity;
     }

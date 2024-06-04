@@ -56,8 +56,6 @@ public class HomeController extends AbstractController{
 
     private Image groupIconSelectedImage;
 
-    private ImageUrlParse imageUrlParse;
-
     @FXML
     private Pane homePane;
 
@@ -75,12 +73,11 @@ public class HomeController extends AbstractController{
 
     @FXML
     public void initialize(){
-        this.imageUrlParse = new ClassPathImageUrlParse();
         //设置当前登录人头像
         DefaultClientUserChannelContext userChannelContext = (DefaultClientUserChannelContext)ClientContextHolder.clientContext();
         UserInfo userInfo = userChannelContext.getUserInfo();
         String avatar = userInfo.getAvatar();
-        String avatarUrl = imageUrlParse.loadUrl(avatar);
+        String avatarUrl = loadImageUrl(avatar);
         homeAvatarImageView.setImage(new Image(avatarUrl));
         //初始化聊天图标
         URL chatIconUrl = ResourceUtils.classPathResource("/img/home_chat_icon.png");
