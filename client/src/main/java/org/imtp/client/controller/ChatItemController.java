@@ -64,6 +64,7 @@ public class ChatItemController extends AbstractController{
                 if (!chatItemEntity.isSelf()){
                     chatItemHBox.setPadding(new Insets(0,0,0,0));
                     chatItemHBox.setAlignment(Pos.CENTER_LEFT);
+                    chatItemVBoxChildren.add(new Label("卡卡罗特"));
                     chatItemVBoxChildren.add(chatItemLabelHBox);
                     children.add(chatItemImageView);
                     children.add(chatItemVBox);
