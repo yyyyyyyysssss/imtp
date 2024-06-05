@@ -6,12 +6,12 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextArea;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.TextFlow;
 import lombok.extern.slf4j.Slf4j;
 import org.imtp.client.component.ClassPathImageUrlParse;
 import org.imtp.client.component.ImageUrlParse;
@@ -44,6 +44,15 @@ public class ChatController extends AbstractController{
     private ListView<ChatItemEntity> chatListView;
 
     @FXML
+    private ImageView chatEmoteIcon;
+
+    @FXML
+    private ImageView chatFileIcon;
+
+    @FXML
+    private TextFlow inputTextFlow;
+
+    @FXML
     private TextArea inputText;
 
     @FXML
@@ -70,6 +79,12 @@ public class ChatController extends AbstractController{
         URL sendingImageUrl = ResourceUtils.classPathResource("/img/sending.gif");
         sendingImage = new Image(sendingImageUrl.toExternalForm());
 
+        URL chatEmoteIconUrl = ResourceUtils.classPathResource("/img/emote_icon.png");
+        chatEmoteIcon.setImage(new Image(chatEmoteIconUrl.toExternalForm()));
+
+        URL chatFileIconUrl = ResourceUtils.classPathResource("/img/file_icon.png");
+        chatFileIcon.setImage(new Image(chatFileIconUrl.toExternalForm()));
+
         ackChatItemEntityMap = new ConcurrentHashMap<>();
 
         inputText.setWrapText(true);
@@ -91,13 +106,15 @@ public class ChatController extends AbstractController{
             }
         });
 
-        sendButton.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent mouseEvent) {
-                sendTextMessage();
-            }
+        sendButton.setOnMouseClicked(mouseEvent -> {
+            sendTextMessage();
         });
         chatListView.setCellFactory(c -> new ChatItemListCell());
+
+        chatEmoteIcon.setOnMouseClicked(mouseEvent -> {
+            Alert alert = new Alert(Alert.AlertType.NONE);
+            alert.showAndWait();
+        });
     }
 
     @Override

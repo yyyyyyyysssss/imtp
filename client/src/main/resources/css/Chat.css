@@ -15,3 +15,27 @@
     -fx-font-size: 14px;
     -fx-text-fill: white;
 }
+
+.text-area {
+    -fx-background-insets: 0;
+    -fx-background-color: transparent, #F5F5F5, transparent, #F5F5F5;
+    -fx-font-size: 16px;
+}
+
+.text-area .content {
+    -fx-background-color: transparent, #F5F5F5, transparent, #F5F5F5;
+}
+
+.text-area:focused .content {
+    -fx-background-color: transparent, #F5F5F5, transparent, #F5F5F5;
+}
+
+.text-area:focused {
+    -fx-highlight-fill: #7ecfff;
+}
+
+.text-area .content {
+    -fx-padding: 10px;
+    -fx-text-fill: gray;
+    -fx-highlight-fill: #7ecfff;
+}
