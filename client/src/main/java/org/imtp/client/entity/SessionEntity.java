@@ -31,6 +31,8 @@ public class SessionEntity {
 
     private String lastUserAvatar;
 
+    private String lastUserName;
+
     @Override
     public String toString() {
         return "SessionEntity{" +
@@ -44,6 +46,7 @@ public class SessionEntity {
                 ", timestamp=" + timestamp +
                 ", lastSendMsgUserId=" + lastSendMsgUserId +
                 ", lastUserAvatar='" + lastUserAvatar + '\'' +
+                ", lastUserName='" + lastUserName + '\'' +
                 '}';
     }
 

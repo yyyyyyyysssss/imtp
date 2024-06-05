@@ -36,4 +36,6 @@ public class UserSessionInfo {
 
     private String lastUserAvatar;
 
+    private String lastUserName;
+
 }

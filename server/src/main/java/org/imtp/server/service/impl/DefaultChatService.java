@@ -225,6 +225,7 @@ public class DefaultChatService implements ChatService {
             userSessionInfo.setLastSendMsgUserId(message.getSenderUserId());
             User user = Optional.ofNullable(userIdMap).map(m -> m.get(message.getSenderUserId())).orElse(new User());
             userSessionInfo.setLastUserAvatar(user.getAvatar());
+            userSessionInfo.setLastUserName(user.getNickname());
             userSessionInfos.add(userSessionInfo);
         }
 

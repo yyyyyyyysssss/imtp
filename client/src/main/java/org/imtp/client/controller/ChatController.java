@@ -165,8 +165,10 @@ public class ChatController extends AbstractController{
                     UserFriendInfo groupUserInfo = userGroupController.findGroupUserInfo(textMessage.getReceiver(), textMessage.getSender());
                     String imageUrl = loadImageUrl(groupUserInfo.getAvatar());
                     chatItemEntity.setAvatar(imageUrl);
+                    chatItemEntity.setName(groupUserInfo.getNickname());
                 }else {
                     chatItemEntity.setAvatar(sessionEntity.getAvatar());
+                    chatItemEntity.setName(sessionEntity.getName());
                 }
                 chatItemEntity.setMessageType(MessageType.findMessageTypeByValue((int) textMessage.getCommand().getCmdCode()));
                 chatItemEntity.setContent(textMessage.getMessage());
@@ -198,6 +200,7 @@ public class ChatController extends AbstractController{
         chatItemEntity.setId(IdGen.genId());
         String imageUrl = loadImageUrl(sessionEntity.getLastUserAvatar());
         chatItemEntity.setAvatar(imageUrl);
+        chatItemEntity.setName(sessionEntity.getLastUserName());
         if (ClientContextHolder.clientContext().id().equals(sessionEntity.getLastSendMsgUserId())){
             chatItemEntity.setSelf(true);
         }else {

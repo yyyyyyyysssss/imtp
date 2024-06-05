@@ -248,6 +248,7 @@ public class UserSessionController extends AbstractController{
         sessionEntity.setDeliveryMethod(userSessionInfo.getDeliveryMethod());
         sessionEntity.setLastSendMsgUserId(userSessionInfo.getLastSendMsgUserId());
         sessionEntity.setLastUserAvatar(userSessionInfo.getLastUserAvatar());
+        sessionEntity.setLastUserName(userSessionInfo.getLastUserName());
         return sessionEntity;
     }
 
@@ -286,6 +287,7 @@ public class UserSessionController extends AbstractController{
             sessionEntity.setDeliveryMethod(DeliveryMethod.GROUP);
             UserFriendInfo groupUserInfo = userGroupController.findGroupUserInfo(packet.getReceiver(), packet.getSender());
             sessionEntity.setLastUserAvatar(loadImageUrl(groupUserInfo.getAvatar()));
+            sessionEntity.setLastUserName(groupUserInfo.getNickname());
         }else {
             sessionEntity.setReceiverUserId(sender);
             UserFriendInfo userFriendInfo = userFriendController.findUserFriendInfo(sender);
@@ -294,6 +296,7 @@ public class UserSessionController extends AbstractController{
             sessionEntity.setAvatar(url);
             sessionEntity.setDeliveryMethod(DeliveryMethod.SINGLE);
             sessionEntity.setLastUserAvatar(url);
+            sessionEntity.setLastUserName(userFriendInfo.getNickname());
         }
         MessageType messageType = MessageType.findMessageTypeByValue((int) packet.getCommand().getCmdCode());
         sessionEntity.setLastMsgType(messageType);

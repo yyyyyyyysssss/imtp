@@ -10,6 +10,7 @@ import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import org.imtp.client.entity.ChatItemEntity;
 
@@ -28,6 +29,9 @@ public class ChatItemController extends AbstractController{
 
     @FXML
     private VBox chatItemVBox;
+
+    @FXML
+    private Label sendNameLabel;
 
     @FXML
     private ImageView chatItemImageView;
@@ -64,11 +68,11 @@ public class ChatItemController extends AbstractController{
                 if (!chatItemEntity.isSelf()){
                     chatItemHBox.setPadding(new Insets(0,0,0,0));
                     chatItemHBox.setAlignment(Pos.CENTER_LEFT);
-                    chatItemVBoxChildren.add(new Label("卡卡罗特"));
-                    chatItemVBoxChildren.add(chatItemLabelHBox);
+                    sendNameLabel.setText(chatItemEntity.getName());
+                    chatItemVBoxChildren.addAll(sendNameLabel,chatItemLabelHBox);
                     children.add(chatItemImageView);
                     children.add(chatItemVBox);
-                    HBox.setMargin(chatItemLabelHBox,new Insets(0,0,0,10));
+                    HBox.setMargin(chatItemVBox,new Insets(0,0,0,5));
                 }else {
                     imageView.setImage(chatItemEntity.getImage());
                     chatItemEntity.imageProperty().bindBidirectional(imageView.imageProperty());
@@ -81,7 +85,7 @@ public class ChatItemController extends AbstractController{
                     chatItemVBoxChildren.add(chatItemLabelHBox);
                     children.add(chatItemVBox);
                     children.add(chatItemImageView);
-                    HBox.setMargin(chatItemLabelHBox,new Insets(0,10,0,0));
+                    HBox.setMargin(chatItemVBox,new Insets(0,10,0,0));
                 }
             });
         }

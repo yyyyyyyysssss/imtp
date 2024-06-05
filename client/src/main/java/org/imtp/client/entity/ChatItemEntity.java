@@ -27,6 +27,8 @@ public class ChatItemEntity {
 
     private Long id;
 
+    private String name;
+
     private boolean self;
 
     private String avatar;

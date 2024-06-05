@@ -1,3 +1,8 @@
-.label{
+#chatItemLabel{
     -fx-font-size: 14px;
+}
+
+#sendNameLabel{
+    -fx-text-fill: Grey;
+    -fx-font-size: 10px;
 }
