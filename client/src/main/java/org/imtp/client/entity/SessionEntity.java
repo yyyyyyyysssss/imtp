@@ -33,6 +33,8 @@ public class SessionEntity {
 
     private String lastUserName;
 
+    private int count;
+
     @Override
     public String toString() {
         return "SessionEntity{" +

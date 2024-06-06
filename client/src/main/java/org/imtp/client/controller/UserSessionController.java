@@ -101,6 +101,7 @@ public class UserSessionController extends AbstractController{
                         //添加会话关联的聊天框
                         addChatNode(sessionEntity);
                     }
+                    sessionEntity.setLastSendMsgUserId(packet.getSender());
                     sessionEntity.setLastMsg(textMessage.getMessage());
                     updateUserSessionNode(sessionEntity);
                 }
@@ -300,6 +301,7 @@ public class UserSessionController extends AbstractController{
         }
         MessageType messageType = MessageType.findMessageTypeByValue((int) packet.getCommand().getCmdCode());
         sessionEntity.setLastMsgType(messageType);
+        sessionEntity.setLastSendMsgUserId(packet.getSender());
         if (messageType.equals(MessageType.TEXT_MESSAGE)){
             sessionEntity.setLastMsg(((TextMessage)packet).getMessage());
         }

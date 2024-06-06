@@ -159,6 +159,7 @@ public class ChatController extends AbstractController{
 
         ackChatItemEntityMap.put(ackId,selfChatItemEntity);
 
+        sessionEntity.setLastSendMsgUserId(ClientContextHolder.clientContext().id());
         sessionEntity.setLastMsgType(MessageType.TEXT_MESSAGE);
         sessionEntity.setLastMsg(text);
         chatVbox.fireEvent(new UserSessionEvent(UserSessionEvent.SEND_MESSAGE,sessionEntity));

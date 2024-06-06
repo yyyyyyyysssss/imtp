@@ -6,7 +6,9 @@ import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import lombok.extern.slf4j.Slf4j;
+import org.imtp.client.context.ClientContextHolder;
 import org.imtp.client.entity.SessionEntity;
+import org.imtp.common.enums.DeliveryMethod;
 
 @Slf4j
 public class UserSessionItemController extends AbstractController{
@@ -22,6 +24,9 @@ public class UserSessionItemController extends AbstractController{
 
     @FXML
     private Label lastMsg;
+
+    @FXML
+    private Label sendUserName;
 
     @FXML
     private Label isAlert;
@@ -47,6 +52,13 @@ public class UserSessionItemController extends AbstractController{
     private void setData(SessionEntity sessionEntity){
         Platform.runLater(() -> {
             sessionImg.setImage(new Image(sessionEntity.getAvatar()));
+            if (sessionEntity.getDeliveryMethod().equals(DeliveryMethod.GROUP)
+                    && sessionEntity.getLastSendMsgUserId() != null
+                    && !ClientContextHolder.clientContext().id().equals(sessionEntity.getLastSendMsgUserId())){
+                sendUserName.setText(sessionEntity.getLastUserName() + ":");
+            }else {
+                sendUserName.setText("");
+            }
             nameLabel.setText(sessionEntity.getName());
             timeLabel.setText("23:34");
             lastMsg.setText(sessionEntity.getLastMsg());
