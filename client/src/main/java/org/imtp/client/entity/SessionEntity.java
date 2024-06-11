@@ -1,5 +1,7 @@
 package org.imtp.client.entity;
 
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import lombok.Getter;
 import lombok.Setter;
 import org.imtp.common.enums.DeliveryMethod;
@@ -33,7 +35,22 @@ public class SessionEntity {
 
     private String lastUserName;
 
-    private int count;
+    private StringProperty count;
+
+    public StringProperty countProperty(){
+        if (count == null){
+            count = new SimpleStringProperty(this,"count");
+        }
+        return count;
+    }
+
+    public String getCount() {
+        return countProperty().get();
+    }
+
+    public void setCount(String count) {
+        this.countProperty().set(count);
+    }
 
     @Override
     public String toString() {

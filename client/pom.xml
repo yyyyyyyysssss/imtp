@@ -144,6 +144,9 @@
                         <list>org.imtp.client.controller.UserFriendController</list>
                         <list>org.imtp.client.controller.UserFriendItemController</list>
                         <list>org.imtp.client.controller.UserFriendDetailsController</list>
+                        <list>org.imtp.client.controller.UserGroupController</list>
+                        <list>org.imtp.client.controller.UserGroupDetailsController</list>
+                        <list>org.imtp.client.controller.UserGroupItemController</list>
                     </reflectionList>
                     <bundlesList>
                         <list>com.sun.glass.ui.win</list>

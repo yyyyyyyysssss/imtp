@@ -8,12 +8,12 @@ DROP TABLE IF EXISTS `im_group`;
 CREATE TABLE `im_group`  (
                              `id` bigint(0) NOT NULL,
                              `name` varchar(48) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '群名称',
+                             `avatar` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '群组头像',
                              `create_user_id` bigint(0) NULL DEFAULT NULL COMMENT '创建人id',
                              `create_time` datetime(0) NULL DEFAULT NULL COMMENT '创建时间',
-                             `avatar` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '头像',
                              `state` tinyint(1) NULL DEFAULT NULL COMMENT '群组状态 0  已解散 1 正常',
                              PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Table structure for im_group_user
@@ -25,7 +25,7 @@ CREATE TABLE `im_group_user`  (
                                   `user_id` bigint(0) NULL DEFAULT NULL COMMENT '关联用户id',
                                   `join_time` datetime(0) NULL DEFAULT NULL COMMENT '加入时间',
                                   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Table structure for im_msg
@@ -38,9 +38,9 @@ CREATE TABLE `im_msg`  (
                            `type` int(0) NULL DEFAULT NULL COMMENT '消息类型',
                            `content` varchar(2048) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '消息内容',
                            `send_time` datetime(0) NULL DEFAULT NULL COMMENT '发送时间',
-                            `delivery_method` varchar(12) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '投递方式',
+                           `delivery_method` varchar(12) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '投递方式',
                            PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Table structure for im_offline_msg
@@ -52,7 +52,7 @@ CREATE TABLE `im_offline_msg`  (
                                    `user_id` bigint(0) NULL DEFAULT NULL COMMENT '关联用户id',
                                    `state` tinyint(1) NULL DEFAULT NULL COMMENT '消息状态 0 待推送 1 已推送',
                                    PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Table structure for im_user
@@ -67,7 +67,7 @@ CREATE TABLE `im_user`  (
                             `avatar` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '头像',
                             `create_time` datetime(0) NULL DEFAULT NULL COMMENT '创建时间',
                             PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Table structure for im_user_friend
@@ -81,20 +81,19 @@ CREATE TABLE `im_user_friend`  (
                                    `create_time` datetime(0) NULL DEFAULT NULL COMMENT '创建时间',
                                    PRIMARY KEY (`id`) USING BTREE,
                                    INDEX `user_id_idx`(`user_id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Table structure for im_user_session
 -- ----------------------------
 DROP TABLE IF EXISTS `im_user_session`;
-CREATE TABLE `im_user_session` (
-                                   `id` bigint NOT NULL,
-                                   `user_id` bigint DEFAULT NULL COMMENT '用户id',
-                                   `last_msg_id` bigint DEFAULT NULL COMMENT '关联最后一条消息id',
-                                   `receiver_user_id` bigint DEFAULT NULL COMMENT '接收人id',
-                                   `delivery_method` varchar(12) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '投递方式',
-                                   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC;
-
+CREATE TABLE `im_user_session`  (
+                                    `id` bigint(0) NOT NULL,
+                                    `user_id` bigint(0) NULL DEFAULT NULL COMMENT '用户id',
+                                    `last_msg_id` bigint(0) NULL DEFAULT NULL COMMENT '关联最后一条消息id',
+                                    `receiver_user_id` bigint(0) NULL DEFAULT NULL COMMENT '接收人id',
+                                    `delivery_method` varchar(12) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '投递方式',
+                                    PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
 
 SET FOREIGN_KEY_CHECKS = 1;

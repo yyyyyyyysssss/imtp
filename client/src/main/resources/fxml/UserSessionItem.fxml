@@ -34,7 +34,7 @@
                             </padding>
                         </Label>
                         <Region HBox.hgrow="ALWAYS" />
-                        <Label fx:id="isAlert" style="-fx-text-fill: Grey">
+                        <Label fx:id="isAlert" style="-fx-text-fill: red">
                         </Label>
                     </children>
                 </HBox>

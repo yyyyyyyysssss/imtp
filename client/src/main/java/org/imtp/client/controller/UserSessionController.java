@@ -1,21 +1,22 @@
 package org.imtp.client.controller;
 
 
+import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.Pane;
 import lombok.extern.slf4j.Slf4j;
-import org.imtp.client.component.ClassPathImageUrlParse;
-import org.imtp.client.component.ImageUrlParse;
 import org.imtp.client.constant.FXMLResourceConstant;
 import org.imtp.client.entity.SessionEntity;
 import org.imtp.client.event.UserSessionEvent;
 import org.imtp.client.util.Tuple2;
 import org.imtp.common.enums.DeliveryMethod;
 import org.imtp.common.enums.MessageType;
-import org.imtp.common.packet.*;
+import org.imtp.common.packet.OfflineMessageResponse;
+import org.imtp.common.packet.TextMessage;
+import org.imtp.common.packet.UserSessionResponse;
 import org.imtp.common.packet.base.Packet;
 import org.imtp.common.packet.body.OfflineMessageInfo;
 import org.imtp.common.packet.body.UserFriendInfo;
@@ -60,6 +61,7 @@ public class UserSessionController extends AbstractController{
                 return;
             }
             showChatNode(sessionEntity);
+            sessionEntity.setCount("");
         });
     }
 
@@ -72,6 +74,7 @@ public class UserSessionController extends AbstractController{
     @Override
     public void update(Object object) {
         Packet packet = (Packet)object;
+        SessionEntity sessionEntity = null;
         switch (packet.getHeader().getCmd()){
             case OFFLINE_MSG_RES:
                 OfflineMessageResponse offlineMessageResponse = (OfflineMessageResponse) packet;
@@ -88,7 +91,7 @@ public class UserSessionController extends AbstractController{
                 break;
             case TEXT_MESSAGE:
                 Long sender = packet.realSender();
-                SessionEntity sessionEntity = userSessionEntityMap.get(sender);
+                sessionEntity = userSessionEntityMap.get(sender);
                 TextMessage textMessage = (TextMessage) packet;
                 if (sessionEntity == null){
                     sessionEntity = createUserSessionByPacket(textMessage);
@@ -107,8 +110,21 @@ public class UserSessionController extends AbstractController{
                 }
                 break;
         }
+        messageCount(sessionEntity);
     }
 
+    private void messageCount(SessionEntity sessionEntity){
+        Platform.runLater(() -> {
+            if (sessionEntity != null){
+                String currentCount = sessionEntity.getCount();
+                if (currentCount == null || currentCount.isEmpty()){
+                    sessionEntity.countProperty().set("1");
+                }else {
+                    sessionEntity.setCount(String.valueOf(Long.parseLong(currentCount) + 1));
+                }
+            }
+        });
+    }
 
     public void setUserFriendController(UserFriendController userFriendController) {
         this.userFriendController = userFriendController;

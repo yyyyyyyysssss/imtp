@@ -287,7 +287,16 @@
   "fields":[{"name":"base"}, {"name":"cellsBusy"}]
 },
 {
+  "name":"javafx.animation.KeyValue"
+},
+{
   "name":"javafx.fxml.FXMLLoader"
+},
+{
+  "name":"javafx.geometry.Insets",
+  "queryAllPublicMethods":true,
+  "queryAllPublicConstructors":true,
+  "methods":[{"name":"<init>","parameterTypes":["double"] }, {"name":"<init>","parameterTypes":["double","double","double","double"] }]
 },
 {
   "name":"javafx.geometry.Pos",
@@ -302,14 +311,15 @@
 {
   "name":"javafx.scene.Node",
   "queryAllDeclaredMethods":true,
-  "methods":[{"name":"getId","parameterTypes":[] }, {"name":"setFocusTraversable","parameterTypes":["boolean"] }, {"name":"setId","parameterTypes":["java.lang.String"] }, {"name":"setStyle","parameterTypes":["java.lang.String"] }, {"name":"setVisible","parameterTypes":["boolean"] }]
+  "methods":[{"name":"getId","parameterTypes":[] }, {"name":"getStyleClass","parameterTypes":[] }, {"name":"setFocusTraversable","parameterTypes":["boolean"] }, {"name":"setId","parameterTypes":["java.lang.String"] }, {"name":"setPickOnBounds","parameterTypes":["boolean"] }, {"name":"setStyle","parameterTypes":["java.lang.String"] }, {"name":"setVisible","parameterTypes":["boolean"] }]
 },
 {
   "name":"javafx.scene.ParallelCamera"
 },
 {
   "name":"javafx.scene.Parent",
-  "queryAllDeclaredMethods":true
+  "queryAllDeclaredMethods":true,
+  "methods":[{"name":"getStylesheets","parameterTypes":[] }]
 },
 {
   "name":"javafx.scene.Scene"
@@ -338,7 +348,7 @@
 {
   "name":"javafx.scene.control.Labeled",
   "queryAllDeclaredMethods":true,
-  "methods":[{"name":"setAlignment","parameterTypes":["javafx.geometry.Pos"] }, {"name":"setFont","parameterTypes":["javafx.scene.text.Font"] }, {"name":"setMnemonicParsing","parameterTypes":["boolean"] }, {"name":"setText","parameterTypes":["java.lang.String"] }, {"name":"setTextAlignment","parameterTypes":["javafx.scene.text.TextAlignment"] }]
+  "methods":[{"name":"setAlignment","parameterTypes":["javafx.geometry.Pos"] }, {"name":"setFont","parameterTypes":["javafx.scene.text.Font"] }, {"name":"setMnemonicParsing","parameterTypes":["boolean"] }, {"name":"setText","parameterTypes":["java.lang.String"] }, {"name":"setTextAlignment","parameterTypes":["javafx.scene.text.TextAlignment"] }, {"name":"setWrapText","parameterTypes":["boolean"] }]
 },
 {
   "name":"javafx.scene.control.ListView",
@@ -376,7 +386,10 @@
   "name":"javafx.scene.image.Image"
 },
 {
-  "name":"javafx.scene.image.ImageView"
+  "name":"javafx.scene.image.ImageView",
+  "queryAllDeclaredMethods":true,
+  "queryAllPublicConstructors":true,
+  "methods":[{"name":"<init>","parameterTypes":[] }, {"name":"setFitHeight","parameterTypes":["double"] }, {"name":"setFitWidth","parameterTypes":["double"] }, {"name":"setPreserveRatio","parameterTypes":["boolean"] }]
 },
 {
   "name":"javafx.scene.layout.ColumnConstraints",
@@ -398,7 +411,7 @@
   "name":"javafx.scene.layout.HBox",
   "queryAllDeclaredMethods":true,
   "queryAllPublicConstructors":true,
-  "methods":[{"name":"<init>","parameterTypes":[] }, {"name":"setAlignment","parameterTypes":["javafx.geometry.Pos"] }]
+  "methods":[{"name":"<init>","parameterTypes":[] }, {"name":"getHgrow","parameterTypes":["javafx.scene.Node"] }, {"name":"getHgrow","parameterTypes":["javafx.scene.Parent"] }, {"name":"getHgrow","parameterTypes":["javafx.scene.layout.Region"] }, {"name":"isHgrow","parameterTypes":["javafx.scene.Parent"] }, {"name":"isHgrow","parameterTypes":["javafx.scene.layout.Region"] }, {"name":"setAlignment","parameterTypes":["javafx.geometry.Pos"] }, {"name":"setHgrow","parameterTypes":["java.lang.Object","java.lang.String"] }, {"name":"setHgrow","parameterTypes":["javafx.css.Styleable","java.lang.String"] }, {"name":"setHgrow","parameterTypes":["javafx.event.EventTarget","java.lang.String"] }, {"name":"setHgrow","parameterTypes":["javafx.scene.Node","java.lang.String"] }, {"name":"setHgrow","parameterTypes":["javafx.scene.Node","javafx.scene.layout.Priority"] }, {"name":"setHgrow","parameterTypes":["javafx.scene.Parent","java.lang.String"] }, {"name":"setHgrow","parameterTypes":["javafx.scene.Parent","javafx.scene.layout.Priority"] }, {"name":"setHgrow","parameterTypes":["javafx.scene.layout.Region","java.lang.String"] }, {"name":"setHgrow","parameterTypes":["javafx.scene.layout.Region","javafx.scene.layout.Priority"] }, {"name":"setMargin","parameterTypes":["javafx.scene.Node","javafx.geometry.Insets"] }, {"name":"setMargin","parameterTypes":["javafx.scene.Parent","javafx.geometry.Insets"] }, {"name":"setMargin","parameterTypes":["javafx.scene.control.Button","javafx.geometry.Insets"] }, {"name":"setMargin","parameterTypes":["javafx.scene.control.ButtonBase","javafx.geometry.Insets"] }, {"name":"setMargin","parameterTypes":["javafx.scene.control.Control","javafx.geometry.Insets"] }, {"name":"setMargin","parameterTypes":["javafx.scene.control.Labeled","javafx.geometry.Insets"] }, {"name":"setMargin","parameterTypes":["javafx.scene.control.Skinnable","javafx.geometry.Insets"] }, {"name":"setMargin","parameterTypes":["javafx.scene.layout.Region","javafx.geometry.Insets"] }, {"name":"setSpacing","parameterTypes":["double"] }]
 },
 {
   "name":"javafx.scene.layout.Pane",
@@ -413,7 +426,8 @@
 {
   "name":"javafx.scene.layout.Region",
   "queryAllDeclaredMethods":true,
-  "methods":[{"name":"setMaxHeight","parameterTypes":["double"] }, {"name":"setMaxWidth","parameterTypes":["double"] }, {"name":"setMinHeight","parameterTypes":["double"] }, {"name":"setMinWidth","parameterTypes":["double"] }, {"name":"setPrefHeight","parameterTypes":["double"] }, {"name":"setPrefWidth","parameterTypes":["double"] }]
+  "queryAllPublicConstructors":true,
+  "methods":[{"name":"<init>","parameterTypes":[] }, {"name":"setMaxHeight","parameterTypes":["double"] }, {"name":"setMaxWidth","parameterTypes":["double"] }, {"name":"setMinHeight","parameterTypes":["double"] }, {"name":"setMinWidth","parameterTypes":["double"] }, {"name":"setOpaqueInsets","parameterTypes":["javafx.geometry.Insets"] }, {"name":"setPadding","parameterTypes":["javafx.geometry.Insets"] }, {"name":"setPrefHeight","parameterTypes":["double"] }, {"name":"setPrefWidth","parameterTypes":["double"] }]
 },
 {
   "name":"javafx.scene.layout.RowConstraints",
@@ -431,7 +445,7 @@
   "name":"javafx.scene.layout.VBox",
   "queryAllDeclaredMethods":true,
   "queryAllPublicConstructors":true,
-  "methods":[{"name":"<init>","parameterTypes":[] }, {"name":"setAlignment","parameterTypes":["javafx.geometry.Pos"] }]
+  "methods":[{"name":"<init>","parameterTypes":[] }, {"name":"getVgrow","parameterTypes":["javafx.scene.Node"] }, {"name":"getVgrow","parameterTypes":["javafx.scene.Parent"] }, {"name":"getVgrow","parameterTypes":["javafx.scene.layout.Region"] }, {"name":"isVgrow","parameterTypes":["javafx.scene.Parent"] }, {"name":"isVgrow","parameterTypes":["javafx.scene.layout.Region"] }, {"name":"setAlignment","parameterTypes":["javafx.geometry.Pos"] }, {"name":"setMargin","parameterTypes":["javafx.scene.Node","javafx.geometry.Insets"] }, {"name":"setMargin","parameterTypes":["javafx.scene.Parent","javafx.geometry.Insets"] }, {"name":"setMargin","parameterTypes":["javafx.scene.image.ImageView","javafx.geometry.Insets"] }, {"name":"setMargin","parameterTypes":["javafx.scene.layout.HBox","javafx.geometry.Insets"] }, {"name":"setMargin","parameterTypes":["javafx.scene.layout.Pane","javafx.geometry.Insets"] }, {"name":"setMargin","parameterTypes":["javafx.scene.layout.Region","javafx.geometry.Insets"] }, {"name":"setVgrow","parameterTypes":["java.lang.Object","java.lang.String"] }, {"name":"setVgrow","parameterTypes":["javafx.css.Styleable","java.lang.String"] }, {"name":"setVgrow","parameterTypes":["javafx.event.EventTarget","java.lang.String"] }, {"name":"setVgrow","parameterTypes":["javafx.scene.Node","java.lang.String"] }, {"name":"setVgrow","parameterTypes":["javafx.scene.Node","javafx.scene.layout.Priority"] }, {"name":"setVgrow","parameterTypes":["javafx.scene.Parent","java.lang.String"] }, {"name":"setVgrow","parameterTypes":["javafx.scene.Parent","javafx.scene.layout.Priority"] }, {"name":"setVgrow","parameterTypes":["javafx.scene.layout.Region","java.lang.String"] }, {"name":"setVgrow","parameterTypes":["javafx.scene.layout.Region","javafx.scene.layout.Priority"] }]
 },
 {
   "name":"javafx.scene.shape.LineTo"
@@ -463,6 +477,12 @@
 {
   "name":"javafx.scene.text.TextAlignment",
   "methods":[{"name":"valueOf","parameterTypes":["java.lang.String"] }]
+},
+{
+  "name":"javafx.scene.text.TextFlow",
+  "queryAllDeclaredMethods":true,
+  "queryAllPublicConstructors":true,
+  "methods":[{"name":"<init>","parameterTypes":[] }]
 },
 {
   "name":"javafx.scene.transform.Transform"
@@ -502,13 +522,61 @@
   "name":"org.imtp.client.controller.ChatController",
   "allDeclaredFields":true,
   "queryAllDeclaredMethods":true,
-  "methods":[{"name":"<init>","parameterTypes":[] }]
+  "methods":[{"name":"<init>","parameterTypes":[] }, {"name":"initialize","parameterTypes":[] }]
+},
+{
+  "name":"org.imtp.client.controller.ChatItemController",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "methods":[{"name":"<init>","parameterTypes":[] }, {"name":"initialize","parameterTypes":[] }]
+},
+{
+  "name":"org.imtp.client.controller.HomeController",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "methods":[{"name":"<init>","parameterTypes":[] }, {"name":"initialize","parameterTypes":[] }]
 },
 {
   "name":"org.imtp.client.controller.LoginController",
   "allDeclaredFields":true,
   "queryAllDeclaredMethods":true,
   "methods":[{"name":"<init>","parameterTypes":[] }, {"name":"login","parameterTypes":["javafx.event.ActionEvent"] }]
+},
+{
+  "name":"org.imtp.client.controller.UserFriendController",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "methods":[{"name":"<init>","parameterTypes":[] }, {"name":"initialize","parameterTypes":[] }]
+},
+{
+  "name":"org.imtp.client.controller.UserFriendItemController",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"org.imtp.client.controller.UserGroupController",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "methods":[{"name":"<init>","parameterTypes":[] }, {"name":"initialize","parameterTypes":[] }]
+},
+{
+  "name":"org.imtp.client.controller.UserGroupItemController",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"org.imtp.client.controller.UserSessionController",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "methods":[{"name":"<init>","parameterTypes":[] }, {"name":"initialize","parameterTypes":[] }]
+},
+{
+  "name":"org.imtp.client.controller.UserSessionItemController",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "methods":[{"name":"<init>","parameterTypes":[] }]
 },
 {
   "name":"org.imtp.client.handler.ClientCmdHandlerHandler",
@@ -525,6 +593,22 @@
   "name":"org.imtp.common.codec.IMTPEncoder"
 },
 {
+  "name":"org.imtp.common.enums.DeliveryMethod",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true
+},
+{
+  "name":"org.imtp.common.enums.Gender",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true
+},
+{
+  "name":"org.imtp.common.enums.MessageType",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "methods":[{"name":"getValue","parameterTypes":[] }]
+},
+{
   "name":"org.imtp.common.packet.body.LoginInfo",
   "allDeclaredFields":true,
   "queryAllDeclaredMethods":true,
@@ -532,18 +616,25 @@
   "methods":[{"name":"getPassword","parameterTypes":[] }, {"name":"getUsername","parameterTypes":[] }]
 },
 {
+  "name":"org.imtp.common.packet.body.OfflineMessageInfo",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[{"name":"<init>","parameterTypes":[] }, {"name":"setContent","parameterTypes":["java.lang.String"] }, {"name":"setDeliveryMethod","parameterTypes":["org.imtp.common.enums.DeliveryMethod"] }, {"name":"setId","parameterTypes":["java.lang.Long"] }, {"name":"setReceiver","parameterTypes":["java.lang.Long"] }, {"name":"setSendTime","parameterTypes":["java.lang.Long"] }, {"name":"setSender","parameterTypes":["java.lang.Long"] }, {"name":"setType","parameterTypes":["java.lang.Integer"] }]
+},
+{
   "name":"org.imtp.common.packet.body.UserFriendInfo",
   "allDeclaredFields":true,
   "queryAllDeclaredMethods":true,
   "queryAllDeclaredConstructors":true,
-  "methods":[{"name":"<init>","parameterTypes":[] }, {"name":"setAvatar","parameterTypes":["java.lang.String"] }, {"name":"setGender","parameterTypes":["java.lang.String"] }, {"name":"setId","parameterTypes":["java.lang.Long"] }, {"name":"setNickname","parameterTypes":["java.lang.String"] }]
+  "methods":[{"name":"<init>","parameterTypes":[] }, {"name":"setAccount","parameterTypes":["java.lang.String"] }, {"name":"setAvatar","parameterTypes":["java.lang.String"] }, {"name":"setGender","parameterTypes":["java.lang.String"] }, {"name":"setGender","parameterTypes":["org.imtp.common.enums.Gender"] }, {"name":"setId","parameterTypes":["java.lang.Long"] }, {"name":"setNickname","parameterTypes":["java.lang.String"] }]
 },
 {
   "name":"org.imtp.common.packet.body.UserGroupInfo",
   "allDeclaredFields":true,
   "queryAllDeclaredMethods":true,
   "queryAllDeclaredConstructors":true,
-  "methods":[{"name":"<init>","parameterTypes":[] }, {"name":"setAvatar","parameterTypes":["java.lang.String"] }, {"name":"setGroupName","parameterTypes":["java.lang.String"] }, {"name":"setId","parameterTypes":["java.lang.Long"] }]
+  "methods":[{"name":"<init>","parameterTypes":[] }, {"name":"setAvatar","parameterTypes":["java.lang.String"] }, {"name":"setGroupName","parameterTypes":["java.lang.String"] }, {"name":"setGroupUserInfos","parameterTypes":["java.util.List"] }, {"name":"setId","parameterTypes":["java.lang.Long"] }]
 },
 {
   "name":"org.imtp.common.packet.body.UserInfo",
@@ -551,6 +642,13 @@
   "queryAllDeclaredMethods":true,
   "queryAllDeclaredConstructors":true,
   "methods":[{"name":"<init>","parameterTypes":[] }, {"name":"setAvatar","parameterTypes":["java.lang.String"] }, {"name":"setGender","parameterTypes":["java.lang.String"] }, {"name":"setId","parameterTypes":["java.lang.Long"] }, {"name":"setNickname","parameterTypes":["java.lang.String"] }, {"name":"setPassword","parameterTypes":["java.lang.String"] }, {"name":"setUsername","parameterTypes":["java.lang.String"] }]
+},
+{
+  "name":"org.imtp.common.packet.body.UserSessionInfo",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[{"name":"<init>","parameterTypes":[] }, {"name":"setAvatar","parameterTypes":["java.lang.String"] }, {"name":"setDeliveryMethod","parameterTypes":["org.imtp.common.enums.DeliveryMethod"] }, {"name":"setId","parameterTypes":["java.lang.Long"] }, {"name":"setLastMsgContent","parameterTypes":["java.lang.String"] }, {"name":"setLastMsgTime","parameterTypes":["java.lang.Long"] }, {"name":"setLastMsgType","parameterTypes":["org.imtp.common.enums.MessageType"] }, {"name":"setLastSendMsgUserId","parameterTypes":["java.lang.Long"] }, {"name":"setLastUserAvatar","parameterTypes":["java.lang.String"] }, {"name":"setLastUserName","parameterTypes":["java.lang.String"] }, {"name":"setName","parameterTypes":["java.lang.String"] }, {"name":"setReceiverUserId","parameterTypes":["java.lang.Long"] }, {"name":"setUserId","parameterTypes":["java.lang.Long"] }]
 },
 {
   "name":"sun.misc.Unsafe",

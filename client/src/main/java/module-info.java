@@ -41,6 +41,7 @@ module client{
     exports org.imtp.client.entity;
     exports org.imtp.client.event;
     exports org.imtp.client.handler;
+    exports org.imtp.client.idwork;
     exports org.imtp.client.model;
     exports org.imtp.client.util;
     exports org.imtp.client.view;
