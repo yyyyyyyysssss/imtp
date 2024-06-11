@@ -115,7 +115,7 @@ public class UserSessionController extends AbstractController{
 
     private void messageCount(SessionEntity sessionEntity){
         Platform.runLater(() -> {
-            if (sessionEntity != null){
+            if (sessionEntity != null && !sessionEntity.equals(listView.getSelectionModel().getSelectedItem())){
                 String currentCount = sessionEntity.getCount();
                 if (currentCount == null || currentCount.isEmpty()){
                     sessionEntity.countProperty().set("1");
