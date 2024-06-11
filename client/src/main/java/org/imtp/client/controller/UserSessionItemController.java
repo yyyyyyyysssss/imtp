@@ -62,8 +62,9 @@ public class UserSessionItemController extends AbstractController{
             nameLabel.setText(sessionEntity.getName());
             timeLabel.setText("23:34");
             lastMsg.setText(sessionEntity.getLastMsg());
-            sessionEntity.countProperty().bindBidirectional(isAlert.textProperty());
-            isAlert.textProperty().bindBidirectional(sessionEntity.countProperty());
+            if (!sessionEntity.countProperty().isBound()){
+                sessionEntity.countProperty().bindBidirectional(isAlert.textProperty());
+            }
         });
     }
 

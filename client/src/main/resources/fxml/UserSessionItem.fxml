@@ -25,7 +25,7 @@
                     </children>
                 </HBox>
                 <Region prefWidth="165.0" VBox.vgrow="ALWAYS" />
-                <HBox prefWidth="165.0">
+                <HBox fx:id="userSessionHBox2" prefWidth="165.0">
                     <children>
                         <Label fx:id="sendUserName" style="-fx-text-fill: Grey;">
                      <HBox.margin>
@@ -37,8 +37,7 @@
                             </padding>
                         </Label>
                         <Region HBox.hgrow="ALWAYS" />
-                        <Label fx:id="isAlert" style="-fx-text-fill: red">
-                        </Label>
+                        <Label fx:id="isAlert" style="-fx-text-fill: red"/>
                     </children>
                 </HBox>
             </children>
