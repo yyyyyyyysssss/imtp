@@ -123,7 +123,9 @@ public class ChatController extends AbstractController{
                 dialog.show();
             }else {
                 if (dialog.isShowing()){
-                    dialog.hide();
+                    dialog.setX(Double.NaN);
+                    dialog.setY(Double.NaN);
+                    dialog.close();
                 }else {
                     dialog.setX(500);
                     dialog.setY(100);
