@@ -1,5 +1,6 @@
 package org.imtp.client.view;
 
+import lombok.extern.slf4j.Slf4j;
 import org.imtp.client.context.ClientContextHolder;
 import org.imtp.client.controller.Controller;
 import org.imtp.client.idwork.IdGen;
@@ -14,14 +15,18 @@ import org.imtp.common.packet.body.OfflineMessageInfo;
 import org.imtp.common.packet.body.UserFriendInfo;
 import org.imtp.common.packet.body.UserGroupInfo;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 /**
  * @Description 控制台聊天框
  * @Author ys
  * @Date 2024/4/26 11:44
  */
+@Slf4j
 public class ConsoleView implements Observer,Runnable {
 
     //持有模型对象
@@ -30,6 +35,10 @@ public class ConsoleView implements Observer,Runnable {
     //持有控制层对象
     private Controller controller;
 
+    private Map<String,UserFriendInfo> userFriendInfoMap;
+
+    private Map<String,UserGroupInfo> userGroupInfoMap;
+
     public ConsoleView(Controller controller, MessageModel messageModel){
         this.messageModel = messageModel;
         this.controller = controller;
@@ -37,6 +46,9 @@ public class ConsoleView implements Observer,Runnable {
         messageModel.pullFriendship();
         messageModel.pullGroupRelationship();
         messageModel.pullOfflineMessage();
+
+        userFriendInfoMap = new HashMap<>();
+        userGroupInfoMap = new HashMap<>();
     }
 
     @Override
@@ -46,12 +58,14 @@ public class ConsoleView implements Observer,Runnable {
             case FRIENDSHIP_RES:
                 FriendshipResponse friendshipResponse = (FriendshipResponse)packet;
                 List<UserFriendInfo> userFriendInfos = friendshipResponse.getUserFriendInfos();
-                System.out.println(userFriendInfos);
+                userFriendInfoMap = userFriendInfos.stream().collect(Collectors.toMap(UserFriendInfo::getAccount, a->a));
+                log.debug("userFriendInfos:{}",userFriendInfos);
                 break;
             case GROUP_RELATIONSHIP_RES:
                 GroupRelationshipResponse groupRelationshipResponse = (GroupRelationshipResponse) packet;
                 List<UserGroupInfo> userGroupInfos = groupRelationshipResponse.getUserGroupInfos();
-                System.out.println(userGroupInfos);
+                userGroupInfoMap = userGroupInfos.stream().collect(Collectors.toMap(k -> k.getId().toString(), a->a));
+                log.debug("userGroupInfos:{}",userGroupInfos);
                 break;
             case OFFLINE_MSG_RES:
                 OfflineMessageResponse offlineMessageResponse = (OfflineMessageResponse) packet;
@@ -146,7 +160,12 @@ public class ConsoleView implements Observer,Runnable {
             if(isGroupChat){
                 controller.send(new TextMessage(msg, ClientContextHolder.clientContext().id(), receiver, IdGen.genId(),true));
             }else {
-                controller.send(new TextMessage(msg, ClientContextHolder.clientContext().id(), receiver,IdGen.genId(),false));
+                UserFriendInfo userFriendInfo = userFriendInfoMap.get(receiver.toString());
+                if (userFriendInfo == null){
+                    System.out.println("你们还不是好友");
+                    continue;
+                }
+                controller.send(new TextMessage(msg, ClientContextHolder.clientContext().id(), userFriendInfo.getId(),IdGen.genId(),false));
             }
 
         }

@@ -74,8 +74,7 @@ public class ChatItemController extends AbstractController{
                     children.add(chatItemVBox);
                     HBox.setMargin(chatItemVBox,new Insets(0,0,0,5));
                 }else {
-                    imageView.setImage(chatItemEntity.getImage());
-                    chatItemEntity.imageProperty().bindBidirectional(imageView.imageProperty());
+                    imageView.imageProperty().bind(chatItemEntity.imageProperty());
                     chatItemHBox.setPadding(new Insets(0,20,0,0));
                     chatItemHBox.setAlignment(Pos.CENTER_RIGHT);
                     ObservableList<Node> cd = chatItemLabelHBox.getChildren();

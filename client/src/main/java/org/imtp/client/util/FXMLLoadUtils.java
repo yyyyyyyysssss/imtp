@@ -27,7 +27,7 @@ public class FXMLLoadUtils {
         return new Tuple2<>(node,controller);
     }
 
-    public static Node loadFxml(String fxmlPath) {
+    public static Node loadNodeByFxmlPath(String fxmlPath) {
         try {
             URL url = ResourceUtils.classPathResource(fxmlPath);
             return FXMLLoader.load(url);
@@ -35,6 +35,10 @@ public class FXMLLoadUtils {
             log.error("{}文件加载异常:", fxmlPath, e);
         }
         return null;
+    }
+
+    public static URL loadUrlByFxmlPath(String fxmlPath) {
+        return ResourceUtils.classPathResource(fxmlPath);
     }
 
 }

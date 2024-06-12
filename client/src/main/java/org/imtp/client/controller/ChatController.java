@@ -6,6 +6,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -70,6 +71,8 @@ public class ChatController extends AbstractController{
 
     private UserGroupController userGroupController;
 
+    private ChatEmoteDialog dialog;
+
 
     @FXML
     public void initialize(){
@@ -111,10 +114,24 @@ public class ChatController extends AbstractController{
         });
         chatListView.setCellFactory(c -> new ChatItemListCell());
 
+
         chatEmoteIcon.setOnMouseClicked(mouseEvent -> {
-            Alert alert = new Alert(Alert.AlertType.NONE);
-            alert.showAndWait();
+            if (dialog == null){
+                dialog = new ChatEmoteDialog();
+                dialog.setX(500);
+                dialog.setY(100);
+                dialog.show();
+            }else {
+                if (dialog.isShowing()){
+                    dialog.hide();
+                }else {
+                    dialog.setX(500);
+                    dialog.setY(100);
+                    dialog.show();
+                }
+            }
         });
+
     }
 
     @Override
@@ -154,8 +171,8 @@ public class ChatController extends AbstractController{
         ChatItemEntity selfChatItemEntity = ChatItemEntity.createSelfChatItemEntity();
         selfChatItemEntity.setContent(text);
         selfChatItemEntity.setMessageType(MessageType.findMessageTypeByValue((int) packet.getCommand().getCmdCode()));
-        selfChatItemEntity.setImage(sendingImage);
         addChatItem(selfChatItemEntity);
+        selfChatItemEntity.setImage(sendingImage);
 
         ackChatItemEntityMap.put(ackId,selfChatItemEntity);
 

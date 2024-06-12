@@ -65,6 +65,10 @@ public class Client implements Runnable{
 
             }
         }
+        if (account == null || password == null){
+            System.out.println("账号或密码不能为空");
+            System.exit(0);
+        }
         Client client = new Client(account,password,new LoginHandler());
         client.start();
     }

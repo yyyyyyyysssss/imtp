@@ -5,6 +5,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.shape.Circle;
 import lombok.extern.slf4j.Slf4j;
 import org.imtp.client.context.ClientContextHolder;
 import org.imtp.client.entity.SessionEntity;
@@ -63,7 +64,6 @@ public class UserSessionItemController extends AbstractController{
             timeLabel.setText("23:34");
             lastMsg.setText(sessionEntity.getLastMsg());
             isAlert.textProperty().bind(sessionEntity.countProperty());
-            sessionEntity.setCount("1");
         });
     }
 

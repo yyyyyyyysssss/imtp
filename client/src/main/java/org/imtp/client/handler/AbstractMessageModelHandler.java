@@ -1,6 +1,9 @@
 package org.imtp.client.handler;
 
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.SimpleChannelInboundHandler;
+import org.imtp.client.constant.SendMessageListener;
 import org.imtp.client.context.ClientContextHolder;
 import org.imtp.client.model.Observer;
 import org.imtp.client.model.MessageModel;
@@ -41,6 +44,24 @@ public abstract class AbstractMessageModelHandler<T> extends SimpleChannelInboun
     @Override
     public void sendMessage(Packet packet) {
         ClientContextHolder.clientContext().channel().writeAndFlush(packet);
+    }
+
+    public void sendMessage(Packet packet, SendMessageListener sendMessageListener) {
+        ChannelFuture channelFuture = ClientContextHolder.clientContext().channel().writeAndFlush(packet);
+        channelFuture.addListener(new ChannelFutureListener() {
+            @Override
+            public void operationComplete(ChannelFuture channelFuture) throws Exception {
+                if (channelFuture.isDone()){
+                    if (channelFuture.isSuccess()){
+                        sendMessageListener.isSuccess();
+                    }else if (channelFuture.isCancelled()){
+                        sendMessageListener.isCancelled();
+                    }else {
+                        Throwable cause = channelFuture.cause();
+                    }
+                }
+            }
+        });
     }
 
     @Override

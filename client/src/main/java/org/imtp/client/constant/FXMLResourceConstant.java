@@ -1,6 +1,6 @@
 package org.imtp.client.constant;
 
-public interface  FXMLResourceConstant {
+public interface FXMLResourceConstant {
 
     String BASE = "/fxml";
 
@@ -27,5 +27,7 @@ public interface  FXMLResourceConstant {
     String CHAT_FML = BASE + "/Chat.fxml";
 
     String CHAT_ITEM_FML = BASE + "/ChatItem.fxml";
+
+    String CHAT_EMOTE_DIALOG_FML = BASE + "/ChatEmoteDialog.fxml";
 
 }
