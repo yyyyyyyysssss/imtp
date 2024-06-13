@@ -29,8 +29,7 @@ public class LoginHandler extends AbstractMessageModelHandler<Packet> {
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        //初始化上下文对象
-        ClientContextHolder.createClientContext(ctx.channel());
+
     }
 
     @Override
@@ -47,7 +46,9 @@ public class LoginHandler extends AbstractMessageModelHandler<Packet> {
                     DefaultClientUserChannelContext clientContext = (DefaultClientUserChannelContext)ClientContextHolder.clientContext();
                     clientContext.setUserInfo(userInfo);
                     //添加业务命令处理器并移除自身
-                    this.clientCmdHandlerHandler = new ClientCmdHandlerHandler();
+                    if (clientCmdHandlerHandler == null){
+                        this.clientCmdHandlerHandler = new ClientCmdHandlerHandler();
+                    }
                     channelHandlerContext.pipeline().addLast(clientCmdHandlerHandler).remove(this);
                     //将业务命令处理器引用发布到控制层
                     channelHandlerContext.pipeline().fireChannelActive();
@@ -61,6 +62,9 @@ public class LoginHandler extends AbstractMessageModelHandler<Packet> {
         }
     }
 
+    public void setClientCmdHandlerHandler(ChannelHandler channelHandler) {
+        this.clientCmdHandlerHandler = (ClientCmdHandlerHandler) channelHandler;
+    }
 
     @Override
     public MessageModel getNextModel() {

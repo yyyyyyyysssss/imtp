@@ -1,6 +1,7 @@
 package org.imtp.client.context;
 
 import io.netty.channel.Channel;
+import org.imtp.client.Client;
 import org.imtp.common.packet.body.UserInfo;
 
 /**
@@ -12,8 +13,8 @@ public class DefaultClientUserChannelContext extends AbstractClientChannelContex
 
     private UserInfo userInfo;
 
-    public DefaultClientUserChannelContext(Channel channel, UserInfo userInfo) {
-        super(channel);
+    public DefaultClientUserChannelContext(Channel channel, Client client, UserInfo userInfo) {
+        super(channel,client);
         this.userInfo = userInfo;
     }
 
@@ -21,16 +22,6 @@ public class DefaultClientUserChannelContext extends AbstractClientChannelContex
     @Override
     public Long id() {
         return this.userInfo.getId();
-    }
-
-    @Override
-    public String principal() {
-        return this.userInfo.getUsername();
-    }
-
-    @Override
-    public String credentials() {
-        return this.userInfo.getPassword();
     }
 
     public void setUserInfo(UserInfo userInfo) {

@@ -13,6 +13,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import org.imtp.client.entity.ChatItemEntity;
+import org.imtp.common.enums.DeliveryMethod;
 
 /**
  * @Description
@@ -68,8 +69,12 @@ public class ChatItemController extends AbstractController{
                 if (!chatItemEntity.isSelf()){
                     chatItemHBox.setPadding(new Insets(0,0,0,0));
                     chatItemHBox.setAlignment(Pos.CENTER_LEFT);
-                    sendNameLabel.setText(chatItemEntity.getName());
-                    chatItemVBoxChildren.addAll(sendNameLabel,chatItemLabelHBox);
+                    if (chatItemEntity.getDeliveryMethod().equals(DeliveryMethod.GROUP)){
+                        sendNameLabel.setText(chatItemEntity.getName());
+                        chatItemVBoxChildren.addAll(sendNameLabel,chatItemLabelHBox);
+                    }else {
+                        chatItemVBoxChildren.add(chatItemLabelHBox);
+                    }
                     children.add(chatItemImageView);
                     children.add(chatItemVBox);
                     HBox.setMargin(chatItemVBox,new Insets(0,0,0,5));

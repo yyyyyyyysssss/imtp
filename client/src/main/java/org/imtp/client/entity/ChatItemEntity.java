@@ -10,7 +10,10 @@ import org.imtp.client.component.ClassPathImageUrlParse;
 import org.imtp.client.context.ClientContextHolder;
 import org.imtp.client.context.DefaultClientUserChannelContext;
 import org.imtp.client.idwork.IdGen;
+import org.imtp.common.enums.DeliveryMethod;
 import org.imtp.common.enums.MessageType;
+
+import java.util.Date;
 
 /**
  * @Description
@@ -36,6 +39,8 @@ public class ChatItemEntity {
     private String content;
 
     private MessageType messageType;
+
+    private DeliveryMethod deliveryMethod;
 
 
 

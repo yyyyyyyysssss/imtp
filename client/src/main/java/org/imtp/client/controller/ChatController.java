@@ -209,15 +209,16 @@ public class ChatController extends AbstractController{
                 }
                 chatItemEntity.setMessageType(MessageType.findMessageTypeByValue((int) textMessage.getCommand().getCmdCode()));
                 chatItemEntity.setContent(textMessage.getMessage());
+                chatItemEntity.setDeliveryMethod(textMessage.isGroup() ? DeliveryMethod.GROUP : DeliveryMethod.SINGLE);
                 addChatItem(chatItemEntity);
                 break;
             case MSG_RES:
                 MessageStateResponse messageStateResponse = (MessageStateResponse) packet;
-                log.info("{},{}",messageStateResponse.getState(),messageStateResponse.getAckId());
                 ChatItemEntity cie = ackChatItemEntityMap.get(messageStateResponse.getAckId());
                 if (cie != null){
                     switch (messageStateResponse.getState()){
                         case DELIVERED :
+                            log.info("{},{}",messageStateResponse.getState(),messageStateResponse.getAckId());
                             cie.imageProperty().set(null);
                             ackChatItemEntityMap.remove(messageStateResponse.getAckId());
                             break;
@@ -245,6 +246,7 @@ public class ChatController extends AbstractController{
         }
         chatItemEntity.setMessageType(sessionEntity.getLastMsgType());
         chatItemEntity.setContent(sessionEntity.getLastMsg());
+        chatItemEntity.setDeliveryMethod(sessionEntity.getDeliveryMethod());
         addChatItem(chatItemEntity);
     }
 

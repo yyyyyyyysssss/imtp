@@ -1,9 +1,13 @@
 package org.imtp.client.controller;
 
 import org.imtp.client.SceneManager;
+import org.imtp.client.constant.SendMessageListener;
 import org.imtp.client.model.MessageModel;
 import org.imtp.client.view.ConsoleView;
 import org.imtp.common.packet.base.Packet;
+
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * @Description 控制台发送消息
@@ -12,19 +16,46 @@ import org.imtp.common.packet.base.Packet;
  */
 public class ConsoleController implements Controller {
 
-    private MessageModel messageModel;
 
-    private ConsoleView consoleView;
+    private ConsoleController(){
+    }
 
-    public ConsoleController(MessageModel messageModel){
+    private ConsoleController(MessageModel messageModel){
         this.messageModel = messageModel;
         this.consoleView = new ConsoleView(this,messageModel);
         new Thread(consoleView).start();
     }
 
+    private static volatile ConsoleController INSTANCE;
+
+    private static final Lock lock = new ReentrantLock();
+
+    private MessageModel messageModel;
+
+    private ConsoleView consoleView;
+
+    public static ConsoleController getInstance(MessageModel messageModel){
+        if (INSTANCE == null){
+            try {
+                lock.lock();
+                if (INSTANCE == null){
+                    INSTANCE = new ConsoleController(messageModel);
+                }
+            }finally {
+                lock.unlock();
+            }
+        }
+        return INSTANCE;
+    }
+
     @Override
     public void send(Packet packet) {
         messageModel.sendMessage(packet);
+    }
+
+    @Override
+    public void send(Packet packet, SendMessageListener sendMessageListener) {
+        messageModel.sendMessage(packet,sendMessageListener);
     }
 
     @Override

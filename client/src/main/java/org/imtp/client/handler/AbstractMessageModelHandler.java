@@ -2,7 +2,9 @@ package org.imtp.client.handler;
 
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
+import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import org.imtp.client.Client;
 import org.imtp.client.constant.SendMessageListener;
 import org.imtp.client.context.ClientContextHolder;
 import org.imtp.client.model.Observer;
@@ -46,19 +48,19 @@ public abstract class AbstractMessageModelHandler<T> extends SimpleChannelInboun
         ClientContextHolder.clientContext().channel().writeAndFlush(packet);
     }
 
+    @Override
     public void sendMessage(Packet packet, SendMessageListener sendMessageListener) {
+        if (ClientContextHolder.clientContext() == null){
+            sendMessageListener.disconnected();
+            return;
+        }
         ChannelFuture channelFuture = ClientContextHolder.clientContext().channel().writeAndFlush(packet);
         channelFuture.addListener(new ChannelFutureListener() {
             @Override
             public void operationComplete(ChannelFuture channelFuture) throws Exception {
-                if (channelFuture.isDone()){
-                    if (channelFuture.isSuccess()){
-                        sendMessageListener.isSuccess();
-                    }else if (channelFuture.isCancelled()){
-                        sendMessageListener.isCancelled();
-                    }else {
-                        Throwable cause = channelFuture.cause();
-                    }
+                Throwable cause = channelFuture.cause();
+                if (cause != null){
+                    sendMessageListener.exception(cause);
                 }
             }
         });
@@ -121,5 +123,12 @@ public abstract class AbstractMessageModelHandler<T> extends SimpleChannelInboun
     @Override
     public void pullUserSession() {
         ClientContextHolder.clientContext().channel().writeAndFlush(new UserSessionRequest(ClientContextHolder.clientContext().id()));
+    }
+
+    @Override
+    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        Client client = ClientContextHolder.clientContext().client();
+        client.resetChannelHandler(this);
+        client.connect();
     }
 }

@@ -2,10 +2,13 @@ package org.imtp.client.handler;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
+import org.imtp.client.Client;
 import org.imtp.client.context.ClientContextHolder;
 import org.imtp.client.controller.ConsoleController;
+import org.imtp.client.enums.ClientType;
 import org.imtp.client.model.MessageModel;
 import org.imtp.common.enums.Command;
 import org.imtp.common.packet.*;
@@ -19,12 +22,16 @@ import org.imtp.common.utils.JsonUtil;
  * @Date 2024/4/8 14:53
  */
 @Slf4j
+@ChannelHandler.Sharable
 public class ClientCmdHandlerHandler extends AbstractMessageModelHandler<Packet> {
 
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) {
-        new ConsoleController(this);
+        Client client = ClientContextHolder.clientContext().client();
+        if (client.getClientType().equals(ClientType.CONSOLE)){
+            ConsoleController.getInstance(this);
+        }
     }
 
     @Override

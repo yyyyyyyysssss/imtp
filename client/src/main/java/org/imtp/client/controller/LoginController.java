@@ -7,6 +7,7 @@ import javafx.scene.control.TextField;
 import lombok.extern.slf4j.Slf4j;
 import org.imtp.client.Client;
 import org.imtp.client.constant.FXMLResourceConstant;
+import org.imtp.client.constant.SendMessageListener;
 import org.imtp.client.context.ClientContextHolder;
 import org.imtp.client.handler.LoginHandler;
 import org.imtp.client.model.MessageModel;
@@ -35,9 +36,7 @@ public class LoginController extends AbstractController{
 
     @Override
     protected void init0() {
-        client = new Client((LoginHandler) messageModel);
-        //启动netty
-        new Thread(client).start();
+
     }
 
     public void login(ActionEvent actionEvent){
@@ -49,8 +48,27 @@ public class LoginController extends AbstractController{
             errorMsg.setVisible(true);
             return;
         }
+        if (client == null){
+            client = new Client(u,p,(LoginHandler) messageModel);
+            //启动netty
+            new Thread(client).start();
+        }
         LoginInfo loginInfo = new LoginInfo(u,p);
-        send(new LoginRequest(loginInfo));
+        send(new LoginRequest(loginInfo), new SendMessageListener() {
+
+            @Override
+            public void exception(Throwable throwable) {
+                errorMsg.setText("发送消息异常");
+                log.error("exception:",throwable);
+                errorMsg.setVisible(true);
+            }
+
+            @Override
+            public void disconnected() {
+                errorMsg.setText("与服务器连接失败");
+                errorMsg.setVisible(true);
+            }
+        });
     }
 
     @Override

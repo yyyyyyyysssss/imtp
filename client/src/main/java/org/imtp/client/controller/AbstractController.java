@@ -6,6 +6,7 @@ import org.imtp.client.SceneManager;
 import org.imtp.client.component.ClassPathImageUrlParse;
 import org.imtp.client.component.ImageUrlParse;
 import org.imtp.client.constant.Callback;
+import org.imtp.client.constant.SendMessageListener;
 import org.imtp.client.model.MessageModel;
 import org.imtp.client.model.Observer;
 import org.imtp.client.util.FXMLLoadUtils;
@@ -48,6 +49,11 @@ public abstract class AbstractController implements Controller, Observer {
     @Override
     public void send(Packet packet) {
         this.messageModel.sendMessage(packet);
+    }
+
+    @Override
+    public void send(Packet packet, SendMessageListener sendMessageListener) {
+        this.messageModel.sendMessage(packet,sendMessageListener);
     }
 
     @Override

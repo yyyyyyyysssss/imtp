@@ -1,6 +1,7 @@
 package org.imtp.client.context;
 
 import io.netty.channel.Channel;
+import org.imtp.client.Client;
 
 /**
  * @Description
@@ -14,7 +15,7 @@ public interface ClientContext {
 
     Channel channel();
 
-    String principal();
+    void resetChannel(Channel channel);
 
-    String credentials();
+    Client client();
 }

@@ -6,11 +6,15 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import lombok.extern.slf4j.Slf4j;
+import org.imtp.client.context.ClientContextHolder;
+import org.imtp.client.enums.ClientType;
 import org.imtp.client.handler.LoginHandler;
 import org.imtp.common.codec.IMTPDecoder;
 import org.imtp.common.codec.IMTPEncoder;
 import org.imtp.common.packet.LoginRequest;
 import org.imtp.common.packet.body.LoginInfo;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * @Description
@@ -18,7 +22,7 @@ import org.imtp.common.packet.body.LoginInfo;
  * @Date 2024/4/8 14:39
  */
 @Slf4j
-public class Client implements Runnable{
+public class Client implements Runnable {
 
     private String account;
 
@@ -26,24 +30,42 @@ public class Client implements Runnable{
 
     private EventLoopGroup group;
 
-    private Channel channel;
+    private Bootstrap bootstrap;
 
-    private LoginHandler loginHandler;
+    private ClientType clientType;
 
-    public Client(LoginHandler loginHandler) {
-        this(null,null,loginHandler);
+    private ChannelHandler channelHandler;
+
+    public Client(String account, String password, ChannelHandler channelHandler) {
+        this(account,password,channelHandler,ClientType.WINDOW);
     }
 
-    public Client(String account, String password,LoginHandler loginHandler) {
+    public Client(String account, String password, ChannelHandler channelHandler, ClientType clientType) {
         this.account = account;
         this.password = password;
-        this.loginHandler = loginHandler;
+        this.clientType = clientType;
+        this.channelHandler = channelHandler;
+        this.group = new NioEventLoopGroup();
+        this.bootstrap = new Bootstrap();
+        bootstrap.group(group)
+                .channel(NioSocketChannel.class)
+                .option(ChannelOption.TCP_NODELAY, true)
+                .handler(new ChannelInitializer<SocketChannel>() {
+                    @Override
+                    protected void initChannel(SocketChannel socketChannel) {
+                        ChannelPipeline pipeline = socketChannel.pipeline();
+                        pipeline.addLast(new IMTPDecoder());
+                        pipeline.addLast(new IMTPEncoder());
+                        pipeline.addLast(channelHandler);
+                    }
+                });
+
     }
 
     public static void main(String[] args) {
         int length;
         String account = null;
-        String password = null,p = null;
+        String password = null, p = null;
         char c;
         char[] cc;
         if (args != null && (length = args.length) > 0) {
@@ -65,74 +87,72 @@ public class Client implements Runnable{
 
             }
         }
-        if (account == null || password == null){
+        if (account == null || password == null) {
             System.out.println("账号或密码不能为空");
             System.exit(0);
         }
-        Client client = new Client(account,password,new LoginHandler());
-        client.start();
+        Client client = new Client(account, password, new LoginHandler(),ClientType.CONSOLE);
+        client.connect();
     }
 
 
-    public void start() {
-        if(channel != null && channel.isActive()){
-            channel.close();
-        }
-        group = new NioEventLoopGroup();
-        Bootstrap bootstrap = new Bootstrap();
+    public void connect() {
         try {
-            bootstrap.group(group)
-                    .channel(NioSocketChannel.class)
-                    .option(ChannelOption.TCP_NODELAY, true)
-                    .handler(new ChannelInitializer<SocketChannel>() {
-                        @Override
-                        protected void initChannel(SocketChannel socketChannel) {
-                            ChannelPipeline pipeline = socketChannel.pipeline();
-                            pipeline.addLast(new IMTPDecoder());
-                            pipeline.addLast(new IMTPEncoder());
-                            pipeline.addLast(loginHandler);
-                        }
-                    });
             ChannelFuture connected = bootstrap.connect("127.0.0.1", 2921);
             connected.addListener((ChannelFutureListener) channelFuture -> {
                 if (channelFuture.isSuccess()) {
                     log.info("与服务器建立连接成功");
-                    if (account != null && password != null) {
-                        channel = channelFuture.channel();
-                        LoginInfo loginInfo = new LoginInfo(this.account,this.password);
-                        channelFuture.channel().writeAndFlush(new LoginRequest(loginInfo));
+                    Channel channel = channelFuture.channel();
+                    //初始化上下文对象
+                    if (ClientContextHolder.clientContext() == null){
+                        ClientContextHolder.createClientContext(channel,this);
+                        if (clientType.equals(ClientType.CONSOLE)) {
+                            LoginInfo loginInfo = new LoginInfo(this.account, this.password);
+                            channel.writeAndFlush(new LoginRequest(loginInfo));
+                        }
+                    }else {
+                        LoginHandler loginHandler = channel.pipeline().get(LoginHandler.class);
+                        loginHandler.setClientCmdHandlerHandler(this.channelHandler);
+                        ClientContextHolder.clientContext().resetChannel(channel);
+                        LoginInfo loginInfo = new LoginInfo(this.account, this.password);
+                        channel.writeAndFlush(new LoginRequest(loginInfo));
                     }
                 } else {
-                    log.warn("与服务器建立连接失败");
+                    //每隔1秒重连
+                    EventLoop eventLoop = channelFuture.channel().eventLoop();
+                    eventLoop.schedule(() -> {
+                        log.warn("与服务器建立连接失败,正在重新连接...");
+                        connect();
+                    },1L, TimeUnit.SECONDS);
                 }
             });
             connected.channel().closeFuture().sync();
         } catch (Exception e) {
-            log.error("error:",e);
-        } finally {
+            log.error("error:", e);
             group.shutdownGracefully();
-            log.info("stop client");
         }
     }
 
     @Override
     public void run() {
-        start();
+        connect();
+    }
+
+    public void resetChannelHandler(ChannelHandler channelHandler) {
+        this.channelHandler = channelHandler;
     }
 
     public String getAccount() {
         return account;
     }
 
-    public void setAccount(String account) {
-        this.account = account;
-    }
-
     public String getPassword() {
         return password;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+
+    public ClientType getClientType() {
+        return clientType;
     }
+
 }

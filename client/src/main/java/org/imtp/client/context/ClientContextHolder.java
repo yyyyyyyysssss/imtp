@@ -1,6 +1,7 @@
 package org.imtp.client.context;
 
 import io.netty.channel.Channel;
+import org.imtp.client.Client;
 import org.imtp.common.packet.body.UserInfo;
 
 import java.util.concurrent.locks.Lock;
@@ -19,17 +20,17 @@ public class ClientContextHolder {
     private static final Lock lock = new ReentrantLock();
 
 
-    public static ClientContext createClientContext(Channel channel){
+    public static ClientContext createClientContext(Channel channel,Client client){
 
-        return createClientContext(channel,null);
+        return createClientContext(channel,client,null);
     }
 
-    public static ClientContext createClientContext(Channel channel, UserInfo userInfo){
+    public static ClientContext createClientContext(Channel channel, Client client, UserInfo userInfo){
         if(clientContext == null){
             try {
                 lock.lock();
                 if(clientContext == null){
-                    clientContext = new DefaultClientUserChannelContext(channel,userInfo);
+                    clientContext = new DefaultClientUserChannelContext(channel,client,userInfo);
                 }
             }finally {
                 lock.unlock();
@@ -39,9 +40,6 @@ public class ClientContextHolder {
     }
 
     public static ClientContext clientContext(){
-        if(clientContext == null){
-            throw new RuntimeException("ClientContext未初始化");
-        }
         return clientContext;
     }
 
