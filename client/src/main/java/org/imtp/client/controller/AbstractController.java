@@ -1,5 +1,7 @@
 package org.imtp.client.controller;
 
+import io.netty.channel.EventLoop;
+import io.netty.util.concurrent.ScheduledFuture;
 import javafx.scene.Node;
 import lombok.extern.slf4j.Slf4j;
 import org.imtp.client.SceneManager;
@@ -7,12 +9,17 @@ import org.imtp.client.component.ClassPathImageUrlParse;
 import org.imtp.client.component.ImageUrlParse;
 import org.imtp.client.constant.Callback;
 import org.imtp.client.constant.SendMessageListener;
+import org.imtp.client.context.ClientContextHolder;
 import org.imtp.client.model.MessageModel;
 import org.imtp.client.model.Observer;
 import org.imtp.client.util.FXMLLoadUtils;
 import org.imtp.client.util.Tuple2;
 import org.imtp.common.packet.base.Packet;
 
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -26,6 +33,8 @@ public abstract class AbstractController implements Controller, Observer {
     private ImageUrlParse imageUrlParse;
 
     private final Lock lock = new ReentrantLock();
+
+    private Map<Packet, RetryTask> retryTaskMap;
 
     @Override
     public void initData(Object object) {
@@ -41,6 +50,7 @@ public abstract class AbstractController implements Controller, Observer {
     public void init(MessageModel messageModel) {
         this.messageModel = messageModel;
         messageModel.registerObserver(this);
+        retryTaskMap = new ConcurrentHashMap<>();
         init0();
     }
 
@@ -48,7 +58,40 @@ public abstract class AbstractController implements Controller, Observer {
 
     @Override
     public void send(Packet packet) {
-        this.messageModel.sendMessage(packet);
+        RetryTask retryTask = new RetryTask(3);
+        retryTaskMap.put(packet,retryTask);
+        send(packet, new SendMessageListener() {
+            @Override
+            public void isSuccess() {
+                RetryTask rt = retryTaskMap.get(packet);
+                if (rt != null){
+                    rt.cancel();
+                    retryTaskMap.remove(packet);
+                }
+            }
+            @Override
+            public void isFail() {
+                RetryTask rt = retryTaskMap.get(packet);
+                if(!rt.isScheduled()){
+                    synchronized (rt){
+                        if (!rt.isScheduled()){
+                            EventLoop eventLoop = ClientContextHolder.clientContext().channel().eventLoop();
+                            rt.setScheduledFuture(eventLoop.scheduleAtFixedRate(() -> {
+                                rt.incrementRetryCount();
+                                System.out.println("执行");
+                                send(packet,this);
+                                if (rt.isComplete()){
+                                    rt.cancel();
+                                    retryTaskMap.remove(packet);
+                                }
+                            }, 0, 3, TimeUnit.SECONDS));
+                            //标记任务已经开始
+                            rt.setScheduled(true);
+                        }
+                    }
+                }
+            }
+        });
     }
 
     @Override

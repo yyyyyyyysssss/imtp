@@ -66,6 +66,6 @@ public class ClientCmdHandlerHandler extends AbstractMessageModelHandler<Packet>
 
     @Override
     public MessageModel getNextModel() {
-        return this;
+        return null;
     }
 }

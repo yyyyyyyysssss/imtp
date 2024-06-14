@@ -53,19 +53,18 @@ public class LoginController extends AbstractController{
             //启动netty
             new Thread(client).start();
         }
+        client.setAccount(u);
+        client.setPassword(p);
         LoginInfo loginInfo = new LoginInfo(u,p);
         send(new LoginRequest(loginInfo), new SendMessageListener() {
 
             @Override
-            public void exception(Throwable throwable) {
-                errorMsg.setText("发送消息异常");
-                log.error("exception:",throwable);
-                errorMsg.setVisible(true);
-            }
+            public void isSuccess() {
 
+            }
             @Override
-            public void disconnected() {
-                errorMsg.setText("与服务器连接失败");
+            public void isFail() {
+                errorMsg.setText("登录失败，与服务连接异常");
                 errorMsg.setVisible(true);
             }
         });
@@ -80,6 +79,8 @@ public class LoginController extends AbstractController{
             MessageModel nextModel = messageModel.getNextModel();
             //跳转主页
             skipScene(FXMLResourceConstant.HOME_FXML,"聊天页",nextModel);
+            //将自身移除
+            messageModel.removeObserver(this.getClass());
         }else{
             errorMsg.setText("用户名或密码错误!");
             errorMsg.setVisible(true);

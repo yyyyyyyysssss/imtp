@@ -1,9 +1,8 @@
 package org.imtp.client.handler;
 
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelFutureListener;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.channel.*;
+import io.netty.util.concurrent.ScheduledFuture;
+import lombok.extern.slf4j.Slf4j;
 import org.imtp.client.Client;
 import org.imtp.client.constant.SendMessageListener;
 import org.imtp.client.context.ClientContextHolder;
@@ -16,7 +15,9 @@ import org.imtp.common.packet.UserSessionRequest;
 import org.imtp.common.packet.base.Packet;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -25,6 +26,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * @Author ys
  * @Date 2024/4/26 11:41
  */
+@Slf4j
 public abstract class AbstractMessageModelHandler<T> extends SimpleChannelInboundHandler<T> implements MessageModel {
 
     private final Lock lock;
@@ -45,25 +47,27 @@ public abstract class AbstractMessageModelHandler<T> extends SimpleChannelInboun
 
     @Override
     public void sendMessage(Packet packet) {
-        ClientContextHolder.clientContext().channel().writeAndFlush(packet);
+        sendMessage(packet,null);
     }
 
     @Override
     public void sendMessage(Packet packet, SendMessageListener sendMessageListener) {
         if (ClientContextHolder.clientContext() == null){
-            sendMessageListener.disconnected();
+            if (sendMessageListener != null){
+                sendMessageListener.isFail();
+            }
             return;
         }
         ChannelFuture channelFuture = ClientContextHolder.clientContext().channel().writeAndFlush(packet);
-        channelFuture.addListener(new ChannelFutureListener() {
-            @Override
-            public void operationComplete(ChannelFuture channelFuture) throws Exception {
-                Throwable cause = channelFuture.cause();
-                if (cause != null){
-                    sendMessageListener.exception(cause);
+        if (sendMessageListener != null){
+            channelFuture.addListener((ChannelFutureListener) cf -> {
+                if(cf.isSuccess()){
+                    sendMessageListener.isSuccess();
+                }else {
+                    sendMessageListener.isFail();
                 }
-            }
-        });
+            });
+        }
     }
 
     @Override
@@ -83,9 +87,31 @@ public abstract class AbstractMessageModelHandler<T> extends SimpleChannelInboun
 
     @Override
     public void removeObserver(Observer observer) {
+        if (observers.isEmpty()){
+            return;
+        }
         try {
             lock.lock();
             observers.remove(observer);
+        }finally {
+            lock.unlock();
+        }
+    }
+
+    @Override
+    public void removeObserver(Class<? extends Observer> observerClass) {
+        if (observers.isEmpty()){
+            return;
+        }
+        try {
+            lock.lock();
+            Iterator<Observer> iterator = observers.iterator();
+            while (iterator.hasNext()){
+                Observer observer = iterator.next();
+                if (observerClass.isInstance(observer)){
+                    iterator.remove();
+                }
+            }
         }finally {
             lock.unlock();
         }

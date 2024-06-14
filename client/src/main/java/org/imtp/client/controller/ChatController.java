@@ -1,6 +1,7 @@
 package org.imtp.client.controller;
 
 
+import io.netty.channel.EventLoop;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -31,9 +32,11 @@ import org.imtp.common.packet.TextMessage;
 import org.imtp.common.packet.base.Packet;
 import org.imtp.common.packet.body.UserFriendInfo;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 public class ChatController extends AbstractController{
@@ -73,6 +76,8 @@ public class ChatController extends AbstractController{
 
     private ChatEmoteDialog dialog;
 
+    private Map<Long,RetryTask> retryTaskMap;
+
 
     @FXML
     public void initialize(){
@@ -89,6 +94,7 @@ public class ChatController extends AbstractController{
         chatFileIcon.setImage(new Image(chatFileIconUrl.toExternalForm()));
 
         ackChatItemEntityMap = new ConcurrentHashMap<>();
+        retryTaskMap = new ConcurrentHashMap<>();
 
         inputText.setWrapText(true);
         inputText.setOnKeyPressed(keyEvent -> {
@@ -185,6 +191,17 @@ public class ChatController extends AbstractController{
         send(packet);
 
         inputText.clear();
+
+        EventLoop eventLoop = ClientContextHolder.clientContext().channel().eventLoop();
+        RetryTask retryTask = new RetryTask();
+        retryTask.setScheduledFuture(eventLoop.schedule(() -> {
+            ChatItemEntity chatItemEntity = ackChatItemEntityMap.get(ackId);
+            if (chatItemEntity != null){
+                chatItemEntity.setImage(sendFailureImage);
+            }
+            retryTaskMap.remove(ackId);
+        },10, TimeUnit.SECONDS));
+        retryTaskMap.put(ackId,retryTask);
     }
 
     @Override
@@ -221,6 +238,11 @@ public class ChatController extends AbstractController{
                             log.info("{},{}",messageStateResponse.getState(),messageStateResponse.getAckId());
                             cie.imageProperty().set(null);
                             ackChatItemEntityMap.remove(messageStateResponse.getAckId());
+                            RetryTask retryTask = retryTaskMap.get(messageStateResponse.getAckId());
+                            if (retryTask != null){
+                                retryTask.cancel();
+                                retryTaskMap.remove(messageStateResponse.getAckId());
+                            }
                             break;
                     }
                 }

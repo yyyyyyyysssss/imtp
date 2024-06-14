@@ -2,8 +2,8 @@ package org.imtp.client.constant;
 
 public interface SendMessageListener {
 
-    void exception(Throwable throwable);
+    void isSuccess();
 
-    void disconnected();
+    void isFail();
 
 }

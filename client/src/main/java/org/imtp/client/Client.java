@@ -150,6 +150,13 @@ public class Client implements Runnable {
         return password;
     }
 
+    public void setAccount(String account) {
+        this.account = account;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
 
     public ClientType getClientType() {
         return clientType;

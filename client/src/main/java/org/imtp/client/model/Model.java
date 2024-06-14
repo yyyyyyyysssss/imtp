@@ -11,6 +11,8 @@ public interface Model {
 
     void removeObserver(Observer observer);
 
+    void removeObserver(Class<? extends Observer> observerClass);
+
     void notifyObservers(Object object);
 
 
