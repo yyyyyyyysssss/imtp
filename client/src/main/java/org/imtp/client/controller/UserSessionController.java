@@ -54,6 +54,7 @@ public class UserSessionController extends AbstractController{
         userSessionEntityMap = new HashMap<>();
         //会话框设置
         listView.setCellFactory(c -> new UserSessionListCell());
+        listView.setFocusTraversable(false);
         //设置鼠标监听
         listView.setOnMouseClicked(mouseEvent -> {
             SessionEntity sessionEntity = listView.getSelectionModel().getSelectedItem();
@@ -106,6 +107,10 @@ public class UserSessionController extends AbstractController{
                     }
                     sessionEntity.setLastSendMsgUserId(packet.getSender());
                     sessionEntity.setLastMsg(textMessage.getMessage());
+                    if (packet.isGroup()){
+                        UserFriendInfo groupUserInfo = userGroupController.findGroupUserInfo(packet.getReceiver(), packet.getSender());
+                        sessionEntity.setLastUserName(groupUserInfo.getNickname());
+                    }
                     updateUserSessionNode(sessionEntity);
                 }
                 break;

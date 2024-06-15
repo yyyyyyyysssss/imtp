@@ -6,8 +6,6 @@ import javafx.scene.Node;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.Pane;
 import lombok.extern.slf4j.Slf4j;
-import org.imtp.client.component.ClassPathImageUrlParse;
-import org.imtp.client.component.ImageUrlParse;
 import org.imtp.client.constant.Callback;
 import org.imtp.client.constant.FXMLResourceConstant;
 import org.imtp.client.entity.GroupEntity;
@@ -54,6 +52,7 @@ public class UserGroupController extends AbstractController implements Callback<
         groupUserInfoMap = new HashMap<>();
 
         groupListView.setCellFactory(c -> new UserGroupListCell());
+        groupListView.setFocusTraversable(false);
         groupListView.setOnMouseClicked(mouseEvent -> {
             GroupEntity groupEntity = groupListView.getSelectionModel().getSelectedItem();
             if (groupEntity == null){

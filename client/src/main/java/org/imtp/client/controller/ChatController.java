@@ -119,7 +119,7 @@ public class ChatController extends AbstractController{
             sendTextMessage();
         });
         chatListView.setCellFactory(c -> new ChatItemListCell());
-
+        chatListView.setFocusTraversable(false);
 
         chatEmoteIcon.setOnMouseClicked(mouseEvent -> {
             if (dialog == null){

@@ -6,17 +6,13 @@ import javafx.scene.Node;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.Pane;
 import lombok.extern.slf4j.Slf4j;
-import org.imtp.client.component.ClassPathImageUrlParse;
-import org.imtp.client.component.ImageUrlParse;
 import org.imtp.client.constant.Callback;
 import org.imtp.client.constant.FXMLResourceConstant;
 import org.imtp.client.entity.FriendEntity;
 import org.imtp.client.util.Tuple2;
 import org.imtp.common.packet.FriendshipResponse;
-import org.imtp.common.packet.GroupRelationshipResponse;
 import org.imtp.common.packet.base.Packet;
 import org.imtp.common.packet.body.UserFriendInfo;
-import org.imtp.common.packet.body.UserGroupInfo;
 
 import java.util.HashMap;
 import java.util.List;
@@ -49,6 +45,7 @@ public class UserFriendController extends AbstractController implements Callback
         userFriendInfoMap = new HashMap<>();
 
         friendListView.setCellFactory(c -> new UserFriendListCell());
+        friendListView.setFocusTraversable(false);
         friendListView.setOnMouseClicked(mouseEvent -> {
             FriendEntity friendEntity = friendListView.getSelectionModel().getSelectedItem();
             if (friendEntity == null){

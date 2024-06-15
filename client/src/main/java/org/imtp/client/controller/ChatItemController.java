@@ -9,9 +9,8 @@ import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import org.imtp.client.entity.ChatItemEntity;
 import org.imtp.common.enums.DeliveryMethod;
 
@@ -62,11 +61,14 @@ public class ChatItemController extends AbstractController{
             Platform.runLater(() -> {
                 chatItemImageView.setImage(new Image(chatItemEntity.getAvatar()));
                 chatItemLabel.setText(chatItemEntity.getContent());
+                chatItemLabel.setPadding(new Insets(7,7,7,7));
                 ObservableList<Node> children = chatItemHBox.getChildren();
                 children.clear();
                 ObservableList<Node> chatItemVBoxChildren = chatItemVBox.getChildren();
                 chatItemVBoxChildren.clear();
+                CornerRadii cornerRadii = new CornerRadii(5);
                 if (!chatItemEntity.isSelf()){
+                    chatItemLabel.setBackground(new Background(new BackgroundFill(Color.WHITE,cornerRadii,Insets.EMPTY)));
                     chatItemHBox.setPadding(new Insets(0,0,0,0));
                     chatItemHBox.setAlignment(Pos.CENTER_LEFT);
                     if (chatItemEntity.getDeliveryMethod().equals(DeliveryMethod.GROUP)){
@@ -82,6 +84,7 @@ public class ChatItemController extends AbstractController{
                     imageView.imageProperty().bind(chatItemEntity.imageProperty());
                     chatItemHBox.setPadding(new Insets(0,20,0,0));
                     chatItemHBox.setAlignment(Pos.CENTER_RIGHT);
+                    chatItemLabel.setBackground(new Background(new BackgroundFill(Color.LIGHTGREEN,cornerRadii,Insets.EMPTY)));
                     ObservableList<Node> cd = chatItemLabelHBox.getChildren();
                     cd.clear();
                     cd.add(imageView);
