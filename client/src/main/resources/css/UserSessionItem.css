@@ -1,4 +1,6 @@
 
-#isAlert{
-    -fx-text-fill: red;
+#messageCount{
+    -fx-font-size: 12;
+    -fx-font-weight: bold;
+    -fx-fill: white;
 }

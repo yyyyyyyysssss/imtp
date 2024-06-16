@@ -5,8 +5,11 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Circle?>
 
+<?import javafx.scene.text.Text?>
 <HBox prefWidth="205.0" stylesheets="@../css/UserSessionItem.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.imtp.client.controller.UserSessionItemController">
     <children>
         <ImageView fx:id="sessionImg" fitHeight="40.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true" />
@@ -31,13 +34,18 @@
                      <HBox.margin>
                         <Insets left="5.0" />
                      </HBox.margin></Label>
-                        <Label fx:id="lastMsg" style="-fx-text-fill: Grey">
+                        <Label fx:id="lastMsg" style="-fx-text-fill: Grey" maxWidth="80">
                             <padding>
                                 <Insets left="5.0" />
                             </padding>
                         </Label>
                         <Region HBox.hgrow="ALWAYS" />
-                        <Label fx:id="isAlert"/>
+                      <StackPane fx:id="itemStackPane">
+                         <children>
+                             <Circle fx:id="alertCircle" />
+                             <Text fx:id="messageCount"/>
+                         </children>
+                      </StackPane>
                     </children>
                 </HBox>
             </children>

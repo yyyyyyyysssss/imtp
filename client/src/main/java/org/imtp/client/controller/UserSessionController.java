@@ -175,6 +175,7 @@ public class UserSessionController extends AbstractController{
             listView.getItems().add(sessionEntity);
         }
         if (selected){
+            listView.getSelectionModel().clearSelection();
             listView.getSelectionModel().select(sessionEntity);
         }
         userSessionEntityMap.put(sessionEntity.getReceiverUserId(),sessionEntity);

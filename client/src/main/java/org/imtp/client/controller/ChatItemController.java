@@ -41,6 +41,21 @@ public class ChatItemController extends AbstractController{
 
     private ImageView imageView;
 
+    private static final Insets FIVE_BOTTOM = new Insets(0,0,5,0);
+
+    private static final Insets LEFT_INSETS = new Insets(0,0,0,10);
+
+    private static final Insets RIGHT_INSETS = new Insets(0,10,0,0);
+
+    private static final Insets RIGHT_INSETS_PADDING = new Insets(0,20,0,0);
+
+    private static final Insets CHAT_ITEM_LABEL_PADDING = new Insets(7,7,7,7);
+
+    private static final CornerRadii CORNER_RADII = new CornerRadii(5);
+
+    private static final Background BACKGROUND_LEFT = new Background(new BackgroundFill(Color.WHITE,CORNER_RADII,Insets.EMPTY));
+
+    private static final Background BACKGROUND_RIGHT = new Background(new BackgroundFill(Color.LIGHTGREEN,CORNER_RADII,Insets.EMPTY));
 
     @FXML
     public void initialize(){
@@ -61,38 +76,39 @@ public class ChatItemController extends AbstractController{
             Platform.runLater(() -> {
                 chatItemImageView.setImage(new Image(chatItemEntity.getAvatar()));
                 chatItemLabel.setText(chatItemEntity.getContent());
-                chatItemLabel.setPadding(new Insets(7,7,7,7));
+                chatItemLabel.setPadding(CHAT_ITEM_LABEL_PADDING);
                 ObservableList<Node> children = chatItemHBox.getChildren();
                 children.clear();
                 ObservableList<Node> chatItemVBoxChildren = chatItemVBox.getChildren();
                 chatItemVBoxChildren.clear();
-                CornerRadii cornerRadii = new CornerRadii(5);
+                ObservableList<Node> cd = chatItemLabelHBox.getChildren();
+                cd.clear();
                 if (!chatItemEntity.isSelf()){
-                    chatItemLabel.setBackground(new Background(new BackgroundFill(Color.WHITE,cornerRadii,Insets.EMPTY)));
-                    chatItemHBox.setPadding(new Insets(0,0,0,0));
+                    chatItemLabel.setBackground(BACKGROUND_LEFT);
+                    chatItemHBox.setPadding(Insets.EMPTY);
                     chatItemHBox.setAlignment(Pos.CENTER_LEFT);
                     if (chatItemEntity.getDeliveryMethod().equals(DeliveryMethod.GROUP)){
                         sendNameLabel.setText(chatItemEntity.getName());
                         chatItemVBoxChildren.addAll(sendNameLabel,chatItemLabelHBox);
+                        VBox.setMargin(sendNameLabel,FIVE_BOTTOM);
                     }else {
                         chatItemVBoxChildren.add(chatItemLabelHBox);
                     }
+                    cd.add(chatItemLabel);
                     children.add(chatItemImageView);
                     children.add(chatItemVBox);
-                    HBox.setMargin(chatItemVBox,new Insets(0,0,0,5));
+                    HBox.setMargin(chatItemVBox,LEFT_INSETS);
                 }else {
                     imageView.imageProperty().bind(chatItemEntity.imageProperty());
-                    chatItemHBox.setPadding(new Insets(0,20,0,0));
+                    chatItemHBox.setPadding(RIGHT_INSETS_PADDING);
                     chatItemHBox.setAlignment(Pos.CENTER_RIGHT);
-                    chatItemLabel.setBackground(new Background(new BackgroundFill(Color.LIGHTGREEN,cornerRadii,Insets.EMPTY)));
-                    ObservableList<Node> cd = chatItemLabelHBox.getChildren();
-                    cd.clear();
+                    chatItemLabel.setBackground(BACKGROUND_RIGHT);
                     cd.add(imageView);
                     cd.add(chatItemLabel);
                     chatItemVBoxChildren.add(chatItemLabelHBox);
                     children.add(chatItemVBox);
                     children.add(chatItemImageView);
-                    HBox.setMargin(chatItemVBox,new Insets(0,10,0,0));
+                    HBox.setMargin(chatItemVBox,RIGHT_INSETS);
                 }
             });
         }
