@@ -7,6 +7,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
+import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
@@ -76,7 +77,6 @@ public class ChatItemController extends AbstractController{
             Platform.runLater(() -> {
                 chatItemImageView.setImage(new Image(chatItemEntity.getAvatar()));
                 chatItemLabel.setText(chatItemEntity.getContent());
-                chatItemLabel.setPadding(CHAT_ITEM_LABEL_PADDING);
                 ObservableList<Node> children = chatItemHBox.getChildren();
                 children.clear();
                 ObservableList<Node> chatItemVBoxChildren = chatItemVBox.getChildren();
