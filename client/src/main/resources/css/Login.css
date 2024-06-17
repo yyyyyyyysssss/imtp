@@ -1,0 +1,11 @@
+.separator_default .line{
+    -fx-background-color: #404040;
+    -fx-pref-height: 2;
+    -fx-border-color: null ;
+}
+
+.separator_change .line{
+    -fx-background-color: red;
+    -fx-pref-height: 2;
+    -fx-border-color: null ;
+}

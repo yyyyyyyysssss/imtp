@@ -1,13 +1,19 @@
 package org.imtp.client.controller;
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.PasswordField;
+import javafx.scene.control.Separator;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.Text;
@@ -46,6 +52,12 @@ public class LoginController extends AbstractController{
     @FXML
     private Circle pic;
 
+    @FXML
+    private Separator uSeparator;
+
+    @FXML
+    private Separator pSeparator;
+
     private Client client;
 
     @FXML
@@ -60,6 +72,13 @@ public class LoginController extends AbstractController{
                 login();
             }
         });
+        username.textProperty().addListener((observableValue, s, t1) -> {
+            if (!t1.isEmpty()){
+                username.setStyle("-fx-background-color: transparent; -fx-border-color: #404040; -fx-border-width: 0px 0px 2px 0px;");
+                uSeparator.getStyleClass().removeAll("separator_change");
+                uSeparator.getStyleClass().add("separator_default");
+            }
+        });
 
         password.setTooltip(new Tooltip("请输入密码"));
         password.setOnKeyPressed(event -> {
@@ -67,7 +86,13 @@ public class LoginController extends AbstractController{
                 login();
             }
         });
-
+        password.textProperty().addListener((observableValue, s, t1) -> {
+            if (!t1.isEmpty()){
+                password.setStyle("-fx-background-color: transparent; -fx-border-color: #404040; -fx-border-width: 0px 0px 2px 0px;");
+                pSeparator.getStyleClass().removeAll("separator_change");
+                pSeparator.getStyleClass().add("separator_default");
+            }
+        });
     }
 
     @Override
@@ -79,8 +104,20 @@ public class LoginController extends AbstractController{
         String u = username.getText();
         String p = password.getText();
         log.info("u:{} p:{}",u,p);
-        if(u.isEmpty() || p.isEmpty()){
-            showErrMsg("用户名或密码为空");
+        if (u.isEmpty()){
+            showErrMsg("请输入用户名");
+            username.setStyle("-fx-background-color: transparent; -fx-border-color: red; -fx-border-width: 0px 0px 2px 0px;");
+            username.requestFocus();
+            uSeparator.getStyleClass().removeAll("separator_default");
+            uSeparator.getStyleClass().add("separator_change");
+            return;
+        }
+        if(p.isEmpty()){
+            showErrMsg("请输入密码");
+            password.setStyle("-fx-background-color: transparent; -fx-border-color: red; -fx-border-width: 0px 0px 2px 0px;");
+            password.requestFocus();
+            pSeparator.getStyleClass().removeAll("separator_default");
+            pSeparator.getStyleClass().add("separator_change");
             return;
         }
         if (client == null){
