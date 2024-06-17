@@ -11,6 +11,7 @@ import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.InputMethodEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.TextFlow;
@@ -133,9 +134,9 @@ public class ChatController extends AbstractController{
                     dialog.setY(Double.NaN);
                     dialog.close();
                 }else {
+                    dialog.show();
                     dialog.setX(500);
                     dialog.setY(100);
-                    dialog.show();
                 }
             }
         });

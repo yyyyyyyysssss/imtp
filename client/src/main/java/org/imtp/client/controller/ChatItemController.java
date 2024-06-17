@@ -50,8 +50,6 @@ public class ChatItemController extends AbstractController{
 
     private static final Insets RIGHT_INSETS_PADDING = new Insets(0,20,0,0);
 
-    private static final Insets CHAT_ITEM_LABEL_PADDING = new Insets(7,7,7,7);
-
     private static final CornerRadii CORNER_RADII = new CornerRadii(5);
 
     private static final Background BACKGROUND_LEFT = new Background(new BackgroundFill(Color.WHITE,CORNER_RADII,Insets.EMPTY));

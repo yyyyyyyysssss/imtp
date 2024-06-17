@@ -12,6 +12,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
+<?import javafx.scene.text.Text?>
 <StackPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="320.0" prefWidth="480.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.imtp.client.controller.LoginController">
    <children>
       <VBox alignment="CENTER" prefHeight="359.0" prefWidth="400.0" StackPane.alignment="CENTER">
@@ -46,11 +47,11 @@
                            <font>
                               <Font size="14.0" />
                            </font></Button>
-                        <TextField fx:id="errorMsg" editable="false" prefHeight="31.0" prefWidth="200.0" style="-fx-background-color: transparent; -fx-border-width: 0; -fx-text-fill: red;" visible="false" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                        <Text fx:id="errorMsg" style="-fx-background-color: transparent; -fx-border-width: 0; -fx-text-fill: red;" visible="false" GridPane.columnIndex="1" GridPane.rowIndex="3">
                            <font>
                               <Font size="14.0" />
                            </font>
-                        </TextField>
+                        </Text>
                      </children>
                   </GridPane>
                </children>
