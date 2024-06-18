@@ -34,6 +34,30 @@ public class ChatEmoteDialog extends Dialog<String> {
     @FXML
     private TableColumn<EmoteEntity, String> e4;
 
+    @FXML
+    private void initialize(){
+        chatEmoteTable.setFocusTraversable(false);
+        chatEmoteTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        chatEmoteTable.getSelectionModel().setCellSelectionEnabled(true);
+        chatEmoteTable.setOnMouseClicked(event -> {
+            if (event.getClickCount() >= 1) {
+                @SuppressWarnings("rawtypes")
+                TablePosition pos = chatEmoteTable.getSelectionModel().getSelectedCells().getFirst();
+                int row = pos.getRow();
+                @SuppressWarnings("rawtypes")
+                TableColumn column = pos.getTableColumn();
+                String val = column.getCellData(row).toString();
+                System.out.println("Selected Value, " + val);
+            }
+        });
+        //设置单元格工厂
+        e0.setCellValueFactory(cellData -> cellData.getValue().getEmoteAt(0));
+        e1.setCellValueFactory(cellData -> cellData.getValue().getEmoteAt(1));
+        e2.setCellValueFactory(cellData -> cellData.getValue().getEmoteAt(2));
+        e3.setCellValueFactory(cellData -> cellData.getValue().getEmoteAt(3));
+        e4.setCellValueFactory(cellData -> cellData.getValue().getEmoteAt(4));
+    }
+
     public ChatEmoteDialog() {
         FXMLLoader fxmlLoader = new FXMLLoader();
         fxmlLoader.setLocation(FXMLLoadUtils.loadUrlByFxmlPath(FXMLResourceConstant.CHAT_EMOTE_DIALOG_FML));
@@ -53,13 +77,6 @@ public class ChatEmoteDialog extends Dialog<String> {
     }
 
     private void initEmoteData() {
-        chatEmoteTable.setFocusTraversable(false);
-        chatEmoteTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-        e0.setCellValueFactory(cellData -> cellData.getValue().getEmoteAt(0));
-        e1.setCellValueFactory(cellData -> cellData.getValue().getEmoteAt(1));
-        e2.setCellValueFactory(cellData -> cellData.getValue().getEmoteAt(2));
-        e3.setCellValueFactory(cellData -> cellData.getValue().getEmoteAt(3));
-        e4.setCellValueFactory(cellData -> cellData.getValue().getEmoteAt(4));
         ObservableList<EmoteEntity> data = FXCollections.observableArrayList();
         String[][] emojis = {
                 {"\uD83D\uDE00", "\uD83D\uDE01", "\uD83D\uDE02", "\uD83E\uDD23", "\uD83D\uDE03"},

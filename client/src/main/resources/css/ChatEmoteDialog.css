@@ -1,5 +1,5 @@
 .table-view{
-    -fx-font-size: 24;
+    -fx-font-size: 25;
     -fx-background-color: #F5F5F5;
 }
 
@@ -9,6 +9,16 @@
 
 .table-view .table-cell{
     -fx-background-color: #F5F5F5;
+    -fx-border-width: 0px;
+    -fx-padding: 10px,10px,10px,10px;
+}
+
+.table-view .table-cell:hover{
+    -fx-background-color: lightgray;
+}
+
+.table-view .table-row-cell {
+
 }
 
 /*隐藏表头*/
