@@ -5,13 +5,16 @@
 <?import javafx.scene.control.TableView?>
 
 
-<DialogPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" prefWidth="500" prefHeight="450">
-   <content>
-      <TableView fx:id="chatEmoteTable" prefHeight="200.0" prefWidth="200.0">
-        <columns>
-          <TableColumn prefWidth="75.0" text="C1" />
-          <TableColumn prefWidth="75.0" text="C2" />
-        </columns>
-      </TableView>
-   </content>
+<DialogPane style="-fx-background-color: #F5F5F5" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" prefWidth="500" prefHeight="450" stylesheets="@../css/ChatEmoteDialog.css">
+    <content>
+        <TableView fx:id="chatEmoteTable" prefHeight="450.0" prefWidth="500.0">
+            <columns>
+                <TableColumn fx:id="e0" prefWidth="75.0"/>
+                <TableColumn fx:id="e1" prefWidth="75.0"/>
+                <TableColumn fx:id="e2" prefWidth="75.0"/>
+                <TableColumn fx:id="e3" prefWidth="75.0"/>
+                <TableColumn fx:id="e4" prefWidth="75.0"/>
+            </columns>
+        </TableView>
+    </content>
 </DialogPane>

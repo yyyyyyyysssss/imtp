@@ -28,12 +28,13 @@
                     </children>
                 </HBox>
                 <Region prefWidth="165.0" VBox.vgrow="ALWAYS" />
-                <HBox prefWidth="165.0">
+                <HBox prefWidth="165.0" alignment="BOTTOM_LEFT">
                     <children>
                         <Label fx:id="sendUserName" style="-fx-text-fill: Grey;">
-                     <HBox.margin>
-                        <Insets left="5.0" />
-                     </HBox.margin></Label>
+                         <HBox.margin>
+                            <Insets left="5.0" />
+                         </HBox.margin>
+                        </Label>
                         <Label fx:id="lastMsg" style="-fx-text-fill: Grey" maxWidth="80">
                             <padding>
                                 <Insets left="5.0" />

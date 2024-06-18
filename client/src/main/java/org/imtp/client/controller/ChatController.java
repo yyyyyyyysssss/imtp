@@ -7,6 +7,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.geometry.Point2D;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
@@ -15,6 +16,7 @@ import javafx.scene.input.InputMethodEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.TextFlow;
+import javafx.util.Duration;
 import lombok.extern.slf4j.Slf4j;
 import org.imtp.client.component.ClassPathImageUrlParse;
 import org.imtp.client.component.ImageUrlParse;
@@ -125,18 +127,22 @@ public class ChatController extends AbstractController{
         chatEmoteIcon.setOnMouseClicked(mouseEvent -> {
             if (dialog == null){
                 dialog = new ChatEmoteDialog();
-                dialog.setX(500);
-                dialog.setY(100);
+                Point2D point2D = chatEmoteIcon.localToScene(0.0, 0.0);
+                double x = point2D.getX()  + chatEmoteIcon.getScene().getX() + chatEmoteIcon.getScene().getWindow().getX() - 200;
+                double y = point2D.getY() + chatEmoteIcon.getScene().getY() + chatEmoteIcon.getScene().getWindow().getY() - 490;
+                dialog.setX(x);
+                dialog.setY(y);
                 dialog.show();
             }else {
                 if (dialog.isShowing()){
-                    dialog.setX(Double.NaN);
-                    dialog.setY(Double.NaN);
                     dialog.close();
                 }else {
                     dialog.show();
-                    dialog.setX(500);
-                    dialog.setY(100);
+                    Point2D point2D = chatEmoteIcon.localToScene(0.0, 0.0);
+                    double x = point2D.getX()  + chatEmoteIcon.getScene().getX() + chatEmoteIcon.getScene().getWindow().getX() - 200;
+                    double y = point2D.getY() + chatEmoteIcon.getScene().getY() + chatEmoteIcon.getScene().getWindow().getY() - 490;
+                    dialog.setX(x);
+                    dialog.setY(y);
                 }
             }
         });

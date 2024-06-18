@@ -102,7 +102,7 @@ public class UserSessionItemController extends AbstractController{
                     && !ClientContextHolder.clientContext().id().equals(sessionEntity.getLastSendMsgUserId())){
                 sendUserName.setText(sessionEntity.getLastUserName() + ":");
             }else {
-                sendUserName.setText("");
+                sendUserName.setText(null);
             }
             nameLabel.setText(sessionEntity.getName());
             timeLabel.setText("23:34");

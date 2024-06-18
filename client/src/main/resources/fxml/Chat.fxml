@@ -31,7 +31,7 @@
         </TextFlow>
         <HBox alignment="CENTER_RIGHT" prefHeight="30.0" prefWidth="670.0">
             <children>
-                <Button fx:id="sendButton" prefHeight="30.0" prefWidth="50" styleClass="send-button" text="发送">
+                <Button fx:id="sendButton" prefHeight="30.0" prefWidth="100" styleClass="send-button" text="发送">
                     <HBox.margin>
                         <Insets right="10.0" />
                     </HBox.margin>

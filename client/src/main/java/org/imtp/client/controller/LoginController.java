@@ -2,18 +2,13 @@ package org.imtp.client.controller;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.Separator;
-import javafx.scene.control.TextField;
-import javafx.scene.control.Tooltip;
+import javafx.geometry.Point2D;
+import javafx.scene.Node;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
-import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.Text;
@@ -21,7 +16,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.imtp.client.Client;
 import org.imtp.client.constant.FXMLResourceConstant;
 import org.imtp.client.constant.SendMessageListener;
-import org.imtp.client.context.ClientContextHolder;
 import org.imtp.client.handler.LoginHandler;
 import org.imtp.client.model.MessageModel;
 import org.imtp.client.util.ResourceUtils;
@@ -30,7 +24,6 @@ import org.imtp.common.packet.LoginResponse;
 import org.imtp.common.packet.body.LoginInfo;
 
 import java.net.URL;
-import java.security.Key;
 
 /**
  * @Description
@@ -39,6 +32,9 @@ import java.security.Key;
  */
 @Slf4j
 public class LoginController extends AbstractController{
+
+    @FXML
+    private BorderPane borderPaneTest;
 
     @FXML
     private TextField username;
@@ -53,6 +49,9 @@ public class LoginController extends AbstractController{
     private Circle pic;
 
     @FXML
+    private Button loginButton;
+
+    @FXML
     private Separator uSeparator;
 
     @FXML
@@ -60,37 +59,49 @@ public class LoginController extends AbstractController{
 
     private Client client;
 
+    private final Tooltip errorTip = new Tooltip();
+
     @FXML
     public void initialize(){
+
+        borderPaneTest.setOnMouseClicked(event -> {
+            errorTip.hide();
+        });
+
+
         URL passwordImageUrl = ResourceUtils.classPathResource("/img/tmp.jpg");
         Image passwordImageIcon = new Image(passwordImageUrl.toExternalForm());
         pic.setFill(new ImagePattern(passwordImageIcon));
 
-        username.setTooltip(new Tooltip("请输入账号"));
         username.setOnKeyPressed(event -> {
             if (event.getCode() == KeyCode.ENTER){
                 login();
             }
         });
+        username.setOnMouseClicked(event -> {
+            errorTip.hide();
+        });
         username.textProperty().addListener((observableValue, s, t1) -> {
             if (!t1.isEmpty()){
-                username.setStyle("-fx-background-color: transparent; -fx-border-color: #404040; -fx-border-width: 0px 0px 2px 0px;");
                 uSeparator.getStyleClass().removeAll("separator_change");
                 uSeparator.getStyleClass().add("separator_default");
+                errorTip.hide();
             }
         });
 
-        password.setTooltip(new Tooltip("请输入密码"));
         password.setOnKeyPressed(event -> {
             if (event.getCode() == KeyCode.ENTER){
                 login();
             }
         });
+        password.setOnMouseClicked(event -> {
+            errorTip.hide();
+        });
         password.textProperty().addListener((observableValue, s, t1) -> {
             if (!t1.isEmpty()){
-                password.setStyle("-fx-background-color: transparent; -fx-border-color: #404040; -fx-border-width: 0px 0px 2px 0px;");
                 pSeparator.getStyleClass().removeAll("separator_change");
                 pSeparator.getStyleClass().add("separator_default");
+                errorTip.hide();
             }
         });
     }
@@ -105,19 +116,17 @@ public class LoginController extends AbstractController{
         String p = password.getText();
         log.info("u:{} p:{}",u,p);
         if (u.isEmpty()){
-            showErrMsg("请输入用户名");
-            username.setStyle("-fx-background-color: transparent; -fx-border-color: red; -fx-border-width: 0px 0px 2px 0px;");
             username.requestFocus();
             uSeparator.getStyleClass().removeAll("separator_default");
             uSeparator.getStyleClass().add("separator_change");
+            showTooltip(username,"请输入账号后再登录");
             return;
         }
         if(p.isEmpty()){
-            showErrMsg("请输入密码");
-            password.setStyle("-fx-background-color: transparent; -fx-border-color: red; -fx-border-width: 0px 0px 2px 0px;");
             password.requestFocus();
             pSeparator.getStyleClass().removeAll("separator_default");
             pSeparator.getStyleClass().add("separator_change");
+            showTooltip(password,"请输入密码后再登录");
             return;
         }
         if (client == null){
@@ -165,6 +174,14 @@ public class LoginController extends AbstractController{
         errorMsg.setVisible(true);
         errorMsg.setLayoutX(layoutX);
         errorMsg.setLayoutY(layoutY);
+    }
+
+
+    private void showTooltip(Node node,String msg){
+        errorTip.setText(msg);
+        Point2D point2D = node.localToScene(0.0, 0.0);
+        errorTip.show(node,point2D.getX() + node.getScene().getX() + node.getScene().getWindow().getX(),
+                point2D.getY() + node.getScene().getY() + node.getScene().getWindow().getY() + 10);
     }
 
 }

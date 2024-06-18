@@ -1,3 +1,8 @@
+.up_default{
+    -fx-background-color: transparent;
+    -fx-border-width: 0px 0px 0px 0px;
+}
+
 .separator_default .line{
     -fx-background-color: #404040;
     -fx-pref-height: 2;
