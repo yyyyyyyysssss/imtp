@@ -3,28 +3,25 @@ package org.imtp.client.controller;
 
 import io.netty.channel.EventLoop;
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.Point2D;
-import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.InputMethodEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.TextFlow;
-import javafx.util.Duration;
 import lombok.extern.slf4j.Slf4j;
-import org.imtp.client.component.ClassPathImageUrlParse;
-import org.imtp.client.component.ImageUrlParse;
-import org.imtp.client.context.ClientContext;
 import org.imtp.client.context.ClientContextHolder;
-import org.imtp.client.context.DefaultClientUserChannelContext;
 import org.imtp.client.entity.ChatItemEntity;
 import org.imtp.client.entity.SessionEntity;
+import org.imtp.client.event.EmojiEvent;
 import org.imtp.client.event.UserSessionEvent;
 import org.imtp.client.idwork.IdGen;
 import org.imtp.client.util.ResourceUtils;
@@ -35,7 +32,6 @@ import org.imtp.common.packet.TextMessage;
 import org.imtp.common.packet.base.Packet;
 import org.imtp.common.packet.body.UserFriendInfo;
 import java.net.URL;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -77,7 +73,7 @@ public class ChatController extends AbstractController{
 
     private UserGroupController userGroupController;
 
-    private ChatEmoteDialog dialog;
+    private ChatEmojiDialog dialog;
 
     private Map<Long,RetryTask> retryTaskMap;
 
@@ -126,27 +122,20 @@ public class ChatController extends AbstractController{
 
         chatEmoteIcon.setOnMouseClicked(mouseEvent -> {
             if (dialog == null){
-                dialog = new ChatEmoteDialog();
-                Point2D point2D = chatEmoteIcon.localToScene(0.0, 0.0);
-                double x = point2D.getX()  + chatEmoteIcon.getScene().getX() + chatEmoteIcon.getScene().getWindow().getX() - 200;
-                double y = point2D.getY() + chatEmoteIcon.getScene().getY() + chatEmoteIcon.getScene().getWindow().getY() - 490;
-                dialog.setX(x);
-                dialog.setY(y);
-                dialog.show();
-            }else {
-                if (dialog.isShowing()){
+                dialog = new ChatEmojiDialog();
+                dialog.getDialogPane().addEventHandler(EmojiEvent.SELECTED, emojiEvent -> {
+                    System.out.println("Selected Value, " + emojiEvent.getEmojiValue());
                     dialog.close();
-                }else {
-                    dialog.show();
-                    Point2D point2D = chatEmoteIcon.localToScene(0.0, 0.0);
-                    double x = point2D.getX()  + chatEmoteIcon.getScene().getX() + chatEmoteIcon.getScene().getWindow().getX() - 200;
-                    double y = point2D.getY() + chatEmoteIcon.getScene().getY() + chatEmoteIcon.getScene().getWindow().getY() - 490;
-                    dialog.setX(x);
-                    dialog.setY(y);
-                }
+                });
+                chatVbox.getScene().addEventFilter(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
+                    @Override
+                    public void handle(MouseEvent mouseEvent) {
+                        dialog.close();
+                    }
+                });
             }
+            dialog.showEmojiPane(chatEmoteIcon);
         });
-
     }
 
     @Override
@@ -173,7 +162,6 @@ public class ChatController extends AbstractController{
     private void sendTextMessage(){
         String text = inputText.getText();
         if (text.isEmpty()){
-            inputText.clear();
             return;
         }
         Long ackId = IdGen.genId();

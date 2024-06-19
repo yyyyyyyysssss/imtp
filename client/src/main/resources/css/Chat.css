@@ -26,9 +26,13 @@
 }
 
 .send-button{
-    -fx-background-color: #00AC6A;
+    -fx-background-color: #E9E9E9;
     -fx-font-size: 14px;
-    -fx-text-fill: white;
+    -fx-text-fill: #07C160;
+}
+
+.send-button:hover{
+    -fx-background-color: #D2D2D2;
 }
 
 .text-area {
@@ -53,4 +57,27 @@
     -fx-padding: 10px;
     -fx-text-fill: gray;
     -fx-highlight-fill: #7ecfff;
+}
+
+
+/*隐藏滚动条*/
+.text-area .scroll-bar:vertical{
+    -fx-scale-x: 0;
+}
+.text-area .scroll-bar:horizontal{
+    -fx-scale-x: 0;
+}
+
+.text-area .scroll-bar:horizontal .increment-arrow,
+.text-area .scroll-bar:horizontal .decrement-arrow,
+.text-area .scroll-bar:horizontal .increment-button,
+.text-area .scroll-bar:horizontal .decrement-button {
+    -fx-padding:0;
+}
+
+.text-area .scroll-bar:vertical .increment-arrow,
+.text-area .scroll-bar:vertical .decrement-arrow,
+.text-area .scroll-bar:vertical .increment-button,
+.text-area .scroll-bar:vertical .decrement-button {
+    -fx-padding:0;
 }

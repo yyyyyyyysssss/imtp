@@ -28,6 +28,6 @@ public interface FXMLResourceConstant {
 
     String CHAT_ITEM_FML = BASE + "/ChatItem.fxml";
 
-    String CHAT_EMOTE_DIALOG_FML = BASE + "/ChatEmoteDialog.fxml";
+    String CHAT_EMOTE_DIALOG_FML = BASE + "/ChatEmojiDialog.fxml";
 
 }

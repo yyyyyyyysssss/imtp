@@ -1,13 +1,13 @@
 package org.imtp.client.controller;
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.Point2D;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Circle;
@@ -34,7 +34,7 @@ import java.net.URL;
 public class LoginController extends AbstractController{
 
     @FXML
-    private BorderPane borderPaneTest;
+    private BorderPane loginBorderPane;
 
     @FXML
     private TextField username;
@@ -63,11 +63,12 @@ public class LoginController extends AbstractController{
 
     @FXML
     public void initialize(){
-
-        borderPaneTest.setOnMouseClicked(event -> {
-            errorTip.hide();
+        loginBorderPane.addEventFilter(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent mouseEvent) {
+                errorTip.hide();
+            }
         });
-
 
         URL passwordImageUrl = ResourceUtils.classPathResource("/img/tmp.jpg");
         Image passwordImageIcon = new Image(passwordImageUrl.toExternalForm());
@@ -78,14 +79,11 @@ public class LoginController extends AbstractController{
                 login();
             }
         });
-        username.setOnMouseClicked(event -> {
-            errorTip.hide();
-        });
+
         username.textProperty().addListener((observableValue, s, t1) -> {
             if (!t1.isEmpty()){
                 uSeparator.getStyleClass().removeAll("separator_change");
                 uSeparator.getStyleClass().add("separator_default");
-                errorTip.hide();
             }
         });
 
@@ -94,14 +92,10 @@ public class LoginController extends AbstractController{
                 login();
             }
         });
-        password.setOnMouseClicked(event -> {
-            errorTip.hide();
-        });
         password.textProperty().addListener((observableValue, s, t1) -> {
             if (!t1.isEmpty()){
                 pSeparator.getStyleClass().removeAll("separator_change");
                 pSeparator.getStyleClass().add("separator_default");
-                errorTip.hide();
             }
         });
     }

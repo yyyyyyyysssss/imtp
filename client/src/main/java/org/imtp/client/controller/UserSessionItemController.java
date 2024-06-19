@@ -59,6 +59,7 @@ public class UserSessionItemController extends AbstractController{
         alertCircle.setStrokeType(StrokeType.INSIDE);
         alertCircle.setFill(Color.RED);
         alertCircle.relocate(0, 0);
+        alertCircle.setVisible(false);
 
         messageCount.setBoundsType(TextBoundsType.VISUAL);
         double W = messageCount.getBoundsInLocal().getWidth();
@@ -110,6 +111,8 @@ public class UserSessionItemController extends AbstractController{
             messageCount.textProperty().bind(sessionEntity.countProperty());
             if (sessionEntity.getCount() == null || sessionEntity.getCount().isEmpty()){
                 alertCircle.setVisible(false);
+            }else {
+                alertCircle.setVisible(true);
             }
         });
     }
