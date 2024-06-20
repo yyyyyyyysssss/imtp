@@ -10,6 +10,7 @@ import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.Point2D;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
@@ -17,6 +18,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.TextFlow;
+import javafx.stage.Window;
 import lombok.extern.slf4j.Slf4j;
 import org.imtp.client.context.ClientContextHolder;
 import org.imtp.client.entity.ChatItemEntity;
@@ -56,9 +58,6 @@ public class ChatController extends AbstractController{
     private TextFlow inputTextFlow;
 
     @FXML
-    private TextArea inputText;
-
-    @FXML
     private Button sendButton;
 
     private SessionEntity sessionEntity;
@@ -95,27 +94,11 @@ public class ChatController extends AbstractController{
         ackChatItemEntityMap = new ConcurrentHashMap<>();
         retryTaskMap = new ConcurrentHashMap<>();
 
-        inputText.setWrapText(true);
-        inputText.setOnKeyPressed(keyEvent -> {
-            switch (keyEvent.getCode()){
-                case ENTER :
-                    int caretPosition = inputText.getCaretPosition();
-                    keyEvent.consume();
-                    if(keyEvent.isShiftDown()){
-                        inputText.appendText(System.lineSeparator());
-                    }else {
-                        //去除末尾的换行符
-                        String text = inputText.getText();
-                        text =  text.substring(0,caretPosition-1);
-                        inputText.setText(text);
-                        sendTextMessage();
-                    }
-                    break;
-            }
-        });
+        TextArea textArea = createTextArea();
+        inputTextFlow.getChildren().add(textArea);
 
         sendButton.setOnMouseClicked(mouseEvent -> {
-            sendTextMessage();
+            sendMessage();
         });
         chatListView.setCellFactory(c -> new ChatItemListCell());
         chatListView.setFocusTraversable(false);
@@ -125,8 +108,14 @@ public class ChatController extends AbstractController{
                 dialog = new ChatEmojiDialog();
                 dialog.getDialogPane().addEventHandler(EmojiEvent.SELECTED, emojiEvent -> {
                     System.out.println("Selected Value, " + emojiEvent.getEmojiValue());
+                    ObservableList<Node> children = inputTextFlow.getChildren();
+                    TextArea inputText = (TextArea)children.getLast();
+                    int caretPosition = inputText.getCaretPosition();
+                    inputText.insertText(caretPosition,emojiEvent.getEmojiValue());
                     dialog.close();
                 });
+                Window window = chatVbox.getScene().getWindow();
+                dialog.initOwner(window);
                 chatVbox.getScene().addEventFilter(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
                     @Override
                     public void handle(MouseEvent mouseEvent) {
@@ -143,14 +132,6 @@ public class ChatController extends AbstractController{
 
     }
 
-    public void setUserFriendController(UserFriendController userFriendController) {
-        this.userFriendController = userFriendController;
-    }
-
-    public void setUserGroupController(UserGroupController userGroupController) {
-        this.userGroupController = userGroupController;
-    }
-
     @Override
     public void initData(Object object) {
         this.sessionEntity = (SessionEntity) object;
@@ -159,34 +140,67 @@ public class ChatController extends AbstractController{
         }
     }
 
-    private void sendTextMessage(){
+    private TextArea createTextArea(){
+        TextArea textArea = new TextArea();
+        textArea.setWrapText(true);
+        textArea.setOnKeyPressed(keyEvent -> {
+            switch (keyEvent.getCode()){
+                case ENTER :
+                    int caretPosition = textArea.getCaretPosition();
+                    keyEvent.consume();
+                    if(keyEvent.isShiftDown()){
+                        textArea.appendText(System.lineSeparator());
+                    }else {
+                        //去除末尾的换行符
+                        String text = textArea.getText();
+                        text =  text.substring(0,caretPosition-1);
+                        textArea.setText(text);
+                        sendMessage();
+                    }
+                    break;
+            }
+        });
+        return textArea;
+    }
+
+    private void sendMessage(){
+        ObservableList<Node> children = inputTextFlow.getChildren();
+        TextArea inputText = (TextArea)children.getFirst();
         String text = inputText.getText();
         if (text.isEmpty()){
             return;
         }
-        Long ackId = IdGen.genId();
-        Packet packet;
-        if (sessionEntity.getDeliveryMethod().equals(DeliveryMethod.SINGLE)){
-            packet = new TextMessage(text, ClientContextHolder.clientContext().id(), sessionEntity.getReceiverUserId(),ackId);
-        }else {
-            packet = new TextMessage(text, ClientContextHolder.clientContext().id(), sessionEntity.getReceiverUserId(),ackId,true);
-        }
+        inputText.clear();
+        sendMessage(text,MessageType.TEXT_MESSAGE);
+    }
+
+    private void sendMessage(Object object,MessageType messageType){
+        sessionEntity.setLastSendMsgUserId(ClientContextHolder.clientContext().id());
         ChatItemEntity selfChatItemEntity = ChatItemEntity.createSelfChatItemEntity();
-        selfChatItemEntity.setContent(text);
-        selfChatItemEntity.setMessageType(MessageType.findMessageTypeByValue((int) packet.getCommand().getCmdCode()));
+        Long ackId = IdGen.genId();
+        Packet packet = null;
+        switch (messageType){
+            case TEXT_MESSAGE :
+                String message = (String) object;
+                if (sessionEntity.getDeliveryMethod().equals(DeliveryMethod.SINGLE)){
+                    packet = new TextMessage(message, ClientContextHolder.clientContext().id(), sessionEntity.getReceiverUserId(),ackId);
+                }else {
+                    packet = new TextMessage(message, ClientContextHolder.clientContext().id(), sessionEntity.getReceiverUserId(),ackId,true);
+                }
+                sessionEntity.setLastMsgType(messageType);
+                sessionEntity.setLastMsg(message);
+                selfChatItemEntity.setContent(message);
+                selfChatItemEntity.setMessageType(messageType);
+                break;
+        }
         addChatItem(selfChatItemEntity);
         selfChatItemEntity.setImage(sendingImage);
-
         ackChatItemEntityMap.put(ackId,selfChatItemEntity);
-
-        sessionEntity.setLastSendMsgUserId(ClientContextHolder.clientContext().id());
-        sessionEntity.setLastMsgType(MessageType.TEXT_MESSAGE);
-        sessionEntity.setLastMsg(text);
+        //联动会话框
         chatVbox.fireEvent(new UserSessionEvent(UserSessionEvent.SEND_MESSAGE,sessionEntity));
+        //发送消息
         send(packet);
-
-        inputText.clear();
-
+        //异步等待消息回执
         EventLoop eventLoop = ClientContextHolder.clientContext().channel().eventLoop();
         RetryTask retryTask = new RetryTask();
         retryTask.setScheduledFuture(eventLoop.schedule(() -> {
@@ -274,6 +288,15 @@ public class ChatController extends AbstractController{
             items.addLast(chatItemEntity);
             chatListView.scrollTo(index);
         });
+    }
+
+
+    public void setUserFriendController(UserFriendController userFriendController) {
+        this.userFriendController = userFriendController;
+    }
+
+    public void setUserGroupController(UserGroupController userGroupController) {
+        this.userGroupController = userGroupController;
     }
 
 }

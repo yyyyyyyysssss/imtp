@@ -78,7 +78,6 @@ public abstract class AbstractController implements Controller, Observer {
                             EventLoop eventLoop = ClientContextHolder.clientContext().channel().eventLoop();
                             rt.setScheduledFuture(eventLoop.scheduleAtFixedRate(() -> {
                                 rt.incrementRetryCount();
-                                System.out.println("执行");
                                 send(packet,this);
                                 if (rt.isComplete()){
                                     rt.cancel();
