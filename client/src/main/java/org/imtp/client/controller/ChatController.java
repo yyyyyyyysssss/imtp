@@ -16,6 +16,7 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.TextFlow;
 import javafx.stage.Window;
@@ -27,6 +28,7 @@ import org.imtp.client.event.EmojiEvent;
 import org.imtp.client.event.UserSessionEvent;
 import org.imtp.client.idwork.IdGen;
 import org.imtp.client.util.ResourceUtils;
+import org.imtp.client.util.TextUtils;
 import org.imtp.common.enums.DeliveryMethod;
 import org.imtp.common.enums.MessageType;
 import org.imtp.common.packet.MessageStateResponse;
@@ -56,6 +58,9 @@ public class ChatController extends AbstractController{
 
     @FXML
     private TextFlow inputTextFlow;
+
+    @FXML
+    private TextField testText;
 
     @FXML
     private Button sendButton;
@@ -107,9 +112,8 @@ public class ChatController extends AbstractController{
             if (dialog == null){
                 dialog = new ChatEmojiDialog();
                 dialog.getDialogPane().addEventHandler(EmojiEvent.SELECTED, emojiEvent -> {
-                    System.out.println("Selected Value, " + emojiEvent.getEmojiValue());
                     ObservableList<Node> children = inputTextFlow.getChildren();
-                    TextArea inputText = (TextArea)children.getLast();
+                    TextInputControl inputText = (TextInputControl)children.getLast();
                     int caretPosition = inputText.getCaretPosition();
                     inputText.insertText(caretPosition,emojiEvent.getEmojiValue());
                     dialog.close();
@@ -143,6 +147,8 @@ public class ChatController extends AbstractController{
     private TextArea createTextArea(){
         TextArea textArea = new TextArea();
         textArea.setWrapText(true);
+        textArea.setMaxHeight(inputTextFlow.getPrefHeight());
+        textArea.setMaxWidth(inputTextFlow.getPrefWidth());
         textArea.setOnKeyPressed(keyEvent -> {
             switch (keyEvent.getCode()){
                 case ENTER :
@@ -165,7 +171,7 @@ public class ChatController extends AbstractController{
 
     private void sendMessage(){
         ObservableList<Node> children = inputTextFlow.getChildren();
-        TextArea inputText = (TextArea)children.getFirst();
+        TextInputControl inputText = (TextInputControl)children.getFirst();
         String text = inputText.getText();
         if (text.isEmpty()){
             return;

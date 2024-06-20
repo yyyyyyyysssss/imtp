@@ -99,12 +99,12 @@ public class ChatEmojiDialog extends Dialog<String> {
         if (this.isShowing()){
             this.close();
         }
-        this.show();
         Point2D point2D = node.localToScene(0.0, 0.0);
         double x = point2D.getX()  + node.getScene().getX() + node.getScene().getWindow().getX() - 200;
         double y = point2D.getY() + node.getScene().getY() + node.getScene().getWindow().getY() - 490;
         this.setX(x);
         this.setY(y);
+        this.show();
     }
 
 }
