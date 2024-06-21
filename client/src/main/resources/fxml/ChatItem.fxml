@@ -4,14 +4,15 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.TextFlow?>
 <HBox fx:id="chatItemHBox" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="670" stylesheets="@../css/ChatItem.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.imtp.client.controller.ChatItemController">
    <children>
       <ImageView fx:id="chatItemImageView" fitHeight="40.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true" />
       <VBox fx:id="chatItemVBox" alignment="CENTER_LEFT">
          <Label fx:id="sendNameLabel" />
-         <HBox fx:id="chatItemLabelHBox" alignment="CENTER_LEFT" spacing="5">
+         <HBox fx:id="chatItemLabelHBox" maxWidth="400" alignment="CENTER_LEFT" spacing="5">
             <children>
-               <Label fx:id="chatItemLabel" maxWidth="400" wrapText="true" />
+               <TextFlow fx:id="chatItemTextFlow" maxWidth="400"/>
             </children>
          </HBox>
       </VBox>

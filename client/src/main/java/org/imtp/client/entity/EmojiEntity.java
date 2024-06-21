@@ -5,14 +5,14 @@ package org.imtp.client.entity;
  * @Author ys
  * @Date 2024/6/21 14:37
  */
-public class Emoji {
+public class EmojiEntity {
 
 
-    public Emoji(String unicode){
+    public EmojiEntity(String unicode){
         this(null,unicode,null,0);
     }
 
-    public Emoji(String shortname,String unicode,String desc,int order){
+    public EmojiEntity(String shortname, String unicode, String desc, int order){
         this.shortname = shortname;
         this.unicode = unicode;
         this.desc = desc;

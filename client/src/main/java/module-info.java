@@ -32,6 +32,8 @@ module client{
     requires io.netty.codec.smtp;
     requires io.netty.codec.socks;
     requires io.netty.codec.stomp;
+    requires com.gluonhq.emoji;
+    requires com.gluonhq.richtextarea;
 
     exports org.imtp.client;
     exports org.imtp.client.component;

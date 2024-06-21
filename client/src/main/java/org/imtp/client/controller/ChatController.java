@@ -1,6 +1,10 @@
 package org.imtp.client.controller;
 
 
+import com.gluonhq.emoji.Emoji;
+import com.gluonhq.emoji.EmojiData;
+import com.gluonhq.emoji.util.TextUtils;
+import com.gluonhq.richtextarea.RichTextArea;
 import io.netty.channel.EventLoop;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
@@ -30,7 +34,6 @@ import org.imtp.client.event.EmojiEvent;
 import org.imtp.client.event.UserSessionEvent;
 import org.imtp.client.idwork.IdGen;
 import org.imtp.client.util.ResourceUtils;
-import org.imtp.client.util.TextUtils;
 import org.imtp.common.enums.DeliveryMethod;
 import org.imtp.common.enums.MessageType;
 import org.imtp.common.packet.MessageStateResponse;
@@ -40,6 +43,7 @@ import org.imtp.common.packet.body.UserFriendInfo;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
@@ -109,7 +113,6 @@ public class ChatController extends AbstractController{
         });
         chatListView.setCellFactory(c -> new ChatItemListCell());
         chatListView.setFocusTraversable(false);
-
         chatEmoteIcon.setOnMouseClicked(mouseEvent -> {
             if (dialog == null){
                 dialog = new ChatEmojiDialog();
@@ -150,6 +153,13 @@ public class ChatController extends AbstractController{
         TextField textField = new AutoResizeTextFiled();
         textField.setPrefColumnCount(1);
         return textField;
+    }
+
+    private RichTextArea createRichTextArea(){
+        RichTextArea richTextArea = new RichTextArea();
+        richTextArea.setPrefHeight(inputTextFlow.getPrefHeight());
+        richTextArea.setPrefWidth(inputTextFlow.getPrefWidth());
+        return richTextArea;
     }
 
     private TextArea createTextArea(){

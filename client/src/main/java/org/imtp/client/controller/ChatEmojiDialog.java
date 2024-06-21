@@ -9,7 +9,7 @@ import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.stage.Modality;
 import org.imtp.client.constant.FXMLResourceConstant;
-import org.imtp.client.entity.Emoji;
+import org.imtp.client.entity.EmojiEntity;
 import org.imtp.client.entity.EmojiRowEntity;
 import org.imtp.client.util.FXMLLoadUtils;
 
@@ -27,15 +27,15 @@ public class ChatEmojiDialog extends Dialog<String> {
     @FXML
     private TableView<EmojiRowEntity> chatEmoteTable;
     @FXML
-    private TableColumn<EmojiRowEntity, Emoji> e0;
+    private TableColumn<EmojiRowEntity, EmojiEntity> e0;
     @FXML
-    private TableColumn<EmojiRowEntity, Emoji> e1;
+    private TableColumn<EmojiRowEntity, EmojiEntity> e1;
     @FXML
-    private TableColumn<EmojiRowEntity, Emoji> e2;
+    private TableColumn<EmojiRowEntity, EmojiEntity> e2;
     @FXML
-    private TableColumn<EmojiRowEntity, Emoji> e3;
+    private TableColumn<EmojiRowEntity, EmojiEntity> e3;
     @FXML
-    private TableColumn<EmojiRowEntity, Emoji> e4;
+    private TableColumn<EmojiRowEntity, EmojiEntity> e4;
 
     private static final String[][] EMOJIS = {
             {"\uD83D\uDE00", "\uD83D\uDE01", "\uD83D\uDE02", "\uD83E\uDD23", "\uD83D\uDE03"},

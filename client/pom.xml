@@ -54,7 +54,17 @@
             <version>${javafx.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.gluonhq</groupId>
+            <artifactId>emoji</artifactId>
+            <version>1.0.1</version>
+        </dependency>
 
+        <dependency>
+            <groupId>com.gluonhq</groupId>
+            <artifactId>rich-text-area</artifactId>
+            <version>1.1.3</version>
+        </dependency>
 
 
         <dependency>
@@ -147,6 +157,7 @@
                         <list>org.imtp.client.controller.UserGroupController</list>
                         <list>org.imtp.client.controller.UserGroupDetailsController</list>
                         <list>org.imtp.client.controller.UserGroupItemController</list>
+                        <list>org.imtp.client.controller.ChatEmojiDialog</list>
                     </reflectionList>
                     <bundlesList>
                         <list>com.sun.glass.ui.win</list>
