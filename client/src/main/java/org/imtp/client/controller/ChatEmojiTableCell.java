@@ -2,7 +2,8 @@ package org.imtp.client.controller;
 
 import javafx.scene.control.DialogPane;
 import javafx.scene.control.TableCell;
-import org.imtp.client.entity.EmoteEntity;
+import org.imtp.client.entity.Emoji;
+import org.imtp.client.entity.EmojiRowEntity;
 import org.imtp.client.event.EmojiEvent;
 
 /**
@@ -10,7 +11,7 @@ import org.imtp.client.event.EmojiEvent;
  * @Author ys
  * @Date 2024/6/19 13:56
  */
-public class ChatEmojiTableCell extends TableCell<EmoteEntity,String>{
+public class ChatEmojiTableCell extends TableCell<EmojiRowEntity, Emoji>{
 
     private DialogPane dialogPane;
 
@@ -23,13 +24,13 @@ public class ChatEmojiTableCell extends TableCell<EmoteEntity,String>{
     }
 
     @Override
-    protected void updateItem(String s, boolean b) {
-        super.updateItem(s, b);
-        if (b || s ==null){
+    protected void updateItem(Emoji emoji, boolean b) {
+        super.updateItem(emoji, b);
+        if (b || emoji ==null){
             setGraphic(null);
             setText(null);
         }else {
-            setText(s);
+            setText(emoji.getUnicode());
         }
     }
 }

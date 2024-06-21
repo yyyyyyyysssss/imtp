@@ -9,9 +9,10 @@ import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.stage.Modality;
 import org.imtp.client.constant.FXMLResourceConstant;
-import org.imtp.client.entity.EmoteEntity;
-import org.imtp.client.event.EmojiEvent;
+import org.imtp.client.entity.Emoji;
+import org.imtp.client.entity.EmojiRowEntity;
 import org.imtp.client.util.FXMLLoadUtils;
+
 import java.io.IOException;
 
 /**
@@ -24,17 +25,17 @@ public class ChatEmojiDialog extends Dialog<String> {
     @FXML
     private DialogPane emojiDialogPane;
     @FXML
-    private TableView<EmoteEntity> chatEmoteTable;
+    private TableView<EmojiRowEntity> chatEmoteTable;
     @FXML
-    private TableColumn<EmoteEntity, String> e0;
+    private TableColumn<EmojiRowEntity, Emoji> e0;
     @FXML
-    private TableColumn<EmoteEntity, String> e1;
+    private TableColumn<EmojiRowEntity, Emoji> e1;
     @FXML
-    private TableColumn<EmoteEntity, String> e2;
+    private TableColumn<EmojiRowEntity, Emoji> e2;
     @FXML
-    private TableColumn<EmoteEntity, String> e3;
+    private TableColumn<EmojiRowEntity, Emoji> e3;
     @FXML
-    private TableColumn<EmoteEntity, String> e4;
+    private TableColumn<EmojiRowEntity, Emoji> e4;
 
     private static final String[][] EMOJIS = {
             {"\uD83D\uDE00", "\uD83D\uDE01", "\uD83D\uDE02", "\uD83E\uDD23", "\uD83D\uDE03"},
@@ -59,11 +60,11 @@ public class ChatEmojiDialog extends Dialog<String> {
         e3.setCellFactory(cellFactory -> new ChatEmojiTableCell(emojiDialogPane));
         e4.setCellFactory(cellFactory -> new ChatEmojiTableCell(emojiDialogPane));
         //设置单元格工厂
-        e0.setCellValueFactory(cellData -> cellData.getValue().getEmoteAt(0));
-        e1.setCellValueFactory(cellData -> cellData.getValue().getEmoteAt(1));
-        e2.setCellValueFactory(cellData -> cellData.getValue().getEmoteAt(2));
-        e3.setCellValueFactory(cellData -> cellData.getValue().getEmoteAt(3));
-        e4.setCellValueFactory(cellData -> cellData.getValue().getEmoteAt(4));
+        e0.setCellValueFactory(cellData -> cellData.getValue().var1Property());
+        e1.setCellValueFactory(cellData -> cellData.getValue().var2Property());
+        e2.setCellValueFactory(cellData -> cellData.getValue().var3Property());
+        e3.setCellValueFactory(cellData -> cellData.getValue().var4Property());
+        e4.setCellValueFactory(cellData -> cellData.getValue().var5Property());
     }
 
     public ChatEmojiDialog() {
@@ -85,10 +86,10 @@ public class ChatEmojiDialog extends Dialog<String> {
     }
 
     private void initEmoteData() {
-        ObservableList<EmoteEntity> data = FXCollections.observableArrayList();
+        ObservableList<EmojiRowEntity> data = FXCollections.observableArrayList();
         for (int i = 0; i < EMOJIS.length; i++) {
             String[] e = EMOJIS[i];
-            EmoteEntity emoteEntity = new EmoteEntity(e);
+            EmojiRowEntity emoteEntity = new EmojiRowEntity(e[0],e[1],e[2],e[3],e[4]);
             data.add(emoteEntity);
         }
         chatEmoteTable.setItems(data);

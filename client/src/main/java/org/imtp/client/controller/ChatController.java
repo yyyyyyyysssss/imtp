@@ -13,6 +13,7 @@ import javafx.geometry.Point2D;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.skin.TextFieldSkin;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
@@ -21,6 +22,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.TextFlow;
 import javafx.stage.Window;
 import lombok.extern.slf4j.Slf4j;
+import org.imtp.client.component.AutoResizeTextFiled;
 import org.imtp.client.context.ClientContextHolder;
 import org.imtp.client.entity.ChatItemEntity;
 import org.imtp.client.entity.SessionEntity;
@@ -99,8 +101,8 @@ public class ChatController extends AbstractController{
         ackChatItemEntityMap = new ConcurrentHashMap<>();
         retryTaskMap = new ConcurrentHashMap<>();
 
-        TextArea textArea = createTextArea();
-        inputTextFlow.getChildren().add(textArea);
+        TextInputControl textInput = createTextArea();
+        inputTextFlow.getChildren().add(textInput);
 
         sendButton.setOnMouseClicked(mouseEvent -> {
             sendMessage();
@@ -142,6 +144,12 @@ public class ChatController extends AbstractController{
         if (sessionEntity != null && sessionEntity.getLastMsg() != null){
             addChatItem(sessionEntity);
         }
+    }
+
+    private TextField createTextField(){
+        TextField textField = new AutoResizeTextFiled();
+        textField.setPrefColumnCount(1);
+        return textField;
     }
 
     private TextArea createTextArea(){
