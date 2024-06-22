@@ -29,7 +29,7 @@
 }
 
 
-/*隐藏滚动条*/
+/*隐藏水平滚动条*/
 .table-view .scroll-bar:horizontal{
     -fx-scale-x: 0;
 }
@@ -45,6 +45,7 @@
 /*    -fx-scale-x: 0;*/
 /*}*/
 
+/*垂直滚动条样式*/
 .table-view .scroll-bar:vertical .increment-button,
 .table-view .scroll-bar:vertical .decrement-button {
     -fx-background-color :transparent;
