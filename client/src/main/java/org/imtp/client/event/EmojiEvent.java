@@ -1,5 +1,6 @@
 package org.imtp.client.event;
 
+import com.gluonhq.emoji.Emoji;
 import javafx.event.Event;
 import javafx.event.EventType;
 
@@ -10,16 +11,16 @@ import javafx.event.EventType;
  */
 public class EmojiEvent extends Event {
 
-    private String emojiValue;
+    private Emoji emoji;
 
     public static final EventType<EmojiEvent> SELECTED = new EventType<>(ANY,"SELECTED");
 
-    public EmojiEvent(EventType<? extends Event> eventType,String emojiValue) {
+    public EmojiEvent(EventType<? extends Event> eventType,Emoji emoji) {
         super(eventType);
-        this.emojiValue = emojiValue;
+        this.emoji = emoji;
     }
 
-    public String getEmojiValue() {
-        return emojiValue;
+    public Emoji getEmoji() {
+        return emoji;
     }
 }

@@ -26,6 +26,17 @@
     -fx-background-color: lightgrey;
 }
 
+.user-session-listview{
+    -fx-background-color: #F5F5F5;
+    -fx-border-color: lightgrey;
+}
+
+.user-session-listview .list-cell{
+    -fx-background-color: #F5F5F5;
+    -fx-padding: 10px;
+    -fx-border-color: #F5F5F5;
+}
+
 .user-session-listview .list-cell:odd{
     -fx-background-color: #F5F5F5;
     -fx-padding: 10px;

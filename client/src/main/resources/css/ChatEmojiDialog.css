@@ -1,3 +1,7 @@
+.dialog-pane .content {
+    -fx-padding: 0,0,0,0;
+}
+
 .table-view{
     -fx-font-size: 25;
     -fx-background-color: #F5F5F5;
@@ -17,10 +21,6 @@
     -fx-background-color: lightgray;
 }
 
-.table-view .table-row-cell {
-
-}
-
 /*隐藏表头*/
 .table-view .column-header-background {
     -fx-max-height: 0;
@@ -30,9 +30,6 @@
 
 
 /*隐藏滚动条*/
-.table-view .scroll-bar:vertical{
-    -fx-scale-x: 0;
-}
 .table-view .scroll-bar:horizontal{
     -fx-scale-x: 0;
 }
@@ -44,9 +41,38 @@
     -fx-padding:0;
 }
 
-.table-view .scroll-bar:vertical .increment-arrow,
-.table-view .scroll-bar:vertical .decrement-arrow,
+/*.table-view .scroll-bar:vertical{*/
+/*    -fx-scale-x: 0;*/
+/*}*/
+
 .table-view .scroll-bar:vertical .increment-button,
 .table-view .scroll-bar:vertical .decrement-button {
-    -fx-padding:0;
+    -fx-background-color :transparent;
+    -fx-background-radius : 0.0em;
+    -fx-padding :0.0 1.0 0.0 0.0;
+}
+
+.table-view .scroll-bar:vertical .increment-arrow,
+.table-view .scroll-bar:vertical .decrement-arrow{
+    -fx-shape : " ";
+    -fx-padding :0.0 0.15em;
+}
+
+.table-view .scroll-bar:vertical .track{
+    -fx-background-color :#F5F5F5;
+    -fx-border-color :transparent;
+    -fx-background-radius : 0.0em;
+    -fx-border-radius :2.0em;
+}
+
+.table-view .scroll-bar:vertical .thumb {
+    -fx-background-color :derive(black,90.0%);
+    -fx-background-insets : 2.0, 0.0, 0.0;
+    -fx-background-radius : 2.0em;
+}
+
+.table-view .scroll-bar:vertical .thumb:hover {
+    -fx-background-color :derive(#4D4C4F,10.0%);
+    -fx-background-insets : 2.0, 0.0, 0.0;
+    -fx-background-radius : 2.0em;
 }

@@ -120,7 +120,8 @@ public class ChatController extends AbstractController{
                     ObservableList<Node> children = inputTextFlow.getChildren();
                     TextInputControl inputText = (TextInputControl)children.getLast();
                     int caretPosition = inputText.getCaretPosition();
-                    inputText.insertText(caretPosition,emojiEvent.getEmojiValue());
+                    Emoji emoji = emojiEvent.getEmoji();
+                    inputText.insertText(caretPosition,emoji.character());
                     dialog.close();
                 });
                 Window window = chatVbox.getScene().getWindow();
@@ -157,8 +158,6 @@ public class ChatController extends AbstractController{
 
     private RichTextArea createRichTextArea(){
         RichTextArea richTextArea = new RichTextArea();
-        richTextArea.setPrefHeight(inputTextFlow.getPrefHeight());
-        richTextArea.setPrefWidth(inputTextFlow.getPrefWidth());
         return richTextArea;
     }
 
@@ -190,6 +189,7 @@ public class ChatController extends AbstractController{
     private void sendMessage(){
         ObservableList<Node> children = inputTextFlow.getChildren();
         TextInputControl inputText = (TextInputControl)children.getFirst();
+        inputText.positionCaret(inputText.getLength());
         String text = inputText.getText();
         if (text.isEmpty()){
             return;

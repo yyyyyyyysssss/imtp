@@ -1,17 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.control.DialogPane?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.VBox?>
 
-<?import javafx.scene.control.*?>
-<DialogPane fx:id="emojiDialogPane" style="-fx-background-color: #F5F5F5" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" prefWidth="500" prefHeight="450" stylesheets="@../css/ChatEmojiDialog.css">
-    <content>
-        <TableView fx:id="chatEmoteTable" prefHeight="450.0" prefWidth="500.0">
-            <columns>
-                <TableColumn fx:id="e0" prefWidth="75.0"/>
-                <TableColumn fx:id="e1" prefWidth="75.0"/>
-                <TableColumn fx:id="e2" prefWidth="75.0"/>
-                <TableColumn fx:id="e3" prefWidth="75.0"/>
-                <TableColumn fx:id="e4" prefWidth="75.0"/>
-            </columns>
-        </TableView>
-    </content>
+<DialogPane fx:id="emojiDialogPane" prefHeight="450" prefWidth="500" style="-fx-background-color: #F5F5F5" stylesheets="@../css/ChatEmojiDialog.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
+   <content>
+      <VBox prefHeight="450.0" prefWidth="500.0">
+         <children>
+              <TableView fx:id="chatEmoteTable" prefHeight="450.0" prefWidth="500.0" />
+         </children>
+      </VBox>
+   </content>
 </DialogPane>

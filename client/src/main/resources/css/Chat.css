@@ -20,9 +20,20 @@
     -fx-padding:0;
 }
 
+.list-view{
+    -fx-background-color: #F5F5F5;
+    -fx-border-color: lightgrey;
+    -fx-border-width: 1 1 1 0;
+}
+
 .list-cell{
     -fx-padding: 10px;
     -fx-background-color: #F5F5F5;
+    -fx-border-color: #F5F5F5;
+}
+
+#chatVbox{
+
 }
 
 .send-button{

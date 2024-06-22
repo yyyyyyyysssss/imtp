@@ -21,9 +21,21 @@
     -fx-padding:0;
 }
 
+.user-group-listview{
+    -fx-background-color: #F5F5F5;
+    -fx-border-color: lightgrey;
+}
+
 .user-group-listview-listview .list-cell:selected:odd,
 .user-group-listview .list-cell:selected:even{
     -fx-background-color: lightgrey;
+}
+
+
+.user-group-listview .list-cell{
+    -fx-background-color: #F5F5F5;
+    -fx-padding: 10px;
+    -fx-border-color: #F5F5F5;
 }
 
 .user-group-listview .list-cell:odd{
