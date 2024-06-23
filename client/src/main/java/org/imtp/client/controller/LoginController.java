@@ -1,5 +1,6 @@
 package org.imtp.client.controller;
 
+import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.Point2D;
@@ -151,6 +152,8 @@ public class LoginController extends AbstractController{
             errorMsg.setVisible(false);
             log.info("登录成功");
             MessageModel nextModel = messageModel.getNextModel();
+            //触发静态代码块执行，提前加载表情包
+            ChatEmojiDialog.trigger();
             //跳转主页
             skipScene(FXMLResourceConstant.HOME_FXML,"聊天页",nextModel);
             //将自身移除

@@ -2,6 +2,7 @@ package org.imtp.client.controller;
 
 import com.gluonhq.emoji.Emoji;
 import com.gluonhq.emoji.EmojiData;
+import com.gluonhq.emoji.util.TextUtils;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -11,6 +12,7 @@ import javafx.geometry.Point2D;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.stage.Modality;
+import lombok.extern.slf4j.Slf4j;
 import org.imtp.client.constant.FXMLResourceConstant;
 import org.imtp.client.util.FXMLLoadUtils;
 
@@ -24,6 +26,7 @@ import java.util.stream.IntStream;
  * @Author ys
  * @Date 2024/6/12 10:44
  */
+@Slf4j
 public class ChatEmojiDialog extends Dialog<String> {
 
     @FXML
@@ -48,7 +51,11 @@ public class ChatEmojiDialog extends Dialog<String> {
         orderMap.put("Food & Drink",8);
         orderMap.put("Activities",9);
         Collection<Emoji> emojiCollection = EmojiData.getEmojiCollection();
-        EMOJIS_ALL = emojiCollection.stream().sorted(Comparator.comparingInt(o -> orderMap.get(o.getCategory()))).toList();
+        EMOJIS_ALL = emojiCollection.stream().peek(p -> TextUtils.convertToTextAndImageNodes(p.character())).sorted(Comparator.comparingInt(o -> orderMap.get(o.getCategory()))).toList();
+    }
+
+    public static void trigger(){
+        log.info("Trigger class loading");
     }
 
     @FXML

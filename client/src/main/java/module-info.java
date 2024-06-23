@@ -9,7 +9,6 @@ module client{
     requires javafx.controls;
     requires javafx.fxml;
     requires javafx.graphics;
-    requires javafx.web;
     requires io.netty.all;
     requires io.netty.buffer;
     requires io.netty.codec;
@@ -34,8 +33,7 @@ module client{
     requires io.netty.codec.socks;
     requires io.netty.codec.stomp;
     requires com.gluonhq.emoji;
-    requires org.fxmisc.richtext;
-
+    requires com.gluonhq.richtextarea;
 
     exports org.imtp.client;
     exports org.imtp.client.component;

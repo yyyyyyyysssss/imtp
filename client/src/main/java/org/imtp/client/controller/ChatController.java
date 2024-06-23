@@ -2,19 +2,22 @@ package org.imtp.client.controller;
 
 
 import com.gluonhq.emoji.Emoji;
+import com.gluonhq.richtextarea.RichTextArea;
 import io.netty.channel.EventLoop;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.scene.Node;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.ListView;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.TextFlow;
 import javafx.stage.Window;
 import lombok.extern.slf4j.Slf4j;
 import org.imtp.client.component.AutoResizeTextFiled;
@@ -31,6 +34,7 @@ import org.imtp.common.packet.MessageStateResponse;
 import org.imtp.common.packet.TextMessage;
 import org.imtp.common.packet.base.Packet;
 import org.imtp.common.packet.body.UserFriendInfo;
+
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
@@ -52,8 +56,11 @@ public class ChatController extends AbstractController{
     @FXML
     private ImageView chatFileIcon;
 
+//    @FXML
+//    private TextFlow inputTextFlow;
+
     @FXML
-    private TextFlow inputTextFlow;
+    private RichTextArea richTextArea;
 
     @FXML
     private Button sendButton;
@@ -92,8 +99,7 @@ public class ChatController extends AbstractController{
         ackChatItemEntityMap = new ConcurrentHashMap<>();
         retryTaskMap = new ConcurrentHashMap<>();
 
-        TextInputControl textInput = createTextArea();
-        inputTextFlow.getChildren().add(textInput);
+        richTextArea.setAutoSave(true);
 
         sendButton.setOnMouseClicked(mouseEvent -> {
             sendMessage();
@@ -104,11 +110,8 @@ public class ChatController extends AbstractController{
             if (dialog == null){
                 dialog = new ChatEmojiDialog();
                 dialog.getDialogPane().addEventHandler(EmojiEvent.SELECTED, emojiEvent -> {
-                    ObservableList<Node> children = inputTextFlow.getChildren();
-                    TextInputControl inputText = (TextInputControl)children.getLast();
-                    int caretPosition = inputText.getCaretPosition();
                     Emoji emoji = emojiEvent.getEmoji();
-                    inputText.insertText(caretPosition,emoji.character());
+                    richTextArea.getActionFactory().insertEmoji(emoji).execute(new ActionEvent());
                     dialog.close();
                 });
                 Window window = chatVbox.getScene().getWindow();
@@ -146,20 +149,13 @@ public class ChatController extends AbstractController{
     private TextArea createTextArea(){
         TextArea textArea = new TextArea();
         textArea.setWrapText(true);
-        textArea.setMaxHeight(inputTextFlow.getPrefHeight());
-        textArea.setMaxWidth(inputTextFlow.getPrefWidth());
         textArea.setOnKeyPressed(keyEvent -> {
             switch (keyEvent.getCode()){
                 case ENTER :
-                    int caretPosition = textArea.getCaretPosition();
                     keyEvent.consume();
                     if(keyEvent.isShiftDown()){
                         textArea.appendText(System.lineSeparator());
                     }else {
-                        //去除末尾的换行符
-                        String text = textArea.getText();
-                        text =  text.substring(0,caretPosition-1);
-                        textArea.setText(text);
                         sendMessage();
                     }
                     break;
@@ -169,14 +165,11 @@ public class ChatController extends AbstractController{
     }
 
     private void sendMessage(){
-        ObservableList<Node> children = inputTextFlow.getChildren();
-        TextInputControl inputText = (TextInputControl)children.getFirst();
-        inputText.positionCaret(inputText.getLength());
-        String text = inputText.getText();
-        if (text.isEmpty()){
+        String text = richTextArea.getDocument().getText();
+        if (text == null || text.isEmpty()){
             return;
         }
-        inputText.clear();
+        richTextArea.getActionFactory().newDocument().execute(new ActionEvent());
         sendMessage(text,MessageType.TEXT_MESSAGE);
     }
 

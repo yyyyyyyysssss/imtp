@@ -72,23 +72,23 @@
 
 
 /*隐藏滚动条*/
-.text-area .scroll-bar:vertical{
+#richTextArea .scroll-bar:vertical{
     -fx-scale-x: 0;
 }
-.text-area .scroll-bar:horizontal{
+#richTextArea .scroll-bar:horizontal{
     -fx-scale-x: 0;
 }
 
-.text-area .scroll-bar:horizontal .increment-arrow,
-.text-area .scroll-bar:horizontal .decrement-arrow,
-.text-area .scroll-bar:horizontal .increment-button,
-.text-area .scroll-bar:horizontal .decrement-button {
+#richTextArea .scroll-bar:horizontal .increment-arrow,
+#richTextArea .scroll-bar:horizontal .decrement-arrow,
+#richTextArea .scroll-bar:horizontal .increment-button,
+#richTextArea .scroll-bar:horizontal .decrement-button {
     -fx-padding:0;
 }
 
-.text-area .scroll-bar:vertical .increment-arrow,
-.text-area .scroll-bar:vertical .decrement-arrow,
-.text-area .scroll-bar:vertical .increment-button,
-.text-area .scroll-bar:vertical .decrement-button {
+#richTextArea .scroll-bar:vertical .increment-arrow,
+#richTextArea .scroll-bar:vertical .decrement-arrow,
+#richTextArea .scroll-bar:vertical .increment-button,
+#richTextArea .scroll-bar:vertical .decrement-button {
     -fx-padding:0;
 }
