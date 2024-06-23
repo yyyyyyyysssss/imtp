@@ -2,26 +2,17 @@ package org.imtp.client.controller;
 
 
 import com.gluonhq.emoji.Emoji;
-import com.gluonhq.emoji.EmojiData;
-import com.gluonhq.emoji.util.TextUtils;
-import com.gluonhq.richtextarea.RichTextArea;
 import io.netty.channel.EventLoop;
 import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.geometry.Point2D;
 import javafx.scene.Node;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.control.skin.TextFieldSkin;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.TextFlow;
 import javafx.stage.Window;
@@ -43,7 +34,6 @@ import org.imtp.common.packet.body.UserFriendInfo;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
@@ -64,9 +54,6 @@ public class ChatController extends AbstractController{
 
     @FXML
     private TextFlow inputTextFlow;
-
-    @FXML
-    private TextField testText;
 
     @FXML
     private Button sendButton;
@@ -154,11 +141,6 @@ public class ChatController extends AbstractController{
         TextField textField = new AutoResizeTextFiled();
         textField.setPrefColumnCount(1);
         return textField;
-    }
-
-    private RichTextArea createRichTextArea(){
-        RichTextArea richTextArea = new RichTextArea();
-        return richTextArea;
     }
 
     private TextArea createTextArea(){
