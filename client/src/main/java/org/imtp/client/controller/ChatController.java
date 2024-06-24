@@ -3,24 +3,29 @@ package org.imtp.client.controller;
 
 import com.gluonhq.emoji.Emoji;
 import com.gluonhq.richtextarea.RichTextArea;
+import com.gluonhq.richtextarea.model.Document;
+import com.gluonhq.richtextarea.model.ParagraphDecoration;
 import io.netty.channel.EventLoop;
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.InputMethodEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import javafx.stage.Window;
 import lombok.extern.slf4j.Slf4j;
-import org.imtp.client.component.AutoResizeTextFiled;
+import org.imtp.client.component.ImageUrlParse;
 import org.imtp.client.context.ClientContextHolder;
 import org.imtp.client.entity.ChatItemEntity;
 import org.imtp.client.entity.SessionEntity;
@@ -100,6 +105,9 @@ public class ChatController extends AbstractController{
         retryTaskMap = new ConcurrentHashMap<>();
 
         richTextArea.setAutoSave(true);
+        richTextArea.setOnKeyPressed(keyEvent -> {
+            System.out.println(keyEvent.getCode());
+        });
 
         sendButton.setOnMouseClicked(mouseEvent -> {
             sendMessage();
@@ -138,12 +146,6 @@ public class ChatController extends AbstractController{
         if (sessionEntity != null && sessionEntity.getLastMsg() != null){
             addChatItem(sessionEntity);
         }
-    }
-
-    private TextField createTextField(){
-        TextField textField = new AutoResizeTextFiled();
-        textField.setPrefColumnCount(1);
-        return textField;
     }
 
     private TextArea createTextArea(){

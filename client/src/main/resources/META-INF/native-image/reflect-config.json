@@ -19,6 +19,12 @@
   "methods":[{"name":"<init>","parameterTypes":[] }]
 },
 {
+  "name":"com.gluonhq.richtextarea.RichTextArea",
+  "queryAllDeclaredMethods":true,
+  "queryAllPublicConstructors":true,
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
   "name":"com.sun.glass.ui.Screen"
 },
 {
@@ -51,6 +57,10 @@
 },
 {
   "name":"com.sun.prism.shader.DrawCircle_Color_Loader",
+  "methods":[{"name":"loadShader","parameterTypes":["com.sun.prism.ps.ShaderFactory","java.io.InputStream"] }]
+},
+{
+  "name":"com.sun.prism.shader.DrawPgram_Color_Loader",
   "methods":[{"name":"loadShader","parameterTypes":["com.sun.prism.ps.ShaderFactory","java.io.InputStream"] }]
 },
 {
@@ -445,6 +455,9 @@
   "methods":[{"name":"<init>","parameterTypes":[] }, {"name":"setFitHeight","parameterTypes":["double"] }, {"name":"setFitWidth","parameterTypes":["double"] }, {"name":"setImage","parameterTypes":["javafx.scene.image.Image"] }, {"name":"setPreserveRatio","parameterTypes":["boolean"] }]
 },
 {
+  "name":"javafx.scene.input.Clipboard"
+},
+{
   "name":"javafx.scene.layout.AnchorPane",
   "queryAllDeclaredMethods":true,
   "queryAllPublicConstructors":true,
@@ -630,7 +643,7 @@
   "name":"org.imtp.client.controller.LoginController",
   "allDeclaredFields":true,
   "queryAllDeclaredMethods":true,
-  "methods":[{"name":"<init>","parameterTypes":[] }, {"name":"initialize","parameterTypes":[] }, {"name":"login","parameterTypes":["javafx.event.ActionEvent"] }]
+  "methods":[{"name":"<init>","parameterTypes":[] }, {"name":"initialize","parameterTypes":[] }, {"name":"login","parameterTypes":[] }, {"name":"login","parameterTypes":["javafx.event.ActionEvent"] }]
 },
 {
   "name":"org.imtp.client.controller.UserFriendController",

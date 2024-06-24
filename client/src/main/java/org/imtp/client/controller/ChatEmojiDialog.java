@@ -2,6 +2,7 @@ package org.imtp.client.controller;
 
 import com.gluonhq.emoji.Emoji;
 import com.gluonhq.emoji.EmojiData;
+import com.gluonhq.emoji.util.EmojiImageUtils;
 import com.gluonhq.emoji.util.TextUtils;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
@@ -51,7 +52,7 @@ public class ChatEmojiDialog extends Dialog<String> {
         orderMap.put("Food & Drink",8);
         orderMap.put("Activities",9);
         Collection<Emoji> emojiCollection = EmojiData.getEmojiCollection();
-        EMOJIS_ALL = emojiCollection.stream().peek(p -> TextUtils.convertToTextAndImageNodes(p.character())).sorted(Comparator.comparingInt(o -> orderMap.get(o.getCategory()))).toList();
+        EMOJIS_ALL = emojiCollection.stream().peek(p -> EmojiImageUtils.emojiView(p,30)).sorted(Comparator.comparingInt(o -> orderMap.get(o.getCategory()))).toList();
     }
 
     public static void trigger(){

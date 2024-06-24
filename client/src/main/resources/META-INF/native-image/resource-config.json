@@ -2,18 +2,6 @@
   "resources": {
     "includes": [
       {
-        "pattern": "client:\\Qfxml/*.fxml\\E"
-      },
-      {
-        "pattern": "client:\\Qcss/*.css\\E"
-      },
-      {
-        "pattern": "client:\\Qimg/*.jpg\\E"
-      },
-      {
-        "pattern": "client:\\Qimg/*.png\\E"
-      },
-      {
         "pattern": "\\QMETA-INF/fonts.mf\\E"
       },
       {
@@ -47,7 +35,37 @@
         "pattern": "\\Qlogback.xml\\E"
       },
       {
+        "pattern": "client:\\Qfxml/*.fxml\\E"
+      },
+      {
+        "pattern": "client:\\Qcss/*.css\\E"
+      },
+      {
+        "pattern": "client:\\Qimg/*.jpg\\E"
+      },
+      {
+        "pattern": "client:\\Qimg/*.png\\E"
+      },
+      {
+        "pattern": "client:\\Qimg/*.gif\\E"
+      },
+      {
+        "pattern": "com.gluonhq.emoji:\\Qcom/gluonhq/emoji/emoji.csv\\E"
+      },
+      {
+        "pattern": "com.gluonhq.emoji:\\Qcom/gluonhq/emoji/util/sheet_apple_64.png\\E"
+      },
+      {
+        "pattern": "com.gluonhq.richtextarea:\\Qcom/gluonhq/richtextarea/rich-text-area.css\\E"
+      },
+      {
         "pattern": "java.base:\\Qjdk/internal/icu/impl/data/icudt72b/ubidi.icu\\E"
+      },
+      {
+        "pattern": "java.base:\\Qjdk/internal/icu/impl/data/icudt72b/uprops.icu\\E"
+      },
+      {
+        "pattern": "java.base:\\Qsun/text/resources/LineBreakIteratorData\\E"
       },
       {
         "pattern": "javafx.base:\\Qcom/sun/javafx/reflect/Trampoline.class\\E"
@@ -182,10 +200,22 @@
         "pattern": "javafx.graphics:\\Qcom/sun/glass/utils/NativeLibLoader.class\\E"
       },
       {
+        "pattern": "javafx.graphics:\\Qcom/sun/prism/d3d/hlsl/DrawCircle_Color.obj\\E"
+      },
+      {
+        "pattern": "javafx.graphics:\\Qcom/sun/prism/d3d/hlsl/DrawPgram_Color.obj\\E"
+      },
+      {
+        "pattern": "javafx.graphics:\\Qcom/sun/prism/d3d/hlsl/FillCircle_ImagePattern.obj\\E"
+      },
+      {
         "pattern": "javafx.graphics:\\Qcom/sun/prism/d3d/hlsl/FillPgram_Color.obj\\E"
       },
       {
         "pattern": "javafx.graphics:\\Qcom/sun/prism/d3d/hlsl/FillPgram_LinearGradient_PAD.obj\\E"
+      },
+      {
+        "pattern": "javafx.graphics:\\Qcom/sun/prism/d3d/hlsl/FillRoundRect_Color.obj\\E"
       },
       {
         "pattern": "javafx.graphics:\\Qcom/sun/prism/d3d/hlsl/Solid_TextureFirstPassLCD.obj\\E"
@@ -238,6 +268,12 @@
     ]
   },
   "bundles": [
+    {
+      "name": "com.gluonhq.richtextarea.rich-text-area",
+      "locales": [
+        ""
+      ]
+    },
     {
       "name": "com.sun.javafx.tk.quantum.QuantumMessagesBundle",
       "locales": [

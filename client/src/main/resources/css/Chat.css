@@ -70,6 +70,9 @@
     -fx-highlight-fill: #7ecfff;
 }
 
+.rich-text-area .caret {
+    -fx-stroke: black;
+}
 
 /*隐藏滚动条*/
 #richTextArea .scroll-bar:vertical{

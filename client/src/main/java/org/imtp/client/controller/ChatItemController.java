@@ -80,47 +80,77 @@ public class ChatItemController extends AbstractController{
         if (object instanceof ChatItemEntity chatItemEntity){
             Platform.runLater(() -> {
                 chatItemImageView.setImage(new Image(chatItemEntity.getAvatar()));
+                //清除节点
+                ObservableList<Node> rootChildren = chatItemHBox.getChildren();
+                ObservableList<Node> chatItemVBoxChildren = chatItemVBox.getChildren();
+                ObservableList<Node> chatItemLabelHBoxChildren = chatItemLabelHBox.getChildren();
                 ObservableList<Node> textFlowChildren = chatItemTextFlow.getChildren();
                 textFlowChildren.clear();
-                List<Node> nodes = parseContent(chatItemEntity.getContent());
-                textFlowChildren.addAll(nodes);
-                ObservableList<Node> children = chatItemHBox.getChildren();
-                children.clear();
-                ObservableList<Node> chatItemVBoxChildren = chatItemVBox.getChildren();
+                rootChildren.clear();
                 chatItemVBoxChildren.clear();
-                ObservableList<Node> cd = chatItemLabelHBox.getChildren();
-                cd.clear();
+                chatItemLabelHBoxChildren.clear();
+                //组件节点
                 if (!chatItemEntity.isSelf()){
-                    chatItemTextFlow.setBackground(BACKGROUND_LEFT);
-                    chatItemHBox.setPadding(Insets.EMPTY);
-                    chatItemHBox.setAlignment(Pos.CENTER_LEFT);
-                    if (chatItemEntity.getDeliveryMethod().equals(DeliveryMethod.GROUP)){
-                        sendNameLabel.setText(chatItemEntity.getName());
-                        chatItemVBoxChildren.addAll(sendNameLabel,chatItemLabelHBox);
-                        VBox.setMargin(sendNameLabel,FIVE_BOTTOM);
-                    }else {
-                        chatItemVBoxChildren.add(chatItemLabelHBox);
-                    }
-                    cd.add(chatItemTextFlow);
-                    children.add(chatItemImageView);
-                    children.add(chatItemVBox);
-                    HBox.setMargin(chatItemVBox,LEFT_INSETS);
+                    leftNode(chatItemEntity);
                 }else {
-                    imageView.imageProperty().bind(chatItemEntity.imageProperty());
-                    chatItemHBox.setPadding(RIGHT_INSETS_PADDING);
-                    chatItemHBox.setAlignment(Pos.CENTER_RIGHT);
-                    cd.add(imageView);
-                    chatItemTextFlow.setBackground(BACKGROUND_RIGHT);
-                    cd.add(chatItemTextFlow);
-                    chatItemVBoxChildren.add(chatItemLabelHBox);
-                    children.add(chatItemVBox);
-                    children.add(chatItemImageView);
-                    HBox.setMargin(chatItemVBox,RIGHT_INSETS);
+                    rightNode(chatItemEntity);
                 }
+                //展示的消息
+                showMsg(chatItemEntity);
             });
         }
     }
 
+    private void leftNode(ChatItemEntity chatItemEntity){
+        ObservableList<Node> rootChildren = chatItemHBox.getChildren();
+        ObservableList<Node> chatItemVBoxChildren = chatItemVBox.getChildren();
+        ObservableList<Node> chatItemLabelHBoxChildren = chatItemLabelHBox.getChildren();
+
+        chatItemTextFlow.setBackground(BACKGROUND_LEFT);
+        chatItemHBox.setPadding(Insets.EMPTY);
+        chatItemHBox.setAlignment(Pos.CENTER_LEFT);
+        if (chatItemEntity.getDeliveryMethod().equals(DeliveryMethod.GROUP)){
+            sendNameLabel.setText(chatItemEntity.getName());
+            chatItemVBoxChildren.addAll(sendNameLabel,chatItemLabelHBox);
+            VBox.setMargin(sendNameLabel,FIVE_BOTTOM);
+        }else {
+            chatItemVBoxChildren.add(chatItemLabelHBox);
+        }
+        chatItemLabelHBoxChildren.add(chatItemTextFlow);
+        rootChildren.add(chatItemImageView);
+        rootChildren.add(chatItemVBox);
+        HBox.setMargin(chatItemVBox,LEFT_INSETS);
+    }
+
+    private void rightNode(ChatItemEntity chatItemEntity){
+        ObservableList<Node> rootChildren = chatItemHBox.getChildren();
+        ObservableList<Node> chatItemVBoxChildren = chatItemVBox.getChildren();
+        ObservableList<Node> chatItemLabelHBoxChildren = chatItemLabelHBox.getChildren();
+
+        imageView.imageProperty().bind(chatItemEntity.imageProperty());
+        chatItemHBox.setPadding(RIGHT_INSETS_PADDING);
+        chatItemHBox.setAlignment(Pos.CENTER_RIGHT);
+        chatItemTextFlow.setBackground(BACKGROUND_RIGHT);
+        chatItemLabelHBoxChildren.add(imageView);
+        chatItemLabelHBoxChildren.add(chatItemTextFlow);
+        chatItemVBoxChildren.add(chatItemLabelHBox);
+
+        rootChildren.add(chatItemVBox);
+        rootChildren.add(chatItemImageView);
+        HBox.setMargin(chatItemVBox,RIGHT_INSETS);
+    }
+
+    private void showMsg(ChatItemEntity chatItemEntity){
+        ObservableList<Node> textFlowChildren = chatItemTextFlow.getChildren();
+        switch (chatItemEntity.getMessageType()){
+            case TEXT_MESSAGE :
+                List<Node> nodes = parseContent(chatItemEntity.getContent());
+                textFlowChildren.addAll(nodes);
+                break;
+            case IMAGE_MESSAGE:
+                break;
+        }
+    }
 
     private List<Node> parseContent(String content){
         List<Node> nodes = new ArrayList<>();
