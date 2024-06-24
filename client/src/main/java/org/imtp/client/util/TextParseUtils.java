@@ -12,16 +12,19 @@ import java.util.regex.Pattern;
  */
 public class TextParseUtils {
 
-    private static final String imgPattern = ".*?file:/.+\\.(jpg|jpeg|gif|png)(.*)";
+    private static final String imgPattern = "((file:/.*?\\.(jpg|jpeg|gif|png)).*?)";
 
     public static void main(String[] args) {
         Pattern pattern = Pattern.compile(imgPattern);
-        Matcher matcher = pattern.matcher("qeqwefile:/C:/Users/86188/Desktop/工作/loading.gifqwewqeqe");
-        if (matcher.matches()){
-            System.out.println("1");
-        }else {
-            System.out.println("2");
+        Matcher matcher = pattern.matcher("12313131file:/C:/Users/86188/Desktop/工作/loading.gi1fqwewqeqeqeqwefile:/C:/Users/86188/Desktop/工作/loading.gifqwewqeqe");
+        while (matcher.find()){
+            System.out.println(matcher.group(1));
         }
+//        if (matcher.find()){
+//            System.out.println(matcher.group(1));
+//        }else {
+//            System.out.println("2");
+//        }
     }
 
 }

@@ -12,7 +12,9 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.event.EventHandler;
+import javafx.event.EventType;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -21,6 +23,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.InputMethodEvent;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import javafx.stage.Window;
@@ -105,8 +108,8 @@ public class ChatController extends AbstractController{
         retryTaskMap = new ConcurrentHashMap<>();
 
         richTextArea.setAutoSave(true);
-        richTextArea.setOnKeyPressed(keyEvent -> {
-            System.out.println(keyEvent.getCode());
+        richTextArea.setOnAction(actionEvent -> {
+            sendMessage();
         });
 
         sendButton.setOnMouseClicked(mouseEvent -> {
