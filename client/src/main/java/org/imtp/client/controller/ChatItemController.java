@@ -9,6 +9,8 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
+import javafx.scene.effect.DropShadow;
+import javafx.scene.effect.Effect;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
@@ -61,6 +63,10 @@ public class ChatItemController extends AbstractController{
     private static final Background BACKGROUND_LEFT = new Background(new BackgroundFill(Color.WHITE,CORNER_RADII,Insets.EMPTY));
 
     private static final Background BACKGROUND_RIGHT = new Background(new BackgroundFill(Color.LIGHTGREEN,CORNER_RADII,Insets.EMPTY));
+
+    private final double max_width_image = 200;
+
+    private final double max_height_image = 200;
 
     @FXML
     public void initialize(){
@@ -148,6 +154,10 @@ public class ChatItemController extends AbstractController{
                 textFlowChildren.addAll(nodes);
                 break;
             case IMAGE_MESSAGE:
+                chatItemTextFlow.setBackground(null);
+                String path = chatItemEntity.getContent();
+                ImageView iv = createImageView(path);
+                textFlowChildren.add(iv);
                 break;
         }
     }
@@ -172,6 +182,21 @@ public class ChatItemController extends AbstractController{
         Text text = new Text(msg);
         text.getStyleClass().add("text_flow_text");
         return text;
+    }
+
+    private ImageView createImageView(String path){
+        Image image = new Image(path);
+        double height = image.getHeight();
+        double width = image.getWidth();
+        ImageView iv = new ImageView(image);
+        iv.setStyle("-fx-effect: dropshadow(three-pass-box, black, 5, 0, 0, 0);");
+        if (height > max_height_image){
+            iv.setFitHeight(max_height_image);
+        }
+        if (width > max_width_image){
+            iv.setFitWidth(max_width_image);
+        }
+        return iv;
     }
 
     @Override

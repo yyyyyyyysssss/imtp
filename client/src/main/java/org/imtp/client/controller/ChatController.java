@@ -2,19 +2,15 @@ package org.imtp.client.controller;
 
 
 import com.gluonhq.emoji.Emoji;
+import com.gluonhq.emoji.EmojiData;
+import com.gluonhq.emoji.util.EmojiImageUtils;
 import com.gluonhq.richtextarea.RichTextArea;
-import com.gluonhq.richtextarea.model.Document;
-import com.gluonhq.richtextarea.model.ParagraphDecoration;
 import io.netty.channel.EventLoop;
 import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.event.Event;
 import javafx.event.EventHandler;
-import javafx.event.EventType;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -22,13 +18,12 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.InputMethodEvent;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextFlow;
 import javafx.stage.Window;
 import lombok.extern.slf4j.Slf4j;
-import org.imtp.client.component.ImageUrlParse;
 import org.imtp.client.context.ClientContextHolder;
 import org.imtp.client.entity.ChatItemEntity;
 import org.imtp.client.entity.SessionEntity;
@@ -38,6 +33,7 @@ import org.imtp.client.idwork.IdGen;
 import org.imtp.client.util.ResourceUtils;
 import org.imtp.common.enums.DeliveryMethod;
 import org.imtp.common.enums.MessageType;
+import org.imtp.common.packet.ImageMessage;
 import org.imtp.common.packet.MessageStateResponse;
 import org.imtp.common.packet.TextMessage;
 import org.imtp.common.packet.base.Packet;
@@ -46,6 +42,8 @@ import org.imtp.common.packet.body.UserFriendInfo;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
@@ -63,9 +61,6 @@ public class ChatController extends AbstractController{
 
     @FXML
     private ImageView chatFileIcon;
-
-//    @FXML
-//    private TextFlow inputTextFlow;
 
     @FXML
     private RichTextArea richTextArea;
@@ -151,31 +146,45 @@ public class ChatController extends AbstractController{
         }
     }
 
-    private TextArea createTextArea(){
-        TextArea textArea = new TextArea();
-        textArea.setWrapText(true);
-        textArea.setOnKeyPressed(keyEvent -> {
-            switch (keyEvent.getCode()){
-                case ENTER :
-                    keyEvent.consume();
-                    if(keyEvent.isShiftDown()){
-                        textArea.appendText(System.lineSeparator());
-                    }else {
-                        sendMessage();
-                    }
-                    break;
-            }
-        });
-        return textArea;
-    }
-
     private void sendMessage(){
-        String text = richTextArea.getDocument().getText();
-        if (text == null || text.isEmpty()){
-            return;
+        Set<Node> nodes = richTextArea.lookupAll(".text-flow");
+        StringBuilder sb = new StringBuilder();
+        for (Node node : nodes){
+            ObservableList<Node> childrenNodes = ((TextFlow) node).getChildrenUnmodifiable();
+            for (Node n : childrenNodes){
+                if (n instanceof Text text){
+                    sb.append(text.getText());
+                }
+                if (n instanceof ImageView imageView){
+                    String emojiUnified = (String) imageView.getProperties().get(EmojiImageUtils.IMAGE_VIEW_EMOJI_PROPERTY);
+                    if (emojiUnified != null){
+                        Optional<Emoji> emojiOptional = EmojiData.emojiFromCodepoints(emojiUnified);
+                        if (emojiOptional.isPresent()){
+                            Emoji emoji = emojiOptional.get();
+                            sb.append(emoji.character());
+                        }
+                    }else {
+                        String message = sb.toString();
+                        if (!message.isEmpty()){
+                            sendMessage(message,MessageType.TEXT_MESSAGE);
+                        }
+
+                        String url = imageView.getImage().getUrl();
+                        sendMessage(url,MessageType.IMAGE_MESSAGE);
+                        sb = new StringBuilder();
+                    }
+                }
+            }
+        }
+        if (!sb.toString().isEmpty()){
+            sendMessage(sb.toString(),MessageType.TEXT_MESSAGE);
         }
         richTextArea.getActionFactory().newDocument().execute(new ActionEvent());
-        sendMessage(text,MessageType.TEXT_MESSAGE);
+//        String text = richTextArea.getDocument().getText();
+//        if (text == null || text.isEmpty()){
+//            return;
+//        }
+//        sendMessage(text,MessageType.TEXT_MESSAGE);
     }
 
     private void sendMessage(Object object,MessageType messageType){
@@ -194,6 +203,18 @@ public class ChatController extends AbstractController{
                 sessionEntity.setLastMsgType(messageType);
                 sessionEntity.setLastMsg(message);
                 selfChatItemEntity.setContent(message);
+                selfChatItemEntity.setMessageType(messageType);
+                break;
+            case IMAGE_MESSAGE:
+                String path = (String) object;
+                if (sessionEntity.getDeliveryMethod().equals(DeliveryMethod.SINGLE)){
+                    packet = new ImageMessage(path, ClientContextHolder.clientContext().id(), sessionEntity.getReceiverUserId(),ackId);
+                }else {
+                    packet = new ImageMessage(path, ClientContextHolder.clientContext().id(), sessionEntity.getReceiverUserId(),ackId,true);
+                }
+                sessionEntity.setLastMsgType(messageType);
+                sessionEntity.setLastMsg("[图片]");
+                selfChatItemEntity.setContent(path);
                 selfChatItemEntity.setMessageType(messageType);
                 break;
         }

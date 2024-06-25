@@ -32,6 +32,9 @@ public class CommandHandler extends SimpleChannelInboundHandler<Packet> {
     private TextMessageHandler textMessageHandler;
 
     @Resource
+    private ImageMessageHandler imageMessageHandler;
+
+    @Resource
     private UserFriendshipHandler userFriendshipHandler;
 
     @Resource
@@ -69,6 +72,10 @@ public class CommandHandler extends SimpleChannelInboundHandler<Packet> {
                 case TEXT_MESSAGE:
                     packet = new TextMessage(byteBuf,header);
                     channelHandlerContext.pipeline().addLast(textMessageHandler).fireChannelRead(packet);
+                    break;
+                case IMAGE_MESSAGE:
+                    packet = new ImageMessage(byteBuf,header);
+                    channelHandlerContext.pipeline().addLast(imageMessageHandler).fireChannelRead(packet);
                     break;
                 default:
                     throw new UnsupportedOperationException("不支持的操作");

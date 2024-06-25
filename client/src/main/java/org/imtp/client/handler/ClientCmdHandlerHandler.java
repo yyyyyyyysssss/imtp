@@ -56,6 +56,9 @@ public class ClientCmdHandlerHandler extends AbstractMessageModelHandler<Packet>
             case TEXT_MESSAGE:
                 publishMessage(new TextMessage(byteBuf,header));
                 break;
+            case IMAGE_MESSAGE:
+                publishMessage(new ImageMessage(byteBuf,header));
+                break;
             case MSG_RES:
                 publishMessage(new MessageStateResponse(byteBuf,header));
                 break;

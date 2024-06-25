@@ -14,6 +14,7 @@ import org.imtp.client.event.UserSessionEvent;
 import org.imtp.client.util.Tuple2;
 import org.imtp.common.enums.DeliveryMethod;
 import org.imtp.common.enums.MessageType;
+import org.imtp.common.packet.AbstractTextMessage;
 import org.imtp.common.packet.OfflineMessageResponse;
 import org.imtp.common.packet.TextMessage;
 import org.imtp.common.packet.UserSessionResponse;
@@ -90,10 +91,10 @@ public class UserSessionController extends AbstractController{
                     setListView(sessionEntities);
                 }
                 break;
-            case TEXT_MESSAGE:
+            case TEXT_MESSAGE,IMAGE_MESSAGE:
                 Long sender = packet.realSender();
                 sessionEntity = userSessionEntityMap.get(sender);
-                TextMessage textMessage = (TextMessage) packet;
+                AbstractTextMessage textMessage = (TextMessage) packet;
                 if (sessionEntity == null){
                     sessionEntity = createUserSessionByPacket(textMessage);
                     //添加会话项
