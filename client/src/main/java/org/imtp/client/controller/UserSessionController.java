@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.imtp.client.constant.FXMLResourceConstant;
 import org.imtp.client.entity.SessionEntity;
 import org.imtp.client.event.UserSessionEvent;
+import org.imtp.client.idwork.IdGen;
 import org.imtp.client.util.Tuple2;
 import org.imtp.common.enums.DeliveryMethod;
 import org.imtp.common.enums.MessageType;
@@ -94,9 +95,14 @@ public class UserSessionController extends AbstractController{
             case TEXT_MESSAGE,IMAGE_MESSAGE:
                 Long sender = packet.realSender();
                 sessionEntity = userSessionEntityMap.get(sender);
-                AbstractTextMessage textMessage = (TextMessage) packet;
+                AbstractTextMessage textMessage = (AbstractTextMessage) packet;
                 if (sessionEntity == null){
                     sessionEntity = createUserSessionByPacket(textMessage);
+
+                    sessionEntity.setLastSendMsgUserId(packet.getSender());
+                    sessionEntity.setLastMsgType(packet.messageType());
+                    sessionEntity.setLastMsg(textMessage.getMessage());
+
                     //添加会话项
                     addUserSessionNode(sessionEntity,true,false);
                     //添加会话关联的聊天框
@@ -107,7 +113,9 @@ public class UserSessionController extends AbstractController{
                         addChatNode(sessionEntity);
                     }
                     sessionEntity.setLastSendMsgUserId(packet.getSender());
+                    sessionEntity.setLastMsgType(packet.messageType());
                     sessionEntity.setLastMsg(textMessage.getMessage());
+
                     if (packet.isGroup()){
                         UserFriendInfo groupUserInfo = userGroupController.findGroupUserInfo(packet.getReceiver(), packet.getSender());
                         sessionEntity.setLastUserName(groupUserInfo.getNickname());
@@ -301,7 +309,7 @@ public class UserSessionController extends AbstractController{
 
     private SessionEntity createUserSessionByPacket(Packet packet){
         SessionEntity sessionEntity = new SessionEntity();
-        sessionEntity.setId(new Random().nextLong());
+        sessionEntity.setId(IdGen.genId());
         Long sender = packet.realSender();
         sessionEntity.setReceiverUserId(sender);
         if(packet.isGroup()){
@@ -321,12 +329,6 @@ public class UserSessionController extends AbstractController{
             sessionEntity.setDeliveryMethod(DeliveryMethod.SINGLE);
             sessionEntity.setLastUserAvatar(url);
             sessionEntity.setLastUserName(userFriendInfo.getNickname());
-        }
-        MessageType messageType = MessageType.findMessageTypeByValue((int) packet.getCommand().getCmdCode());
-        sessionEntity.setLastMsgType(messageType);
-        sessionEntity.setLastSendMsgUserId(packet.getSender());
-        if (messageType.equals(MessageType.TEXT_MESSAGE)){
-            sessionEntity.setLastMsg(((TextMessage)packet).getMessage());
         }
         //TODO 消息时间
         return sessionEntity;

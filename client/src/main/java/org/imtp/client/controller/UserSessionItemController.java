@@ -20,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.imtp.client.context.ClientContextHolder;
 import org.imtp.client.entity.SessionEntity;
 import org.imtp.common.enums.DeliveryMethod;
+import org.imtp.common.enums.MessageType;
 
 @Slf4j
 public class UserSessionItemController extends AbstractController{
@@ -107,7 +108,18 @@ public class UserSessionItemController extends AbstractController{
             }
             nameLabel.setText(sessionEntity.getName());
             timeLabel.setText("23:34");
-            lastMsg.setText(sessionEntity.getLastMsg());
+            if (sessionEntity.getLastMsgType().equals(MessageType.TEXT_MESSAGE)){
+                lastMsg.setText(sessionEntity.getLastMsg());
+            }else if (sessionEntity.getLastMsgType().equals(MessageType.IMAGE_MESSAGE)){
+                lastMsg.setText("[图片]");
+            }else if (sessionEntity.getLastMsgType().equals(MessageType.VIDEO_MESSAGE)){
+                lastMsg.setText("[视频]");
+            }else if (sessionEntity.getLastMsgType().equals(MessageType.VOICE_MESSAGE)){
+                lastMsg.setText("[语音]");
+            }else if (sessionEntity.getLastMsgType().equals(MessageType.FILE_MESSAGE)){
+                lastMsg.setText("[文件]");
+            }
+
             messageCount.textProperty().bind(sessionEntity.countProperty());
             if (sessionEntity.getCount() == null || sessionEntity.getCount().isEmpty()){
                 alertCircle.setVisible(false);

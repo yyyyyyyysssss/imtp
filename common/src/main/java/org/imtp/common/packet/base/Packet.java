@@ -4,6 +4,7 @@ import io.netty.buffer.ByteBuf;
 import lombok.Getter;
 import lombok.Setter;
 import org.imtp.common.enums.Command;
+import org.imtp.common.enums.MessageType;
 import org.imtp.common.utils.CRC16Util;
 
 /**
@@ -85,6 +86,11 @@ public abstract class Packet{
 
     public Long realSender(){
         return this.isGroup() ? this.getReceiver() : this.getSender();
+    }
+
+    public MessageType messageType(){
+
+        return MessageType.findMessageTypeByValue((int) this.header.getCmd().getCmdCode());
     }
 
 }

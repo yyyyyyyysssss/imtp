@@ -180,11 +180,6 @@ public class ChatController extends AbstractController{
             sendMessage(sb.toString(),MessageType.TEXT_MESSAGE);
         }
         richTextArea.getActionFactory().newDocument().execute(new ActionEvent());
-//        String text = richTextArea.getDocument().getText();
-//        if (text == null || text.isEmpty()){
-//            return;
-//        }
-//        sendMessage(text,MessageType.TEXT_MESSAGE);
     }
 
     private void sendMessage(Object object,MessageType messageType){
@@ -213,7 +208,7 @@ public class ChatController extends AbstractController{
                     packet = new ImageMessage(path, ClientContextHolder.clientContext().id(), sessionEntity.getReceiverUserId(),ackId,true);
                 }
                 sessionEntity.setLastMsgType(messageType);
-                sessionEntity.setLastMsg("[图片]");
+                sessionEntity.setLastMsg(path);
                 selfChatItemEntity.setContent(path);
                 selfChatItemEntity.setMessageType(messageType);
                 break;
@@ -244,24 +239,18 @@ public class ChatController extends AbstractController{
         if (packet.getSender() != 0 && !packet.realSender().equals(sessionEntity.getReceiverUserId())){
             return;
         }
+        ChatItemEntity chatItemEntity = null;
         switch (packet.getHeader().getCmd()){
             case TEXT_MESSAGE:
                 TextMessage textMessage = (TextMessage) packet;
-                ChatItemEntity chatItemEntity = new ChatItemEntity();
-                chatItemEntity.setSelf(false);
-                if (textMessage.isGroup()){
-                    UserFriendInfo groupUserInfo = userGroupController.findGroupUserInfo(textMessage.getReceiver(), textMessage.getSender());
-                    String imageUrl = loadImageUrl(groupUserInfo.getAvatar());
-                    chatItemEntity.setAvatar(imageUrl);
-                    chatItemEntity.setName(groupUserInfo.getNickname());
-                }else {
-                    chatItemEntity.setAvatar(sessionEntity.getAvatar());
-                    chatItemEntity.setName(sessionEntity.getName());
-                }
-                chatItemEntity.setMessageType(MessageType.findMessageTypeByValue((int) textMessage.getCommand().getCmdCode()));
+                chatItemEntity = new ChatItemEntity();
                 chatItemEntity.setContent(textMessage.getMessage());
-                chatItemEntity.setDeliveryMethod(textMessage.isGroup() ? DeliveryMethod.GROUP : DeliveryMethod.SINGLE);
-                addChatItem(chatItemEntity);
+
+                break;
+            case IMAGE_MESSAGE:
+                ImageMessage imageMessage = (ImageMessage) packet;
+                chatItemEntity = new ChatItemEntity();
+                chatItemEntity.setContent(imageMessage.getPath());
                 break;
             case MSG_RES:
                 MessageStateResponse messageStateResponse = (MessageStateResponse) packet;
@@ -282,6 +271,22 @@ public class ChatController extends AbstractController{
                 }
                 break;
         }
+        if (chatItemEntity == null){
+            return;
+        }
+        if (packet.isGroup()){
+            UserFriendInfo groupUserInfo = userGroupController.findGroupUserInfo(packet.getReceiver(), packet.getSender());
+            String imageUrl = loadImageUrl(groupUserInfo.getAvatar());
+            chatItemEntity.setAvatar(imageUrl);
+            chatItemEntity.setName(groupUserInfo.getNickname());
+        }else {
+            chatItemEntity.setAvatar(sessionEntity.getAvatar());
+            chatItemEntity.setName(sessionEntity.getName());
+        }
+        chatItemEntity.setSelf(false);
+        chatItemEntity.setMessageType(MessageType.findMessageTypeByValue((int) packet.getCommand().getCmdCode()));
+        chatItemEntity.setDeliveryMethod(packet.isGroup() ? DeliveryMethod.GROUP : DeliveryMethod.SINGLE);
+        addChatItem(chatItemEntity);
     }
 
     private void setListView(List<ChatItemEntity> chatItemEntities){

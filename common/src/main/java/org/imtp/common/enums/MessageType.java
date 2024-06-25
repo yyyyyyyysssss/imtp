@@ -3,6 +3,9 @@ package org.imtp.common.enums;
 import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Getter;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Getter
 public enum MessageType {
 
@@ -15,6 +18,8 @@ public enum MessageType {
 
     private final Integer value;
 
+    private static final Map<Integer, MessageType> cacheMap = new HashMap<Integer, MessageType>();
+
     MessageType(Integer value) {
         this.value = value;
     }
@@ -25,9 +30,14 @@ public enum MessageType {
     }
 
     public static MessageType findMessageTypeByValue(Integer value){
+        MessageType type;
+        if ((type = cacheMap.get(value)) != null){
+            return type;
+        }
         MessageType[] values = MessageType.values();
         for (MessageType messageType : values){
             if(messageType.value.equals(value)){
+                cacheMap.put(value, messageType);
                 return messageType;
             }
         }
