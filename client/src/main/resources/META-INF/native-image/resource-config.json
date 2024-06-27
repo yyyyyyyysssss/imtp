@@ -50,6 +50,9 @@
         "pattern": "client:\\Qimg/*.gif\\E"
       },
       {
+        "pattern": "client:\\Qimg/*.ico\\E"
+      },
+      {
         "pattern": "com.gluonhq.emoji:\\Qcom/gluonhq/emoji/emoji.csv\\E"
       },
       {

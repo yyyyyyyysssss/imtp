@@ -149,6 +149,7 @@ public class ChatController extends AbstractController{
     private void sendMessage(){
         Set<Node> nodes = richTextArea.lookupAll(".text-flow");
         StringBuilder sb = new StringBuilder();
+        int i = nodes.size();
         for (Node node : nodes){
             ObservableList<Node> childrenNodes = ((TextFlow) node).getChildrenUnmodifiable();
             for (Node n : childrenNodes){
@@ -174,6 +175,9 @@ public class ChatController extends AbstractController{
                         sb = new StringBuilder();
                     }
                 }
+            }
+            if (--i > 0 ){
+                sb.append(System.lineSeparator());
             }
         }
         if (!sb.toString().isEmpty()){
