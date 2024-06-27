@@ -108,7 +108,9 @@ public class UserSessionItemController extends AbstractController{
             }
             nameLabel.setText(sessionEntity.getName());
             timeLabel.setText("23:34");
-            if (sessionEntity.getLastMsgType().equals(MessageType.TEXT_MESSAGE)){
+            if (sessionEntity.getLastMsgType() == null){
+                lastMsg.setText(null);
+            }else if (sessionEntity.getLastMsgType().equals(MessageType.TEXT_MESSAGE)){
                 lastMsg.setText(sessionEntity.getLastMsg());
             }else if (sessionEntity.getLastMsgType().equals(MessageType.IMAGE_MESSAGE)){
                 lastMsg.setText("[图片]");
