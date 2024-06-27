@@ -96,9 +96,10 @@
                 <filtering>false</filtering>
             </resource>
             <resource>
-                <directory>src/windows</directory>
+                <directory>${project.basedir}</directory>
+                <targetPath>${project.build.directory}</targetPath>
                 <includes>
-                    <include>**/*</include>
+                    <include>src/windows/**</include>
                 </includes>
             </resource>
         </resources>
