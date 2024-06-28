@@ -102,6 +102,13 @@
                     <include>src/windows/**</include>
                 </includes>
             </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+                <targetPath>${project.build.directory}/gluonfx/x86_64-windows</targetPath>
+                <includes>
+                    <include>config.properties</include>
+                </includes>
+            </resource>
         </resources>
         <finalName>imtp-client</finalName>
         <plugins>

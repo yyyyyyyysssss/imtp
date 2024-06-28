@@ -274,7 +274,8 @@
     {
       "name": "com.gluonhq.richtextarea.rich-text-area",
       "locales": [
-        ""
+        "",
+        "und"
       ]
     },
     {
@@ -299,6 +300,12 @@
         "",
         "und",
         "zh-CN"
+      ]
+    },
+    {
+      "name": "config",
+      "locales": [
+        ""
       ]
     }
   ]

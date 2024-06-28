@@ -1,5 +1,6 @@
 package org.imtp.client;
 
+import javafx.application.Application;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import org.imtp.client.constant.FXMLResourceConstant;
@@ -13,7 +14,7 @@ import java.net.URL;
  * @Author ys
  * @Date 2024/5/6 9:43
  */
-public class MainApp extends AbstractApplication {
+public class MainApp extends Application {
 
     public static void main(String[] args) {
         launch(args);
