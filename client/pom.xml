@@ -95,20 +95,6 @@
                 </excludes>
                 <filtering>false</filtering>
             </resource>
-            <resource>
-                <directory>${project.basedir}</directory>
-                <targetPath>${project.build.directory}</targetPath>
-                <includes>
-                    <include>src/windows/**</include>
-                </includes>
-            </resource>
-            <resource>
-                <directory>src/main/resources</directory>
-                <targetPath>${project.build.directory}/gluonfx/x86_64-windows</targetPath>
-                <includes>
-                    <include>config.properties</include>
-                </includes>
-            </resource>
         </resources>
         <finalName>imtp-client</finalName>
         <plugins>
@@ -146,6 +132,7 @@
                 <version>${gluonfx.plugin.version}</version>
                 <configuration>
                     <mainClass>org.imtp.client.MainApp</mainClass>
+                    <enableSWRendering>${enableSWRendering}</enableSWRendering>
                     <attachList>
                         <list>display</list>
                         <list>lifecycle</list>
@@ -176,10 +163,7 @@
                     <bundlesList>
                         <list>com.sun.glass.ui.win</list>
                     </bundlesList>
-                    <linkerArgs>
-                        <arg>management_ext.lib</arg>
-                        <arg>psapi.lib</arg>
-                    </linkerArgs>
+                    <linkerArgs>${dump.link}</linkerArgs>
                 </configuration>
             </plugin>
 
@@ -189,6 +173,62 @@
     </build>
 
     <profiles>
+
+        <profile>
+            <id>win</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <dump.link>management_ext.lib,psapi.lib</dump.link>
+                <enableSWRendering>false</enableSWRendering>
+            </properties>
+            <build>
+                <resources>
+                    <resource>
+                        <directory>${project.basedir}</directory>
+                        <targetPath>${project.build.directory}</targetPath>
+                        <includes>
+                            <include>src/windows/**</include>
+                        </includes>
+                    </resource>
+                    <resource>
+                        <directory>src/main/resources</directory>
+                        <targetPath>${project.build.directory}/gluonfx/x86_64-windows</targetPath>
+                        <includes>
+                            <include>config.properties</include>
+                        </includes>
+                    </resource>
+                </resources>
+            </build>
+        </profile>
+
+        <profile>
+            <id>linux</id>
+            <properties>
+                <dump.link>missing_symbols_linux64.o</dump.link>
+                <enableSWRendering>true</enableSWRendering>
+            </properties>
+            <build>
+                <resources>
+                    <resource>
+                        <directory>${project.basedir}</directory>
+                        <targetPath>${project.build.directory}</targetPath>
+                        <includes>
+                            <include>src/linux/**</include>
+                        </includes>
+                    </resource>
+                    <resource>
+                        <directory>src/main/resources</directory>
+                        <targetPath>${project.build.directory}/gluonfx/x86_64-linux</targetPath>
+                        <includes>
+                            <include>config.properties</include>
+                        </includes>
+                    </resource>
+                </resources>
+            </build>
+        </profile>
+
         <!--  jar方式运行JavaFx窗体      -->
         <profile>
             <id>jar</id>
