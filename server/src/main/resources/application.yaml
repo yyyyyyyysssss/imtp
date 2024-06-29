@@ -3,25 +3,25 @@ spring:
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
     driver-class-name: com.mysql.cj.jdbc.Driver
-#    url: jdbc:h2:~/imtp_server;AUTO_SERVER=TRUE;MODE=MySQL
-#    url: jdbc:h2:mem:imtp_server;MODE=MySQL
     url: jdbc:mysql://127.0.0.1:3306/im?useUnicode=true&useSSL=false&useLegacyDatetimeCode=false&allowMultiQueries=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
     username: root
-#    password: Yan@136156
     password: 123456
     hikari:
       maximum-pool-size: 10
-  h2:
-    console:
-      enabled: true
   sql:
     init:
       schema-locations: schema.sql
       data-locations: data.sql
-      mode: never
+      mode: EMBEDDED
 
 
 mybatis-plus:
   mapper-locations: classpath:mapper/*xml
   configuration:
     map-underscore-to-camel-case: true
+
+
+im:
+  server:
+    host: 172.30.112.1
+    port: 2921

@@ -28,6 +28,9 @@ public class IMServer{
     @Resource
     private LoginHandler loginHandler;
 
+    @Resource
+    private ServerProperties serverProperties;
+
     private EventLoopGroup bossEventLoopGroup;
     private EventLoopGroup workEventLoopGroup;
     private ChannelFuture channelFuture;
@@ -52,7 +55,7 @@ public class IMServer{
                             pipeline.addLast(loginHandler);
                         }
                     });
-            channelFuture = serverBootstrap.bind("127.0.0.1", 2921).sync();
+            channelFuture = serverBootstrap.bind(serverProperties.getHost(), serverProperties.getPort()).sync();
             channelFuture.addListener((ChannelFutureListener) channelFuture -> {
                 if (channelFuture.isSuccess()){
                     log.info("IMServer started");
