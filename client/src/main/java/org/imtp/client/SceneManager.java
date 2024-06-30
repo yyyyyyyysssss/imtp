@@ -25,11 +25,7 @@ public class SceneManager {
         this.stage = stage;
     }
 
-    public void setScene(String fxmlPath, MessageModel messageModel) throws IOException {
-        setScene(fxmlPath,null,messageModel);
-    }
-
-    public void setScene(String fxmlPath,String title,MessageModel messageModel){
+    public void setScene(String fxmlPath,String title,MessageModel messageModel,boolean resizable){
         Platform.runLater(() -> {
             URL url = ResourceUtils.classPathResource(fxmlPath);
             FXMLLoader fxmlLoader = new FXMLLoader();
@@ -44,16 +40,18 @@ public class SceneManager {
                 throw new RuntimeException(e);
             }
             Controller controller = fxmlLoader.getController();
-            controller.init(messageModel);
             controller.setSceneManager(this);
             Scene scene = new Scene(parent);
-
             stage.setTitle(title);
             stage.setScene(scene);
             stage.centerOnScreen();
-            stage.setResizable(false);
+            stage.setResizable(resizable);
+            controller.init(messageModel);
             stage.show();
         });
     }
 
+    public Stage getStage() {
+        return stage;
+    }
 }
