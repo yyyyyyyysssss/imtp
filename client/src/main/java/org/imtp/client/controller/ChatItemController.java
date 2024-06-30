@@ -3,6 +3,8 @@ package org.imtp.client.controller;
 import com.gluonhq.emoji.Emoji;
 import com.gluonhq.emoji.util.TextUtils;
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
@@ -56,7 +58,7 @@ public class ChatItemController extends AbstractController{
 
     private static final Insets RIGHT_INSETS = new Insets(0,10,0,0);
 
-    private static final Insets RIGHT_INSETS_PADDING = new Insets(0,20,0,0);
+    private static final Insets RIGHT_INSETS_PADDING = Insets.EMPTY;
 
     private static final CornerRadii CORNER_RADII = new CornerRadii(5);
 
@@ -73,6 +75,16 @@ public class ChatItemController extends AbstractController{
         imageView = new ImageView();
         imageView.setFitWidth(15);
         imageView.setFitHeight(15);
+
+        chatItemHBox.widthProperty().addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observableValue, Number number, Number t1) {
+                double maxWidth = chatItemTextFlow.getMaxWidth();
+                double d = t1.doubleValue() / (number.doubleValue() == 0.0 ? t1.doubleValue() : number.doubleValue());
+                chatItemTextFlow.setMaxWidth(maxWidth * d);
+            }
+        });
+
     }
 
 

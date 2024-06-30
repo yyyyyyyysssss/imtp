@@ -2,6 +2,7 @@ package org.imtp.client.controller;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
@@ -23,7 +24,7 @@ import java.net.URL;
 public class UserFriendDetailsController extends AbstractController{
 
     @FXML
-    private HBox userFriendDetailsHbox;
+    private HBox userFriendDetailsHBox;
 
     @FXML
     private ImageView friendDetailsImg;
@@ -55,6 +56,8 @@ public class UserFriendDetailsController extends AbstractController{
 
     @FXML
     public void initialize(){
+
+        userFriendDetailsHBox.setAlignment(Pos.TOP_CENTER);
 
         URL maleImageUrl = ResourceUtils.classPathResource("/img/gender_male.png");
         genderMaleImage = new Image(maleImageUrl.toExternalForm());

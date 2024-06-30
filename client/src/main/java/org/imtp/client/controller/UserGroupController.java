@@ -1,9 +1,13 @@
 package org.imtp.client.controller;
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.ListView;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import lombok.extern.slf4j.Slf4j;
 import org.imtp.client.constant.Callback;
@@ -23,13 +27,13 @@ import java.util.Map;
 public class UserGroupController extends AbstractController implements Callback<Long> {
 
     @FXML
-    private Pane userGroupPane;
+    private HBox userGroupHBox;
 
     @FXML
     private ListView<GroupEntity> groupListView;
 
     @FXML
-    private Pane groupPane;
+    private BorderPane groupPane;
 
     private HomeController homeController;
 
@@ -62,11 +66,18 @@ public class UserGroupController extends AbstractController implements Callback<
             if (( node = userGroupNodeMap.get(groupEntity.getId())) == null){
                 node = addGroupDetailsNode(groupEntity);
             }
-            ObservableList<Node> children = groupPane.getChildren();
-            if (!children.isEmpty()){
-                children.removeLast();
+
+            groupPane.setCenter(node);
+        });
+
+        groupListView.prefHeightProperty().bind(userGroupHBox.heightProperty());
+        groupPane.prefHeightProperty().bind(userGroupHBox.heightProperty());
+
+        userGroupHBox.widthProperty().addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observableValue, Number number, Number t1) {
+                groupPane.setPrefWidth(t1.doubleValue() - groupListView.getPrefWidth());
             }
-            children.addLast(node);
         });
 
     }

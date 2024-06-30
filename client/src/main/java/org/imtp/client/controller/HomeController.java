@@ -1,22 +1,21 @@
 package org.imtp.client.controller;
 
-import javafx.collections.ObservableList;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.Pane;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
+import javafx.stage.Window;
 import lombok.extern.slf4j.Slf4j;
-import org.imtp.client.component.ClassPathImageUrlParse;
-import org.imtp.client.component.ImageUrlParse;
 import org.imtp.client.constant.FXMLResourceConstant;
 import org.imtp.client.context.ClientContextHolder;
 import org.imtp.client.context.DefaultClientUserChannelContext;
-import org.imtp.client.event.UserFriendEvent;
 import org.imtp.client.util.ResourceUtils;
 import org.imtp.client.util.Tuple2;
-import org.imtp.common.packet.body.UserFriendInfo;
 import org.imtp.common.packet.body.UserInfo;
 
 import java.net.URL;
@@ -28,6 +27,9 @@ import java.net.URL;
  */
 @Slf4j
 public class HomeController extends AbstractController{
+
+    @FXML
+    private BorderPane borderPane;
 
     @FXML
     private VBox homeVbox;
@@ -56,9 +58,6 @@ public class HomeController extends AbstractController{
 
     private Image groupIconSelectedImage;
 
-    @FXML
-    private Pane homePane;
-
     private Node sessionNode;
 
     private UserSessionController sessionController;
@@ -70,6 +69,10 @@ public class HomeController extends AbstractController{
     private Node groupNode;
 
     private UserGroupController groupController;
+
+    private final static double MIN_HEIGHT = 700.0;
+
+    private final static double MIN_WIDTH = 950.0;
 
     @FXML
     public void initialize(){
@@ -140,8 +143,22 @@ public class HomeController extends AbstractController{
         groupController.setHomeController(this);
 
         //设置默认组件
-        ObservableList<Node> children = homePane.getChildren();
-        children.add(sessionNode);
+        borderPane.setCenter(sessionNode);
+
+        //设置home页最小窗口大小
+        Stage stage = (Stage) borderPane.getScene().getWindow();
+        stage.setMinHeight(MIN_HEIGHT);
+        stage.setMinWidth(MIN_WIDTH);
+        stage.heightProperty().addListener((observableValue, number, t1) -> {
+            if (t1.doubleValue() < MIN_HEIGHT){
+                stage.setHeight(MIN_HEIGHT);
+            }
+        });
+        stage.widthProperty().addListener((observableValue, number, t1) -> {
+            if (t1.doubleValue() < MIN_WIDTH){
+                stage.setMinWidth(MIN_WIDTH);
+            }
+        });
     }
 
     @Override
@@ -154,11 +171,7 @@ public class HomeController extends AbstractController{
         homeFriendImageView.setImage(friendIconImage);
         homeGroupImageView.setImage(groupIconImage);
 
-        ObservableList<Node> children = homePane.getChildren();
-        if (!children.isEmpty()){
-            children.removeLast();
-        }
-        children.add(sessionNode);
+        borderPane.setCenter(sessionNode);
     }
 
     public void switchUserFriend(){
@@ -166,11 +179,7 @@ public class HomeController extends AbstractController{
         homeSessionImageView.setImage(sessionIconImage);
         homeGroupImageView.setImage(groupIconImage);
 
-        ObservableList<Node> children = homePane.getChildren();
-        if (!children.isEmpty()){
-            children.removeLast();
-        }
-        children.add(friendNode);
+        borderPane.setCenter(friendNode);
     }
 
     public void switchUserGroup(){
@@ -178,11 +187,7 @@ public class HomeController extends AbstractController{
         homeSessionImageView.setImage(sessionIconImage);
         homeFriendImageView.setImage(friendIconImage);
 
-        ObservableList<Node> children = homePane.getChildren();
-        if (!children.isEmpty()){
-            children.removeLast();
-        }
-        children.add(groupNode);
+        borderPane.setCenter(groupNode);
     }
 
 }

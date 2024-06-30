@@ -1,9 +1,13 @@
 package org.imtp.client.controller;
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.ListView;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import lombok.extern.slf4j.Slf4j;
 import org.imtp.client.constant.Callback;
@@ -22,13 +26,13 @@ import java.util.Map;
 public class UserFriendController extends AbstractController implements Callback<Long> {
 
     @FXML
-    private Pane userFriendPane;
+    private HBox userFriendHBox;
 
     @FXML
     private ListView<FriendEntity> friendListView;
 
     @FXML
-    private Pane friendPane;
+    private BorderPane friendPane;
 
     private HomeController homeController;
 
@@ -55,11 +59,18 @@ public class UserFriendController extends AbstractController implements Callback
             if (( node = userFriendNodeMap.get(friendEntity.getId())) == null){
                 node = addFriendDetailsNode(friendEntity);
             }
-            ObservableList<Node> children = friendPane.getChildren();
-            if (!children.isEmpty()){
-                children.removeLast();
+
+            friendPane.setCenter(node);
+        });
+
+        friendListView.prefHeightProperty().bind(userFriendHBox.heightProperty());
+        friendPane.prefHeightProperty().bind(userFriendHBox.heightProperty());
+
+        userFriendHBox.widthProperty().addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observableValue, Number number, Number t1) {
+                friendPane.setPrefWidth(t1.doubleValue() - friendListView.getPrefWidth());
             }
-            children.addLast(node);
         });
 
     }

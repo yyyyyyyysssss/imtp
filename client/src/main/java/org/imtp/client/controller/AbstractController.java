@@ -104,7 +104,7 @@ public abstract class AbstractController implements Controller, Observer {
     }
 
     protected void skipScene(String fxmlPath,String title,MessageModel messageModel){
-        this.sceneManager.setScene(fxmlPath,title,messageModel,false);
+        this.sceneManager.setScene(fxmlPath,title,messageModel,true);
     }
 
     protected Tuple2<Node, Controller> loadNodeAndController(String fxmlPath){

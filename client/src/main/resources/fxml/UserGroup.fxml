@@ -1,20 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.ListView?>
+<?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
-<Pane fx:id="userGroupPane" prefHeight="700.0" prefWidth="900.0" stylesheets="@../css/UserGroup.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.imtp.client.controller.UserGroupController">
+<HBox fx:id="userGroupHBox" prefHeight="700.0" prefWidth="900.0" stylesheets="@../css/UserGroup.css" xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.imtp.client.controller.UserGroupController">
     <children>
-        <HBox prefHeight="700.0" prefWidth="900.0">
+        <VBox prefHeight="700.0" prefWidth="230.0">
             <children>
-                <VBox prefHeight="700.0" prefWidth="230.0">
-                    <children>
-                        <ListView fx:id="groupListView" prefHeight="700.0" prefWidth="230.0" styleClass="user-group-listview" />
-                    </children>
-                </VBox>
-                <Pane prefHeight="700.0" prefWidth="670.0" fx:id="groupPane"/>
+                <ListView fx:id="groupListView" prefHeight="700.0" prefWidth="230.0" styleClass="user-group-listview"/>
             </children>
-        </HBox>
+        </VBox>
+        <BorderPane fx:id="groupPane"/>
     </children>
-</Pane>
+</HBox>

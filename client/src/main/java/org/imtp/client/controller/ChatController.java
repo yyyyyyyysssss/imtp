@@ -7,6 +7,8 @@ import com.gluonhq.emoji.util.EmojiImageUtils;
 import com.gluonhq.richtextarea.RichTextArea;
 import io.netty.channel.EventLoop;
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -19,6 +21,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
@@ -57,6 +60,9 @@ public class ChatController extends AbstractController{
     private ListView<ChatItemEntity> chatListView;
 
     @FXML
+    private HBox chatEmojiHBox;
+
+    @FXML
     private ImageView chatEmoteIcon;
 
     @FXML
@@ -64,6 +70,9 @@ public class ChatController extends AbstractController{
 
     @FXML
     private RichTextArea richTextArea;
+
+    @FXML
+    private HBox chatSendHBox;
 
     @FXML
     private Button sendButton;
@@ -131,6 +140,18 @@ public class ChatController extends AbstractController{
             }
             dialog.showEmojiPane(chatEmoteIcon);
         });
+
+        chatVbox.heightProperty().addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observableValue, Number number, Number t1) {
+                chatListView.setPrefHeight(t1.doubleValue() - 250);
+            }
+        });
+
+        chatListView.prefWidthProperty().bind(chatVbox.widthProperty());
+        chatEmojiHBox.prefWidthProperty().bind(chatVbox.widthProperty());
+        richTextArea.prefWidthProperty().bind(chatVbox.widthProperty());
+        chatSendHBox.prefWidthProperty().bind(chatVbox.widthProperty());
     }
 
     @Override

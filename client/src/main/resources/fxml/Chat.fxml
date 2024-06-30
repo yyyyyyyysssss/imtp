@@ -6,10 +6,10 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.*?>
 <?import com.gluonhq.richtextarea.RichTextArea?>
-<VBox fx:id="chatVbox" prefHeight="700.0" prefWidth="670.0" stylesheets="@../css/Chat.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.imtp.client.controller.ChatController">
+<VBox fx:id="chatVbox" stylesheets="@../css/Chat.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.imtp.client.controller.ChatController">
     <children>
-        <ListView fx:id="chatListView" prefHeight="460.0" prefWidth="670.0" />
-        <HBox alignment="CENTER_LEFT" prefHeight="30.0" prefWidth="670.0" spacing="10">
+        <ListView fx:id="chatListView" prefHeight="450.0" prefWidth="670.0" />
+        <HBox fx:id="chatEmojiHBox" alignment="CENTER_LEFT" prefHeight="30.0" prefWidth="670.0" spacing="10">
              <children>
                 <ImageView fx:id="chatEmoteIcon" fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true" />
                 <ImageView fx:id="chatFileIcon" fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true" />
@@ -21,8 +21,8 @@
             <Insets top="5.0" />
          </VBox.margin>
         </HBox>
-        <RichTextArea fx:id="richTextArea" prefHeight="180.0" prefWidth="670.0"/>
-        <HBox alignment="CENTER_RIGHT" prefHeight="30.0" prefWidth="670.0">
+        <RichTextArea fx:id="richTextArea" prefHeight="170.0" prefWidth="670.0"/>
+        <HBox fx:id="chatSendHBox" alignment="CENTER_RIGHT" prefHeight="30.0" prefWidth="670.0">
             <children>
                 <Button fx:id="sendButton" prefHeight="30.0" prefWidth="100" styleClass="send-button" text="发送(S)">
                     <HBox.margin>

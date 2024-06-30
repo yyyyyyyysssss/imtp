@@ -2,10 +2,14 @@ package org.imtp.client.controller;
 
 
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.ListView;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import lombok.extern.slf4j.Slf4j;
 import org.imtp.client.constant.FXMLResourceConstant;
@@ -34,7 +38,10 @@ import java.util.Random;
 public class UserSessionController extends AbstractController{
 
     @FXML
-    private Pane chatPane;
+    private HBox userSessionHBox;
+
+    @FXML
+    private BorderPane chatPane;
 
     @FXML
     private ListView<SessionEntity> listView;
@@ -65,6 +72,16 @@ public class UserSessionController extends AbstractController{
             }
             showChatNode(sessionEntity);
             sessionEntity.setCount("");
+        });
+
+        listView.prefHeightProperty().bind(userSessionHBox.heightProperty());
+        chatPane.prefHeightProperty().bind(userSessionHBox.heightProperty());
+
+        userSessionHBox.widthProperty().addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observableValue, Number number, Number t1) {
+                chatPane.setPrefWidth(t1.doubleValue() - listView.getPrefWidth());
+            }
         });
     }
 
@@ -161,11 +178,12 @@ public class UserSessionController extends AbstractController{
     }
 
     private void showChatNode(Node node){
-        ObservableList<Node> children = chatPane.getChildren();
-        if (!children.isEmpty()){
-            children.removeLast();
-        }
-        children.addLast(node);
+//        ObservableList<Node> children = chatPane.getChildren();
+//        if (!children.isEmpty()){
+//            children.removeLast();
+//        }
+//        children.addLast(node);
+        chatPane.setCenter(node);
     }
 
     private void setListView(List<SessionEntity> sessionEntities){
