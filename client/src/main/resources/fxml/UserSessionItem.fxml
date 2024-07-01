@@ -30,14 +30,9 @@
                 <Region prefWidth="165.0" VBox.vgrow="ALWAYS" />
                 <HBox prefWidth="165.0" alignment="BOTTOM_LEFT">
                     <children>
-                        <Label fx:id="sendUserName" style="-fx-text-fill: Grey;">
-                         <HBox.margin>
-                            <Insets left="5.0" />
-                         </HBox.margin>
-                        </Label>
-                        <Label fx:id="lastMsg" style="-fx-text-fill: Grey" maxWidth="80">
+                        <Label fx:id="lastMsg" style="-fx-text-fill: Grey" maxWidth="120">
                             <padding>
-                                <Insets left="5.0" />
+                                <Insets left="5.0"/>
                             </padding>
                         </Label>
                         <Region HBox.hgrow="ALWAYS" />

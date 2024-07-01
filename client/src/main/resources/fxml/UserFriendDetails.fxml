@@ -1,13 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.Separator?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
 <?import javafx.scene.image.ImageView?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.Pane?>
-<?import javafx.scene.layout.VBox?>
-
+<?import javafx.scene.layout.*?>
 <HBox fx:id="userFriendDetailsHBox" alignment="CENTER" stylesheets="@../css/UserFriendDetails.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.imtp.client.controller.UserFriendDetailsController">
     <children>
       <VBox alignment="TOP_CENTER" prefHeight="200.0" prefWidth="300.0">
@@ -48,16 +44,13 @@
                </padding></Separator>
             <HBox alignment="CENTER">
                <children>
-                  <Pane fx:id="friendSendMessagePane">
+                  <VBox fx:id="friendSendMessagePane" alignment="CENTER">
                      <children>
                         <ImageView fx:id="friendSendMessage" fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true" />
                         <Label text="发消息" style="-fx-text-fill: #9AA5BE">
-                           <padding>
-                              <Insets top="32.0" />
-                           </padding>
                         </Label>
                      </children>
-                  </Pane>
+                  </VBox>
                </children>
                <VBox.margin>
                   <Insets top="20.0" />

@@ -6,7 +6,7 @@ import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 import lombok.extern.slf4j.Slf4j;
 import org.imtp.client.constant.Callback;
 import org.imtp.client.entity.GroupEntity;
@@ -30,7 +30,7 @@ public class UserGroupDetailsController extends AbstractController{
     private ImageView groupSendMessage;
 
     @FXML
-    private Pane groupSendMessagePane;
+    private VBox groupSendMessagePane;
 
     private GroupEntity groupEntity;
 

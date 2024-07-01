@@ -21,7 +21,7 @@ import java.net.URL;
 @Slf4j
 public class SceneManager {
 
-    private Stage stage;
+    private volatile Stage stage;
 
     public SceneManager(Stage stage){
         this.stage = stage;

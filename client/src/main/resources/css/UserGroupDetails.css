@@ -1,8 +1,8 @@
 
-#friendSendMessagePane{
+#groupSendMessagePane{
     -fx-padding: 5 10 5 10;
 }
 
-#friendSendMessagePane:hover{
+#groupSendMessagePane:hover{
     -fx-background-color: lightgray;
 }

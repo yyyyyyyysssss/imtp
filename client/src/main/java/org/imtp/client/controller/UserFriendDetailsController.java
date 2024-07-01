@@ -9,6 +9,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 import lombok.extern.slf4j.Slf4j;
 import org.imtp.client.component.ClassPathImageUrlParse;
 import org.imtp.client.component.ImageUrlParse;
@@ -42,7 +43,7 @@ public class UserFriendDetailsController extends AbstractController{
     private ImageView friendSendMessage;
 
     @FXML
-    private Pane friendSendMessagePane;
+    private VBox friendSendMessagePane;
 
     private FriendEntity friendEntity;
 

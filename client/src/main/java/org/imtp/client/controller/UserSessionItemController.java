@@ -38,9 +38,6 @@ public class UserSessionItemController extends AbstractController{
     private Label lastMsg;
 
     @FXML
-    private Label sendUserName;
-
-    @FXML
     private StackPane itemStackPane;
 
     @FXML
@@ -99,29 +96,30 @@ public class UserSessionItemController extends AbstractController{
     private void setData(SessionEntity sessionEntity){
         Platform.runLater(() -> {
             sessionImg.setImage(new Image(sessionEntity.getAvatar()));
+            StringBuilder sb = new StringBuilder();
             if (sessionEntity.getDeliveryMethod().equals(DeliveryMethod.GROUP)
                     && sessionEntity.getLastSendMsgUserId() != null
                     && !ClientContextHolder.clientContext().id().equals(sessionEntity.getLastSendMsgUserId())){
-                sendUserName.setText(sessionEntity.getLastUserName() + ":");
-            }else {
-                sendUserName.setText(null);
+                sb.append(sessionEntity.getLastUserName()).append(":");
             }
             nameLabel.setText(sessionEntity.getName());
             timeLabel.setText("23:34");
             if (sessionEntity.getLastMsgType() == null){
                 lastMsg.setText(null);
             }else if (sessionEntity.getLastMsgType().equals(MessageType.TEXT_MESSAGE)){
-                lastMsg.setText(sessionEntity.getLastMsg());
+                sb.append(sessionEntity.getLastMsg());
             }else if (sessionEntity.getLastMsgType().equals(MessageType.IMAGE_MESSAGE)){
-                lastMsg.setText("[图片]");
+                sb.append("[图片]");
             }else if (sessionEntity.getLastMsgType().equals(MessageType.VIDEO_MESSAGE)){
-                lastMsg.setText("[视频]");
+                sb.append("[视频]");
             }else if (sessionEntity.getLastMsgType().equals(MessageType.VOICE_MESSAGE)){
-                lastMsg.setText("[语音]");
+                sb.append("[语音]");
             }else if (sessionEntity.getLastMsgType().equals(MessageType.FILE_MESSAGE)){
-                lastMsg.setText("[文件]");
+                sb.append("[文件]");
             }
-
+            if (!sb.toString().isEmpty()){
+                lastMsg.setText(sb.toString());
+            }
             messageCount.textProperty().bind(sessionEntity.countProperty());
             if (sessionEntity.getCount() == null || sessionEntity.getCount().isEmpty()){
                 alertCircle.setVisible(false);
