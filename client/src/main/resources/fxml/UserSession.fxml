@@ -9,7 +9,7 @@
     <children>
         <VBox>
             <children>
-                <ListView fx:id="listView" prefHeight="700.0" prefWidth="230.0" styleClass="user-session-listview"/>
+                <ListView fx:id="listView" prefWidth="230.0" styleClass="user-session-listview"/>
             </children>
         </VBox>
         <BorderPane fx:id="chatPane"/>

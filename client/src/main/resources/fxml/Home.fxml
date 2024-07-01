@@ -6,30 +6,23 @@
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane fx:id="borderPane" prefHeight="700.0" prefWidth="950.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.imtp.client.controller.HomeController">
+<?import javafx.scene.layout.HBox?>
+<BorderPane fx:id="rootPane" prefHeight="750.0" prefWidth="1000.0" stylesheets="@../css/Home.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.imtp.client.controller.HomeController">
    <left>
-        <VBox fx:id="homeVbox" prefHeight="700.0" prefWidth="50.0" BorderPane.alignment="CENTER">
+        <VBox fx:id="homeVbox" prefWidth="50.0" BorderPane.alignment="CENTER">
          <children>
             <VBox alignment="TOP_CENTER" prefHeight="300.0" prefWidth="50.0">
                <children>
                   <ImageView fx:id="homeAvatarImageView" fitHeight="40.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true">
                      <VBox.margin>
-                        <Insets top="10.0" />
+                        <Insets top="20.0" />
                      </VBox.margin>
                   </ImageView>
-                  <VBox alignment="TOP_CENTER" prefWidth="50.0">
+                  <VBox alignment="TOP_CENTER" prefWidth="50.0" spacing="15">
                      <children>
                         <ImageView fx:id="homeSessionImageView" fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true" />
-                        <ImageView fx:id="homeFriendImageView" fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
-                           <VBox.margin>
-                              <Insets top="10.0" />
-                           </VBox.margin>
-                        </ImageView>
-                         <ImageView fx:id="homeGroupImageView" fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
-                             <VBox.margin>
-                                 <Insets top="10.0" />
-                             </VBox.margin>
-                        </ImageView>
+                        <ImageView fx:id="homeFriendImageView" fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true"/>
+                         <ImageView fx:id="homeGroupImageView" fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true"/>
                      </children>
                      <padding>
                         <Insets top="20.0" />
@@ -42,4 +35,16 @@
          </children>
       </VBox>
    </left>
+    <center>
+        <BorderPane fx:id="centerBorderPane">
+            <top>
+                <HBox prefHeight="50.0">
+                    <children>
+                        <HBox fx:id="homeSearchHBox" prefWidth="230"/>
+                        <HBox/>
+                    </children>
+                </HBox>
+            </top>
+        </BorderPane>
+    </center>
 </BorderPane>

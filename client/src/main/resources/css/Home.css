@@ -1,5 +1,6 @@
 
 
-#homeVbox{
-
+#homeSearchHBox{
+    -fx-border-width: 0 1 0 0;
+    -fx-border-color: lightgrey;
 }
