@@ -305,7 +305,8 @@
     {
       "name": "config",
       "locales": [
-        ""
+        "",
+        "und"
       ]
     }
   ]
