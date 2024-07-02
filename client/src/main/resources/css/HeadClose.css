@@ -1,0 +1,11 @@
+#headMaximizeVBxo:hover{
+    -fx-background-color: lightgray;
+}
+
+#headMinimizeVBxo:hover{
+    -fx-background-color: lightgray;
+}
+
+#headCloseVBxo:hover{
+    -fx-background-color: #FB7373;
+}

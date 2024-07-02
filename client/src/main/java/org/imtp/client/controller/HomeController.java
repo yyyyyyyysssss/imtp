@@ -1,16 +1,23 @@
 package org.imtp.client.controller;
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import lombok.extern.slf4j.Slf4j;
+import org.imtp.client.SceneManager;
+import org.imtp.client.SceneManagerHolder;
 import org.imtp.client.constant.FXMLResourceConstant;
 import org.imtp.client.context.ClientContextHolder;
 import org.imtp.client.context.DefaultClientUserChannelContext;
+import org.imtp.client.util.EffectUtilities;
 import org.imtp.client.util.ResourceUtils;
 import org.imtp.client.util.Tuple2;
 import org.imtp.common.packet.body.UserInfo;
@@ -28,12 +35,20 @@ public class HomeController extends AbstractController{
     @FXML
     private BorderPane rootPane;
 
-
     @FXML
     private BorderPane centerBorderPane;
 
     @FXML
-    private VBox homeVbox;
+    private HBox centerBorderPaneHBox;
+
+    @FXML
+    private HBox centerHomeLeftHBox;
+
+    @FXML
+    private HBox centerHomeRightHBox;
+
+    @FXML
+    private Label headName;
 
     @FXML
     private ImageView homeAvatarImageView;
@@ -76,6 +91,9 @@ public class HomeController extends AbstractController{
     private final static double MIN_WIDTH = 1000.0;
 
     @FXML
+    private BorderPane centerHomeRightBorderPane;
+
+    @FXML
     public void initialize(){
         //设置当前登录人头像
         DefaultClientUserChannelContext userChannelContext = (DefaultClientUserChannelContext)ClientContextHolder.clientContext();
@@ -116,6 +134,30 @@ public class HomeController extends AbstractController{
             switchUserGroup();
         });
 
+        centerBorderPaneHBox.widthProperty().addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observableValue, Number number, Number t1) {
+                double prefWidth = centerHomeLeftHBox.getPrefWidth();
+                centerHomeRightBorderPane.setPrefWidth(t1.doubleValue() - prefWidth);
+            }
+        });
+
+        SceneManager sceneManager = SceneManagerHolder.getSceneManager();
+        Stage stage = sceneManager.getStage();
+        stage.setMinHeight(MIN_HEIGHT);
+        stage.setMinWidth(MIN_WIDTH);
+        stage.heightProperty().addListener((observableValue, number, t1) -> {
+            if (t1.doubleValue() < MIN_HEIGHT){
+                stage.setHeight(MIN_HEIGHT);
+            }
+        });
+        stage.widthProperty().addListener((observableValue, number, t1) -> {
+            if (t1.doubleValue() < MIN_WIDTH){
+                stage.setMinWidth(MIN_WIDTH);
+            }
+        });
+        //设置拖动
+        EffectUtilities.makeDraggable(stage,centerBorderPaneHBox);
     }
 
     @Override
@@ -146,20 +188,6 @@ public class HomeController extends AbstractController{
         //设置默认组件
         centerBorderPane.setCenter(sessionNode);
 
-        //设置home页最小窗口大小
-        Stage stage = (Stage) rootPane.getScene().getWindow();
-        stage.setMinHeight(MIN_HEIGHT);
-        stage.setMinWidth(MIN_WIDTH);
-        stage.heightProperty().addListener((observableValue, number, t1) -> {
-            if (t1.doubleValue() < MIN_HEIGHT){
-                stage.setHeight(MIN_HEIGHT);
-            }
-        });
-        stage.widthProperty().addListener((observableValue, number, t1) -> {
-            if (t1.doubleValue() < MIN_WIDTH){
-                stage.setMinWidth(MIN_WIDTH);
-            }
-        });
     }
 
     @Override
@@ -173,6 +201,8 @@ public class HomeController extends AbstractController{
         homeGroupImageView.setImage(groupIconImage);
 
         centerBorderPane.setCenter(sessionNode);
+
+        headName.setVisible(true);
     }
 
     public void switchUserFriend(){
@@ -181,6 +211,8 @@ public class HomeController extends AbstractController{
         homeGroupImageView.setImage(groupIconImage);
 
         centerBorderPane.setCenter(friendNode);
+
+        headName.setVisible(false);
     }
 
     public void switchUserGroup(){
@@ -189,6 +221,12 @@ public class HomeController extends AbstractController{
         homeFriendImageView.setImage(friendIconImage);
 
         centerBorderPane.setCenter(groupNode);
+
+        headName.setVisible(false);
+    }
+
+    public void setHeadName(String content){
+        headName.setText(content);
     }
 
 }

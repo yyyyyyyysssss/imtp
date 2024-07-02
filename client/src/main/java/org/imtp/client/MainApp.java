@@ -23,7 +23,8 @@ public class MainApp extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
-        SceneManager sceneManager = new SceneManager(stage);
+        stage.initStyle(StageStyle.UNDECORATED);
+        SceneManager sceneManager = SceneManagerHolder.createSceneManager(stage);
         sceneManager.setScene(FXMLResourceConstant.LOGIN_FXML,"登录页",new LoginHandler(),false);
         URL url = ResourceUtils.classPathResource("/img/taskbar_icon.png");
         stage.getIcons().add(new Image(url.toExternalForm()));

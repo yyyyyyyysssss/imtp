@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<HBox fx:id="rootHBox" spacing="20" alignment="TOP_RIGHT" stylesheets="@../css/HeadClose.css" fx:controller="org.imtp.client.controller.HeadClose" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml">
+    <children>
+        <VBox fx:id="headMinimizeVBxo">
+            <children>
+                <ImageView fx:id="headMinimize">
+                    <image>
+                        <Image url="@../img/minimize_16.png" />
+                    </image>
+                    <VBox.margin>
+                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                    </VBox.margin>
+                </ImageView>
+            </children>
+        </VBox>
+        <VBox fx:id="headMaximizeVBxo">
+            <children>
+                <ImageView fx:id="headMaximize">
+                    <image>
+                        <Image url="@../img/maximize_16.png" />
+                    </image>
+                    <VBox.margin>
+                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                    </VBox.margin>
+                </ImageView>
+            </children>
+            <HBox.margin>
+                <Insets />
+            </HBox.margin>
+        </VBox>
+        <VBox fx:id="headCloseVBxo">
+            <children>
+                <ImageView fx:id="headClose">
+                    <image>
+                        <Image url="@../img/close_16.png" />
+                    </image>
+                    <VBox.margin>
+                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                    </VBox.margin>
+                </ImageView>
+            </children>
+        </VBox>
+    </children>
+</HBox>

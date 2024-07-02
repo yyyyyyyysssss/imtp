@@ -10,6 +10,7 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import lombok.extern.slf4j.Slf4j;
 import org.imtp.client.controller.Controller;
 import org.imtp.client.model.MessageModel;
@@ -21,7 +22,7 @@ import java.net.URL;
 @Slf4j
 public class SceneManager {
 
-    private volatile Stage stage;
+    private Stage stage;
 
     public SceneManager(Stage stage){
         this.stage = stage;

@@ -1,6 +1,15 @@
 
+#rootPane{
+    -fx-effect: innershadow(gaussian, #D0D0D0, 1, 1.0, 0, 0);
+}
 
-#homeSearchHBox{
+#centerHomeLeftHBox{
     -fx-border-width: 0 1 0 0;
     -fx-border-color: lightgrey;
+}
+
+#headName{
+    -fx-padding: 0 0 0 10;
+    -fx-font-size: 16;
+    -fx-font-weight: bold;
 }

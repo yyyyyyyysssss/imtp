@@ -159,6 +159,7 @@
                         <list>org.imtp.client.controller.UserGroupDetailsController</list>
                         <list>org.imtp.client.controller.UserGroupItemController</list>
                         <list>org.imtp.client.controller.ChatEmojiDialog</list>
+                        <list>org.imtp.client.controller.HeadClose</list>
                     </reflectionList>
                     <bundlesList>
                         <list>com.sun.glass.ui.win</list>

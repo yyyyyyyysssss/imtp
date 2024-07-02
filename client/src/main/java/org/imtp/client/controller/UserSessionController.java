@@ -72,6 +72,7 @@ public class UserSessionController extends AbstractController{
             }
             showChatNode(sessionEntity);
             sessionEntity.setCount("");
+            homeController.setHeadName(sessionEntity.getName());
         });
 
         listView.prefHeightProperty().bind(userSessionHBox.heightProperty());

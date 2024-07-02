@@ -17,12 +17,16 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.Text;
+import javafx.stage.Stage;
 import lombok.extern.slf4j.Slf4j;
 import org.imtp.client.Client;
+import org.imtp.client.SceneManager;
+import org.imtp.client.SceneManagerHolder;
 import org.imtp.client.constant.FXMLResourceConstant;
 import org.imtp.client.constant.SendMessageListener;
 import org.imtp.client.handler.LoginHandler;
 import org.imtp.client.model.MessageModel;
+import org.imtp.client.util.EffectUtilities;
 import org.imtp.client.util.ResourceUtils;
 import org.imtp.common.packet.LoginRequest;
 import org.imtp.common.packet.LoginResponse;
@@ -122,6 +126,10 @@ public class LoginController extends AbstractController{
                 errorTip.hide();
             }
         });
+
+        SceneManager sceneManager = SceneManagerHolder.getSceneManager();
+        Stage stage = sceneManager.getStage();
+        EffectUtilities.makeDraggable(stage,loginBorderPane);
     }
 
 
