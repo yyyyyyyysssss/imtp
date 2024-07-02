@@ -3,11 +3,11 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
-<HBox fx:id="rootHBox" spacing="20" alignment="TOP_RIGHT" stylesheets="@../css/HeadClose.css" fx:controller="org.imtp.client.controller.HeadClose" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml">
+<HBox spacing="20" alignment="TOP_RIGHT" stylesheets="@../css/HeadClose.css" fx:controller="org.imtp.client.controller.HeadClose" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml">
     <children>
         <VBox fx:id="headMinimizeVBxo">
             <children>
-                <ImageView fx:id="headMinimize">
+                <ImageView>
                     <image>
                         <Image url="@../img/minimize_16.png" />
                     </image>
@@ -19,7 +19,7 @@
         </VBox>
         <VBox fx:id="headMaximizeVBxo">
             <children>
-                <ImageView fx:id="headMaximize">
+                <ImageView>
                     <image>
                         <Image url="@../img/maximize_16.png" />
                     </image>
@@ -34,7 +34,7 @@
         </VBox>
         <VBox fx:id="headCloseVBxo">
             <children>
-                <ImageView fx:id="headClose">
+                <ImageView>
                     <image>
                         <Image url="@../img/close_16.png" />
                     </image>
