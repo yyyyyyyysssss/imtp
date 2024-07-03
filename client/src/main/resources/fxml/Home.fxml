@@ -2,6 +2,7 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.BorderPane?>
@@ -48,7 +49,35 @@
             <top>
                 <HBox fx:id="centerBorderPaneHBox" prefHeight="50.0" prefWidth="950">
                     <children>
-                        <HBox fx:id="centerHomeLeftHBox" prefWidth="230"/>
+                        <HBox fx:id="centerHomeLeftHBox" alignment="CENTER" prefWidth="230" spacing="5">
+                            <children>
+                                <HBox styleClass="searchStyle" alignment="CENTER" maxHeight="-Infinity">
+                                    <children>
+                                        <ImageView>
+                                            <image>
+                                                <Image url="@../img/search_14.png"/>
+                                            </image>
+                                            <HBox.margin>
+                                                <Insets left="5.0"/>
+                                            </HBox.margin>
+                                        </ImageView>
+                                        <TextField fx:id="homeSearch" styleClass="searchStyle" prefWidth="150.0" promptText="搜索"/>
+                                    </children>
+                                </HBox>
+                                <HBox styleClass="searchStyle" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity">
+                                    <children>
+                                        <ImageView>
+                                            <image>
+                                                <Image url="@../img/add_14.png"/>
+                                            </image>
+                                            <HBox.margin>
+                                                <Insets left="4.0" right="4.0" top="4.0" bottom="4.0"/>
+                                            </HBox.margin>
+                                        </ImageView>
+                                    </children>
+                                </HBox>
+                            </children>
+                        </HBox>
                         <HBox fx:id="centerHomeRightHBox">
                             <BorderPane fx:id="centerHomeRightBorderPane" prefWidth="720">
                                 <left>

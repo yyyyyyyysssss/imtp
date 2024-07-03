@@ -27,13 +27,13 @@ import org.imtp.client.constant.SendMessageListener;
 import org.imtp.client.handler.LoginHandler;
 import org.imtp.client.model.MessageModel;
 import org.imtp.client.util.EffectUtilities;
+import org.imtp.client.util.ResizeHelper;
 import org.imtp.client.util.ResourceUtils;
 import org.imtp.common.packet.LoginRequest;
 import org.imtp.common.packet.LoginResponse;
 import org.imtp.common.packet.body.LoginInfo;
 
 import java.net.URL;
-import java.util.List;
 
 /**
  * @Description
@@ -41,7 +41,7 @@ import java.util.List;
  * @Date 2024/5/6 16:46
  */
 @Slf4j
-public class LoginController extends AbstractController{
+public class LoginController extends AbstractController {
 
     @FXML
     private BorderPane loginBorderPane;
@@ -70,6 +70,12 @@ public class LoginController extends AbstractController{
     @FXML
     private Text errorMsg;
 
+    @FXML
+    private VBox headMinimizeVBxo;
+
+    @FXML
+    private VBox headCloseVBxo;
+
     private ImageView loadingImage;
 
     private Client client;
@@ -77,7 +83,6 @@ public class LoginController extends AbstractController{
     private final Tooltip errorTip = new Tooltip();
 
     private ObservableList<Node> defaultChildren;
-
 
     @FXML
     public void initialize(){
@@ -130,6 +135,13 @@ public class LoginController extends AbstractController{
         SceneManager sceneManager = SceneManagerHolder.getSceneManager();
         Stage stage = sceneManager.getStage();
         EffectUtilities.makeDraggable(stage,loginBorderPane);
+
+        headMinimizeVBxo.setOnMouseClicked(event -> {
+            stage.setIconified(true);
+        });
+        headCloseVBxo.setOnMouseClicked(event -> {
+            stage.close();
+        });
     }
 
 
@@ -234,5 +246,4 @@ public class LoginController extends AbstractController{
         });
 
     }
-
 }

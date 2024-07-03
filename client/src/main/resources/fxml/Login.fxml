@@ -1,34 +1,75 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.*?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.Cursor?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
 <?import javafx.scene.shape.Circle?>
 <?import javafx.scene.text.Text?>
+
 <BorderPane fx:id="loginBorderPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="450.0" prefWidth="300.0" style="-fx-background-color: white" stylesheets="@../css/Login.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.imtp.client.controller.LoginController">
+    <top>
+        <VBox prefHeight="50.0" BorderPane.alignment="CENTER">
+            <HBox alignment="TOP_RIGHT" stylesheets="@../css/HeadClose.css" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml">
+                <children>
+                    <VBox fx:id="headMinimizeVBxo">
+                        <children>
+                            <ImageView>
+                                <image>
+                                    <Image url="@../img/minimize_16.png" />
+                                </image>
+                                <VBox.margin>
+                                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                </VBox.margin>
+                            </ImageView>
+                        </children>
+                    </VBox>
+                    <VBox fx:id="headCloseVBxo">
+                        <children>
+                            <ImageView>
+                                <image>
+                                    <Image url="@../img/close_16.png" />
+                                </image>
+                                <VBox.margin>
+                                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                </VBox.margin>
+                            </ImageView>
+                        </children>
+                    </VBox>
+                </children>
+            </HBox>
+        </VBox>
+    </top>
     <center>
         <AnchorPane prefHeight="400.0" prefWidth="300.0" BorderPane.alignment="CENTER">
             <children>
-                <Circle fx:id="pic" fill="DODGERBLUE" layoutX="150.0" layoutY="120.0" radius="35.0" stroke="#8c90b3" strokeType="INSIDE" strokeWidth="0.5" />
-                <ImageView fitHeight="20.0" fitWidth="20.0" layoutX="49.0" layoutY="163.0" pickOnBounds="true" preserveRatio="true">
+                <Circle fx:id="pic" fill="DODGERBLUE" layoutX="150.0" layoutY="85.0" radius="35.0" stroke="#8c90b3" strokeType="INSIDE" strokeWidth="0.5" />
+                <ImageView fitHeight="20.0" fitWidth="20.0" layoutX="49.0" layoutY="153.0" pickOnBounds="true" preserveRatio="true">
                     <image>
                         <Image url="@../img/username_icon.png" />
                     </image>
                 </ImageView>
-                <TextField fx:id="username" layoutX="69.0" layoutY="163.0" prefHeight="25.0" prefWidth="182.0" promptText="登录名" styleClass="up_default" />
-                <Separator fx:id="pSeparator" layoutX="49.0" layoutY="225.0" prefWidth="202.0" styleClass="separator_default" />
-                <ImageView fitHeight="20.0" fitWidth="20.0" layoutX="48.0" layoutY="202.0" pickOnBounds="true" preserveRatio="true">
+                <TextField fx:id="username" layoutX="69.0" layoutY="153.0" prefHeight="25.0" prefWidth="182.0" promptText="登录名" styleClass="up_default" />
+                <Separator fx:id="pSeparator" layoutX="49.0" layoutY="215.0" prefWidth="202.0" styleClass="separator_default" />
+                <ImageView fitHeight="20.0" fitWidth="20.0" layoutX="48.0" layoutY="192.0" pickOnBounds="true" preserveRatio="true">
                     <image>
                         <Image url="@../img/password_icon.png" />
                     </image>
                 </ImageView>
-                <PasswordField fx:id="password" layoutX="69.0" layoutY="202.0" prefHeight="25.0" prefWidth="182.0" promptText="密码" styleClass="up_default" />
-                <Separator fx:id="uSeparator" layoutX="49.0" layoutY="186.0" prefWidth="202.0" styleClass="separator_default" />
-                <VBox fx:id="loginVBox" alignment="CENTER" layoutX="75.0" layoutY="255.0" prefHeight="80.0" prefWidth="150.0">
+                <PasswordField fx:id="password" layoutX="69.0" layoutY="192.0" prefHeight="25.0" prefWidth="182.0" promptText="密码" styleClass="up_default" />
+                <Separator fx:id="uSeparator" layoutX="49.0" layoutY="176.0" prefWidth="202.0" styleClass="separator_default" />
+                <VBox fx:id="loginVBox" alignment="CENTER" layoutX="75.0" layoutY="260.0" prefHeight="80.0" prefWidth="150.0">
                     <children>
-                        <Button fx:id="loginButton" mnemonicParsing="false" onAction="#login" prefHeight="32.0" prefWidth="76.0" style="-fx-background-color: #404040; -fx-background-radius: 0px;" text="登录" textFill="WHITE">
+                        <Button fx:id="loginButton" mnemonicParsing="false" onAction="#login" prefHeight="35.0" prefWidth="75.0" style="-fx-background-color: #404040; -fx-background-radius: 0px;" text="登录" textFill="WHITE">
                             <cursor>
                                 <Cursor fx:constant="OPEN_HAND" />
                             </cursor>
@@ -44,10 +85,4 @@
             </children>
         </AnchorPane>
     </center>
-    <top>
-        <VBox prefHeight="50.0" BorderPane.alignment="CENTER">
-            <fx:include source="HeadClose.fxml"/>
-        </VBox>
-    </top>
-
 </BorderPane>

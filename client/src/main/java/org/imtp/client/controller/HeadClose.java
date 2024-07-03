@@ -1,6 +1,7 @@
 package org.imtp.client.controller;
 
 import javafx.fxml.FXML;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.imtp.client.SceneManager;
@@ -11,7 +12,7 @@ import org.imtp.client.SceneManagerHolder;
  * @Author ys
  * @Date 2024/7/2 17:41
  */
-public class HeadClose {
+public class HeadClose{
 
     @FXML
     private VBox headMinimizeVBxo;

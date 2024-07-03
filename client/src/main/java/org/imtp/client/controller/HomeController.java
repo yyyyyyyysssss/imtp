@@ -2,11 +2,14 @@ package org.imtp.client.controller;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -18,6 +21,7 @@ import org.imtp.client.constant.FXMLResourceConstant;
 import org.imtp.client.context.ClientContextHolder;
 import org.imtp.client.context.DefaultClientUserChannelContext;
 import org.imtp.client.util.EffectUtilities;
+import org.imtp.client.util.ResizeHelper;
 import org.imtp.client.util.ResourceUtils;
 import org.imtp.client.util.Tuple2;
 import org.imtp.common.packet.body.UserInfo;
@@ -69,6 +73,9 @@ public class HomeController extends AbstractController{
 
     @FXML
     private ImageView homeGroupImageView;
+
+    @FXML
+    private TextField homeSearch;
 
     private Image groupIconImage;
 
@@ -142,6 +149,8 @@ public class HomeController extends AbstractController{
             }
         });
 
+        homeSearch.setFocusTraversable(false);
+
         SceneManager sceneManager = SceneManagerHolder.getSceneManager();
         Stage stage = sceneManager.getStage();
         stage.setMinHeight(MIN_HEIGHT);
@@ -156,12 +165,16 @@ public class HomeController extends AbstractController{
                 stage.setMinWidth(MIN_WIDTH);
             }
         });
-        //设置拖动
-        EffectUtilities.makeDraggable(stage,centerBorderPaneHBox);
     }
 
     @Override
     protected void init0() {
+
+        //设置拖动以及窗口伸缩
+        SceneManager sceneManager = SceneManagerHolder.getSceneManager();
+        Stage stage = sceneManager.getStage();
+        ResizeHelper.addResizeListener(stage);
+
         Tuple2<Node, Controller> chatTuple2 = loadNodeAndController(FXMLResourceConstant.USER_SESSION_FML);
         this.sessionNode = chatTuple2.getV1();
         this.sessionController = (UserSessionController) chatTuple2.getV2();
