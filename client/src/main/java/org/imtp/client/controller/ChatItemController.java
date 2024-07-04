@@ -202,11 +202,10 @@ public class ChatItemController extends AbstractController{
         double width = image.getWidth();
         ImageView iv = new ImageView(image);
         iv.setStyle("-fx-effect: dropshadow(three-pass-box, lightgray, 1, 0, 0, 0);");
-        if (height > max_height_image){
-            iv.setFitHeight(max_height_image);
-        }
         if (width > max_width_image){
             iv.setFitWidth(max_width_image);
+            double h = max_width_image * height / width;
+            iv.setFitHeight(h);
         }
         return iv;
     }

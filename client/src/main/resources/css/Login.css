@@ -1,3 +1,7 @@
+#loginBorderPane{
+    -fx-effect: innershadow(gaussian, #D0D0D0, 1, 1.0, 0, 0);
+}
+
 .up_default{
     -fx-background-color: transparent;
     -fx-border-width: 0px 0px 0px 0px;
