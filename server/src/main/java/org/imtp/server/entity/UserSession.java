@@ -2,6 +2,7 @@ package org.imtp.server.entity;
 
 import com.baomidou.mybatisplus.annotation.EnumValue;
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 import org.imtp.common.enums.DeliveryMethod;
@@ -19,7 +20,7 @@ import org.imtp.common.enums.DeliveryMethod;
 @TableName("im_user_session")
 public class UserSession {
 
-    @TableField
+    @TableId
     private Long id;
 
     @TableField("user_id")

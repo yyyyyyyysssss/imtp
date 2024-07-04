@@ -11,10 +11,15 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.imtp.common.codec.IMTPDecoder;
 import org.imtp.common.codec.IMTPEncoder;
+import org.imtp.common.utils.JsonUtil;
+import org.imtp.server.config.ServiceRegister;
 import org.imtp.server.context.ChannelContextHolder;
-import org.imtp.server.handler.CommandHandler;
+import org.imtp.server.enums.Model;
 import org.imtp.server.handler.LoginHandler;
+import org.imtp.server.utils.SpringUtil;
 import org.springframework.stereotype.Component;
+
+import java.util.UUID;
 
 /**
  * @Description
@@ -61,6 +66,21 @@ public class IMServer{
                     log.info("IMServer started");
                     //初始化上下文对象
                     ChannelContextHolder.createChannelContext();
+
+                    //集群模式将服务器信息注册
+                    if (Model.CLUSTER.equals(serverProperties.getConfiguration().getModel())){
+                        String id = serverProperties.getConfiguration().getId();
+                        if (id == null){
+                            id = UUID.randomUUID().toString().replace("-","");
+                            serverProperties.getConfiguration().setId(id);
+                        }
+                        ServiceRegister serviceRegister = SpringUtil.getBean(ServiceRegister.class);
+                        if (serviceRegister == null){
+                            throw new NullPointerException("serviceRegister is null");
+                        }
+                        serviceRegister.register(id,JsonUtil.toJSONString(serverProperties));
+                    }
+
                 }
             });
         }catch (Exception e){

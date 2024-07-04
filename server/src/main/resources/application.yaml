@@ -23,5 +23,10 @@ mybatis-plus:
 
 im:
   server:
-    host: 0.0.0.0
+    configuration:
+      model: host
+      zookeeper:
+        servers: 127.0.0.1:2181
+        sessionTimeout: 3000
+    host: 172.30.112.1
     port: 2921
