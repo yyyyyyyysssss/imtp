@@ -7,6 +7,8 @@ import org.apache.zookeeper.*;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.DependsOn;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import java.util.concurrent.CountDownLatch;
@@ -56,6 +58,7 @@ public class ZookeeperConfig {
         return zooKeeper;
     }
 
+    @DependsOn("zooKeeper")
     @Bean
     public ServiceRegister serviceRegister(ZooKeeper zooKeeper){
         return new ServiceRegister(zooKeeper);

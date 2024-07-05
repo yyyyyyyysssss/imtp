@@ -17,6 +17,8 @@ import org.imtp.server.context.ChannelContextHolder;
 import org.imtp.server.enums.Model;
 import org.imtp.server.handler.LoginHandler;
 import org.imtp.server.utils.SpringUtil;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import java.util.UUID;
@@ -36,9 +38,16 @@ public class IMServer{
     @Resource
     private ServerProperties serverProperties;
 
+    private ServiceRegister serviceRegister;
+
     private EventLoopGroup bossEventLoopGroup;
     private EventLoopGroup workEventLoopGroup;
     private ChannelFuture channelFuture;
+
+    @Autowired(required = false)
+    public void setServiceRegister(ServiceRegister serviceRegister) {
+        this.serviceRegister = serviceRegister;
+    }
 
     @PostConstruct
     public void start() {
@@ -73,10 +82,6 @@ public class IMServer{
                         if (id == null){
                             id = UUID.randomUUID().toString().replace("-","");
                             serverProperties.getConfiguration().setId(id);
-                        }
-                        ServiceRegister serviceRegister = SpringUtil.getBean(ServiceRegister.class);
-                        if (serviceRegister == null){
-                            throw new NullPointerException("serviceRegister is null");
                         }
                         serviceRegister.register(id,JsonUtil.toJSONString(serverProperties));
                     }
