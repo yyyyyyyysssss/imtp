@@ -9,17 +9,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.imtp.client.context.ClientContextHolder;
 import org.imtp.client.enums.ClientType;
 import org.imtp.client.handler.LoginHandler;
-import org.imtp.client.util.ResourceUtils;
 import org.imtp.common.codec.IMTPDecoder;
 import org.imtp.common.codec.IMTPEncoder;
+import org.imtp.client.component.ServiceInfo;
 import org.imtp.common.packet.LoginRequest;
 import org.imtp.common.packet.body.LoginInfo;
 
-import java.io.*;
-import java.net.URL;
-import java.util.Locale;
-import java.util.Properties;
-import java.util.ResourceBundle;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -41,10 +36,6 @@ public class Client implements Runnable {
     private ClientType clientType;
 
     private ChannelHandler channelHandler;
-
-    private String host;
-
-    private int port;
 
     public Client(String account, String password, ChannelHandler channelHandler) {
         this(account,password,channelHandler,ClientType.WINDOW);
@@ -69,10 +60,6 @@ public class Client implements Runnable {
                         pipeline.addLast(channelHandler);
                     }
                 });
-        Config config = Config.getInstance();
-        this.host = config.getHost();
-        this.port = config.getPort();
-
     }
 
     public static void main(String[] args) {
@@ -111,7 +98,10 @@ public class Client implements Runnable {
 
     public void connect() {
         try {
-            ChannelFuture connected = bootstrap.connect(this.host, this.port);
+            ServerAddress serverAddress = ServerAddressFactory.getServerAddress();
+            ServiceInfo serviceInfo = serverAddress.serviceInfo();
+            log.info("serviceInfo : {}",serviceInfo);
+            ChannelFuture connected = bootstrap.connect(serviceInfo.getHost(), serviceInfo.getPort());
             connected.addListener((ChannelFutureListener) channelFuture -> {
                 if (channelFuture.isSuccess()) {
                     log.info("与服务器建立连接成功");

@@ -2,7 +2,7 @@ package org.imtp.server;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.imtp.server.enums.Model;
+import org.imtp.common.enums.ServerModel;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
@@ -34,7 +34,7 @@ public class ServerProperties {
     @Getter
     @Setter
     class Configuration{
-        private Model model;
+        private ServerModel model;
         private String id;
     }
 

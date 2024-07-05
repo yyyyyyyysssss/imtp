@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.ZooDefs;
 import org.apache.zookeeper.ZooKeeper;
+import org.imtp.common.component.ZookeeperMetadata;
 
 import java.nio.charset.StandardCharsets;
 
@@ -24,7 +25,7 @@ public class ServiceRegister {
     //注册服务
     public boolean register(String nodeName,String data){
         try {
-            String path = ZookeeperConfig.SERVER_REGISTER_PATH + "/" + nodeName;
+            String path = ZookeeperMetadata.SERVER_REGISTER_PATH + "/" + nodeName;
             zooKeeper.create(path,data.getBytes(StandardCharsets.UTF_8), ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL);
             return true;
         } catch (Exception e) {

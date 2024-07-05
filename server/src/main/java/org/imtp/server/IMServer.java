@@ -14,11 +14,9 @@ import org.imtp.common.codec.IMTPEncoder;
 import org.imtp.common.utils.JsonUtil;
 import org.imtp.server.config.ServiceRegister;
 import org.imtp.server.context.ChannelContextHolder;
-import org.imtp.server.enums.Model;
+import org.imtp.common.enums.ServerModel;
 import org.imtp.server.handler.LoginHandler;
-import org.imtp.server.utils.SpringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import java.util.UUID;
@@ -38,12 +36,11 @@ public class IMServer{
     @Resource
     private ServerProperties serverProperties;
 
-    private ServiceRegister serviceRegister;
-
     private EventLoopGroup bossEventLoopGroup;
     private EventLoopGroup workEventLoopGroup;
     private ChannelFuture channelFuture;
 
+    private ServiceRegister serviceRegister;
     @Autowired(required = false)
     public void setServiceRegister(ServiceRegister serviceRegister) {
         this.serviceRegister = serviceRegister;
@@ -77,7 +74,7 @@ public class IMServer{
                     ChannelContextHolder.createChannelContext();
 
                     //集群模式将服务器信息注册
-                    if (Model.CLUSTER.equals(serverProperties.getConfiguration().getModel())){
+                    if (ServerModel.CLUSTER.equals(serverProperties.getConfiguration().getModel())){
                         String id = serverProperties.getConfiguration().getId();
                         if (id == null){
                             id = UUID.randomUUID().toString().replace("-","");
