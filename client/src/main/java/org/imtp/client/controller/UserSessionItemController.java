@@ -116,6 +116,8 @@ public class UserSessionItemController extends AbstractController{
             }
             if (!sb.toString().isEmpty()){
                 lastMsg.setText(sb.toString());
+            }else {
+                lastMsg.setText(null);
             }
             //时间处理
             timeLabel.setText("23:34");

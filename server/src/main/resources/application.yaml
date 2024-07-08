@@ -13,6 +13,19 @@ spring:
       schema-locations: schema.sql
       data-locations: data.sql
       mode: EMBEDDED
+  data:
+    redis:
+      host: 127.0.0.1
+      port: 6379
+      password: 123456
+      lettuce:
+        pool:
+          min-idle: 1
+          max-idle: 8
+          max-active: 8
+          max-wait: 3000
+
+
 
 
 mybatis-plus:

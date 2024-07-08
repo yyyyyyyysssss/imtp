@@ -1,5 +1,6 @@
 package org.imtp.client.controller;
 
+import io.netty.channel.ChannelHandler;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -22,12 +23,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.imtp.client.Client;
 import org.imtp.client.SceneManager;
 import org.imtp.client.SceneManagerHolder;
+import org.imtp.client.constant.ConnectListener;
 import org.imtp.client.constant.FXMLResourceConstant;
 import org.imtp.client.constant.SendMessageListener;
+import org.imtp.client.handler.ClientCmdHandlerHandler;
 import org.imtp.client.handler.LoginHandler;
 import org.imtp.client.model.MessageModel;
 import org.imtp.client.util.EffectUtilities;
-import org.imtp.client.util.ResizeHelper;
 import org.imtp.client.util.ResourceUtils;
 import org.imtp.common.packet.LoginRequest;
 import org.imtp.common.packet.LoginResponse;
@@ -169,27 +171,13 @@ public class LoginController extends AbstractController {
             return;
         }
         if (client == null){
-            client = new Client(u,p,(LoginHandler) messageModel);
+            client = new Client((ChannelHandler) messageModel);
+            client.addListener(() -> loggingIn(client,u,p));
             //启动netty
             new Thread(client).start();
+        }else {
+            loggingIn(client,u,p);
         }
-
-        loggingIn();
-
-        client.setAccount(u);
-        client.setPassword(p);
-        LoginInfo loginInfo = new LoginInfo(u,p);
-        send(new LoginRequest(loginInfo), new SendMessageListener() {
-
-            @Override
-            public void isSuccess() {
-
-            }
-            @Override
-            public void isFail() {
-                showErrMsg("登录失败，与服务连接异常");
-            }
-        });
     }
 
     @Override
@@ -198,11 +186,10 @@ public class LoginController extends AbstractController {
         if(loginResponse.loginSuccess()){
             errorMsg.setVisible(false);
             log.info("登录成功");
-            MessageModel nextModel = messageModel.getNextModel();
             //触发静态代码块执行，提前加载表情包
             ChatEmojiDialog.trigger();
             //跳转主页
-            skipScene(FXMLResourceConstant.HOME_FXML,"聊天页",nextModel);
+            skipScene(FXMLResourceConstant.HOME_FXML,"聊天页",((LoginHandler)messageModel).getClientCmdHandlerHandler());
             //将自身移除
             messageModel.removeObserver(this.getClass());
         }else{
@@ -229,13 +216,25 @@ public class LoginController extends AbstractController {
                 point2D.getY() + node.getScene().getY() + node.getScene().getWindow().getY() + 10);
     }
 
-    private void loggingIn(){
+    private void loggingIn(Client client,String u,String p){
         Platform.runLater(() -> {
             ObservableList<Node> children = loginVBox.getChildren();
             children.removeAll(loginVBox.getChildren());
             children.add(loadingImage);
         });
+        client.setAccount(u);
+        client.setPassword(p);
+        LoginInfo loginInfo = new LoginInfo(u,p);
+        send(new LoginRequest(loginInfo), new SendMessageListener() {
+            @Override
+            public void isSuccess() {
 
+            }
+            @Override
+            public void isFail() {
+                showErrMsg("登录失败，与服务连接异常");
+            }
+        });
     }
 
     private void loggingFail(){

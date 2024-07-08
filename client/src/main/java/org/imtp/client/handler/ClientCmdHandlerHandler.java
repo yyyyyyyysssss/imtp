@@ -66,9 +66,4 @@ public class ClientCmdHandlerHandler extends AbstractMessageModelHandler<Packet>
                 throw new UnsupportedOperationException("不支持的操作");
         }
     }
-
-    @Override
-    public MessageModel getNextModel() {
-        return null;
-    }
 }

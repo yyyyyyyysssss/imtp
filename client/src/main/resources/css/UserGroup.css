@@ -28,7 +28,7 @@
 
 .user-group-listview-listview .list-cell:selected:odd,
 .user-group-listview .list-cell:selected:even{
-    -fx-background-color: lightgrey;
+    -fx-background-color: #C8C6C5;
 }
 
 
@@ -46,4 +46,13 @@
 .user-group-listview .list-cell:even{
     -fx-background-color: #F5F5F5;
     -fx-padding: 10px;
+}
+
+.user-group-listview .list-cell:hover{
+    -fx-background-color: #DDDAD9;
+    -fx-padding: 10px;
+}
+
+.user-group-listview .list-cell:hover:empty{
+    -fx-background-color: #F5F5F5;
 }

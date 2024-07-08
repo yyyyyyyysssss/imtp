@@ -179,11 +179,6 @@ public class UserSessionController extends AbstractController{
     }
 
     private void showChatNode(Node node){
-//        ObservableList<Node> children = chatPane.getChildren();
-//        if (!children.isEmpty()){
-//            children.removeLast();
-//        }
-//        children.addLast(node);
         chatPane.setCenter(node);
     }
 

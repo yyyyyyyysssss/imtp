@@ -66,9 +66,8 @@ public class LoginHandler extends AbstractMessageModelHandler<Packet> {
         this.clientCmdHandlerHandler = (ClientCmdHandlerHandler) channelHandler;
     }
 
-    @Override
-    public MessageModel getNextModel() {
-        return this.clientCmdHandlerHandler;
+    public ClientCmdHandlerHandler getClientCmdHandlerHandler() {
+        return clientCmdHandlerHandler;
     }
 
     @Override

@@ -6,6 +6,8 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import lombok.extern.slf4j.Slf4j;
+import org.imtp.client.constant.ConnectListener;
+import org.imtp.client.constant.SendMessageListener;
 import org.imtp.client.context.ClientContextHolder;
 import org.imtp.client.enums.ClientType;
 import org.imtp.client.handler.LoginHandler;
@@ -37,6 +39,12 @@ public class Client implements Runnable {
 
     private ChannelHandler channelHandler;
 
+    private ConnectListener connectListener;
+
+    public Client(ChannelHandler channelHandler) {
+        this(null,null,channelHandler,ClientType.WINDOW);
+    }
+
     public Client(String account, String password, ChannelHandler channelHandler) {
         this(account,password,channelHandler,ClientType.WINDOW);
     }
@@ -60,6 +68,10 @@ public class Client implements Runnable {
                         pipeline.addLast(channelHandler);
                     }
                 });
+    }
+
+    public void addListener(ConnectListener connectListener){
+        this.connectListener = connectListener;
     }
 
     public static void main(String[] args) {
@@ -109,6 +121,9 @@ public class Client implements Runnable {
                     //初始化上下文对象
                     if (ClientContextHolder.clientContext() == null){
                         ClientContextHolder.createClientContext(channel,this);
+                        if (connectListener != null){
+                            connectListener.connected();
+                        }
                         if (clientType.equals(ClientType.CONSOLE)) {
                             LoginInfo loginInfo = new LoginInfo(this.account, this.password);
                             channel.writeAndFlush(new LoginRequest(loginInfo));

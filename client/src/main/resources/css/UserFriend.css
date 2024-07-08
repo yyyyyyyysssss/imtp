@@ -28,7 +28,7 @@
 
 .user-friend-listview .list-cell:selected:odd,
 .user-friend-listview .list-cell:selected:even{
-    -fx-background-color: lightgrey;
+    -fx-background-color: #C8C6C5;
 }
 
 .user-friend-listview .list-cell{
@@ -45,4 +45,13 @@
 .user-friend-listview .list-cell:even{
     -fx-background-color: #F5F5F5;
     -fx-padding: 10px;
+}
+
+.user-friend-listview .list-cell:hover{
+    -fx-background-color: #DDDAD9;
+    -fx-padding: 10px;
+}
+
+.user-friend-listview .list-cell:hover:empty{
+    -fx-background-color: #F5F5F5;
 }

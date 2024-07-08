@@ -20,6 +20,4 @@ public interface MessageModel extends Model{
 
     void sendMessage(Packet packet, SendMessageListener sendMessageListener);
 
-    MessageModel getNextModel();
-
 }
