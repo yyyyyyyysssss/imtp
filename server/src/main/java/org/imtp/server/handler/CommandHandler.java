@@ -12,6 +12,7 @@ import org.imtp.common.enums.Command;
 import org.imtp.common.packet.*;
 import org.imtp.common.packet.base.Header;
 import org.imtp.common.packet.base.Packet;
+import org.imtp.server.config.RedisWrapper;
 import org.imtp.server.constant.ProjectConstant;
 import org.imtp.server.context.ChannelContextHolder;
 import org.springframework.stereotype.Component;
@@ -45,6 +46,9 @@ public class CommandHandler extends SimpleChannelInboundHandler<Packet> {
 
     @Resource
     private UserSessionHandler userSessionHandler;
+
+    @Resource
+    private RedisWrapper redisWrapper;
 
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, Packet packet) {
@@ -97,5 +101,7 @@ public class CommandHandler extends SimpleChannelInboundHandler<Packet> {
         }
         //移除
         ChannelContextHolder.createChannelContext().removeChannel(loginUser.toString());
+        //移除用户在线状态
+        redisWrapper.userOffline(loginUser.toString());
     }
 }

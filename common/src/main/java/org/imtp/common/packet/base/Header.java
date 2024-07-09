@@ -2,6 +2,7 @@ package org.imtp.common.packet.base;
 
 import io.netty.buffer.ByteBuf;
 import lombok.Getter;
+import lombok.Setter;
 import org.imtp.common.enums.Command;
 import org.imtp.common.enums.ProtocolVersion;
 
@@ -11,6 +12,7 @@ import org.imtp.common.enums.ProtocolVersion;
  * @Date 2023/4/2 13:33
  */
 @Getter
+@Setter
 public class Header{
     //魔数 占1个字节
     private byte magic = (byte) 0xdf;
@@ -114,9 +116,5 @@ public class Header{
     public static int headLength(){
 
         return 24;
-    }
-
-    public void setLength(int length) {
-        this.length = length;
     }
 }

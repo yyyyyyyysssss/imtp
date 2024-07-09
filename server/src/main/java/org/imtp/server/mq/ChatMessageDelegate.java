@@ -14,4 +14,9 @@ public class ChatMessageDelegate implements MessageDelegate{
     public void handleMessage(String message) {
         log.info("message:{}",message);
     }
+
+    @Override
+    public void handleMessage(byte[] bytes) {
+        log.info("bytes:{}",bytes);
+    }
 }

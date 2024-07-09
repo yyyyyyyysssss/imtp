@@ -62,12 +62,6 @@ public abstract class Packet{
         return this.header.isGroupFlag();
     }
 
-
-    public Header getHeader(){
-
-        return this.header;
-    }
-
     public Long getSender(){
 
         return this.header.getSender();
@@ -93,4 +87,21 @@ public abstract class Packet{
         return MessageType.findMessageTypeByValue((int) this.header.getCmd().getCmdCode());
     }
 
+
+    public Header getHeader(){
+
+        return this.header;
+    }
+
+    public void setHeader(Header header) {
+        this.header = header;
+    }
+
+    public short getVerify() {
+        return verify;
+    }
+
+    public void setVerify(short verify) {
+        this.verify = verify;
+    }
 }

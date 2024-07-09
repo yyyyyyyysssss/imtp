@@ -35,6 +35,14 @@ public class RedisMQConfig {
         return container.receive(StreamOffset.fromStart("my-stream"),defaultStreamListener);
     }
 
+    //基于发布订阅的轻量级消息队列
+    @Bean
+    public RedisMessageListenerContainer redisMessageListenerContainer(RedisConnectionFactory redisConnectionFactory,MessageListenerAdapter messageListenerAdapter){
+        RedisMessageListenerContainer container = new RedisMessageListenerContainer();
+        container.setConnectionFactory(redisConnectionFactory);
+        container.addMessageListener(messageListenerAdapter, ChannelTopic.of("message_forward"));
+        return container;
+    }
 
     @Bean
     public MessageDelegate messageDelegate(){
@@ -44,14 +52,6 @@ public class RedisMQConfig {
     @Bean
     public MessageListenerAdapter messageListenerAdapter(MessageDelegate messageDelegate){
         return new MessageListenerAdapter(messageDelegate,"handleMessage");
-    }
-
-    @Bean
-    public RedisMessageListenerContainer redisMessageListenerContainer(RedisConnectionFactory redisConnectionFactory,MessageListenerAdapter messageListenerAdapter){
-        RedisMessageListenerContainer container = new RedisMessageListenerContainer();
-        container.setConnectionFactory(redisConnectionFactory);
-        container.addMessageListener(messageListenerAdapter, ChannelTopic.of("message_forward"));
-        return container;
     }
 
 }

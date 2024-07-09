@@ -61,6 +61,19 @@ public abstract class AbstractTextMessage extends Packet {
         return this.text.getBytes(StandardCharsets.UTF_8).length + 12;
     }
 
+
+    public String getText() {
+        return text;
+    }
+
+    public void setText(String text) {
+        this.text = text;
+    }
+
+    public void setAckId(Long ackId) {
+        this.ackId = ackId;
+    }
+
     public String getMessage() {
         return text;
     }

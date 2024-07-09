@@ -3,6 +3,7 @@ package org.imtp.server.handler;
 import io.netty.channel.SimpleChannelInboundHandler;
 import jakarta.annotation.Resource;
 import org.imtp.common.packet.base.Packet;
+import org.imtp.server.config.RedisWrapper;
 import org.imtp.server.service.ChatService;
 
 import java.util.List;
@@ -16,6 +17,9 @@ public abstract class AbstractHandler<I> extends SimpleChannelInboundHandler<I> 
 
     @Resource
     protected ChatService chatService;
+
+    @Resource
+    protected RedisWrapper redisWrapper;
 
 
     protected List<Long> getReceivers(Packet packet){
