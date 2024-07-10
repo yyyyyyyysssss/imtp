@@ -257,6 +257,6 @@ public class DefaultChatService implements ChatService {
         }
         List<String> keys = userIds.stream().map(m -> RedisKey.USER_ONLINE + m).collect(Collectors.toList());
         List<Object> values = redisWrapper.getMultiValue(keys);
-        return values == null ? null : values.stream().map(Object::toString).toList();
+        return values.stream().filter(Objects::nonNull).map(Object::toString).toList();
     }
 }
