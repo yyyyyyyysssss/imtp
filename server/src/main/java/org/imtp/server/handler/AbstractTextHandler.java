@@ -44,13 +44,13 @@ public abstract class AbstractTextHandler<T extends AbstractTextMessage>  extend
 
         //获取在线且不在当前服务器的用户并发布
         List<String> userOnline = chatService.batchGetUserOnline(offlineReceivers);
-        if (userOnline != null){
+        if (userOnline != null && !userOnline.isEmpty()){
             ByteBuf byteBuf = Unpooled.buffer();
             try {
                 msg.encodeAsByteBuf(byteBuf);
                 byte[] bytes = new byte[byteBuf.readableBytes()];
                 byteBuf.readBytes(bytes);
-                ForwardMessage forwardMessage = new ForwardMessage(userOnline, bytes);
+                ForwardMessage forwardMessage = new ForwardMessage(userOnline, msg);
                 redisWrapper.publishMsg(forwardMessage);
             }finally {
                 byteBuf.release();

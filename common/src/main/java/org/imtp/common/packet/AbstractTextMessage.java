@@ -1,7 +1,11 @@
 package org.imtp.common.packet;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 import io.netty.buffer.ByteBuf;
 import io.netty.util.internal.StringUtil;
+import lombok.Getter;
+import lombok.Setter;
 import org.imtp.common.enums.Command;
 import org.imtp.common.packet.base.Header;
 import org.imtp.common.packet.base.Packet;
@@ -13,15 +17,22 @@ import java.nio.charset.StandardCharsets;
  * @Author ys
  * @Date 2024/4/7 10:35
  */
+@Getter
+@Setter
 public abstract class AbstractTextMessage extends Packet {
 
     //最大字符长度
+    @JsonIgnore
     protected final int MAX_CHAR_LENGTH =2048;
 
     protected String text;
 
     //由客户端生成，应答确认消息时会带上此id给到客户端
     protected Long ackId;
+
+    public AbstractTextMessage(){
+        super();
+    }
 
     public AbstractTextMessage(ByteBuf byteBuf, Header header){
         super(header);
@@ -56,30 +67,19 @@ public abstract class AbstractTextMessage extends Packet {
     public abstract void encodeBodyAsByteBuf0(ByteBuf byteBuf);
 
     //12 = 4字节内容长度+8字节应答id
+    @JsonIgnore
     @Override
     public int getBodyLength() {
         return this.text.getBytes(StandardCharsets.UTF_8).length + 12;
     }
 
-
-    public String getText() {
-        return text;
-    }
-
-    public void setText(String text) {
-        this.text = text;
-    }
-
-    public void setAckId(Long ackId) {
-        this.ackId = ackId;
-    }
-
+    @JsonIgnore
     public String getMessage() {
         return text;
     }
 
-    public Long getAckId(){
-        return ackId;
+    @JsonIgnore
+    public int getMAX_CHAR_LENGTH() {
+        return MAX_CHAR_LENGTH;
     }
-
 }

@@ -1,5 +1,6 @@
 package org.imtp.common.packet.base;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.netty.buffer.ByteBuf;
 import lombok.Getter;
 import lombok.Setter;
@@ -30,7 +31,10 @@ public class Header{
     private int length;
 
     //群聊标识位 取保留位从右往左的第0位 1:群聊 0:私聊
+    @JsonIgnore
     private boolean groupFlag;
+
+    public Header(){}
 
     public Header(long sender, long receiver, Command cmd,boolean groupFlag){
         this(ProtocolVersion.VER1,sender,receiver,cmd,0,groupFlag);
@@ -85,6 +89,7 @@ public class Header{
         return (num & mask) >> n;
     }
 
+    @JsonIgnore
     private byte setBitValue(byte b,int n,byte v){
         byte mask = (byte) (1 << n);
         if(v == 1){

@@ -5,6 +5,9 @@ import org.imtp.common.enums.Command;
 import org.imtp.common.packet.base.Header;
 
 public class TextMessage extends AbstractTextMessage {
+
+    public TextMessage(){}
+
     public TextMessage(ByteBuf byteBuf, Header header) {
         super(byteBuf, header);
     }

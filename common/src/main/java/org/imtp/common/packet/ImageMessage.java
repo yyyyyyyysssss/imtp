@@ -11,6 +11,8 @@ import org.imtp.common.packet.base.Header;
  */
 public class ImageMessage extends AbstractTextMessage{
 
+    public ImageMessage(){}
+
     public ImageMessage(ByteBuf byteBuf, Header header) {
         super(byteBuf, header);
     }

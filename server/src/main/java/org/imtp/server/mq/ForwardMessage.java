@@ -26,7 +26,7 @@ public class ForwardMessage implements Serializable {
 
     private List<String> receivers;
 
-    private byte[] message;
+    private Packet message;
 
     @Override
     public String toString() {

@@ -112,6 +112,10 @@ public class Client implements Runnable {
         try {
             ServerAddress serverAddress = ServerAddressFactory.getServerAddress();
             ServiceInfo serviceInfo = serverAddress.serviceInfo();
+            if (serviceInfo == null){
+                connect();
+                return;
+            }
             log.info("serviceInfo : {}",serviceInfo);
             ChannelFuture connected = bootstrap.connect(serviceInfo.getHost(), serviceInfo.getPort());
             connected.addListener((ChannelFutureListener) channelFuture -> {

@@ -1,5 +1,6 @@
 package org.imtp.common.packet.base;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.netty.buffer.ByteBuf;
 import lombok.Getter;
 import lombok.Setter;
@@ -12,12 +13,16 @@ import org.imtp.common.utils.CRC16Util;
  * @Author ys
  * @Date 2023/4/2 13:49
  */
+@Getter
+@Setter
 public abstract class Packet{
 
     protected Header header;
 
     //数据校验位占2个字节
     protected short verify;
+
+    public Packet(){}
 
     public Packet(long sender, long receiver, Command command,boolean groupFlag){
         this(new Header(sender,receiver,command,groupFlag));
@@ -57,51 +62,38 @@ public abstract class Packet{
     public abstract int getBodyLength();
 
 
+    @JsonIgnore
     public boolean isGroup(){
 
         return this.header.isGroupFlag();
     }
 
+    @JsonIgnore
     public Long getSender(){
 
         return this.header.getSender();
     }
 
+    @JsonIgnore
     public Long getReceiver(){
 
         return this.header.getReceiver();
     }
 
-
+    @JsonIgnore
     public Command getCommand(){
 
         return this.header.getCmd();
     }
 
+    @JsonIgnore
     public Long realSender(){
         return this.isGroup() ? this.getReceiver() : this.getSender();
     }
 
+    @JsonIgnore
     public MessageType messageType(){
 
         return MessageType.findMessageTypeByValue((int) this.header.getCmd().getCmdCode());
-    }
-
-
-    public Header getHeader(){
-
-        return this.header;
-    }
-
-    public void setHeader(Header header) {
-        this.header = header;
-    }
-
-    public short getVerify() {
-        return verify;
-    }
-
-    public void setVerify(short verify) {
-        this.verify = verify;
     }
 }
