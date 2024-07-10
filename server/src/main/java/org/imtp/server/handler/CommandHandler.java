@@ -12,9 +12,9 @@ import org.imtp.common.enums.Command;
 import org.imtp.common.packet.*;
 import org.imtp.common.packet.base.Header;
 import org.imtp.common.packet.base.Packet;
-import org.imtp.server.config.RedisWrapper;
 import org.imtp.server.constant.ProjectConstant;
 import org.imtp.server.context.ChannelContextHolder;
+import org.imtp.server.service.ChatService;
 import org.springframework.stereotype.Component;
 
 import java.net.SocketException;
@@ -48,7 +48,7 @@ public class CommandHandler extends SimpleChannelInboundHandler<Packet> {
     private UserSessionHandler userSessionHandler;
 
     @Resource
-    private RedisWrapper redisWrapper;
+    private ChatService chatService;
 
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, Packet packet) {
@@ -56,34 +56,39 @@ public class CommandHandler extends SimpleChannelInboundHandler<Packet> {
             Header header = commandPacket.getHeader();
             Command cmd = header.getCmd();
             ByteBuf byteBuf = Unpooled.wrappedBuffer(commandPacket.getBytes());
-            switch (cmd) {
-                case FRIENDSHIP_REQ:
-                    packet = new FriendshipRequest(byteBuf,header);
-                    channelHandlerContext.pipeline().addLast(userFriendshipHandler).fireChannelRead(packet);
-                    break;
-                case GROUP_RELATIONSHIP_REQ:
-                    packet = new GroupRelationshipRequest(byteBuf,header);
-                    channelHandlerContext.pipeline().addLast(userGroupRelationshipHandler).fireChannelRead(packet);
-                    break;
-                case OFFLINE_MSG_REQ:
-                    packet = new OfflineMessageRequest(byteBuf,header);
-                    channelHandlerContext.pipeline().addLast(offlineMessageHandler).fireChannelRead(packet);
-                    break;
-                case USER_SESSION_REQ:
-                    packet = new UserSessionRequest(byteBuf,header);
-                    channelHandlerContext.pipeline().addLast(userSessionHandler).fireChannelRead(packet);
-                    break;
-                case TEXT_MESSAGE:
-                    packet = new TextMessage(byteBuf,header);
-                    channelHandlerContext.pipeline().addLast(textMessageHandler).fireChannelRead(packet);
-                    break;
-                case IMAGE_MESSAGE:
-                    packet = new ImageMessage(byteBuf,header);
-                    channelHandlerContext.pipeline().addLast(imageMessageHandler).fireChannelRead(packet);
-                    break;
-                default:
-                    throw new UnsupportedOperationException("不支持的操作");
+            try {
+                switch (cmd) {
+                    case FRIENDSHIP_REQ:
+                        packet = new FriendshipRequest(byteBuf,header);
+                        channelHandlerContext.pipeline().addLast(userFriendshipHandler).fireChannelRead(packet);
+                        break;
+                    case GROUP_RELATIONSHIP_REQ:
+                        packet = new GroupRelationshipRequest(byteBuf,header);
+                        channelHandlerContext.pipeline().addLast(userGroupRelationshipHandler).fireChannelRead(packet);
+                        break;
+                    case OFFLINE_MSG_REQ:
+                        packet = new OfflineMessageRequest(byteBuf,header);
+                        channelHandlerContext.pipeline().addLast(offlineMessageHandler).fireChannelRead(packet);
+                        break;
+                    case USER_SESSION_REQ:
+                        packet = new UserSessionRequest(byteBuf,header);
+                        channelHandlerContext.pipeline().addLast(userSessionHandler).fireChannelRead(packet);
+                        break;
+                    case TEXT_MESSAGE:
+                        packet = new TextMessage(byteBuf,header);
+                        channelHandlerContext.pipeline().addLast(textMessageHandler).fireChannelRead(packet);
+                        break;
+                    case IMAGE_MESSAGE:
+                        packet = new ImageMessage(byteBuf,header);
+                        channelHandlerContext.pipeline().addLast(imageMessageHandler).fireChannelRead(packet);
+                        break;
+                    default:
+                        throw new UnsupportedOperationException("不支持的操作");
+                }
+            }finally {
+                byteBuf.release();
             }
+
         }else {
             channelHandlerContext.fireChannelRead(packet);
         }
@@ -102,6 +107,6 @@ public class CommandHandler extends SimpleChannelInboundHandler<Packet> {
         //移除
         ChannelContextHolder.createChannelContext().removeChannel(loginUser.toString());
         //移除用户在线状态
-        redisWrapper.userOffline(loginUser.toString());
+        chatService.userOffline(loginUser.toString());
     }
 }

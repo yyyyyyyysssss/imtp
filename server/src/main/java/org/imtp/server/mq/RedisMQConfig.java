@@ -5,9 +5,11 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.stream.MapRecord;
 import org.springframework.data.redis.connection.stream.StreamOffset;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
+import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.stream.StreamListener;
 import org.springframework.data.redis.stream.StreamMessageListenerContainer;
 import org.springframework.data.redis.stream.Subscription;
@@ -40,7 +42,7 @@ public class RedisMQConfig {
     public RedisMessageListenerContainer redisMessageListenerContainer(RedisConnectionFactory redisConnectionFactory,MessageListenerAdapter messageListenerAdapter){
         RedisMessageListenerContainer container = new RedisMessageListenerContainer();
         container.setConnectionFactory(redisConnectionFactory);
-        container.addMessageListener(messageListenerAdapter, ChannelTopic.of("message_forward"));
+        container.addMessageListener(messageListenerAdapter, ChannelTopic.of(Topic.MESSAGE_FORWARD));
         return container;
     }
 
@@ -51,7 +53,9 @@ public class RedisMQConfig {
 
     @Bean
     public MessageListenerAdapter messageListenerAdapter(MessageDelegate messageDelegate){
-        return new MessageListenerAdapter(messageDelegate,"handleMessage");
+        MessageListenerAdapter messageListenerAdapter = new MessageListenerAdapter(messageDelegate, "handleMessage");
+        messageListenerAdapter.setSerializer(new GenericJackson2JsonRedisSerializer());
+        return messageListenerAdapter;
     }
 
 }

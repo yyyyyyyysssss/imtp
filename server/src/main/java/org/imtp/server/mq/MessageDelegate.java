@@ -4,6 +4,6 @@ public interface MessageDelegate {
 
     void handleMessage(String message);
 
-    void handleMessage(byte[] bytes);
+    void handleMessage(ForwardMessage forwardMessage);
 
 }

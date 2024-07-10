@@ -8,12 +8,12 @@ import io.netty.util.AttributeKey;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.imtp.common.enums.LoginState;
-import org.imtp.common.packet.*;
+import org.imtp.common.packet.CommandPacket;
+import org.imtp.common.packet.LoginRequest;
+import org.imtp.common.packet.LoginResponse;
 import org.imtp.common.packet.base.Packet;
 import org.imtp.common.packet.body.LoginInfo;
 import org.imtp.common.packet.body.UserInfo;
-import org.imtp.server.config.RedisKey;
-import org.imtp.server.config.RedisWrapper;
 import org.imtp.server.constant.ProjectConstant;
 import org.imtp.server.context.ChannelContext;
 import org.imtp.server.context.ChannelContextHolder;
@@ -57,7 +57,7 @@ public class LoginHandler extends AbstractHandler<Packet> {
             AttributeKey<Long> attributeKey = AttributeKey.valueOf(ProjectConstant.CHANNEL_ATTR_LOGIN_USER);
             channelHandlerContext.channel().attr(attributeKey).set(user.getId());
             log.info("用户:{} 已上线",loginInfo.getUsername());
-            redisWrapper.userOnline(user.getId().toString());
+            chatService.userOnline(user.getId().toString());
 
             //登录成功则添加业务指令处理器并移除当前handler
             channelHandlerContext.pipeline().addLast(commandHandler).remove(this);

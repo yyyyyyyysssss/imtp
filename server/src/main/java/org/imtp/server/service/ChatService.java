@@ -8,6 +8,7 @@ import org.imtp.server.entity.Message;
 import org.imtp.server.entity.OfflineMessage;
 import org.imtp.server.entity.User;
 
+import java.util.Collection;
 import java.util.List;
 
 public interface ChatService {
@@ -35,5 +36,14 @@ public interface ChatService {
 
     //根据用户id查询会话
     List<UserSessionInfo> findUserSessionByUserId(Long userId);
+
+    //用户上线
+    void userOnline(String userId);
+
+    //用户下线
+    void userOffline(String userId);
+
+    //批量获取用户上线状态
+    List<String> batchGetUserOnline(Collection<String> userIds);
 
 }

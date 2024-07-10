@@ -9,6 +9,8 @@ import org.imtp.common.enums.MessageType;
 import org.imtp.common.packet.body.UserFriendInfo;
 import org.imtp.common.packet.body.UserGroupInfo;
 import org.imtp.common.packet.body.UserSessionInfo;
+import org.imtp.server.config.RedisKey;
+import org.imtp.server.config.RedisWrapper;
 import org.imtp.server.entity.*;
 import org.imtp.server.mapper.*;
 import org.imtp.server.service.ChatService;
@@ -50,6 +52,9 @@ public class DefaultChatService implements ChatService {
 
     @Resource
     private UserSessionMapper userSessionMapper;
+
+    @Resource
+    private RedisWrapper redisWrapper;
 
     @Override
     public User findByUsername(String username) {
@@ -230,5 +235,25 @@ public class DefaultChatService implements ChatService {
         }
 
         return userSessionInfos;
+    }
+
+    @Override
+    public void userOnline(String userId) {
+        String k = RedisKey.USER_ONLINE + userId;
+        redisWrapper.setValue(k,userId);
+    }
+
+    @Override
+    public void userOffline(String userId) {
+        String k = RedisKey.USER_ONLINE + userId;
+        redisWrapper.delete(k);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<String> batchGetUserOnline(Collection<String> userIds) {
+        List<String> keys = userIds.stream().map(m -> RedisKey.USER_ONLINE + m).collect(Collectors.toList());
+        List<Object> values = redisWrapper.getMultiValue(keys);
+        return values.stream().map(Object::toString).toList();
     }
 }
