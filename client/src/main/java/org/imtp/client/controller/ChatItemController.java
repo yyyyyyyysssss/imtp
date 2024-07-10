@@ -126,7 +126,7 @@ public class ChatItemController extends AbstractController{
 
         chatItemTextFlow.setBackground(BACKGROUND_LEFT);
         chatItemHBox.setPadding(Insets.EMPTY);
-        chatItemHBox.setAlignment(Pos.CENTER_LEFT);
+        chatItemHBox.setAlignment(Pos.TOP_LEFT);
         if (chatItemEntity.getDeliveryMethod().equals(DeliveryMethod.GROUP)){
             sendNameLabel.setText(chatItemEntity.getName());
             chatItemVBoxChildren.addAll(sendNameLabel,chatItemLabelHBox);
@@ -147,7 +147,7 @@ public class ChatItemController extends AbstractController{
 
         imageView.imageProperty().bind(chatItemEntity.imageProperty());
         chatItemHBox.setPadding(RIGHT_INSETS_PADDING);
-        chatItemHBox.setAlignment(Pos.CENTER_RIGHT);
+        chatItemHBox.setAlignment(Pos.TOP_RIGHT);
         chatItemTextFlow.setBackground(BACKGROUND_RIGHT);
         chatItemLabelHBoxChildren.add(imageView);
         chatItemLabelHBoxChildren.add(chatItemTextFlow);
@@ -201,7 +201,7 @@ public class ChatItemController extends AbstractController{
         double height = image.getHeight();
         double width = image.getWidth();
         ImageView iv = new ImageView(image);
-        iv.setStyle("-fx-effect: dropshadow(three-pass-box, lightgray, 1, 0, 0, 0);");
+        iv.setStyle("-fx-effect: dropshadow(three-pass-box, lightgray, 1, 0.5, 0, 0);");
         if (width > max_width_image){
             iv.setFitWidth(max_width_image);
             double h = max_width_image * height / width;

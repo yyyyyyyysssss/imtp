@@ -18,7 +18,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 @Slf4j
 public class ServiceDiscovery {
 
-    private List<ServiceInfo> serviceInfos;
+    private volatile List<ServiceInfo> serviceInfos;
 
     private ZooKeeper zooKeeper;
 

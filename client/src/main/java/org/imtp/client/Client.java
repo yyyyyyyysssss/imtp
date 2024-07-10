@@ -7,7 +7,6 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import lombok.extern.slf4j.Slf4j;
 import org.imtp.client.constant.ConnectListener;
-import org.imtp.client.constant.SendMessageListener;
 import org.imtp.client.context.ClientContextHolder;
 import org.imtp.client.enums.ClientType;
 import org.imtp.client.handler.LoginHandler;
@@ -17,7 +16,10 @@ import org.imtp.client.component.ServiceInfo;
 import org.imtp.common.packet.LoginRequest;
 import org.imtp.common.packet.body.LoginInfo;
 
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * @Description
@@ -107,13 +109,16 @@ public class Client implements Runnable {
         client.connect();
     }
 
+    private ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
 
     public void connect() {
         try {
-            ServerAddress serverAddress = ServerAddressFactory.getServerAddress();
-            ServiceInfo serviceInfo = serverAddress.serviceInfo();
+            ServiceInfo serviceInfo = getServiceInfo();
             if (serviceInfo == null){
-                connect();
+                scheduledExecutorService.schedule(() -> {
+                    log.warn("正在重新获取服务器信息...");
+                    connect();
+                },1,TimeUnit.SECONDS);
                 return;
             }
             log.info("serviceInfo : {}",serviceInfo);
@@ -153,6 +158,11 @@ public class Client implements Runnable {
             log.error("error:", e);
             group.shutdownGracefully();
         }
+    }
+
+    public ServiceInfo getServiceInfo(){
+        ServerAddress serverAddress = ServerAddressFactory.getServerAddress();
+        return serverAddress.serviceInfo();
     }
 
     @Override
