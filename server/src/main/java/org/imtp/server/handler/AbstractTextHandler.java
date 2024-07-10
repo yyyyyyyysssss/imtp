@@ -44,15 +44,19 @@ public abstract class AbstractTextHandler<T extends AbstractTextMessage>  extend
 
         //获取在线且不在当前服务器的用户并发布
         List<String> userOnline = chatService.batchGetUserOnline(offlineReceivers);
-        ByteBuf byteBuf = Unpooled.buffer();
-        try {
-            msg.encodeAsByteBuf(byteBuf);
-            byte[] bytes = new byte[byteBuf.readableBytes()];
-            byteBuf.readBytes(bytes);
-            ForwardMessage forwardMessage = new ForwardMessage(userOnline, bytes);
-            redisWrapper.publishMsg(forwardMessage);
-        }finally {
-            byteBuf.release();
+        if (userOnline != null){
+            ByteBuf byteBuf = Unpooled.buffer();
+            try {
+                msg.encodeAsByteBuf(byteBuf);
+                byte[] bytes = new byte[byteBuf.readableBytes()];
+                byteBuf.readBytes(bytes);
+                ForwardMessage forwardMessage = new ForwardMessage(userOnline, bytes);
+                redisWrapper.publishMsg(forwardMessage);
+            }finally {
+                byteBuf.release();
+            }
+            //将在线的用户移除
+            offlineReceivers.removeAll(userOnline);
         }
 
         //离线用户消息落库
@@ -60,8 +64,6 @@ public abstract class AbstractTextHandler<T extends AbstractTextMessage>  extend
             Message message = new Message(msg);
             message.setContent(msg.getMessage());
             chatService.saveMessage(message);
-            //将在线的用户移除
-            offlineReceivers.removeAll(userOnline);
             if (!offlineReceivers.isEmpty()){
                 List<OfflineMessage> offlineMessages = new ArrayList<>();
                 for (String receiver : offlineReceivers){

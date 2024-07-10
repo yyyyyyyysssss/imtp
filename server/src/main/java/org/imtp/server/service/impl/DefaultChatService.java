@@ -252,8 +252,11 @@ public class DefaultChatService implements ChatService {
     @Override
     @SuppressWarnings("unchecked")
     public List<String> batchGetUserOnline(Collection<String> userIds) {
+        if (userIds == null || userIds.isEmpty()){
+            return null;
+        }
         List<String> keys = userIds.stream().map(m -> RedisKey.USER_ONLINE + m).collect(Collectors.toList());
         List<Object> values = redisWrapper.getMultiValue(keys);
-        return values.stream().map(Object::toString).toList();
+        return values == null ? null : values.stream().map(Object::toString).toList();
     }
 }
