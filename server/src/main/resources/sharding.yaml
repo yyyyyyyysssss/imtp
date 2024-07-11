@@ -1,0 +1,59 @@
+mode:
+  type: Standalone
+  repository:
+    type: JDBC
+dataSources:
+  master:
+    dataSourceClassName: com.zaxxer.hikari.HikariDataSource
+    driverClassName: com.mysql.cj.jdbc.Driver
+    jdbcUrl: jdbc:mysql://127.0.0.1:3306/im?useUnicode=true&allowPublicKeyRetrieval=true&useSSL=false&useLegacyDatetimeCode=false&allowMultiQueries=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
+    username: root
+    password: 123456
+    autoCommit: true
+    # 属性控制客户端（即您）等待来自池的连接的最大毫秒数。如果超过此时间而没有可用连接，则会抛出 SQLException 可接受的最低连接超时为 250 毫秒。 默认值：30000（30 秒）
+    connectionTimeout: 30000
+    # 此属性控制允许连接在池中空闲的最长时间 0 表示永远不会从池中删除空闲连接允许的最小值为 10000 毫秒（10 秒）。 默认值：600000（10 分钟）
+    idleTimeout: 0
+    # 尝试保持连接活动的频率
+    keepaliveTime: 300000
+    # 该属性控制池中连接的最长生命周期 默认值：1800000（30 分钟） 它应该比任何数据库或基础设施施加的连接时间限制短几秒
+    maxLifetime: 1800000
+    # 如果您的驱动程序支持 JDBC4，我们强烈建议不要设置此属性 这是在从池中向您提供连接之前执行的查询，以验证与数据库的连接是否仍然有效
+    #        connectionTestQuery:
+    # 最小空闲连接数 建议不要设置此值，而是允许 HikariCP 充当固定大小的连接池
+    minimumIdle: 5
+    # 控制池允许达到的最大大小，包括空闲连接和正在使用的连接
+    maximumPoolSize: 50
+  slave0:
+    dataSourceClassName: com.zaxxer.hikari.HikariDataSource
+    driverClassName: com.mysql.cj.jdbc.Driver
+    jdbcUrl: jdbc:mysql://127.0.0.1:3306/im?useUnicode=true&allowPublicKeyRetrieval=true&useSSL=false&useLegacyDatetimeCode=false&allowMultiQueries=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
+    username: root
+    password: 123456
+    autoCommit: true
+    connectionTimeout: 30000
+    idleTimeout: 0
+    keepaliveTime: 300000
+    maxLifetime: 1800000
+    minimumIdle: 5
+    maximumPoolSize: 50
+
+rules:
+  - !SINGLE
+    tables:
+      - "*.*"
+  - !READWRITE_SPLITTING
+    dataSources:
+      readwrite_ds:
+        writeDataSourceName: master
+        readDataSourceNames:
+          - slave0
+        # 事务内读查询的路由策略，值包括:PRIMARY(到主)、FIXED(到固定数据源)、DYNAMIC(到任何数据源)，默认值:DYNAMIC
+        transactionalReadQueryStrategy: PRIMARY
+        loadBalancerName: roundRobin
+    loadBalancers:
+      roundRobin:
+        type: ROUND_ROBIN
+
+props:
+  sql-show: true
