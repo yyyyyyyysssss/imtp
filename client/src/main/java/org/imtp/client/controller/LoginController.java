@@ -170,6 +170,7 @@ public class LoginController extends AbstractController {
             showTooltip(password,"请输入密码后再登录");
             return;
         }
+        switchLogging();
         if (client == null){
             client = new Client((ChannelHandler) messageModel);
             client.addListener(() -> loggingIn(client,u,p));
@@ -216,12 +217,15 @@ public class LoginController extends AbstractController {
                 point2D.getY() + node.getScene().getY() + node.getScene().getWindow().getY() + 10);
     }
 
-    private void loggingIn(Client client,String u,String p){
+    private void switchLogging(){
         Platform.runLater(() -> {
             ObservableList<Node> children = loginVBox.getChildren();
             children.removeAll(loginVBox.getChildren());
             children.add(loadingImage);
         });
+    }
+
+    private void loggingIn(Client client,String u,String p){
         client.setAccount(u);
         client.setPassword(p);
         LoginInfo loginInfo = new LoginInfo(u,p);

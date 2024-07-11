@@ -1,0 +1,8 @@
+server:
+  port: 9090
+
+
+
+zookeeper:
+  servers: 127.0.0.1:2181
+

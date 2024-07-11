@@ -34,7 +34,6 @@ module client{
     requires io.netty.codec.stomp;
     requires com.gluonhq.emoji;
     requires com.gluonhq.richtextarea;
-    requires zookeeper;
 
     exports org.imtp.client;
     exports org.imtp.client.component;

@@ -1,11 +1,9 @@
 package org.imtp.client;
 
-import org.apache.zookeeper.ZooKeeper;
 import org.imtp.client.component.LoadBalancer;
 import org.imtp.client.component.LoadBalancerFactory;
-import org.imtp.client.component.ServiceDiscovery;
 import org.imtp.client.component.ServiceInfo;
-import org.imtp.common.component.ZookeeperHolder;
+
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -22,16 +20,10 @@ public class ClusterServerAddress implements ServerAddress{
 
     private Config config;
 
-    private ZooKeeper zooKeeper;
-
-    private ServiceDiscovery serviceDiscovery;
-
     private LoadBalancer loadBalancer;
 
     private ClusterServerAddress(){
         this.config = Config.getInstance();
-        this.zooKeeper = ZookeeperHolder.getZookeeper(config.getZooKeeperUrls());
-        this.serviceDiscovery = new ServiceDiscovery(zooKeeper);
         this.loadBalancer = LoadBalancerFactory.getLoadBalancer();
     }
 
@@ -52,6 +44,6 @@ public class ClusterServerAddress implements ServerAddress{
 
     @Override
     public ServiceInfo serviceInfo() {
-        return loadBalancer.nextService(serviceDiscovery.getServiceInfos());
+        return new ServiceInfo(config.getHost(),config.getPort());
     }
 }

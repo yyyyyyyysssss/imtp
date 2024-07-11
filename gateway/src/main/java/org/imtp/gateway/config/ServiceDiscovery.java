@@ -1,5 +1,6 @@
-package org.imtp.client.component;
+package org.imtp.gateway.config;
 
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.zookeeper.WatchedEvent;
 import org.apache.zookeeper.Watcher;
@@ -18,6 +19,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 @Slf4j
 public class ServiceDiscovery {
 
+    @Getter
     private volatile List<ServiceInfo> serviceInfos;
 
     private ZooKeeper zooKeeper;
@@ -31,12 +33,9 @@ public class ServiceDiscovery {
 
     public void discovery(){
         try {
-            List<String> children = zooKeeper.getChildren(ZookeeperMetadata.SERVER_REGISTER_PATH, new Watcher() {
-                @Override
-                public void process(WatchedEvent watchedEvent) {
-                    if (watchedEvent.getType() == Event.EventType.NodeChildrenChanged){
-                        discovery();
-                    }
+            List<String> children = zooKeeper.getChildren(ZookeeperMetadata.SERVER_REGISTER_PATH, watchedEvent -> {
+                if (watchedEvent.getType() == Watcher.Event.EventType.NodeChildrenChanged){
+                    discovery();
                 }
             });
             serviceInfos.clear();
@@ -49,10 +48,6 @@ public class ServiceDiscovery {
         } catch (Exception e) {
             log.error("discovery node error:",e);
         }
-    }
-
-    public List<ServiceInfo> getServiceInfos(){
-        return serviceInfos;
     }
 
 }

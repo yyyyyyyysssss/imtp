@@ -28,8 +28,6 @@ public class Config {
 
     private ServerModel model;
 
-    private String zooKeeperUrls;
-
     private LoadBalancerType loadBalancerType;
 
     private static volatile Config config;
@@ -46,7 +44,6 @@ public class Config {
                 this.port = Integer.parseInt(properties.getProperty("server.port"));
                 String modelProperty = properties.getProperty("server.model");
                 this.model = modelProperty != null ? ServerModel.valueOf(modelProperty) : ServerModel.HOST;
-                this.zooKeeperUrls = properties.getProperty("server.zookeeper.urls");
                 String loadBalancerProperty = properties.getProperty("server.loadBalancer");
                 this.loadBalancerType = loadBalancerProperty != null ? LoadBalancerType.valueOf(loadBalancerProperty.toUpperCase()) : LoadBalancerType.ROUND;
             }catch (IOException e){
@@ -58,7 +55,6 @@ public class Config {
             this.port = Integer.parseInt(resourceBundle.getString("server.port"));
             String modelProperty = resourceBundle.getString("server.model");
             this.model = modelProperty != null ? ServerModel.valueOf(modelProperty.toUpperCase()) : ServerModel.HOST;
-            this.zooKeeperUrls = resourceBundle.getString("server.zookeeper.urls");
             String loadBalancerProperty = resourceBundle.getString("server.loadBalancer");
             this.loadBalancerType = loadBalancerProperty != null ? LoadBalancerType.valueOf(loadBalancerProperty.toUpperCase()) : LoadBalancerType.ROUND;
         }

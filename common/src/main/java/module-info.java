@@ -11,7 +11,6 @@ module common {
     requires io.netty.common;
     requires io.netty.handler;
     requires io.netty.transport;
-    requires zookeeper;
 
     exports org.imtp.common.codec;
     exports org.imtp.common.component;

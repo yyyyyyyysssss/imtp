@@ -35,6 +35,54 @@
         "pattern": "\\Qlogback.xml\\E"
       },
       {
+        "pattern": "client:\\Qcss/*.css\\E"
+      },
+      {
+        "pattern": "client:\\Qfxml/*.fxml\\E"
+      },
+      {
+        "pattern": "client:\\Qfxml/Chat.fxml\\E"
+      },
+      {
+        "pattern": "client:\\Qfxml/ChatItem.fxml\\E"
+      },
+      {
+        "pattern": "client:\\Qfxml/Home.fxml\\E"
+      },
+      {
+        "pattern": "client:\\Qfxml/Login.fxml\\E"
+      },
+      {
+        "pattern": "client:\\Qfxml/UserFriend.fxml\\E"
+      },
+      {
+        "pattern": "client:\\Qfxml/UserFriendDetails.fxml\\E"
+      },
+      {
+        "pattern": "client:\\Qfxml/UserFriendItem.fxml\\E"
+      },
+      {
+        "pattern": "client:\\Qfxml/UserGroup.fxml\\E"
+      },
+      {
+        "pattern": "client:\\Qfxml/UserGroupDetails.fxml\\E"
+      },
+      {
+        "pattern": "client:\\Qfxml/UserGroupItem.fxml\\E"
+      },
+      {
+        "pattern": "client:\\Qfxml/UserSession.fxml\\E"
+      },
+      {
+        "pattern": "client:\\Qfxml/UserSessionItem.fxml\\E"
+      },
+      {
+        "pattern": "client:\\Qimg/*.gif\\E"
+      },
+      {
+        "pattern": "client:\\Qimg/*.ico\\E"
+      },
+      {
         "pattern": "client:\\Qfxml/*.fxml\\E"
       },
       {
@@ -221,6 +269,9 @@
         "pattern": "javafx.graphics:\\Qcom/sun/prism/d3d/hlsl/FillRoundRect_Color.obj\\E"
       },
       {
+        "pattern": "javafx.graphics:\\Qcom/sun/prism/d3d/hlsl/Mask_TextureSuper.obj\\E"
+      },
+      {
         "pattern": "javafx.graphics:\\Qcom/sun/prism/d3d/hlsl/Solid_TextureFirstPassLCD.obj\\E"
       },
       {
@@ -234,6 +285,15 @@
       },
       {
         "pattern": "javafx.graphics:\\Qcom/sun/prism/d3d/hlsl/Texture_LinearGradient_PAD.obj\\E"
+      },
+      {
+        "pattern": "javafx.graphics:\\Qcom/sun/scenario/effect/impl/hw/d3d/hlsl/Blend_SRC_ATOP.obj\\E"
+      },
+      {
+        "pattern": "javafx.graphics:\\Qcom/sun/scenario/effect/impl/hw/d3d/hlsl/InvertMask.obj\\E"
+      },
+      {
+        "pattern": "javafx.graphics:\\Qcom/sun/scenario/effect/impl/hw/d3d/hlsl/LinearConvolveShadow_4.obj\\E"
       },
       {
         "pattern": "javafx.graphics:\\Qcom/sun/scenario/effect/impl/hw/d3d/hlsl/LinearConvolveShadow_8.obj\\E"
