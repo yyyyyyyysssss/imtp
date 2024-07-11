@@ -42,6 +42,10 @@ public class Client implements Runnable {
 
     private ConnectListener connectListener;
 
+    private ServerAddress serverAddress;
+
+    private Config config;
+
     public Client(ChannelHandler channelHandler) {
         this(null,null,channelHandler,ClientType.WINDOW);
     }
@@ -69,6 +73,8 @@ public class Client implements Runnable {
                         pipeline.addLast(channelHandler);
                     }
                 });
+        this.config = Config.getInstance();
+        this.serverAddress = ServerAddressFactory.getServerAddress(config.getModel());
     }
 
     public void addListener(ConnectListener connectListener){
@@ -112,7 +118,7 @@ public class Client implements Runnable {
 
     public void connect() {
         try {
-            ServiceInfo serviceInfo = getServiceInfo();
+            ServiceInfo serviceInfo = serverAddress.serviceInfo();
             if (serviceInfo == null){
                 scheduledExecutorService.schedule(() -> {
                     log.warn("正在重新获取服务器信息...");
@@ -157,11 +163,6 @@ public class Client implements Runnable {
             log.error("error:", e);
             group.shutdownGracefully();
         }
-    }
-
-    public ServiceInfo getServiceInfo(){
-        ServerAddress serverAddress = ServerAddressFactory.getServerAddress();
-        return serverAddress.serviceInfo();
     }
 
     @Override
