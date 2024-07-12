@@ -168,6 +168,8 @@
                         <list>org.imtp.client.controller.UserGroupItemController</list>
                         <list>org.imtp.client.controller.ChatEmojiDialog</list>
                         <list>org.imtp.client.controller.HeadClose</list>
+                        <list>com.sun.scenario.effect.impl.sw.java.JSWInvertMaskPeer</list>
+                        <list>com.sun.scenario.effect.impl.sw.java.JSWBlend_SRC_ATOPPeer</list>
                     </reflectionList>
                     <bundlesList>
                         <list>com.sun.glass.ui.win</list>
