@@ -120,13 +120,14 @@ public class Client implements Runnable {
         try {
             ServiceInfo serviceInfo = serverAddress.serviceInfo();
             if (serviceInfo == null){
+                log.warn("获取服务器信息失败...");
                 scheduledExecutorService.schedule(() -> {
                     log.warn("正在重新获取服务器信息...");
                     connect();
                 },1,TimeUnit.SECONDS);
                 return;
             }
-            log.info("serviceInfo : {}",serviceInfo);
+            log.info("服务器信息: {}",serviceInfo);
             ChannelFuture connected = bootstrap.connect(serviceInfo.getHost(), serviceInfo.getPort());
             connected.addListener((ChannelFutureListener) channelFuture -> {
                 if (channelFuture.isSuccess()) {

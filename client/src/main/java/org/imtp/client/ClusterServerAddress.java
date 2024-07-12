@@ -1,9 +1,12 @@
 package org.imtp.client;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import org.imtp.client.component.LoadBalancer;
 import org.imtp.client.component.LoadBalancerFactory;
+import org.imtp.client.component.OKHttpClientHelper;
 import org.imtp.client.component.ServiceInfo;
 
+import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -22,9 +25,12 @@ public class ClusterServerAddress implements ServerAddress{
 
     private LoadBalancer loadBalancer;
 
+    private OKHttpClientHelper okHttpClientHelper;
+
     private ClusterServerAddress(){
         this.config = Config.getInstance();
         this.loadBalancer = LoadBalancerFactory.getLoadBalancer();
+        this.okHttpClientHelper = OKHttpClientHelper.getInstance();
     }
 
     public static ClusterServerAddress getInstance(){
@@ -44,6 +50,7 @@ public class ClusterServerAddress implements ServerAddress{
 
     @Override
     public ServiceInfo serviceInfo() {
-        return new ServiceInfo(config.getHost(),config.getPort());
+        List<ServiceInfo> serviceInfos = okHttpClientHelper.doGet(config.getServiceDiscoveryUrl(), new TypeReference<List<ServiceInfo>>() {});
+        return loadBalancer.nextService(serviceInfos);
     }
 }

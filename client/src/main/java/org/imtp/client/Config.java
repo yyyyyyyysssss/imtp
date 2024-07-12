@@ -8,6 +8,9 @@ import org.imtp.common.enums.ServerModel;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.Locale;
 import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.concurrent.locks.Lock;
@@ -30,34 +33,38 @@ public class Config {
 
     private LoadBalancerType loadBalancerType;
 
+    private String serviceDiscoveryUrl;
+
     private static volatile Config config;
 
     private static final Lock lock = new ReentrantLock();
 
     private Config (){
         File file = new File("./config.properties");
+        ResourceBundle resourceBundle = null;
         if (file.exists()){
-            try (FileInputStream fileInputStream = new FileInputStream(file)){
-                Properties properties = new Properties();
-                properties.load(fileInputStream);
-                this.host = properties.getProperty("server.host");
-                this.port = Integer.parseInt(properties.getProperty("server.port"));
-                String modelProperty = properties.getProperty("server.model");
-                this.model = modelProperty != null ? ServerModel.valueOf(modelProperty) : ServerModel.HOST;
-                String loadBalancerProperty = properties.getProperty("server.loadBalancer");
-                this.loadBalancerType = loadBalancerProperty != null ? LoadBalancerType.valueOf(loadBalancerProperty.toUpperCase()) : LoadBalancerType.ROUND;
+            log.info("正在加载当前目录配置文件");
+            try {
+                resourceBundle = ResourceBundle.getBundle("config", Locale.getDefault(), new URLClassLoader(new URL[] { file.toURI().toURL() }));
             }catch (IOException e){
-                log.error("read config error :",e);
+                log.error("当前目录配置文件读取失败:",e);
             }
         }else {
-            ResourceBundle resourceBundle  = ResourceBundle.getBundle("config");
-            this.host = resourceBundle.getString("server.host");
-            this.port = Integer.parseInt(resourceBundle.getString("server.port"));
-            String modelProperty = resourceBundle.getString("server.model");
-            this.model = modelProperty != null ? ServerModel.valueOf(modelProperty.toUpperCase()) : ServerModel.HOST;
-            String loadBalancerProperty = resourceBundle.getString("server.loadBalancer");
-            this.loadBalancerType = loadBalancerProperty != null ? LoadBalancerType.valueOf(loadBalancerProperty.toUpperCase()) : LoadBalancerType.ROUND;
+            log.info("正在加载类路径下配置文件");
+            resourceBundle  = ResourceBundle.getBundle("config");
         }
+        if (resourceBundle == null){
+            log.error("配置文件读取失败");
+            throw new RuntimeException();
+        }
+        this.host = resourceBundle.getString("server.host");
+        this.port = Integer.parseInt(resourceBundle.getString("server.port"));
+        String modelProperty = resourceBundle.getString("server.model");
+        this.model = ServerModel.valueOf(modelProperty.toUpperCase());
+        String loadBalancerProperty = resourceBundle.getString("server.loadBalancer");
+        this.loadBalancerType = LoadBalancerType.valueOf(loadBalancerProperty.toUpperCase());
+        this.serviceDiscoveryUrl = resourceBundle.getString("api.serviceDiscovery.url");
+        log.info("配置文件加载完成：{}",this);
     }
 
     public static Config getInstance(){
@@ -74,4 +81,13 @@ public class Config {
         return config;
     }
 
+    @Override
+    public String toString() {
+        return "Config{" +
+                "host='" + host + '\'' +
+                ", port=" + port +
+                ", model=" + model +
+                ", loadBalancerType=" + loadBalancerType +
+                '}';
+    }
 }

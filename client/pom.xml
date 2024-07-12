@@ -67,6 +67,14 @@
             <version>1.1.3</version>
         </dependency>
 
+        <!-- https://mvnrepository.com/artifact/com.squareup.okhttp3/okhttp -->
+        <dependency>
+            <groupId>com.squareup.okhttp3</groupId>
+            <artifactId>okhttp</artifactId>
+            <version>4.12.0</version>
+        </dependency>
+
+
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -141,11 +149,9 @@
                     </attachList>
                     <nativeImageArgs>
                         <nativeImageArg>-H:TraceClassInitialization=true</nativeImageArg>
-                        <nativeImageArg>--initialize-at-build-time=ch.qos.logback.core.pattern.parser.Parser,ch.qos.logback.core.util.StatusPrinter,ch.qos.logback.core.util.Loader,org.slf4j.impl.StaticLoggerBinder,org.slf4j.LoggerFactory,ch.qos.logback.classic.Logger,ch.qos.logback.core.spi.AppenderAttachableImpl,ch.qos.logback.core.status.StatusBase,ch.qos.logback.classic.Level,ch.qos.logback.core.status.InfoStatus,ch.qos.logback.classic.PatternLayout,ch.qos.logback.core.CoreConstants</nativeImageArg>
-<!--                        <nativeImageArg>&#45;&#45;initialize-at-build-time=ch.qos.logback</nativeImageArg>-->
-                        <nativeImageArg>--trace-class-initialization=ch.qos.logback.classic.Level,ch.qos.logback.core.util.Loader,ch.qos.logback.core.util.StatusPrinter,ch.qos.logback.core.CoreConstants,ch.qos.logback.classic.Logger,ch.qos.logback.core.pattern.parser.Parser</nativeImageArg>
-<!--                        <nativeImageArg>&#45;&#45;trace-class-initialization=ch.qos.logback</nativeImageArg>-->
-                        <nativeImageArg>--initialize-at-run-time=io.netty.channel.AbstractChannel</nativeImageArg>
+                        <nativeImageArg>--initialize-at-build-time=ch.qos.logback,org.slf4j.LoggerFactory</nativeImageArg>
+                        <nativeImageArg>--trace-object-instantiation=java.io.FileDescriptor</nativeImageArg>
+                        <nativeImageArg>--initialize-at-run-time=io.netty</nativeImageArg>
                     </nativeImageArgs>
                     <reflectionList>
                         <list>org.imtp.client.controller.LoginController</list>

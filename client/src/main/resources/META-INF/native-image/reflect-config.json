@@ -3,16 +3,163 @@
   "name":"[Ljavafx.collections.transformation.SortedList$Element;"
 },
 {
+  "name":"ch.qos.logback.classic.AsyncAppender",
+  "queryAllPublicMethods":true,
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
   "name":"ch.qos.logback.classic.BasicConfigurator",
   "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"ch.qos.logback.classic.Level",
+  "methods":[{"name":"valueOf","parameterTypes":["java.lang.String"] }]
+},
+{
+  "name":"ch.qos.logback.classic.encoder.PatternLayoutEncoder",
+  "queryAllPublicMethods":true,
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"ch.qos.logback.classic.filter.LevelFilter",
+  "queryAllPublicMethods":true,
+  "methods":[{"name":"<init>","parameterTypes":[] }, {"name":"setLevel","parameterTypes":["ch.qos.logback.classic.Level"] }]
 },
 {
   "name":"ch.qos.logback.classic.joran.SerializedModelConfigurator",
   "methods":[{"name":"<init>","parameterTypes":[] }]
 },
 {
+  "name":"ch.qos.logback.classic.pattern.DateConverter",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"ch.qos.logback.classic.pattern.LevelConverter",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"ch.qos.logback.classic.pattern.LineSeparatorConverter",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"ch.qos.logback.classic.pattern.LoggerConverter",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"ch.qos.logback.classic.pattern.MessageConverter",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"ch.qos.logback.classic.pattern.ThreadConverter",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
   "name":"ch.qos.logback.classic.util.DefaultJoranConfigurator",
   "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"ch.qos.logback.core.AsyncAppenderBase",
+  "methods":[{"name":"setDiscardingThreshold","parameterTypes":["int"] }, {"name":"setNeverBlock","parameterTypes":["boolean"] }, {"name":"setQueueSize","parameterTypes":["int"] }]
+},
+{
+  "name":"ch.qos.logback.core.ConsoleAppender",
+  "queryAllPublicMethods":true,
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"ch.qos.logback.core.FileAppender",
+  "methods":[{"name":"valueOf","parameterTypes":["java.lang.String"] }]
+},
+{
+  "name":"ch.qos.logback.core.OutputStreamAppender",
+  "methods":[{"name":"setEncoder","parameterTypes":["ch.qos.logback.core.encoder.Encoder"] }]
+},
+{
+  "name":"ch.qos.logback.core.UnsynchronizedAppenderBase",
+  "methods":[{"name":"addFilter","parameterTypes":["ch.qos.logback.core.filter.Filter"] }]
+},
+{
+  "name":"ch.qos.logback.core.encoder.Encoder",
+  "methods":[{"name":"valueOf","parameterTypes":["java.lang.String"] }]
+},
+{
+  "name":"ch.qos.logback.core.encoder.LayoutWrappingEncoder",
+  "methods":[{"name":"setParent","parameterTypes":["ch.qos.logback.core.spi.ContextAware"] }]
+},
+{
+  "name":"ch.qos.logback.core.filter.AbstractMatcherFilter",
+  "methods":[{"name":"setOnMatch","parameterTypes":["ch.qos.logback.core.spi.FilterReply"] }, {"name":"setOnMismatch","parameterTypes":["ch.qos.logback.core.spi.FilterReply"] }]
+},
+{
+  "name":"ch.qos.logback.core.filter.Filter",
+  "methods":[{"name":"valueOf","parameterTypes":["java.lang.String"] }]
+},
+{
+  "name":"ch.qos.logback.core.pattern.PatternLayoutEncoderBase",
+  "methods":[{"name":"setPattern","parameterTypes":["java.lang.String"] }]
+},
+{
+  "name":"ch.qos.logback.core.pattern.color.BlueCompositeConverter",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"ch.qos.logback.core.pattern.color.CyanCompositeConverter",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"ch.qos.logback.core.pattern.color.GreenCompositeConverter",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"ch.qos.logback.core.pattern.color.RedCompositeConverter",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"ch.qos.logback.core.pattern.color.YellowCompositeConverter",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"ch.qos.logback.core.rolling.RollingFileAppender",
+  "queryAllPublicMethods":true,
+  "methods":[{"name":"<init>","parameterTypes":[] }, {"name":"setRollingPolicy","parameterTypes":["ch.qos.logback.core.rolling.RollingPolicy"] }, {"name":"setTriggeringPolicy","parameterTypes":["ch.qos.logback.core.rolling.TriggeringPolicy"] }]
+},
+{
+  "name":"ch.qos.logback.core.rolling.RollingPolicy",
+  "methods":[{"name":"valueOf","parameterTypes":["java.lang.String"] }]
+},
+{
+  "name":"ch.qos.logback.core.rolling.RollingPolicyBase",
+  "methods":[{"name":"setFileNamePattern","parameterTypes":["java.lang.String"] }, {"name":"setParent","parameterTypes":["ch.qos.logback.core.FileAppender"] }]
+},
+{
+  "name":"ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy",
+  "queryAllPublicMethods":true,
+  "methods":[{"name":"<init>","parameterTypes":[] }, {"name":"setMaxFileSize","parameterTypes":["ch.qos.logback.core.util.FileSize"] }]
+},
+{
+  "name":"ch.qos.logback.core.rolling.TimeBasedRollingPolicy",
+  "queryAllPublicMethods":true,
+  "methods":[{"name":"<init>","parameterTypes":[] }, {"name":"setMaxHistory","parameterTypes":["int"] }, {"name":"setTotalSizeCap","parameterTypes":["ch.qos.logback.core.util.FileSize"] }]
+},
+{
+  "name":"ch.qos.logback.core.rolling.TriggeringPolicy",
+  "methods":[{"name":"valueOf","parameterTypes":["java.lang.String"] }]
+},
+{
+  "name":"ch.qos.logback.core.rolling.helper.DateTokenConverter",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"ch.qos.logback.core.spi.ContextAware",
+  "methods":[{"name":"valueOf","parameterTypes":["java.lang.String"] }]
+},
+{
+  "name":"ch.qos.logback.core.spi.FilterReply",
+  "methods":[{"name":"valueOf","parameterTypes":["java.lang.String"] }]
+},
+{
+  "name":"ch.qos.logback.core.util.FileSize",
+  "methods":[{"name":"valueOf","parameterTypes":["java.lang.String"] }]
 },
 {
   "name":"com.fasterxml.jackson.databind.ext.Java7SupportImpl",
@@ -49,6 +196,10 @@
 },
 {
   "name":"com.sun.javafx.tk.quantum.QuantumToolkit",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"com.sun.org.apache.xerces.internal.jaxp.SAXParserFactoryImpl",
   "methods":[{"name":"<init>","parameterTypes":[] }]
 },
 {
@@ -202,6 +353,10 @@
 {
   "name":"io.netty.util.ReferenceCountUtil",
   "queryAllDeclaredMethods":true
+},
+{
+  "name":"io.netty.util.ResourceLeakDetector$DefaultResourceLeak",
+  "fields":[{"name":"droppedRecords"}, {"name":"head"}]
 },
 {
   "name":"io.netty.util.concurrent.DefaultPromise",

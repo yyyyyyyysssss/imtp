@@ -17,6 +17,9 @@
         "pattern": "\\QMETA-INF/services/java.time.zone.ZoneRulesProvider\\E"
       },
       {
+        "pattern": "\\QMETA-INF/services/javax.xml.parsers.SAXParserFactory\\E"
+      },
+      {
         "pattern": "\\QMETA-INF/services/javax.xml.stream.XMLInputFactory\\E"
       },
       {
@@ -41,64 +44,16 @@
         "pattern": "client:\\Qfxml/*.fxml\\E"
       },
       {
-        "pattern": "client:\\Qfxml/Chat.fxml\\E"
-      },
-      {
-        "pattern": "client:\\Qfxml/ChatItem.fxml\\E"
-      },
-      {
-        "pattern": "client:\\Qfxml/Home.fxml\\E"
-      },
-      {
-        "pattern": "client:\\Qfxml/Login.fxml\\E"
-      },
-      {
-        "pattern": "client:\\Qfxml/UserFriend.fxml\\E"
-      },
-      {
-        "pattern": "client:\\Qfxml/UserFriendDetails.fxml\\E"
-      },
-      {
-        "pattern": "client:\\Qfxml/UserFriendItem.fxml\\E"
-      },
-      {
-        "pattern": "client:\\Qfxml/UserGroup.fxml\\E"
-      },
-      {
-        "pattern": "client:\\Qfxml/UserGroupDetails.fxml\\E"
-      },
-      {
-        "pattern": "client:\\Qfxml/UserGroupItem.fxml\\E"
-      },
-      {
-        "pattern": "client:\\Qfxml/UserSession.fxml\\E"
-      },
-      {
-        "pattern": "client:\\Qfxml/UserSessionItem.fxml\\E"
-      },
-      {
         "pattern": "client:\\Qimg/*.gif\\E"
       },
       {
         "pattern": "client:\\Qimg/*.ico\\E"
-      },
-      {
-        "pattern": "client:\\Qfxml/*.fxml\\E"
-      },
-      {
-        "pattern": "client:\\Qcss/*.css\\E"
       },
       {
         "pattern": "client:\\Qimg/*.jpg\\E"
       },
       {
         "pattern": "client:\\Qimg/*.png\\E"
-      },
-      {
-        "pattern": "client:\\Qimg/*.gif\\E"
-      },
-      {
-        "pattern": "client:\\Qimg/*.ico\\E"
       },
       {
         "pattern": "com.gluonhq.emoji:\\Qcom/gluonhq/emoji/emoji.csv\\E"

@@ -1,6 +1,7 @@
 package org.imtp.common.utils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.CollectionType;
 import java.io.IOException;
@@ -36,6 +37,14 @@ public class JsonUtil {
         try {
             return OBJECT_MAPPER.readValue(bytes,tClass);
         } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static <T> T parseObject(String s, TypeReference<T> typeReference){
+        try {
+            return OBJECT_MAPPER.readValue(s,typeReference);
+        } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
     }
