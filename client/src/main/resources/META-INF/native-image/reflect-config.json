@@ -172,6 +172,30 @@
   "methods":[{"name":"<init>","parameterTypes":[] }]
 },
 {
+  "name":"com.sun.crypto.provider.AESCipher$General",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"com.sun.crypto.provider.ARCFOURCipher",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"com.sun.crypto.provider.ChaCha20Cipher$ChaCha20Poly1305",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"com.sun.crypto.provider.DESCipher",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"com.sun.crypto.provider.DESedeCipher",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"com.sun.crypto.provider.GaloisCounterMode$AESGCM",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
   "name":"com.sun.glass.ui.Screen"
 },
 {
@@ -453,6 +477,9 @@
 {
   "name":"java.nio.channels.spi.SelectorProvider",
   "methods":[{"name":"openSocketChannel","parameterTypes":["java.net.ProtocolFamily"] }]
+},
+{
+  "name":"java.security.AlgorithmParametersSpi"
 },
 {
   "name":"java.security.AllPermission"
@@ -802,6 +829,13 @@
   "methods":[{"name":"<init>","parameterTypes":[] }, {"name":"main","parameterTypes":["java.lang.String[]"] }]
 },
 {
+  "name":"org.imtp.client.component.ServiceInfo",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[{"name":"<init>","parameterTypes":[] }, {"name":"setHost","parameterTypes":["java.lang.String"] }, {"name":"setPort","parameterTypes":["java.lang.Integer"] }]
+},
+{
   "name":"org.imtp.client.controller.AbstractController",
   "allDeclaredFields":true,
   "queryAllDeclaredMethods":true
@@ -989,6 +1023,10 @@
 },
 {
   "name":"sun.security.provider.SHA2$SHA256",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"sun.security.ssl.SSLContextImpl$TLSContext",
   "methods":[{"name":"<init>","parameterTypes":[] }]
 }
 ]

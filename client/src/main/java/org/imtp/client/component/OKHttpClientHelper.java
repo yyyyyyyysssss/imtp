@@ -48,7 +48,7 @@ public class OKHttpClientHelper {
     }
 
 
-    public <T> T doGet(String url, Class<T> tClass) {
+    public <T> T doGet(String url) {
         return doGet(url, new TypeReference<T>() {});
     }
 
