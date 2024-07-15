@@ -12,6 +12,7 @@
     <modules>
         <module>client</module>
         <module>server</module>
+        <module>gateway</module>
         <module>common</module>
     </modules>
 
