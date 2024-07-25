@@ -59,15 +59,19 @@ public class OKHttpClientHelper {
                 .url(url)
                 .build();
         try (Response response = okHttpClient.newCall(request).execute()) {
+            ResponseBody body = response.body();
             if (response.isSuccessful()) {
-                ResponseBody body;
-                if ((body = response.body()) != null) {
+                if (body != null) {
                     String str = body.string();
                     return JsonUtil.parseObject(str, typeReference);
                 }
                 return null;
             }else {
-                throw new RuntimeException("Request failed : " + url);
+                String error = null;
+                if (body != null) {
+                    error = body.string();
+                }
+                throw new RuntimeException("Request Failed Url: " + url + "; response code : " + response.code() + "; error msg : " + error);
             }
         } catch (IOException e) {
             log.error("Request Error", e);

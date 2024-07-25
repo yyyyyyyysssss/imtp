@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.imtp.web.mapper.RoleMapper">
+
+    <select id="findRoleByUserIds" parameterType="java.util.Collection" resultType="org.imtp.web.domain.entity.Role">
+        SELECT r.*
+        FROM im_user u
+        LEFT JOIN im_user_role ur on u.id = ur.user_id
+        LEFT JOIN im_role r on ur.role_id = r.id
+        WHERE u.id in
+        <foreach collection="userIds" item="item" index="index" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </select>
+
+</mapper>

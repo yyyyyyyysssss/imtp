@@ -32,7 +32,7 @@ mybatis-plus:
 im:
   server:
     configuration:
-      model: host
+      model: cluster
       zookeeper:
         servers: 127.0.0.1:2181
         sessionTimeout: 3000

@@ -1,0 +1,43 @@
+server:
+  port: 9090
+
+spring:
+  main:
+    allow-circular-references: true
+  datasource:
+    driver-class-name: org.apache.shardingsphere.driver.ShardingSphereDriver
+    url: jdbc:shardingsphere:classpath:sharding.yaml
+  data:
+    redis:
+      host: 127.0.0.1
+      port: 6379
+      password: 123456
+      lettuce:
+        pool:
+          min-idle: 1
+          max-idle: 8
+          max-active: 8
+          max-wait: 3000
+
+zookeeper:
+  servers: 127.0.0.1:2181
+  sessionTimeout: 3000
+
+
+mybatis-plus:
+  mapper-locations: classpath:mapper/*xml
+  configuration:
+    map-underscore-to-camel-case: true
+
+
+auth:
+  coexistToken: 1
+  jwt:
+    secretKey: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
+    # 单位：s:秒 m:分钟 h:小时 d:天 默认 秒
+    expiration: 24h
+    refreshExpiration: 30d
+  rememberMe:
+    secretKey: 209E335266556A586E3272357538782F413A4428472B4B6250645367566B5B76
+    # 单位：s:秒 m:分钟 h:小时 d:天 默认 秒
+    expiration: 7d
