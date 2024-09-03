@@ -1,6 +1,10 @@
 
 #rootPane{
-    -fx-effect: innershadow(gaussian, #D0D0D0, 1, 1.0, 0, 0);
+    /*-fx-effect: innershadow(gaussian, #D0D0D0, 1, 1.0, 0, 0);*/
+}
+
+#leftVBox{
+    -fx-background-color: #2E2E2E;
 }
 
 #centerHomeLeftHBox{

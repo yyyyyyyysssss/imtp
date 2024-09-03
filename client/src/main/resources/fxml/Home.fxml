@@ -14,17 +14,17 @@
             xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="org.imtp.client.controller.HomeController">
     <left>
-        <VBox prefWidth="50.0" BorderPane.alignment="CENTER">
+        <VBox fx:id="leftVBox" prefWidth="50.0" BorderPane.alignment="CENTER">
             <children>
                 <VBox alignment="TOP_CENTER" prefHeight="300.0" prefWidth="50.0">
                     <children>
                         <ImageView fx:id="homeAvatarImageView" fitHeight="40.0" fitWidth="40.0" pickOnBounds="true"
                                    preserveRatio="true">
                             <VBox.margin>
-                                <Insets top="20.0"/>
+                                <Insets top="30.0"/>
                             </VBox.margin>
                         </ImageView>
-                        <VBox alignment="TOP_CENTER" prefWidth="50.0" spacing="15">
+                        <VBox alignment="TOP_CENTER" prefWidth="50.0" spacing="25">
                             <children>
                                 <ImageView fx:id="homeSessionImageView" fitHeight="30.0" fitWidth="30.0"
                                            pickOnBounds="true" preserveRatio="true"/>
@@ -34,7 +34,7 @@
                                            pickOnBounds="true" preserveRatio="true"/>
                             </children>
                             <padding>
-                                <Insets top="20.0"/>
+                                <Insets top="30.0"/>
                             </padding>
                         </VBox>
                     </children>
