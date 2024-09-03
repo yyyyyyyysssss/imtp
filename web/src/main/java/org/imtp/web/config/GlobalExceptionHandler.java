@@ -28,14 +28,14 @@ import java.util.List;
 public class GlobalExceptionHandler {
 
 
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
     @ExceptionHandler({BadCredentialsException.class})
     public Result<?> handlerBadCredentialsException(BadCredentialsException badCredentialsException){
         log.error("密码错误: ",badCredentialsException);
-        return ResultGenerator.failed(ResultCode.USERNAME_OR_PASSWORD_EXCEPTION);
+        return ResultGenerator.failed(ResultCode.IDENTITY_AUTHENTICATION_EXCEPTION);
     }
 
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
     @ExceptionHandler({UsernameNotFoundException.class})
     public Result<?> handlerBUsernameNotFoundException(UsernameNotFoundException usernameNotFoundException){
         log.error("账号不存在: ",usernameNotFoundException);

@@ -19,7 +19,7 @@ public class LoginDTO {
 
     private String username;
 
-    private String password;
+    private String credential;
 
     private LoginType loginType = LoginType.NORMAL;
 

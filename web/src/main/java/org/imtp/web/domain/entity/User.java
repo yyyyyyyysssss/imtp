@@ -41,7 +41,27 @@ public class User {
     @TableField("avatar")
     private String avatar;
 
+    @TableField("email")
+    private String email;
+
+    @TableField("phone")
+    private String phone;
+
     @TableField("create_time")
     private Date createTime;
 
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", username='" + username + '\'' +
+                ", password='" + password + '\'' +
+                ", nickname='" + nickname + '\'' +
+                ", gender=" + gender +
+                ", avatar='" + avatar + '\'' +
+                ", email='" + email + '\'' +
+                ", phone='" + phone + '\'' +
+                ", createTime=" + createTime +
+                '}';
+    }
 }

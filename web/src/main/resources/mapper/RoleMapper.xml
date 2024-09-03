@@ -2,10 +2,17 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.imtp.web.mapper.RoleMapper">
 
-    <select id="findRoleByUserIds" parameterType="java.util.Collection" resultType="org.imtp.web.domain.entity.Role">
+    <resultMap id="baseResultMap" type="org.imtp.web.domain.entity.Role">
+        <id property="id" column="id"/>
+        <result property="code" column="code"/>
+        <result property="name" column="name"/>
+        <result property="createTime" column="create_time"/>
+    </resultMap>
+
+    <select id="findRoleByUserIds" parameterType="java.util.Collection" resultMap="baseResultMap">
         SELECT r.*
-        FROM im_user u
-        LEFT JOIN im_user_role ur on u.id = ur.user_id
+        FROM im_user_role ur
+        LEFT JOIN im_user u on u.id = ur.user_id
         LEFT JOIN im_role r on ur.role_id = r.id
         WHERE u.id in
         <foreach collection="userIds" item="item" index="index" separator="," open="(" close=")">

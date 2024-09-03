@@ -76,7 +76,7 @@ public class RequestUrlAuthority implements GrantedAuthority {
     static class RequestUrlAuthorityDeserializer extends JsonDeserializer<RequestUrlAuthority> {
 
         @Override
-        public RequestUrlAuthority deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException, JacksonException {
+        public RequestUrlAuthority deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
             ObjectMapper mapper = (ObjectMapper) jsonParser.getCodec();
             JsonNode root = mapper.readTree(jsonParser);
             RequestUrlAuthority requestAuthority = new RequestUrlAuthority();

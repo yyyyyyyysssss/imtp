@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8"/>
+    <style type="text/css">
+        body, p, div {
+            font-family: Helvetica, Arial, sans-serif;
+            font-size: 14px;
+        }
+        a {
+            text-decoration: none;
+        }
+    </style>
+    <title></title>
+</head>
+<body>
+<div>
+    <p>
+        您的验证码为: <strong><span th:text="${verificationCode}"></span></strong>
+    </p>
+    <p>
+        10分钟内有效
+    </p>
+</div>
+</body>
+</html>

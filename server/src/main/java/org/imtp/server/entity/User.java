@@ -41,6 +41,12 @@ public class User {
     @TableField("avatar")
     private String avatar;
 
+    @TableField("email")
+    private String email;
+
+    @TableField("phone")
+    private String phone;
+
     @TableField("create_time")
     private Date createTime;
 

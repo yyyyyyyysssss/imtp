@@ -31,6 +31,8 @@ public class TokenInfo {
 
     private String refreshToken;
 
+    private String rememberMeToken;
+
     private ClientType clientType;
 
     private Long expiration;
@@ -55,6 +57,7 @@ public class TokenInfo {
                 ", userId=" + userId +
                 ", accessToken='" + accessToken + '\'' +
                 ", refreshToken='" + refreshToken + '\'' +
+                ", rememberMeToken='" + rememberMeToken + '\'' +
                 ", clientType=" + clientType +
                 ", expiration=" + expiration +
                 '}';

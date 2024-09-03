@@ -74,7 +74,7 @@ public class JWTTokenServiceImpl implements TokenService {
         String userId = payloadInfo.getSubject();
         ClientType clientType = payloadInfo.getClientType();
         TokenInfo tokenInfo = generate(Long.parseLong(userId), clientType);
-        Long expiration = authProperties.getJwt().getExpiration();
+        Long expiration = payloadInfo.getExpiration() - authProperties.getJwt().getExpiration() * 1000;
         revokeToken(payloadInfo.getId(),expiration);
         return tokenInfo;
     }
@@ -82,7 +82,7 @@ public class JWTTokenServiceImpl implements TokenService {
     @Override
     public void revokeToken(String token) {
         PayloadInfo payloadInfo = JwtUtil.extractPayloadInfo(token);
-        Long expiration = authProperties.getJwt().getExpiration();
+        Long expiration = payloadInfo.getExpiration() - authProperties.getJwt().getExpiration() * 1000;
         revokeToken(payloadInfo.getId(),expiration);
     }
 

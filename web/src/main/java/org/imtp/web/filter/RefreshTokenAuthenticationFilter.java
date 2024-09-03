@@ -9,12 +9,15 @@ import org.imtp.web.enums.TokenType;
 import org.imtp.web.service.TokenService;
 import org.imtp.web.utils.JwtUtil;
 import org.imtp.web.utils.PayloadInfo;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.server.resource.web.BearerTokenResolver;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -31,16 +34,19 @@ public class RefreshTokenAuthenticationFilter extends OncePerRequestFilter {
 
     private TokenService tokenService;
 
+    private final RequestMatcher tokenEndpointMatcher;
+
     public RefreshTokenAuthenticationFilter(BearerTokenResolver bearerTokenResolver,TokenService tokenService){
         this.bearerTokenResolver = bearerTokenResolver;
         this.tokenService = tokenService;
+        this.tokenEndpointMatcher = new AntPathRequestMatcher("/refreshToken", HttpMethod.GET.name());
     }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         SecurityContext securityContext = SecurityContextHolder.getContext();
-        if (!request.getServletPath().contains("/refreshToken") || (securityContext != null && securityContext.getAuthentication() != null)){
-            filterChain.doFilter(request,response);
+        if (!this.tokenEndpointMatcher.matches(request)) {
+            filterChain.doFilter(request, response);
             return;
         }
         String token = bearerTokenResolver.resolve(request);

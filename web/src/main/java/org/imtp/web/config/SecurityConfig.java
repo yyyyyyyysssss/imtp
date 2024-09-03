@@ -1,13 +1,16 @@
 package org.imtp.web.config;
 
 import jakarta.annotation.Resource;
+import org.imtp.web.config.oauth2.OAuthClientAuthenticationProvider;
 import org.imtp.web.filter.RefreshTokenAuthenticationFilter;
 import org.imtp.web.filter.TokenAuthenticationFilter;
 import org.imtp.web.service.TokenService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.RememberMeAuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -31,6 +34,9 @@ import org.springframework.security.web.authentication.rememberme.RememberMeAuth
 import org.springframework.security.web.authentication.rememberme.TokenBasedRememberMeServices;
 import org.springframework.security.web.context.SecurityContextHolderFilter;
 import org.springframework.security.web.context.SecurityContextRepository;
+import org.springframework.web.cors.CorsConfiguration;
+
+import java.util.List;
 
 /**
  * @Description
@@ -56,13 +62,23 @@ public class SecurityConfig {
     @Resource
     private AuthProperties authProperties;
 
+    @Resource
+    private RedisTemplate<String,Object> redisTemplate;
+
     @Bean
-    @Order(2)
+    @Order(Ordered.HIGHEST_PRECEDENCE + 1)
     public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
         http
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .csrf(AbstractHttpConfigurer::disable)
-                .cors(Customizer.withDefaults())
+                //跨域支持
+                .cors(cors -> cors.configurationSource(cs -> {
+                    CorsConfiguration configuration = new CorsConfiguration();
+                    configuration.setAllowedOrigins(List.of("*"));
+                    configuration.setAllowedMethods(List.of("*"));
+                    configuration.setAllowedHeaders(List.of("*"));
+                    return configuration;
+                }))
                 .anonymous(Customizer.withDefaults())
                 .exceptionHandling(exception -> {
                     exception.authenticationEntryPoint(new CustomAuthenticationEntryPoint());
@@ -73,12 +89,27 @@ public class SecurityConfig {
                     securityContext.securityContextRepository(securityContextRepository());
                 })
                 .authorizeHttpRequests(authorize -> {
+                    //放行的路径
                     authorize.requestMatchers(
+                                    "/login",
+                                    "/sendEmailVerificationCode",
+                                    "/error",
+                                    "/assets/**",
                                     "/favicon.ico",
-                                    "/login"
+                                    "/oauth/**",
+                                    "/oauth2/consent",
+                                    "/oauth2/activate",
+                                    "/activated",
+                                    "/"
                             )
                             .permitAll()
+                            //只需要通过身份认证就能访问的路径
+                            .requestMatchers(
+                                    "/logout",
+                                    "/file/**"
+                            ).authenticated()
                             .requestMatchers("/refreshToken").hasAuthority("refresh_token")
+                            //必须校验权限的路径
                             .anyRequest()
                             .access(requestPathAuthorizationManager());
                 })
@@ -86,7 +117,7 @@ public class SecurityConfig {
                 //该过滤器解析token并校验通过后由SecurityContextHolderFilter过滤器加载SecurityContext
                 .addFilterBefore(tokenAuthenticationFilter(), SecurityContextHolderFilter.class)
                 .addFilterBefore(rememberMeFilter(), UsernamePasswordAuthenticationFilter.class)
-                .addFilterBefore(refreshTokenAuthenticationFilter(),UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(refreshTokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
                 .addFilterAfter(logoutFilter(), AuthorizationFilter.class)
                 .logout(AbstractHttpConfigurer::disable);
         return http.build();
@@ -99,13 +130,17 @@ public class SecurityConfig {
         return http.getSharedObject(AuthenticationManagerBuilder.class)
                 //用户名密码身份认证
                 .authenticationProvider(daoAuthenticationProvider())
+                //邮箱验证码认证
+                .authenticationProvider(emailAuthenticationProvider())
+                //用于使用三方登录的身份认证
+                .authenticationProvider(oAuthClientAuthenticationProvider())
                 //记住我身份认证
                 .authenticationProvider(rememberMeAuthenticationProvider())
                 .parentAuthenticationManager(null)
                 .build();
     }
 
-    //基于用户名密码身份认证
+    //基于用户名密码认证
     @Bean
     public DaoAuthenticationProvider daoAuthenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
@@ -114,6 +149,20 @@ public class SecurityConfig {
         authProvider.setPasswordEncoder(passwordEncoder());
         authProvider.setHideUserNotFoundExceptions(false);
         return authProvider;
+    }
+
+    //三方登录认证
+    @Bean
+    public EmailAuthenticationProvider emailAuthenticationProvider(){
+        return new EmailAuthenticationProvider(userService,redisTemplate);
+    }
+
+    //三方登录认证
+    @Bean
+    public OAuthClientAuthenticationProvider oAuthClientAuthenticationProvider(){
+        OAuthClientAuthenticationProvider oAuthClientAuthenticationProvider = new OAuthClientAuthenticationProvider();
+        oAuthClientAuthenticationProvider.setUserDetailsService(userService);
+        return oAuthClientAuthenticationProvider;
     }
 
     //基于请求路径的权限管理器
@@ -127,35 +176,36 @@ public class SecurityConfig {
     @Bean
     public TokenAuthenticationFilter tokenAuthenticationFilter() {
 
-        return new TokenAuthenticationFilter(bearerTokenResolver(),tokenService);
+        return new TokenAuthenticationFilter(bearerTokenResolver(), tokenService);
     }
 
     @Bean
     public RefreshTokenAuthenticationFilter refreshTokenAuthenticationFilter() {
 
-        return new RefreshTokenAuthenticationFilter(bearerTokenResolver(),tokenService);
+        return new RefreshTokenAuthenticationFilter(bearerTokenResolver(), tokenService);
     }
 
 
     //token解析器
     @Bean
-    public BearerTokenResolver bearerTokenResolver(){
+    public BearerTokenResolver bearerTokenResolver() {
 
         return new NormalBearerTokenResolver();
     }
 
     //用户SecurityContext存储
     @Bean
-    public SecurityContextRepository securityContextRepository(){
+    public SecurityContextRepository securityContextRepository() {
 
         return new RedisSecurityContextRepository();
     }
 
     //登出过滤器
     @Bean
-    public LogoutFilter logoutFilter(){
+    public LogoutFilter logoutFilter() {
 
-        return new LogoutFilter((req,res,auth) -> {},logoutHandler);
+        return new LogoutFilter((req, res, auth) -> {
+        }, logoutHandler);
     }
 
     //密码加密  调试使用 生产环境使用BCryptPasswordEncoder

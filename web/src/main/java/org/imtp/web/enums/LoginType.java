@@ -5,6 +5,8 @@ import lombok.Getter;
 @Getter
 public enum LoginType {
     //普通用户名密码登录
-    NORMAL
+    NORMAL,
+    //邮箱验证码登录
+    EMAIL
     ;
 }

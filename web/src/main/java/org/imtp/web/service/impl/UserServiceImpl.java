@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.imtp.web.config.RequestUrlAuthority;
+import org.imtp.web.config.idwork.IdGen;
 import org.imtp.web.domain.entity.Authority;
 import org.imtp.web.domain.entity.Role;
 import org.imtp.web.domain.entity.User;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -40,8 +42,28 @@ public class UserServiceImpl implements UserService {
     private AuthorityMapper authorityMapper;
 
     @Override
+    public boolean save(User user) {
+        User u = findByUsername(user.getUsername());
+        if (u == null){
+            user.setId(IdGen.genId());
+            user.setCreateTime(new Date());
+            return userMapper.insert(user) > 0;
+        }else {
+            user.setId(u.getId());
+            user.setCreateTime(u.getCreateTime());
+            return userMapper.updateById(user) > 0;
+        }
+    }
+
+    @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = findByUsername(username);
+        Wrapper<User> queryWrapper = new QueryWrapper<User>()
+                .eq("username", username)
+                .or()
+                .eq("email",username)
+                .or()
+                .eq("phone",username);
+        User user = userMapper.selectOne(queryWrapper);
         if (user == null){
             throw new UsernameNotFoundException("用户不存在");
         }
@@ -60,7 +82,7 @@ public class UserServiceImpl implements UserService {
     private UserDetails userDetails(User user){
         List<Role> roles = roleMapper.findRoleByUserIds(Collections.singleton(user.getId()));
         if (roles == null || roles.isEmpty()){
-            return new org.springframework.security.core.userdetails.User(user.getUsername(),user.getPassword(), new ArrayList<RequestUrlAuthority>());
+            return new org.springframework.security.core.userdetails.User(user.getUsername(),user.getPassword() == null ? "" : user.getPassword(), new ArrayList<RequestUrlAuthority>());
         }
         List<Long> roleIds = roles.stream().map(Role::getId).toList();
         List<Authority> authorities = authorityMapper.findAuthorityByRoleIds(roleIds);

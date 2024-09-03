@@ -24,6 +24,9 @@ public class NormalBearerTokenResolver implements BearerTokenResolver {
 
     private String resolveFromAuthorizationHeader(HttpServletRequest request) {
         String authorization = request.getHeader(this.bearerTokenHeaderName);
+        if(authorization == null || authorization.isEmpty()){
+            return request.getParameter("access_token");
+        }
         if (!StringUtils.startsWithIgnoreCase(authorization, "Bearer")) {
             return null;
         } else {

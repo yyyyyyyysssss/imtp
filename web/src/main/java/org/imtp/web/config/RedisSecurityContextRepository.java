@@ -74,11 +74,6 @@ public class RedisSecurityContextRepository implements SecurityContextRepository
         return Boolean.TRUE.equals(authRedisTemplate.hasKey(SECURITY_CONTEXT_KEY_PREFIX + attribute));
     }
 
-    public boolean refreshContextExpiration(String userId){
-        Long expiration = authProperties.getJwt().getExpiration();
-        return Boolean.TRUE.equals(authRedisTemplate.expire(SECURITY_CONTEXT_KEY_PREFIX + userId,Duration.ofSeconds(expiration)));
-    }
-
 
     public boolean clearContext(String userId){
 

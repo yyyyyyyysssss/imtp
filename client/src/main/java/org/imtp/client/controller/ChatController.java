@@ -337,10 +337,10 @@ public class ChatController extends AbstractController{
     }
 
     private void addChatItem(ChatItemEntity chatItemEntity){
+        ObservableList<ChatItemEntity> items = chatListView.getItems();
+        int index = items.size();
+        items.addLast(chatItemEntity);
         Platform.runLater(() -> {
-            ObservableList<ChatItemEntity> items = chatListView.getItems();
-            int index = items.size();
-            items.addLast(chatItemEntity);
             chatListView.scrollTo(index);
         });
     }
