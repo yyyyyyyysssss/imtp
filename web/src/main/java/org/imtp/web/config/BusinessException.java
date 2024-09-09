@@ -1,6 +1,6 @@
 package org.imtp.web.config;
 
-import org.imtp.web.config.response.ResultCode;
+import org.imtp.common.response.ResultCode;
 
 /**
  * @Description

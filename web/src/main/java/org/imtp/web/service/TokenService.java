@@ -2,7 +2,7 @@ package org.imtp.web.service;
 
 import org.imtp.web.domain.entity.TokenInfo;
 import org.imtp.web.domain.entity.User;
-import org.imtp.web.enums.ClientType;
+import org.imtp.common.enums.ClientType;
 import org.imtp.web.enums.TokenType;
 
 public interface TokenService {

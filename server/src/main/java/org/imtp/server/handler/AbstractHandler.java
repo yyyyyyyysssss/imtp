@@ -22,12 +22,12 @@ public abstract class AbstractHandler<I> extends SimpleChannelInboundHandler<I> 
     protected RedisWrapper redisWrapper;
 
 
-    protected List<Long> getReceivers(Packet packet){
-        List<Long> receivers;
+    protected List<String> fetchReceiverUserIdByPacket(Packet packet){
+        List<String> receivers;
         if(packet.isGroup()){
             receivers = chatService.findUserIdByGroupId(packet.getReceiver());
         }else {
-            receivers = List.of(packet.getReceiver());
+            receivers = List.of(packet.getReceiver().toString());
         }
         return receivers;
     }

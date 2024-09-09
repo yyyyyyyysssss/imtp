@@ -106,7 +106,8 @@ public class SecurityConfig {
                             //只需要通过身份认证就能访问的路径
                             .requestMatchers(
                                     "/logout",
-                                    "/file/**"
+                                    "/file/**",
+                                    "/service/discovery"
                             ).authenticated()
                             .requestMatchers("/refreshToken").hasAuthority("refresh_token")
                             //必须校验权限的路径

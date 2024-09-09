@@ -14,7 +14,6 @@ import org.imtp.web.mapper.RoleMapper;
 import org.imtp.web.mapper.UserMapper;
 import org.imtp.web.service.UserService;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
@@ -87,10 +86,12 @@ public class UserServiceImpl implements UserService {
         List<Long> roleIds = roles.stream().map(Role::getId).toList();
         List<Authority> authorities = authorityMapper.findAuthorityByRoleIds(roleIds);
         if (authorities == null || authorities.isEmpty()){
-            return new org.springframework.security.core.userdetails.User(user.getUsername(),user.getPassword(), new ArrayList<RequestUrlAuthority>());
+            user.setAuthorities(new ArrayList<RequestUrlAuthority>());
+        }else {
+            List<RequestUrlAuthority> requestUrlAuthorities = authorities.stream().map(m -> new RequestUrlAuthority(m.getCode(), m.getUrls())).toList();
+            user.setAuthorities(requestUrlAuthorities);
         }
-        List<RequestUrlAuthority> requestUrlAuthorities = authorities.stream().map(m -> new RequestUrlAuthority(m.getCode(), m.getUrls())).toList();
-        return new org.springframework.security.core.userdetails.User(user.getUsername(),user.getPassword(), requestUrlAuthorities);
+        return user;
     }
 
     @Override

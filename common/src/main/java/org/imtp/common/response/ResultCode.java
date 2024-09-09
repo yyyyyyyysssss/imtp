@@ -1,4 +1,4 @@
-package org.imtp.web.config.response;
+package org.imtp.common.response;
 
 public enum ResultCode {
 

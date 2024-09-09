@@ -1,8 +1,8 @@
 package org.imtp.server.mq;
 
-import io.netty.channel.Channel;
 import lombok.extern.slf4j.Slf4j;
 import org.imtp.server.context.ChannelContextHolder;
+import org.imtp.server.context.ChannelSession;
 
 /**
  * @Description
@@ -20,10 +20,10 @@ public class ChatMessageDelegate implements MessageDelegate{
     @Override
     public void handleMessage(ForwardMessage forwardMessage) {
         log.info("forwardMessage:{}",forwardMessage);
-        for (String receiver : forwardMessage.getReceivers()){
-            Channel channel = ChannelContextHolder.createChannelContext().getChannel(receiver);
+        for (String channelId : forwardMessage.getChannelIds()){
+            ChannelSession channel = ChannelContextHolder.getChannelContext().getChannel(channelId);
             if(channel != null && channel.isActive()){
-                channel.writeAndFlush(forwardMessage.getMessage());
+                channel.sendMessage(forwardMessage.getMessage());
             }
         }
     }

@@ -7,7 +7,7 @@ import org.imtp.web.config.AuthProperties;
 import org.imtp.web.config.RedisSecurityContextRepository;
 import org.imtp.web.domain.entity.TokenInfo;
 import org.imtp.web.domain.entity.User;
-import org.imtp.web.enums.ClientType;
+import org.imtp.common.enums.ClientType;
 import org.imtp.web.utils.EncryptUtil;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -46,18 +46,18 @@ public class LoginService {
 
     public TokenInfo login(Authentication authenticationToken){
 
-        return login(authenticationToken,false);
+        return login(authenticationToken,false,ClientType.WEB);
     }
 
-    public TokenInfo login(Authentication authenticationToken,boolean rememberMe){
+    public TokenInfo login(Authentication authenticationToken,boolean rememberMe,ClientType clientType){
         Authentication authenticate;
         if ((authenticate = SecurityContextHolder.getContext().getAuthentication()) == null || authenticate instanceof AnonymousAuthenticationToken) {
             authenticate = authenticationManager.authenticate(authenticationToken);
         }
-        org.springframework.security.core.userdetails.User principal = (org.springframework.security.core.userdetails.User)authenticate.getPrincipal();
+        User principal = (User)authenticate.getPrincipal();
         //获取本地用户信息
         User user = userService.findByUsername(principal.getUsername());
-        TokenInfo tokenInfo = tokenService.generate(user, ClientType.PC);
+        TokenInfo tokenInfo = tokenService.generate(user, clientType);
         //序列化securityContext
         SecurityContext securityContext = SecurityContextHolder.getContext();
         securityContext.setAuthentication(authenticate);

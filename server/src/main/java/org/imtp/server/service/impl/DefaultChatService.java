@@ -2,8 +2,10 @@ package org.imtp.server.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import io.netty.util.AttributeKey;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.imtp.common.enums.ClientType;
 import org.imtp.common.enums.DeliveryMethod;
 import org.imtp.common.enums.MessageType;
 import org.imtp.common.packet.body.UserFriendInfo;
@@ -11,6 +13,9 @@ import org.imtp.common.packet.body.UserGroupInfo;
 import org.imtp.common.packet.body.UserSessionInfo;
 import org.imtp.server.config.RedisKey;
 import org.imtp.server.config.RedisWrapper;
+import org.imtp.server.constant.ProjectConstant;
+import org.imtp.server.context.ChannelContextHolder;
+import org.imtp.server.context.ChannelSession;
 import org.imtp.server.entity.*;
 import org.imtp.server.mapper.*;
 import org.imtp.server.service.ChatService;
@@ -84,7 +89,7 @@ public class DefaultChatService implements ChatService {
     }
 
     @Override
-    public List<Long> findUserIdByGroupId(Long groupId) {
+    public List<String> findUserIdByGroupId(Long groupId) {
         Wrapper<GroupUser> groupQueryWrapper = new QueryWrapper<GroupUser>()
                 .select("user_id").eq("group_id", groupId);
         List<GroupUser> groupUsers = groupUserMapper.selectList(groupQueryWrapper);
@@ -95,7 +100,7 @@ public class DefaultChatService implements ChatService {
         Wrapper<User> userQueryWrapper = new QueryWrapper<User>()
                 .select("id").in("id", userIds);
         List<User> users = userMapper.selectList(userQueryWrapper);
-        return users.isEmpty() ? List.of() : users.stream().map(User::getId).toList();
+        return users.isEmpty() ? List.of() : users.stream().map(m -> m.getId().toString()).toList();
     }
 
     @Override
@@ -169,7 +174,9 @@ public class DefaultChatService implements ChatService {
     @Override
     public List<UserSessionInfo> findUserSessionByUserId(Long userId) {
         Wrapper<UserSession> userSessionQueryWrapper = new QueryWrapper<UserSession>()
-                .in("user_id", userId);
+                .in("user_id", userId)
+                .orderByDesc("id");
+
         List<UserSession> userSessions = userSessionMapper.selectList(userSessionQueryWrapper);
         if (userSessions.isEmpty()){
             return List.of();
@@ -183,26 +190,33 @@ public class DefaultChatService implements ChatService {
             }else {
                 groupIds.add(userSession.getReceiverUserId());
             }
-
-            msgIds.add(userSession.getLastMsgId());
+            if(userSession.getLastMsgId() != null){
+                msgIds.add(userSession.getLastMsgId());
+            }
         }
+        //群组
         Map<Long, Group> groupMap = null;
         if (!groupIds.isEmpty()){
             List<Group> groups = groupMapper.selectBatchIds(groupIds);
             groupMap = groups.stream().collect(Collectors.toMap(Group::getId, a -> a));
         }
-        List<Message> messages = messageMapper.selectBatchIds(msgIds);
-        Map<Long, Message> messageIdMap = new HashMap<>();
-        for (Message message : messages){
-            userIds.add(message.getSenderUserId());
-            messageIdMap.put(message.getId(),message);
+        //最新消息
+        Map<Long, Message> messageIdMap = null;
+        if(!msgIds.isEmpty()){
+            List<Message> messages = messageMapper.selectBatchIds(msgIds);
+            messageIdMap = new HashMap<>();
+            for (Message message : messages){
+                userIds.add(message.getSenderUserId());
+                messageIdMap.put(message.getId(),message);
+            }
         }
+        //好友
         Map<Long, User> userIdMap = null;
         if (!userIds.isEmpty()){
             List<User> users = userMapper.selectBatchIds(userIds);
             userIdMap = users.stream().collect(Collectors.toMap(User::getId, a -> a));
         }
-
+        //返回数据
         List<UserSessionInfo> userSessionInfos = new ArrayList<>();
         UserSessionInfo userSessionInfo;
         for (UserSession userSession : userSessions){
@@ -210,27 +224,35 @@ public class DefaultChatService implements ChatService {
             userSessionInfo.setId(userSession.getId());
             userSessionInfo.setUserId(userSession.getUserId());
             userSessionInfo.setReceiverUserId(userSession.getReceiverUserId());
+            userSessionInfo.setDeliveryMethod(userSession.getDeliveryMethod());
 
             if (userSession.getDeliveryMethod().equals(DeliveryMethod.SINGLE)){
-                User user = Optional.ofNullable(userIdMap).map(m -> m.get(userSession.getReceiverUserId())).orElse(new User());
-                userSessionInfo.setName(user.getNickname());
-                userSessionInfo.setAvatar(user.getAvatar());
+                User user = Optional.ofNullable(userIdMap).map(m -> m.get(userSession.getReceiverUserId())).orElse(null);
+                if(user != null){
+                    userSessionInfo.setName(user.getNickname());
+                    userSessionInfo.setAvatar(user.getAvatar());
+                }
             }else {
-                Group group = Optional.ofNullable(groupMap).map(m -> m.get(userSession.getReceiverUserId())).orElse(new Group());
-                userSessionInfo.setName(group.getName());
-                userSessionInfo.setAvatar(group.getAvatar());
+                Group group = Optional.ofNullable(groupMap).map(m -> m.get(userSession.getReceiverUserId())).orElse(null);
+                if (group != null){
+                    userSessionInfo.setName(group.getName());
+                    userSessionInfo.setAvatar(group.getAvatar());
+                }
             }
 
-            Message message = messageIdMap.get(userSession.getLastMsgId());
-            MessageType messageType = MessageType.findMessageTypeByValue(message.getType());
-            userSessionInfo.setLastMsgType(messageType);
-            userSessionInfo.setLastMsgContent(message.getContent());
-            userSessionInfo.setLastMsgTime(message.getSendTime().getTime());
-            userSessionInfo.setDeliveryMethod(message.getDeliveryMethod());
-            userSessionInfo.setLastSendMsgUserId(message.getSenderUserId());
-            User user = Optional.ofNullable(userIdMap).map(m -> m.get(message.getSenderUserId())).orElse(new User());
-            userSessionInfo.setLastUserAvatar(user.getAvatar());
-            userSessionInfo.setLastUserName(user.getNickname());
+            Message message = Optional.ofNullable(messageIdMap).map(m -> m.get(userSession.getLastMsgId())).orElse(null);
+            if(message != null){
+                MessageType messageType = MessageType.findMessageTypeByValue(message.getType());
+                userSessionInfo.setLastMsgType(messageType);
+                userSessionInfo.setLastMsgContent(message.getContent());
+                userSessionInfo.setLastMsgTime(message.getSendTime().getTime());
+                userSessionInfo.setLastSendMsgUserId(message.getSenderUserId());
+                User user = Optional.ofNullable(userIdMap).map(m -> m.get(message.getSenderUserId())).orElse(null);
+                if(user != null){
+                    userSessionInfo.setLastUserAvatar(user.getAvatar());
+                    userSessionInfo.setLastUserName(user.getNickname());
+                }
+            }
             userSessionInfos.add(userSessionInfo);
         }
 
@@ -238,15 +260,44 @@ public class DefaultChatService implements ChatService {
     }
 
     @Override
-    public void userOnline(String userId) {
+    public void userOnline(String userId, String channelId) {
         String k = RedisKey.USER_ONLINE + userId;
-        redisWrapper.setValue(k,userId);
+        redisWrapper.addSet(k,channelId);
     }
 
     @Override
-    public void userOffline(String userId) {
+    public void userOffline(String userId,String channelId) {
         String k = RedisKey.USER_ONLINE + userId;
-        redisWrapper.delete(k);
+        redisWrapper.removeSet(k,channelId);
+        //移除
+        ChannelContextHolder.getChannelContext().removeChannel(channelId);
+    }
+
+    public void allUserOffline(){
+        Collection<ChannelSession> allChannel = ChannelContextHolder.getChannelContext().getAllChannel();
+        if (allChannel == null || allChannel.isEmpty()){
+            return;
+        }
+        AttributeKey<Long> attributeKey = AttributeKey.valueOf(ProjectConstant.CHANNEL_ATTR_LOGIN_USER);
+        List<String> list = allChannel.stream().map(m -> RedisKey.USER_ONLINE + (m.channel().attr(attributeKey).get())).toList();
+        redisWrapper.delete(list.toArray(new String[0]));
+    }
+
+    @Override
+    public Map<String,Set<String>> fetchActiveChannelIdByUserIds(List<String> userIds) {
+        List<String> keys = userIds.stream().map(m -> RedisKey.USER_ONLINE + m).toList();
+        List<Object> set = redisWrapper.getSet(keys);
+        Map<String,Set<String>> map = new HashMap<>();
+        for (int i = 0; i< keys.size(); i++){
+            Set<String> object = (Set<String>)set.get(i);
+            String userId = userIds.get(i);
+            if(object == null || object.isEmpty()){
+                map.put(userId,null);
+            }else {
+                map.put(userId,object);
+            }
+        }
+        return map;
     }
 
     @Override

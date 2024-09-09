@@ -70,9 +70,6 @@ public class IMServer{
             channelFuture.addListener((ChannelFutureListener) channelFuture -> {
                 if (channelFuture.isSuccess()){
                     log.info("IMServer started");
-                    //初始化上下文对象
-                    ChannelContextHolder.createChannelContext();
-
                     //集群模式将服务器信息注册
                     if (ServerModel.CLUSTER.equals(serverProperties.getConfiguration().getModel())){
                         String id = serverProperties.getConfiguration().getId();

@@ -2,6 +2,7 @@ package org.imtp.server.handler;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.util.AttributeKey;
@@ -17,6 +18,7 @@ import org.imtp.common.packet.body.UserInfo;
 import org.imtp.server.constant.ProjectConstant;
 import org.imtp.server.context.ChannelContext;
 import org.imtp.server.context.ChannelContextHolder;
+import org.imtp.server.context.IMChannelSession;
 import org.imtp.server.entity.User;
 import org.springframework.stereotype.Component;
 
@@ -51,13 +53,13 @@ public class LoginHandler extends AbstractHandler<Packet> {
             channelHandlerContext.channel().writeAndFlush(new LoginResponse(LoginState.SUCCESS, user.getId(),userInfo));
 
             //存储channel
-            ChannelContext channelContext = ChannelContextHolder.createChannelContext();
-            channelContext.addChannel(user.getId().toString(),channelHandlerContext.channel());
+            Channel channel = channelHandlerContext.channel();
+            ChannelContext channelContext = ChannelContextHolder.getChannelContext();
+            channelContext.addChannel(channel.id().asLongText(),new IMChannelSession(channelHandlerContext.channel()));
             //建立channel与用户之间的关系
-            AttributeKey<Long> attributeKey = AttributeKey.valueOf(ProjectConstant.CHANNEL_ATTR_LOGIN_USER);
-            channelHandlerContext.channel().attr(attributeKey).set(user.getId());
+            channelHandlerContext.channel().attr(AttributeKey.valueOf(ProjectConstant.CHANNEL_ATTR_LOGIN_USER)).set(user.getId());
             log.info("用户:{} 已上线",loginInfo.getUsername());
-            chatService.userOnline(user.getId().toString());
+            chatService.userOnline(user.getId().toString(), channel.id().asLongText());
 
             //登录成功则添加业务指令处理器并移除当前handler
             channelHandlerContext.pipeline().addLast(commandHandler).remove(this);

@@ -1,4 +1,4 @@
-package org.imtp.web.enums;
+package org.imtp.common.enums;
 
 /**
  * @Description

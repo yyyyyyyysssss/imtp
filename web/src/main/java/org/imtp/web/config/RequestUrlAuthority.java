@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.imtp.web.utils.JsonNodeUtil;
 import org.springframework.security.core.GrantedAuthority;
 
 import java.io.IOException;
@@ -80,48 +81,13 @@ public class RequestUrlAuthority implements GrantedAuthority {
             ObjectMapper mapper = (ObjectMapper) jsonParser.getCodec();
             JsonNode root = mapper.readTree(jsonParser);
             RequestUrlAuthority requestAuthority = new RequestUrlAuthority();
-            String code = JsonNodeUtils.findStringValue(root, "code");
-            String urls = JsonNodeUtils.findStringValue(root, "urls");
+            String code = JsonNodeUtil.findStringValue(root, "code");
+            String urls = JsonNodeUtil.findStringValue(root, "urls");
 
             requestAuthority.setCode(code);
             requestAuthority.setUrls(urls);
             return requestAuthority;
         }
-    }
-
-    abstract static class JsonNodeUtils {
-
-        static final TypeReference<Set<String>> STRING_SET = new TypeReference<Set<String>>() {
-        };
-
-        static final TypeReference<Map<String, Object>> STRING_OBJECT_MAP = new TypeReference<Map<String, Object>>() {
-        };
-
-        static String findStringValue(JsonNode jsonNode, String fieldName) {
-            if (jsonNode == null) {
-                return null;
-            }
-            JsonNode value = jsonNode.findValue(fieldName);
-            return (value != null && value.isTextual()) ? value.asText() : null;
-        }
-
-        static <T> T findValue(JsonNode jsonNode, String fieldName, TypeReference<T> valueTypeReference,
-                               ObjectMapper mapper) {
-            if (jsonNode == null) {
-                return null;
-            }
-            JsonNode value = jsonNode.findValue(fieldName);
-            return (value != null && value.isContainerNode()) ? mapper.convertValue(value, valueTypeReference) : null;
-        }
-
-        static JsonNode findObjectNode(JsonNode jsonNode, String fieldName) {
-            if (jsonNode == null) {
-                return null;
-            }
-            JsonNode value = jsonNode.findValue(fieldName);
-            return (value != null && value.isObject()) ? value : null;
-        }
-
     }
 
 }

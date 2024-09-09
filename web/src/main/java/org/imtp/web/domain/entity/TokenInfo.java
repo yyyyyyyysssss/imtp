@@ -5,7 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Tolerate;
-import org.imtp.web.enums.ClientType;
+import org.imtp.common.enums.ClientType;
 
 import java.util.Objects;
 

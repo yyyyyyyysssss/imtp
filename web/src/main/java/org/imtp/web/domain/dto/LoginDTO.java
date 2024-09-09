@@ -2,6 +2,7 @@ package org.imtp.web.domain.dto;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.imtp.common.enums.ClientType;
 import org.imtp.web.enums.LoginType;
 
 /**
@@ -22,6 +23,8 @@ public class LoginDTO {
     private String credential;
 
     private LoginType loginType = LoginType.NORMAL;
+
+    private ClientType clientType = ClientType.WEB;
 
     //是否勾选记住我 1 勾选  0未勾选
     private Integer rememberMe;

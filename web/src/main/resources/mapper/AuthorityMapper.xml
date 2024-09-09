@@ -5,8 +5,8 @@
     <select id="findAuthorityByRoleIds" parameterType="java.util.Collection" resultType="org.imtp.web.domain.entity.Authority">
         SELECT a.*
         FROM im_role r
-        LEFT JOIN im_role_authority ra on r.id = ra.role_id
-        LEFT JOIN im_authority a on ra.authority_id = a.id
+        RIGHT JOIN im_role_authority ra on r.id = ra.role_id
+        RIGHT JOIN im_authority a on ra.authority_id = a.id
         WHERE r.id in
         <foreach collection="roleIds" item="item" index="index" separator="," open="(" close=")">
             #{item}

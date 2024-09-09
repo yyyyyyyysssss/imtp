@@ -8,7 +8,7 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.imtp.common.utils.JsonUtil;
 import org.imtp.web.config.AuthProperties;
-import org.imtp.web.enums.ClientType;
+import org.imtp.common.enums.ClientType;
 import org.imtp.web.enums.TokenType;
 import org.springframework.stereotype.Component;
 

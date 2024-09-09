@@ -24,14 +24,14 @@ public class ForwardMessage implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    private List<String> receivers;
+    private List<String> channelIds;
 
     private Packet message;
 
     @Override
     public String toString() {
         return "ForwardMessage{" +
-                "receivers=" + receivers +
+                "channelIds=" + channelIds +
                 ", message=" + message +
                 '}';
     }

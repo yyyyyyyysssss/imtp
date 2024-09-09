@@ -1,6 +1,5 @@
 package org.imtp.web.controller;
 
-import io.minio.MinioClient;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -8,9 +7,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.imtp.web.config.EmailAuthenticationProvider;
 import org.imtp.web.config.EmailAuthenticationToken;
 import org.imtp.web.config.RedisSecurityContextRepository;
-import org.imtp.web.config.minio.MinioConfig;
-import org.imtp.web.config.response.Result;
-import org.imtp.web.config.response.ResultGenerator;
+import org.imtp.common.response.Result;
+import org.imtp.common.response.ResultGenerator;
 import org.imtp.web.domain.dto.EmailInfo;
 import org.imtp.web.domain.dto.LoginDTO;
 import org.imtp.web.domain.entity.TokenInfo;
@@ -76,11 +74,11 @@ public class LoginController {
         switch (loginDTO.getLoginType()) {
             case NORMAL:
                 UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(loginDTO.getUsername(), loginDTO.getCredential());
-                tokenInfo = loginService.login(authenticationToken, loginDTO.rememberMe());
+                tokenInfo = loginService.login(authenticationToken, loginDTO.rememberMe(),loginDTO.getClientType());
                 break;
             case EMAIL:
                 EmailAuthenticationToken emailAuthenticationToken = new EmailAuthenticationToken(loginDTO.getUsername(), loginDTO.getCredential());
-                tokenInfo = loginService.login(emailAuthenticationToken, loginDTO.rememberMe());
+                tokenInfo = loginService.login(emailAuthenticationToken, loginDTO.rememberMe(),loginDTO.getClientType());
                 break;
             default:
                 throw new UnsupportedOperationException("不支持的登录方式:" + loginDTO.getLoginType());

@@ -2,8 +2,8 @@ package org.imtp.web.controller;
 
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.imtp.web.config.response.Result;
-import org.imtp.web.config.response.ResultGenerator;
+import org.imtp.common.response.Result;
+import org.imtp.common.response.ResultGenerator;
 import org.imtp.web.domain.dto.UploadChunkDTO;
 import org.imtp.web.service.FileService;
 import org.springframework.http.MediaType;

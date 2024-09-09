@@ -1,13 +1,17 @@
 package org.imtp.server.context;
 
-import io.netty.channel.Channel;
+import java.util.Collection;
 
 public interface ChannelContext {
 
-    void addChannel(String id,Channel channel);
+    void addChannel(String id,ChannelSession channelSession);
 
-    Channel getChannel(String id);
+    ChannelSession getChannel(String id);
+
+    Collection<ChannelSession> getAllChannel();
 
     void removeChannel(String id);
+
+
 
 }

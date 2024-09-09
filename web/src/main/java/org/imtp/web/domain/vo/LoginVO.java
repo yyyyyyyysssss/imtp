@@ -3,7 +3,7 @@ package org.imtp.web.domain.vo;
 import lombok.Getter;
 import lombok.Setter;
 import org.imtp.web.domain.entity.TokenInfo;
-import org.imtp.web.enums.ClientType;
+import org.imtp.common.enums.ClientType;
 
 /**
  * @Description

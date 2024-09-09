@@ -22,9 +22,15 @@ public class UserFriendInfo {
 
     private String nickname;
 
+    private String note;
+
+    private String tagline;
+
     private Gender gender;
 
     private String avatar;
+
+    private String region;
 
     @Override
     public String toString() {
@@ -32,6 +38,8 @@ public class UserFriendInfo {
                 "id=" + id +
                 ", account='" + account + '\'' +
                 ", nickname='" + nickname + '\'' +
+                ", note='" + note + '\'' +
+                ", tagline='" + tagline + '\'' +
                 ", gender=" + gender +
                 ", avatar='" + avatar + '\'' +
                 '}';

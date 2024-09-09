@@ -9,12 +9,15 @@ import org.imtp.common.packet.AbstractTextMessage;
 import org.imtp.common.packet.MessageStateResponse;
 import org.imtp.common.utils.JsonUtil;
 import org.imtp.server.context.ChannelContextHolder;
+import org.imtp.server.context.ChannelSession;
 import org.imtp.server.entity.Message;
 import org.imtp.server.entity.OfflineMessage;
 import org.imtp.server.mq.ForwardMessage;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -27,36 +30,44 @@ public abstract class AbstractTextHandler<T extends AbstractTextMessage>  extend
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, T msg) throws Exception {
         //响应已送达报文
-        ctx.channel().writeAndFlush(new MessageStateResponse(MessageState.DELIVERED,msg));
+        ChannelSession senderChannelSession = ChannelContextHolder.getChannelContext().getChannel(ctx.channel().id().asLongText());
+        senderChannelSession.sendMessage(new MessageStateResponse(MessageState.DELIVERED,msg));
         //转发
+        List<String> forwardChannelIds = new ArrayList<>();
         List<String> offlineReceivers = new ArrayList<>();
-        List<Long> receivers = getReceivers(msg);
-        for(Long receiver : receivers){
-            Channel channel = ChannelContextHolder.createChannelContext().getChannel(receiver.toString());
-            if(channel != null && channel.isActive()){
-                if(!receiver.equals(msg.getSender())){
-                    channel.writeAndFlush(msg);
+        List<String> receiverUserIds = fetchReceiverUserIdByPacket(msg);
+        //根据用户id获取关联的channel
+        Map<String,Set<String>> map = chatService.fetchActiveChannelIdByUserIds(receiverUserIds);
+        for (String userId : map.keySet()){
+            Set<String> channelIds = map.get(userId);
+            //null表示用户未上线
+            if(channelIds == null){
+                offlineReceivers.add(userId);
+                continue;
+            }
+            for(String channelId : channelIds){
+                ChannelSession channel = ChannelContextHolder.getChannelContext().getChannel(channelId);
+                if(channel != null){
+                    if(!channel.id().equals(ctx.channel().id().asLongText())){
+                        channel.sendMessage(msg);
+                    }
+                }else {
+                    forwardChannelIds.add(channelId);
                 }
-            }else {
-                offlineReceivers.add(receiver.toString());
             }
         }
-
-        //获取在线且不在当前服务器的用户并发布
-        List<String> userOnline = chatService.batchGetUserOnline(offlineReceivers);
-        if (userOnline != null && !userOnline.isEmpty()){
+        //发布
+        if(!forwardChannelIds.isEmpty()){
             ByteBuf byteBuf = Unpooled.buffer();
             try {
                 msg.encodeAsByteBuf(byteBuf);
                 byte[] bytes = new byte[byteBuf.readableBytes()];
                 byteBuf.readBytes(bytes);
-                ForwardMessage forwardMessage = new ForwardMessage(userOnline, msg);
+                ForwardMessage forwardMessage = new ForwardMessage(forwardChannelIds, msg);
                 redisWrapper.publishMsg(forwardMessage);
             }finally {
                 byteBuf.release();
             }
-            //将在线的用户移除
-            offlineReceivers.removeAll(userOnline);
         }
 
         //离线用户消息落库

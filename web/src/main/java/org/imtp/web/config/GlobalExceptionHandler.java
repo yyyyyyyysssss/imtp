@@ -2,9 +2,9 @@ package org.imtp.web.config;
 
 import jakarta.validation.ValidationException;
 import lombok.extern.slf4j.Slf4j;
-import org.imtp.web.config.response.Result;
-import org.imtp.web.config.response.ResultCode;
-import org.imtp.web.config.response.ResultGenerator;
+import org.imtp.common.response.Result;
+import org.imtp.common.response.ResultCode;
+import org.imtp.common.response.ResultGenerator;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.nio.file.AccessDeniedException;
 import java.util.List;
 
 /**
@@ -40,6 +41,13 @@ public class GlobalExceptionHandler {
     public Result<?> handlerBUsernameNotFoundException(UsernameNotFoundException usernameNotFoundException){
         log.error("账号不存在: ",usernameNotFoundException);
         return ResultGenerator.failed(ResultCode.USERNAME_OR_PASSWORD_EXCEPTION);
+    }
+
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    @ExceptionHandler({AccessDeniedException.class})
+    public Result<?> handlerAccessDeniedException(AccessDeniedException accessDeniedException){
+        log.error("Access Denied: ",accessDeniedException);
+        return ResultGenerator.failed(ResultCode.ACCESS_AUTHORIZED_EXCEPTION);
     }
 
     @ResponseStatus(HttpStatus.OK)

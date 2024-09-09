@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.imtp.web.config.EmailAuthenticationToken;
 import org.imtp.web.config.RequestUrlAuthority;
 import org.imtp.web.config.oauth2.OAuthClientAuthenticationToken;
+import org.imtp.web.domain.entity.User;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -63,6 +64,7 @@ public class RedisConfig {
         objectMapper.addMixIn(RequestUrlAuthority.class, RequestUrlAuthority.RequestUrlAuthorityMixin.class);
         objectMapper.addMixIn(OAuthClientAuthenticationToken.class, OAuthClientAuthenticationToken.OAuthClientAuthenticationTokenMixin.class);
         objectMapper.addMixIn(EmailAuthenticationToken.class, EmailAuthenticationToken.EmailAuthenticationTokenMixin.class);
+        objectMapper.addMixIn(User.class,User.RequestUrlAuthorityMixin.class);
         return new GenericJackson2JsonRedisSerializer(objectMapper);
     }
 

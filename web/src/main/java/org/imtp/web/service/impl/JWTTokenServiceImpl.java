@@ -8,7 +8,7 @@ import org.imtp.web.config.redis.RedisKey;
 import org.imtp.web.config.redis.RedisWrapper;
 import org.imtp.web.domain.entity.TokenInfo;
 import org.imtp.web.domain.entity.User;
-import org.imtp.web.enums.ClientType;
+import org.imtp.common.enums.ClientType;
 import org.imtp.web.enums.TokenType;
 import org.imtp.web.service.TokenService;
 import org.imtp.web.utils.JwtUtil;

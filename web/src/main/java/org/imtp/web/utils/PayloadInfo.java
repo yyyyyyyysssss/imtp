@@ -2,7 +2,7 @@ package org.imtp.web.utils;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.imtp.web.enums.ClientType;
+import org.imtp.common.enums.ClientType;
 import org.imtp.web.enums.TokenType;
 
 /**

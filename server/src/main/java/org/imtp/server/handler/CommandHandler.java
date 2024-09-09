@@ -2,12 +2,14 @@ package org.imtp.server.handler;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.util.AttributeKey;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.imtp.common.enums.ClientType;
 import org.imtp.common.enums.Command;
 import org.imtp.common.packet.*;
 import org.imtp.common.packet.base.Header;
@@ -97,16 +99,16 @@ public class CommandHandler extends SimpleChannelInboundHandler<Packet> {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
+        Channel channel = ctx.channel();
         AttributeKey<Long> attributeKey = AttributeKey.valueOf(ProjectConstant.CHANNEL_ATTR_LOGIN_USER);
-        Long loginUser = ctx.channel().attr(attributeKey).get();
+        Long userId = channel.attr(attributeKey).get();
         if (cause instanceof SocketException){
-            log.warn("用户[{}]已断开连接",loginUser);
+            log.warn("用户[{}]已断开连接",userId);
         }else {
             log.error("exception message",cause);
         }
-        //移除
-        ChannelContextHolder.createChannelContext().removeChannel(loginUser.toString());
         //移除用户在线状态
-        chatService.userOffline(loginUser.toString());
+        chatService.userOffline(userId.toString(), channel.id().asLongText());
+        ctx.close();
     }
 }
