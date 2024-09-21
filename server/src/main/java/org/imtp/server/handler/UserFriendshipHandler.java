@@ -5,10 +5,8 @@ import io.netty.channel.ChannelHandlerContext;
 import org.imtp.common.packet.FriendshipRequest;
 import org.imtp.common.packet.FriendshipResponse;
 import org.imtp.common.packet.body.UserFriendInfo;
-import org.imtp.server.entity.User;
+import org.imtp.common.response.Result;
 import org.springframework.stereotype.Component;
-
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -23,11 +21,12 @@ public class UserFriendshipHandler extends AbstractHandler<FriendshipRequest>{
 
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, FriendshipRequest friendshipRequest) {
-        List<UserFriendInfo> userFriendInfos = chatService.findFriendByUserId(friendshipRequest.getSender());
-        if(userFriendInfos.isEmpty()){
+        Result<List<UserFriendInfo>> result = webApi.userFriend(friendshipRequest.getSender().toString());
+        List<UserFriendInfo> userFriendInfos;
+        if (result.isSucceed() && !(userFriendInfos = result.getData()).isEmpty()){
+            channelHandlerContext.channel().writeAndFlush(new FriendshipResponse(friendshipRequest.getSender(),userFriendInfos));
+        }else {
             channelHandlerContext.channel().writeAndFlush(new FriendshipResponse(friendshipRequest.getSender()));
-            return;
         }
-        channelHandlerContext.channel().writeAndFlush(new FriendshipResponse(friendshipRequest.getSender(),userFriendInfos));
     }
 }

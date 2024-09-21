@@ -2,19 +2,16 @@ package org.imtp.server.config;
 
 import jakarta.annotation.Resource;
 import org.imtp.server.mq.Topic;
-import org.springframework.dao.DataAccessException;
-import org.springframework.data.redis.connection.RedisConnection;
-import org.springframework.data.redis.connection.StringRedisConnection;
+import org.springframework.data.redis.connection.stream.ObjectRecord;
+import org.springframework.data.redis.connection.stream.RecordId;
+import org.springframework.data.redis.connection.stream.StreamRecords;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.stereotype.Component;
 
-import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * @Description
@@ -36,6 +33,11 @@ public class RedisWrapper {
     public <T> Long publishMsg(String topic,T message){
 
         return redisTemplate.convertAndSend(topic,message);
+    }
+
+    public RecordId addStreamRecord(Object object){
+        ObjectRecord<String, Object> objectObjectRecord = StreamRecords.newRecord().in(Topic.MESSAGE_FORWARD).ofObject(object);
+        return redisTemplate.opsForStream().add(objectObjectRecord);
     }
 
     public void setValue(String key, Object object){

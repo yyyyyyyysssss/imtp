@@ -1,5 +1,6 @@
 package org.imtp.client.controller;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import io.netty.channel.ChannelHandler;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -8,7 +9,10 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.Point2D;
 import javafx.scene.Node;
-import javafx.scene.control.*;
+import javafx.scene.control.PasswordField;
+import javafx.scene.control.Separator;
+import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
@@ -20,22 +24,30 @@ import javafx.scene.shape.Circle;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import lombok.extern.slf4j.Slf4j;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.Response;
+import okhttp3.ResponseBody;
 import org.imtp.client.Client;
+import org.imtp.client.Config;
 import org.imtp.client.SceneManager;
 import org.imtp.client.SceneManagerHolder;
-import org.imtp.client.constant.ConnectListener;
+import org.imtp.client.component.OKHttpClientHelper;
 import org.imtp.client.constant.FXMLResourceConstant;
 import org.imtp.client.constant.SendMessageListener;
-import org.imtp.client.handler.ClientCmdHandlerHandler;
-import org.imtp.client.handler.LoginHandler;
-import org.imtp.client.model.MessageModel;
+import org.imtp.client.entity.TokenEntity;
+import org.imtp.client.handler.AuthenticationHandler;
 import org.imtp.client.util.EffectUtilities;
 import org.imtp.client.util.ResourceUtils;
-import org.imtp.common.packet.LoginRequest;
-import org.imtp.common.packet.LoginResponse;
-import org.imtp.common.packet.body.LoginInfo;
+import org.imtp.common.packet.AuthenticationRequest;
+import org.imtp.common.packet.AuthenticationResponse;
+import org.imtp.common.response.Result;
+import org.imtp.common.utils.JsonUtil;
 
+import java.io.IOException;
 import java.net.URL;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * @Description
@@ -67,9 +79,6 @@ public class LoginController extends AbstractController {
     private VBox loginVBox;
 
     @FXML
-    private Button loginButton;
-
-    @FXML
     private Text errorMsg;
 
     @FXML
@@ -86,8 +95,12 @@ public class LoginController extends AbstractController {
 
     private ObservableList<Node> defaultChildren;
 
+    private OKHttpClientHelper okHttpClientHelper;
+
+    private Config config;
+
     @FXML
-    public void initialize(){
+    public void initialize() {
         defaultChildren = FXCollections.observableArrayList(loginVBox.getChildren());
 
         loginBorderPane.addEventFilter(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
@@ -108,13 +121,13 @@ public class LoginController extends AbstractController {
         loadingImage.setFitHeight(50);
 
         username.setOnKeyPressed(event -> {
-            if (event.getCode() == KeyCode.ENTER){
+            if (event.getCode() == KeyCode.ENTER) {
                 login();
             }
         });
 
         username.textProperty().addListener((observableValue, s, t1) -> {
-            if (!t1.isEmpty()){
+            if (!t1.isEmpty()) {
                 uSeparator.getStyleClass().removeAll("separator_change");
                 uSeparator.getStyleClass().add("separator_default");
                 errorTip.hide();
@@ -122,12 +135,12 @@ public class LoginController extends AbstractController {
         });
 
         password.setOnKeyPressed(event -> {
-            if (event.getCode() == KeyCode.ENTER){
+            if (event.getCode() == KeyCode.ENTER) {
                 login();
             }
         });
         password.textProperty().addListener((observableValue, s, t1) -> {
-            if (!t1.isEmpty()){
+            if (!t1.isEmpty()) {
                 pSeparator.getStyleClass().removeAll("separator_change");
                 pSeparator.getStyleClass().add("separator_default");
                 errorTip.hide();
@@ -136,7 +149,7 @@ public class LoginController extends AbstractController {
 
         SceneManager sceneManager = SceneManagerHolder.getSceneManager();
         Stage stage = sceneManager.getStage();
-        EffectUtilities.makeDraggable(stage,loginBorderPane);
+        EffectUtilities.makeDraggable(stage, loginBorderPane);
 
         headMinimizeVBxo.setOnMouseClicked(event -> {
             stage.setIconified(true);
@@ -144,6 +157,10 @@ public class LoginController extends AbstractController {
         headCloseVBxo.setOnMouseClicked(event -> {
             stage.close();
         });
+
+        okHttpClientHelper = OKHttpClientHelper.getInstance();
+
+        config = Config.getInstance();
     }
 
 
@@ -152,54 +169,104 @@ public class LoginController extends AbstractController {
 
     }
 
-    public void login(){
+    public void login() {
         String u = username.getText();
         String p = password.getText();
-        log.info("u:{} p:{}",u,p);
-        if (u.isEmpty()){
+        log.info("u:{} p:{}", u, p);
+        if (u.isEmpty()) {
             username.requestFocus();
             uSeparator.getStyleClass().removeAll("separator_default");
             uSeparator.getStyleClass().add("separator_change");
-            showTooltip(username,"请输入账号后再登录");
+            showTooltip(username, "请输入账号后再登录");
             return;
         }
-        if(p.isEmpty()){
+        if (p.isEmpty()) {
             password.requestFocus();
             pSeparator.getStyleClass().removeAll("separator_default");
             pSeparator.getStyleClass().add("separator_change");
-            showTooltip(password,"请输入密码后再登录");
+            showTooltip(password, "请输入密码后再登录");
             return;
         }
         switchLogging();
-        if (client == null){
-            client = new Client((ChannelHandler) messageModel);
-            client.addListener(() -> loggingIn(client,u,p));
-            //启动netty
-            new Thread(client).start();
-        }else {
-            loggingIn(client,u,p);
-        }
+        Map<String, String> loginRequest = new LinkedHashMap<>();
+        loginRequest.put("username", u);
+        loginRequest.put("credential", p);
+        loginRequest.put("clientType", "APP");
+        okHttpClientHelper.doPost(config.getApiHost() + "/login", loginRequest, new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                log.error("login error: ", e);
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                ResponseBody body = response.body();
+                if (response.isSuccessful()) {
+                    if (body != null) {
+                        String str = body.string();
+                        Result<TokenEntity> tokenResult = JsonUtil.parseObject(str, new TypeReference<Result<TokenEntity>>() {});
+                        if(!tokenResult.isSucceed()){
+                            showErrMsg("登录失败，用户名或密码错误");
+                            return;
+                        }
+                        TokenEntity tokenEntity = tokenResult.getData();
+                        if (client == null) {
+                            String accessToken = tokenEntity.getAccessToken();
+                            client = new Client((ChannelHandler) messageModel,accessToken);
+                            client.addListener(() -> loggingIn(accessToken));
+                            //启动netty
+                            new Thread(client).start();
+                        } else {
+
+                        }
+
+                    }
+                } else {
+                    if (response.code() == 401){
+                        showErrMsg("登录失败，用户名或密码错误");
+                        return;
+                    }
+                    String error = null;
+                    if (body != null) {
+                        error = body.string();
+                    }
+                    throw new RuntimeException("Request Failed Url: " + response.request().url().url().getPath() + "; response code : " + response.code() + "; error msg : " + error);
+                }
+            }
+        });
+    }
+
+    private void loggingIn(String token) {
+        send(new AuthenticationRequest(token), new SendMessageListener() {
+            @Override
+            public void isSuccess() {
+            }
+            @Override
+            public void isFail() {
+                showErrMsg("登录失败，与服务连接异常");
+            }
+        });
     }
 
     @Override
     public void update(Object object) {
-        LoginResponse loginResponse = (LoginResponse) object;
-        if(loginResponse.loginSuccess()){
+        AuthenticationResponse authenticationResponse = (AuthenticationResponse) object;
+        if (authenticationResponse.isAuthenticated()) {
             errorMsg.setVisible(false);
             log.info("登录成功");
             //触发静态代码块执行，提前加载表情包
             ChatEmojiDialog.trigger();
             //跳转主页
-            skipScene(FXMLResourceConstant.HOME_FXML,"聊天页",((LoginHandler)messageModel).getClientCmdHandlerHandler());
+            skipScene(FXMLResourceConstant.HOME_FXML, "聊天页", ((AuthenticationHandler) messageModel).getClientCmdHandlerHandler());
             //将自身移除
             messageModel.removeObserver(this.getClass());
-        }else{
+        } else {
             showErrMsg("用户名或密码错误!");
             log.info("登录失败");
         }
     }
 
-    private void showErrMsg(String msg){
+    private void showErrMsg(String msg) {
         double layoutX = errorMsg.getLayoutX();
         double layoutY = errorMsg.getLayoutY();
         errorMsg.setText(msg);
@@ -210,14 +277,14 @@ public class LoginController extends AbstractController {
     }
 
 
-    private void showTooltip(Node node,String msg){
+    private void showTooltip(Node node, String msg) {
         errorTip.setText(msg);
         Point2D point2D = node.localToScene(0.0, 0.0);
-        errorTip.show(node,point2D.getX() + node.getScene().getX() + node.getScene().getWindow().getX(),
+        errorTip.show(node, point2D.getX() + node.getScene().getX() + node.getScene().getWindow().getX(),
                 point2D.getY() + node.getScene().getY() + node.getScene().getWindow().getY() + 10);
     }
 
-    private void switchLogging(){
+    private void switchLogging() {
         Platform.runLater(() -> {
             ObservableList<Node> children = loginVBox.getChildren();
             children.removeAll(loginVBox.getChildren());
@@ -225,23 +292,7 @@ public class LoginController extends AbstractController {
         });
     }
 
-    private void loggingIn(Client client,String u,String p){
-        client.setAccount(u);
-        client.setPassword(p);
-        LoginInfo loginInfo = new LoginInfo(u,p);
-        send(new LoginRequest(loginInfo), new SendMessageListener() {
-            @Override
-            public void isSuccess() {
-
-            }
-            @Override
-            public void isFail() {
-                showErrMsg("登录失败，与服务连接异常");
-            }
-        });
-    }
-
-    private void loggingFail(){
+    private void loggingFail() {
         Platform.runLater(() -> {
             ObservableList<Node> children = loginVBox.getChildren();
             children.removeAll(loginVBox.getChildren());

@@ -30,10 +30,13 @@ import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
+import org.springframework.security.web.authentication.preauth.RequestHeaderAuthenticationFilter;
 import org.springframework.security.web.authentication.rememberme.RememberMeAuthenticationFilter;
 import org.springframework.security.web.authentication.rememberme.TokenBasedRememberMeServices;
 import org.springframework.security.web.context.SecurityContextHolderFilter;
 import org.springframework.security.web.context.SecurityContextRepository;
+import org.springframework.security.web.header.HeaderWriterFilter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 
 import java.util.List;
@@ -63,7 +66,7 @@ public class SecurityConfig {
     private AuthProperties authProperties;
 
     @Resource
-    private RedisTemplate<String,Object> redisTemplate;
+    private RedisTemplate<String, Object> redisTemplate;
 
     @Bean
     @Order(Ordered.HIGHEST_PRECEDENCE + 1)
@@ -99,8 +102,7 @@ public class SecurityConfig {
                                     "/oauth/**",
                                     "/oauth2/consent",
                                     "/oauth2/activate",
-                                    "/activated",
-                                    "/"
+                                    "/activated"
                             )
                             .permitAll()
                             //只需要通过身份认证就能访问的路径
@@ -109,7 +111,10 @@ public class SecurityConfig {
                                     "/file/**",
                                     "/service/discovery"
                             ).authenticated()
+                            //刷新token
                             .requestMatchers("/refreshToken").hasAuthority("refresh_token")
+                            //基于请求头授权
+                            .requestMatchers(authProperties.requestHeadAuthenticationPath()).hasAuthority("request_header")
                             //必须校验权限的路径
                             .anyRequest()
                             .access(requestPathAuthorizationManager());
@@ -119,6 +124,8 @@ public class SecurityConfig {
                 .addFilterBefore(tokenAuthenticationFilter(), SecurityContextHolderFilter.class)
                 .addFilterBefore(rememberMeFilter(), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(refreshTokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
+                //基于请求头的认证
+                .addFilterBefore(requestHeaderAuthenticationFilter(), HeaderWriterFilter.class)
                 .addFilterAfter(logoutFilter(), AuthorizationFilter.class)
                 .logout(AbstractHttpConfigurer::disable);
         return http.build();
@@ -137,6 +144,8 @@ public class SecurityConfig {
                 .authenticationProvider(oAuthClientAuthenticationProvider())
                 //记住我身份认证
                 .authenticationProvider(rememberMeAuthenticationProvider())
+                //基于请求头secret认证
+                .authenticationProvider(requestHeaderAuthenticationProvider())
                 .parentAuthenticationManager(null)
                 .build();
     }
@@ -154,13 +163,13 @@ public class SecurityConfig {
 
     //三方登录认证
     @Bean
-    public EmailAuthenticationProvider emailAuthenticationProvider(){
-        return new EmailAuthenticationProvider(userService,redisTemplate);
+    public EmailAuthenticationProvider emailAuthenticationProvider() {
+        return new EmailAuthenticationProvider(userService, redisTemplate);
     }
 
     //三方登录认证
     @Bean
-    public OAuthClientAuthenticationProvider oAuthClientAuthenticationProvider(){
+    public OAuthClientAuthenticationProvider oAuthClientAuthenticationProvider() {
         OAuthClientAuthenticationProvider oAuthClientAuthenticationProvider = new OAuthClientAuthenticationProvider();
         oAuthClientAuthenticationProvider.setUserDetailsService(userService);
         return oAuthClientAuthenticationProvider;
@@ -186,6 +195,23 @@ public class SecurityConfig {
         return new RefreshTokenAuthenticationFilter(bearerTokenResolver(), tokenService);
     }
 
+    //基于请求头的认证
+    @Bean
+    public RequestHeaderAuthenticationFilter requestHeaderAuthenticationFilter() throws Exception {
+        String[] antPaths = authProperties.requestHeadAuthenticationPath();
+        RequestHeaderAuthenticationFilter requestHeaderAuthenticationFilter = new RequestHeaderAuthenticationFilter();
+        requestHeaderAuthenticationFilter.setPrincipalRequestHeader("x-apikey-key");
+        requestHeaderAuthenticationFilter.setExceptionIfHeaderMissing(false);
+        requestHeaderAuthenticationFilter.setRequiresAuthenticationRequestMatcher(new SeparatorAntPathRequestMatcher(antPaths));
+        requestHeaderAuthenticationFilter.setAuthenticationManager(authenticationManager());
+        return requestHeaderAuthenticationFilter;
+    }
+
+    @Bean
+    public RequestHeaderAuthenticationProvider requestHeaderAuthenticationProvider() {
+
+        return new RequestHeaderAuthenticationProvider(authProperties.getRequestHeadAuthentications());
+    }
 
     //token解析器
     @Bean

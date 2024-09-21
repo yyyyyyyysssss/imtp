@@ -98,6 +98,11 @@ public class JWTTokenServiceImpl implements TokenService {
     }
 
     @Override
+    public boolean isValid(String token) {
+        return isValid(token,TokenType.ACCESS_TOKEN);
+    }
+
+    @Override
     public boolean isValid(String token, TokenType tokenType) {
         PayloadInfo payloadInfo = JwtUtil.extractPayloadInfo(token);
         return !redisWrapper.hasKey(RedisKey.TOKEN_BLACKLIST + payloadInfo.getId()) && JwtUtil.verifier(token) && tokenType.equals(payloadInfo.getTokenType());

@@ -1,6 +1,7 @@
 package org.imtp.web.controller;
 
 import jakarta.annotation.Resource;
+import org.imtp.common.packet.body.OfflineMessageInfo;
 import org.imtp.common.packet.body.UserFriendInfo;
 import org.imtp.common.packet.body.UserGroupInfo;
 import org.imtp.common.packet.body.UserSessionInfo;
@@ -30,6 +31,13 @@ public class UserSocialController {
     private UserSocialService userSocialService;
 
 
+    @GetMapping("/userInfo/{userId}")
+    public Result<?> userInfo(@PathVariable(name = "userId") String userId) throws AccessDeniedException {
+        User user = currentLoginUser();
+        checkUserId(user,userId);
+        return ResultGenerator.ok(user);
+    }
+
     @GetMapping("/userSession/{userId}")
     public Result<?> userSession(@PathVariable(name = "userId") String userId) throws AccessDeniedException {
         checkUserId(userId);
@@ -57,12 +65,27 @@ public class UserSocialController {
         return ResultGenerator.ok(groupInfos);
     }
 
+    @GetMapping("/offlineMessage/{userId}")
+    public Result<?> offlineMessage(@PathVariable(name = "userId") String userId)  throws AccessDeniedException {
+        checkUserId(userId);
+        List<OfflineMessageInfo> offlineMessageInfos = userSocialService.offlineMessage(userId);
+        return ResultGenerator.ok(offlineMessageInfos);
+    }
+
     private void checkUserId(String userId) throws AccessDeniedException {
-        SecurityContext securityContext = SecurityContextHolder.getContext();
-        User user = (User) securityContext.getAuthentication().getPrincipal();
+        User user = currentLoginUser();
+        checkUserId(user,userId);
+    }
+
+    private void checkUserId(User user,String userId) throws AccessDeniedException {
         if(!userId.equals(user.getId().toString())){
             throw new AccessDeniedException("Access Denied");
         }
+    }
+
+    private User currentLoginUser(){
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+        return (User) securityContext.getAuthentication().getPrincipal();
     }
 
 }

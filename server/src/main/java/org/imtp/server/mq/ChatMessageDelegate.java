@@ -21,7 +21,7 @@ public class ChatMessageDelegate implements MessageDelegate{
     public void handleMessage(ForwardMessage forwardMessage) {
         log.info("forwardMessage:{}",forwardMessage);
         for (String channelId : forwardMessage.getChannelIds()){
-            ChannelSession channel = ChannelContextHolder.getChannelContext().getChannel(channelId);
+            ChannelSession channel = ChannelContextHolder.channelContext().getChannel(channelId);
             if(channel != null && channel.isActive()){
                 channel.sendMessage(forwardMessage.getMessage());
             }

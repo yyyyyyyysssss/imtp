@@ -36,6 +36,8 @@ public class RefreshTokenAuthenticationFilter extends OncePerRequestFilter {
 
     private final RequestMatcher tokenEndpointMatcher;
 
+    private final GrantedAuthority grantedAuthority = () -> "refresh_token";
+
     public RefreshTokenAuthenticationFilter(BearerTokenResolver bearerTokenResolver,TokenService tokenService){
         this.bearerTokenResolver = bearerTokenResolver;
         this.tokenService = tokenService;
@@ -57,7 +59,6 @@ public class RefreshTokenAuthenticationFilter extends OncePerRequestFilter {
         //设置请求属性  由RedisSecurityContextRepository加载SecurityContext
         if (securityContext != null) {
             if (tokenService.isValid(token,TokenType.REFRESH_TOKEN)) {
-                GrantedAuthority grantedAuthority = () -> "refresh_token";
                 UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(null, null, Collections.singleton(grantedAuthority));
                 authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 securityContext.setAuthentication(authenticationToken);

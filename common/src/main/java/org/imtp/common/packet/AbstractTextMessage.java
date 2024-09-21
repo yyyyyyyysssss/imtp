@@ -30,6 +30,8 @@ public abstract class AbstractTextMessage extends Packet {
     //由客户端生成，应答确认消息时会带上此id给到客户端
     protected Long ackId;
 
+    protected long timestamp;
+
     public AbstractTextMessage(){
         super();
     }
@@ -41,6 +43,7 @@ public abstract class AbstractTextMessage extends Packet {
         byteBuf.readBytes(bytes);
         this.text = new String(bytes, StandardCharsets.UTF_8);
         this.ackId = byteBuf.readLong();
+        this.timestamp = byteBuf.readLong();
     }
 
     public AbstractTextMessage(String message, long sender, long receiver, Command command,Long ackId, boolean groupFlag) {
@@ -61,16 +64,18 @@ public abstract class AbstractTextMessage extends Packet {
         byteBuf.writeBytes(bytes);
         //确认id
         byteBuf.writeLong(this.ackId);
+        //时间戳
+        byteBuf.writeLong(timestamp);
         encodeBodyAsByteBuf0(byteBuf);
     }
 
     public abstract void encodeBodyAsByteBuf0(ByteBuf byteBuf);
 
-    //12 = 4字节内容长度+8字节应答id
+    //20 = 4字节内容长度+8字节应答id+8字节服务器时间戳
     @JsonIgnore
     @Override
     public int getBodyLength() {
-        return this.text.getBytes(StandardCharsets.UTF_8).length + 12;
+        return this.text.getBytes(StandardCharsets.UTF_8).length + 12 + 8;
     }
 
     @JsonIgnore
@@ -81,5 +86,15 @@ public abstract class AbstractTextMessage extends Packet {
     @JsonIgnore
     public int getMAX_CHAR_LENGTH() {
         return MAX_CHAR_LENGTH;
+    }
+
+    @JsonIgnore
+    public AbstractTextMessage additionTimestamp(){
+        this.timestamp = System.currentTimeMillis();
+        return this;
+    }
+
+    public Long getTimestamp() {
+        return timestamp;
     }
 }

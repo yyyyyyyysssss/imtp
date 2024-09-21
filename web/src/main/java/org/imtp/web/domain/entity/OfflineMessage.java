@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
+import org.imtp.common.packet.common.OfflineMessageDTO;
 import org.imtp.web.config.idwork.IdGen;
 
 /**
@@ -19,10 +20,10 @@ import org.imtp.web.config.idwork.IdGen;
 @TableName("im_offline_msg")
 public class OfflineMessage {
 
-    public OfflineMessage(Long msgId,Long userId){
+    public OfflineMessage(OfflineMessageDTO offlineMessageDTO){
         this.id = IdGen.genId();
-        this.msgId = msgId;
-        this.userId = userId;
+        this.msgId = offlineMessageDTO.getMsgId();
+        this.userId = offlineMessageDTO.getUserId();
         this.state = false;
     }
 

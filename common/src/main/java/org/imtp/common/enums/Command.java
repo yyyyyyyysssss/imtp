@@ -1,5 +1,6 @@
 package org.imtp.common.enums;
 
+import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Getter;
 
 @Getter
@@ -7,6 +8,9 @@ public enum Command {
 
     LOGIN_REQ((byte) 126,"登录请求"),
     LOGIN_RES((byte) -126,"登录响应"),
+
+    AUTHORIZATION_REQ((byte) 120,"授权请求"),
+    AUTHORIZATION_RES((byte) -120,"授权响应"),
 
     FRIENDSHIP_REQ((byte)125,"用户好友关系信息拉取"),
     FRIENDSHIP_RES((byte)-125,"用户好友关系信息响应"),
@@ -51,4 +55,8 @@ public enum Command {
         return null;
     }
 
+    @JsonValue
+    public byte getCmdCode() {
+        return cmdCode;
+    }
 }

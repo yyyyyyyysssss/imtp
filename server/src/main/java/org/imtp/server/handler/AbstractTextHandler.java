@@ -2,35 +2,35 @@ package org.imtp.server.handler;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
+import lombok.extern.slf4j.Slf4j;
 import org.imtp.common.enums.MessageState;
 import org.imtp.common.packet.AbstractTextMessage;
 import org.imtp.common.packet.MessageStateResponse;
-import org.imtp.common.utils.JsonUtil;
+import org.imtp.common.packet.common.MessageDTO;
+import org.imtp.common.packet.common.OfflineMessageDTO;
+import org.imtp.common.response.Result;
 import org.imtp.server.context.ChannelContextHolder;
 import org.imtp.server.context.ChannelSession;
-import org.imtp.server.entity.Message;
-import org.imtp.server.entity.OfflineMessage;
 import org.imtp.server.mq.ForwardMessage;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * @Description
  * @Author ys
  * @Date 2024/7/8 15:07
  */
+@Slf4j
 public abstract class AbstractTextHandler<T extends AbstractTextMessage>  extends AbstractHandler<T>{
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, T msg) throws Exception {
         //响应已送达报文
-        ChannelSession senderChannelSession = ChannelContextHolder.getChannelContext().getChannel(ctx.channel().id().asLongText());
+        ChannelSession senderChannelSession = ChannelContextHolder.channelContext().getChannel(ctx.channel().id().asLongText());
         senderChannelSession.sendMessage(new MessageStateResponse(MessageState.DELIVERED,msg));
         //转发
         List<String> forwardChannelIds = new ArrayList<>();
@@ -46,7 +46,7 @@ public abstract class AbstractTextHandler<T extends AbstractTextMessage>  extend
                 continue;
             }
             for(String channelId : channelIds){
-                ChannelSession channel = ChannelContextHolder.getChannelContext().getChannel(channelId);
+                ChannelSession channel = ChannelContextHolder.channelContext().getChannel(channelId);
                 if(channel != null){
                     if(!channel.id().equals(ctx.channel().id().asLongText())){
                         channel.sendMessage(msg);
@@ -72,18 +72,22 @@ public abstract class AbstractTextHandler<T extends AbstractTextMessage>  extend
 
         //离线用户消息落库
         ctx.channel().eventLoop().execute(() -> {
-            Message message = new Message(msg);
-            message.setContent(msg.getMessage());
-            chatService.saveMessage(message);
-            if (!offlineReceivers.isEmpty()){
-                List<OfflineMessage> offlineMessages = new ArrayList<>();
-                for (String receiver : offlineReceivers){
-                    OfflineMessage offlineMessage = new OfflineMessage(message.getId(),Long.parseLong(receiver));
-                    offlineMessages.add(offlineMessage);
+            MessageDTO messageDTO = new MessageDTO(msg);
+            messageDTO.setContent(msg.getMessage());
+            Result<Long> result = webApi.message(messageDTO);
+            if (result.isSucceed()){
+                Long messageId = result.getData();
+                if (!offlineReceivers.isEmpty()){
+                    List<OfflineMessageDTO> offlineMessages = new ArrayList<>();
+                    for (String receiver : offlineReceivers){
+                        OfflineMessageDTO offlineMessage = new OfflineMessageDTO(messageId,Long.parseLong(receiver));
+                        offlineMessages.add(offlineMessage);
+                    }
+                    webApi.offlineMessage(offlineMessages);
                 }
-                chatService.saveOfflineMessage(offlineMessages);
+            }else {
+                log.warn("save message error : {}",result.getMessage());
             }
-
         });
     }
 }

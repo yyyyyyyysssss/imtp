@@ -10,8 +10,8 @@ import io.netty.channel.ChannelFuture;
  * @Date 2024/9/8 16:37
  */
 public class IMChannelSession extends AbstractChannelSession {
-    public IMChannelSession(Channel channel) {
-        super(channel);
+    public IMChannelSession(Channel channel,String userId) {
+        super(channel,userId);
     }
 
     @Override

@@ -1,5 +1,6 @@
 package org.imtp.common.packet;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.netty.buffer.ByteBuf;
 import org.imtp.common.enums.Command;
 import org.imtp.common.packet.base.Header;
@@ -40,6 +41,7 @@ public abstract class SystemTextMessage extends Packet {
     }
 
     @Override
+    @JsonIgnore
     public int getBodyLength() {
         return text == null ? getBodyLength0() : this.text.getBytes(StandardCharsets.UTF_8).length + getBodyLength0();
     }

@@ -5,10 +5,9 @@ import io.netty.channel.ChannelHandlerContext;
 import org.imtp.common.packet.OfflineMessageRequest;
 import org.imtp.common.packet.OfflineMessageResponse;
 import org.imtp.common.packet.body.OfflineMessageInfo;
-import org.imtp.server.entity.Message;
+import org.imtp.common.response.Result;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -22,26 +21,13 @@ public class OfflineMessageHandler extends AbstractHandler<OfflineMessageRequest
 
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, OfflineMessageRequest offlineMessageRequest) throws Exception {
-        List<Message> messages = chatService.findOfflineMessageByUserId(offlineMessageRequest.getSender());
-        if(messages.isEmpty()){
+        Result<List<OfflineMessageInfo>> result = webApi.offlineMessage(offlineMessageRequest.getSender().toString());
+        List<OfflineMessageInfo> offlineMessageInfos;
+        if (result.isSucceed() && !(offlineMessageInfos = result.getData()).isEmpty()){
+            channelHandlerContext.channel().writeAndFlush(new OfflineMessageResponse(offlineMessageRequest.getSender(),offlineMessageInfos));
+        }else {
             channelHandlerContext.channel().writeAndFlush(new OfflineMessageResponse(offlineMessageRequest.getSender()));
-            return;
         }
-        List<OfflineMessageInfo> offlineMessageInfos = new ArrayList<>();
-        for (Message message : messages){
-            OfflineMessageInfo offlineMessageInfo = OfflineMessageInfo
-                    .builder()
-                    .id(message.getId())
-                    .sender(message.getSenderUserId())
-                    .receiver(message.getReceiverUserId())
-                    .type(message.getType())
-                    .content(message.getContent())
-                    .sendTime(message.getSendTime().getTime())
-                    .deliveryMethod(message.getDeliveryMethod())
-                    .build();
-            offlineMessageInfos.add(offlineMessageInfo);
-        }
-        channelHandlerContext.channel().writeAndFlush(new OfflineMessageResponse(offlineMessageRequest.getSender(),offlineMessageInfos));
     }
 
 

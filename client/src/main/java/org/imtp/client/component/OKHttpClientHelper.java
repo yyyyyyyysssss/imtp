@@ -47,17 +47,40 @@ public class OKHttpClientHelper {
         return okHttpClientHelper;
     }
 
-
-    public <T> T doGet(String url) {
-        return doGet(url, new TypeReference<T>() {});
-    }
-
     public <T> T doGet(String url, TypeReference<T> typeReference) {
         Request request = new Request
                 .Builder()
-                .get()
                 .url(url)
+                .get()
                 .build();
+        return execute(request,typeReference);
+    }
+
+    public <T> T doPost(String url,Object body,TypeReference<T> typeReference){
+        RequestBody requestBody = RequestBody.create(JsonUtil.toJSONString(body), MediaType.parse("application/json; charset=utf-8"));
+        Request request = new Request
+                .Builder()
+                .url(url)
+                .post(requestBody)
+                .build();
+        return execute(request,typeReference);
+    }
+
+    public void doPost(String url,Object body,Callback callback){
+        RequestBody requestBody = RequestBody.create(JsonUtil.toJSONString(body), MediaType.parse("application/json; charset=utf-8"));
+        Request request = new Request
+                .Builder()
+                .url(url)
+                .post(requestBody)
+                .build();
+        execute(request,callback);
+    }
+
+    public void execute(Request request,Callback callback){
+        okHttpClient.newCall(request).enqueue(callback);
+    }
+
+    public <T> T execute(Request request,TypeReference<T> typeReference){
         try (Response response = okHttpClient.newCall(request).execute()) {
             ResponseBody body = response.body();
             if (response.isSuccessful()) {
@@ -71,7 +94,7 @@ public class OKHttpClientHelper {
                 if (body != null) {
                     error = body.string();
                 }
-                throw new RuntimeException("Request Failed Url: " + url + "; response code : " + response.code() + "; error msg : " + error);
+                throw new RuntimeException("Request Failed Url: " + request.url().url().getPath() + "; response code : " + response.code() + "; error msg : " + error);
             }
         } catch (IOException e) {
             log.error("Request Error", e);

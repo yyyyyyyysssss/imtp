@@ -5,6 +5,10 @@ import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Stream;
+
 /**
  * @Description
  * @Author ys
@@ -21,6 +25,8 @@ public class AuthProperties {
     private KeyConfig jwt = new KeyConfig();
 
     private KeyConfig rememberMe = new KeyConfig();
+
+    private List<RequestHeadAuthenticationConfig> requestHeadAuthentications = new ArrayList<>();
 
     @Setter
     @Getter
@@ -70,6 +76,22 @@ public class AuthProperties {
             }
             return e;
         }
+    }
+
+
+    public String[] requestHeadAuthenticationPath(){
+        return this.getRequestHeadAuthentications().stream().map(m -> m.antPath.split(",")).toList().stream().flatMap(Stream::of).toArray(String[]::new);
+    }
+
+    @Setter
+    @Getter
+    public static class RequestHeadAuthenticationConfig{
+
+        private String antPath;
+
+        private String apikey;
+
+
     }
 
 }

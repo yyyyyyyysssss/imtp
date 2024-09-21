@@ -5,7 +5,8 @@ import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import org.imtp.client.constant.FXMLResourceConstant;
-import org.imtp.client.handler.LoginHandler;
+import org.imtp.client.context.ClientContextHolder;
+import org.imtp.client.handler.AuthenticationHandler;
 import org.imtp.client.util.ResourceUtils;
 
 import java.net.URL;
@@ -25,13 +26,14 @@ public class MainApp extends Application {
     public void start(Stage stage) throws Exception {
         stage.initStyle(StageStyle.UNDECORATED);
         SceneManager sceneManager = SceneManagerHolder.createSceneManager(stage);
-        sceneManager.setScene(FXMLResourceConstant.LOGIN_FXML,"登录页",new LoginHandler(),false);
+        sceneManager.setScene(FXMLResourceConstant.LOGIN_FXML,"登录页",new AuthenticationHandler(),false);
         URL url = ResourceUtils.classPathResource("/img/taskbar_icon.png");
         stage.getIcons().add(new Image(url.toExternalForm()));
     }
 
     @Override
     public void stop() {
+        ClientContextHolder.clientContext().channel().close();
         System.exit(0);
     }
 }

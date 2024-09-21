@@ -1,13 +1,5 @@
 
 spring:
-  datasource:
-    driver-class-name: org.apache.shardingsphere.driver.ShardingSphereDriver
-    url: jdbc:shardingsphere:classpath:sharding.yaml
-  sql:
-    init:
-      schema-locations: schema.sql
-      data-locations: data.sql
-      mode: EMBEDDED
   data:
     redis:
       host: 127.0.0.1
@@ -21,15 +13,10 @@ spring:
           max-wait: 3000
 
 
-
-
-mybatis-plus:
-  mapper-locations: classpath:mapper/*xml
-  configuration:
-    map-underscore-to-camel-case: true
-
-
 im:
+  web:
+    url: http://localhost:9090
+    apikey: 26662f07703c41d2a4994b8b30b101a9
   server:
     configuration:
       model: cluster

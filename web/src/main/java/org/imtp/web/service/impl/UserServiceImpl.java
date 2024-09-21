@@ -81,7 +81,8 @@ public class UserServiceImpl implements UserService {
     private UserDetails userDetails(User user){
         List<Role> roles = roleMapper.findRoleByUserIds(Collections.singleton(user.getId()));
         if (roles == null || roles.isEmpty()){
-            return new org.springframework.security.core.userdetails.User(user.getUsername(),user.getPassword() == null ? "" : user.getPassword(), new ArrayList<RequestUrlAuthority>());
+            user.setAuthorities(new ArrayList<RequestUrlAuthority>());
+            return user;
         }
         List<Long> roleIds = roles.stream().map(Role::getId).toList();
         List<Authority> authorities = authorityMapper.findAuthorityByRoleIds(roleIds);
@@ -98,5 +99,10 @@ public class UserServiceImpl implements UserService {
     public User findByUsername(String username) {
         Wrapper<User> queryWrapper = new QueryWrapper<User>().eq("username", username);
         return userMapper.selectOne(queryWrapper);
+    }
+
+    @Override
+    public User findByUserId(String userId) {
+        return userMapper.selectById(userId);
     }
 }

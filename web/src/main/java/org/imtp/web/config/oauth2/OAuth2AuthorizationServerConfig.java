@@ -10,6 +10,7 @@ import com.nimbusds.jose.proc.SecurityContext;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.imtp.web.config.RequestUrlAuthority;
+import org.imtp.web.domain.entity.User;
 import org.imtp.web.filter.TokenAuthenticationFilter;
 import org.imtp.web.utils.RSAUtil;
 import org.springframework.context.annotation.Bean;
@@ -168,6 +169,7 @@ public class OAuth2AuthorizationServerConfig {
         objectMapper.registerModule(new JavaTimeModule());
         objectMapper.registerModule(new WebServletJackson2Module());
         objectMapper.addMixIn(RequestUrlAuthority.class, RequestUrlAuthority.RequestUrlAuthorityMixin.class);
+        objectMapper.addMixIn(User.class,User.RequestUrlAuthorityMixin.class);
 
         authorizationRowMapper.setObjectMapper(objectMapper);
 

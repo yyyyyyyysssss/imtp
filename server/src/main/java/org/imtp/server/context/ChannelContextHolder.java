@@ -15,7 +15,7 @@ public class ChannelContextHolder {
     //使用lock  为后续虚拟线程做准备
     private static final Lock lock = new ReentrantLock();
 
-    public static ChannelContext getChannelContext(){
+    public static ChannelContext channelContext(){
         if(channelContext == null){
             try {
                 lock.lock();

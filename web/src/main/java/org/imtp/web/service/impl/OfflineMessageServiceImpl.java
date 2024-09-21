@@ -1,9 +1,9 @@
-package org.imtp.server.service.impl;
+package org.imtp.web.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import org.imtp.server.entity.OfflineMessage;
-import org.imtp.server.mapper.OfflineMessageMapper;
-import org.imtp.server.service.OfflineMessageService;
+import org.imtp.web.domain.entity.OfflineMessage;
+import org.imtp.web.mapper.OfflineMessageMapper;
+import org.imtp.web.service.OfflineMessageService;
 import org.springframework.stereotype.Service;
 
 /**

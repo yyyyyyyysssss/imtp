@@ -1,5 +1,4 @@
 package org.imtp.common.response;
-
 import org.imtp.common.utils.JsonUtil;
 
 /**
@@ -14,6 +13,8 @@ public class Result<T>{
     private T data;
 
     private String message;
+
+    private Boolean succeed;
 
     public Result(){}
 
@@ -65,6 +66,15 @@ public class Result<T>{
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public Boolean isSucceed() {
+        return succeed;
+    }
+
+    public Result<T> setSucceed(Boolean succeed) {
+        this.succeed = succeed;
+        return this;
     }
 
     @Override

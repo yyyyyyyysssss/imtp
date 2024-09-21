@@ -13,7 +13,7 @@ import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.imtp.server.handler.WebSocketFrameHandler;
+import org.imtp.server.handler.AuthenticationHandler;
 import org.springframework.stereotype.Component;
 
 /**
@@ -35,7 +35,7 @@ public class WebSocketServer {
     private ServerProperties serverProperties;
 
     @Resource
-    private WebSocketFrameHandler webSocketFrameHandler;
+    private AuthenticationHandler authorizationHandler;
 
     @PostConstruct
     public void start() {
@@ -61,7 +61,7 @@ public class WebSocketServer {
                             //协议升级
                             pipeline.addLast(new WebSocketServerProtocolHandler("/im",null,true));
                             //业务处理
-                            pipeline.addLast(webSocketFrameHandler);
+                            pipeline.addLast(authorizationHandler);
                         }
                     });
             channelFuture = serverBootstrap.bind("127.0.0.1", 8080).sync();

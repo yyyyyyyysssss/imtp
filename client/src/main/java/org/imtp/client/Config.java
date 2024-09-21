@@ -33,6 +33,8 @@ public class Config {
 
     private LoadBalancerType loadBalancerType;
 
+    private String apiHost;
+
     private String serviceDiscoveryUrl;
 
     private static volatile Config config;
@@ -63,6 +65,7 @@ public class Config {
         this.model = ServerModel.valueOf(modelProperty.toUpperCase());
         String loadBalancerProperty = resourceBundle.getString("server.loadBalancer");
         this.loadBalancerType = LoadBalancerType.valueOf(loadBalancerProperty.toUpperCase());
+        this.apiHost = resourceBundle.getString("api.host");
         this.serviceDiscoveryUrl = resourceBundle.getString("api.serviceDiscovery.url");
         log.info("配置文件加载完成：{}",this);
     }

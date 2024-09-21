@@ -11,11 +11,10 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.imtp.common.codec.IMTPDecoder;
 import org.imtp.common.codec.IMTPEncoder;
+import org.imtp.common.enums.ServerModel;
 import org.imtp.common.utils.JsonUtil;
 import org.imtp.server.config.ServiceRegister;
-import org.imtp.server.context.ChannelContextHolder;
-import org.imtp.common.enums.ServerModel;
-import org.imtp.server.handler.LoginHandler;
+import org.imtp.server.handler.AuthenticationHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -31,7 +30,7 @@ import java.util.UUID;
 public class IMServer{
 
     @Resource
-    private LoginHandler loginHandler;
+    private AuthenticationHandler authorizationHandler;
 
     @Resource
     private ServerProperties serverProperties;
@@ -63,7 +62,7 @@ public class IMServer{
                             ChannelPipeline pipeline = socketChannel.pipeline();
                             pipeline.addLast(new IMTPDecoder());
                             pipeline.addLast(new IMTPEncoder());
-                            pipeline.addLast(loginHandler);
+                            pipeline.addLast(authorizationHandler);
                         }
                     });
             channelFuture = serverBootstrap.bind(serverProperties.getHost(), serverProperties.getPort()).sync();

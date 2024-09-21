@@ -7,6 +7,8 @@ public interface ChannelSession {
 
     String id();
 
+    String userId();
+
     Channel channel();
 
     boolean isActive();

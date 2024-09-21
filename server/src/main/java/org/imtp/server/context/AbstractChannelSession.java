@@ -11,8 +11,11 @@ public abstract class AbstractChannelSession implements ChannelSession{
 
     private Channel channel;
 
-    public AbstractChannelSession(Channel channel){
+    private String userId;
+
+    public AbstractChannelSession(Channel channel,String userId){
         this.channel = channel;
+        this.userId = userId;
     }
 
     @Override
@@ -20,6 +23,11 @@ public abstract class AbstractChannelSession implements ChannelSession{
         return this.channel;
     }
 
+
+    @Override
+    public String userId() {
+        return this.userId;
+    }
 
     @Override
     public String id() {

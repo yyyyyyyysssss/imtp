@@ -10,11 +10,10 @@ import org.imtp.client.component.ServiceInfo;
 import org.imtp.client.constant.ConnectListener;
 import org.imtp.client.context.ClientContextHolder;
 import org.imtp.client.enums.ClientType;
-import org.imtp.client.handler.LoginHandler;
+import org.imtp.client.handler.AuthenticationHandler;
 import org.imtp.common.codec.IMTPDecoder;
 import org.imtp.common.codec.IMTPEncoder;
-import org.imtp.common.packet.LoginRequest;
-import org.imtp.common.packet.body.LoginInfo;
+import org.imtp.common.packet.AuthenticationRequest;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -28,9 +27,7 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class Client implements Runnable {
 
-    private String account;
-
-    private String password;
+    private String token;
 
     private EventLoopGroup group;
 
@@ -46,17 +43,12 @@ public class Client implements Runnable {
 
     private Config config;
 
-    public Client(ChannelHandler channelHandler) {
-        this(null,null,channelHandler,ClientType.WINDOW);
+    public Client(ChannelHandler channelHandler,String token) {
+        this(token,channelHandler,ClientType.WINDOW);
     }
 
-    public Client(String account, String password, ChannelHandler channelHandler) {
-        this(account,password,channelHandler,ClientType.WINDOW);
-    }
-
-    public Client(String account, String password, ChannelHandler channelHandler, ClientType clientType) {
-        this.account = account;
-        this.password = password;
+    public Client(String token, ChannelHandler channelHandler, ClientType clientType) {
+        this.token = token;
         this.clientType = clientType;
         this.channelHandler = channelHandler;
         this.group = new NioEventLoopGroup();
@@ -110,7 +102,7 @@ public class Client implements Runnable {
             System.out.println("账号或密码不能为空");
             System.exit(0);
         }
-        Client client = new Client(account, password, new LoginHandler(),ClientType.CONSOLE);
+        Client client = new Client(null, new AuthenticationHandler(),ClientType.CONSOLE);
         client.connect();
     }
 
@@ -139,24 +131,19 @@ public class Client implements Runnable {
                         if (connectListener != null){
                             connectListener.connected();
                         }
-                        if (clientType.equals(ClientType.CONSOLE)) {
-                            LoginInfo loginInfo = new LoginInfo(this.account, this.password);
-                            channel.writeAndFlush(new LoginRequest(loginInfo));
-                        }
                     }else {
-                        LoginHandler loginHandler = channel.pipeline().get(LoginHandler.class);
-                        loginHandler.setClientCmdHandlerHandler(this.channelHandler);
+                        AuthenticationHandler authenticationHandler = channel.pipeline().get(AuthenticationHandler.class);
+                        authenticationHandler.setClientCmdHandlerHandler(this.channelHandler);
                         ClientContextHolder.clientContext().resetChannel(channel);
-                        LoginInfo loginInfo = new LoginInfo(this.account, this.password);
-                        channel.writeAndFlush(new LoginRequest(loginInfo));
+                        channel.writeAndFlush(new AuthenticationRequest(this.token));
                     }
                 } else {
-                    //每隔1秒重连
+                    //每隔2秒重连
                     EventLoop eventLoop = channelFuture.channel().eventLoop();
                     eventLoop.schedule(() -> {
                         log.warn("与服务器建立连接失败,正在重新连接...");
                         connect();
-                    },1L, TimeUnit.SECONDS);
+                    },2L, TimeUnit.SECONDS);
                 }
             });
             connected.channel().closeFuture().sync();
@@ -173,22 +160,6 @@ public class Client implements Runnable {
 
     public void resetChannelHandler(ChannelHandler channelHandler) {
         this.channelHandler = channelHandler;
-    }
-
-    public String getAccount() {
-        return account;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setAccount(String account) {
-        this.account = account;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 
     public ClientType getClientType() {

@@ -5,13 +5,17 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import jakarta.annotation.Resource;
 import org.imtp.common.enums.DeliveryMethod;
 import org.imtp.common.enums.MessageType;
+import org.imtp.common.packet.body.OfflineMessageInfo;
 import org.imtp.common.packet.body.UserFriendInfo;
 import org.imtp.common.packet.body.UserGroupInfo;
 import org.imtp.common.packet.body.UserSessionInfo;
+import org.imtp.common.packet.common.MessageDTO;
+import org.imtp.common.packet.common.OfflineMessageDTO;
 import org.imtp.web.config.idwork.IdGen;
 import org.imtp.web.domain.dto.UserSessionDTO;
 import org.imtp.web.domain.entity.*;
 import org.imtp.web.mapper.*;
+import org.imtp.web.service.OfflineMessageService;
 import org.imtp.web.service.UserSocialService;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
@@ -44,6 +48,12 @@ public class UserSocialServiceImpl implements UserSocialService {
 
     @Resource
     private MessageMapper messageMapper;
+
+    @Resource
+    private OfflineMessageMapper offlineMessageMapper;
+
+    @Resource
+    private OfflineMessageService offlineMessageService;
 
     @Override
     public List<UserSessionInfo> userSession(String userId) {
@@ -220,4 +230,75 @@ public class UserSocialServiceImpl implements UserSocialService {
         }
         return userGroupInfos;
     }
+
+    @Override
+    public List<OfflineMessageInfo> offlineMessage(String userId) {
+        Wrapper<OfflineMessage> offlineMessageQueryWrapper = new QueryWrapper<OfflineMessage>()
+                .eq("state",false)
+                .eq("user_id", userId);
+        List<OfflineMessage> offlineMessages = offlineMessageMapper.selectList(offlineMessageQueryWrapper);
+        if(offlineMessages.isEmpty()){
+            return List.of();
+        }
+        List<Long> msgIds = offlineMessages.stream().map(OfflineMessage::getMsgId).toList();
+        Wrapper<Message> messageQueryWrapper = new QueryWrapper<Message>().in("id", msgIds);
+        List<Message> messages = messageMapper.selectList(messageQueryWrapper);
+        if (messages.isEmpty()){
+            return List.of();
+        }
+        List<OfflineMessageInfo> offlineMessageInfos = new ArrayList<>();
+        for (Message message : messages){
+            OfflineMessageInfo offlineMessageInfo = OfflineMessageInfo
+                    .builder()
+                    .id(message.getId())
+                    .sender(message.getSenderUserId())
+                    .receiver(message.getReceiverUserId())
+                    .type(message.getType())
+                    .content(message.getContent())
+                    .sendTime(message.getSendTime().getTime())
+                    .deliveryMethod(message.getDeliveryMethod())
+                    .build();
+            offlineMessageInfos.add(offlineMessageInfo);
+        }
+        return offlineMessageInfos;
+    }
+
+    @Override
+    public List<String> userIds(String groupId) {
+        Wrapper<GroupUser> groupQueryWrapper = new QueryWrapper<GroupUser>()
+                .select("user_id").eq("group_id", groupId);
+        List<GroupUser> groupUsers = groupUserMapper.selectList(groupQueryWrapper);
+        if(groupUsers.isEmpty()){
+            return List.of();
+        }
+        List<Long> userIds = groupUsers.stream().map(GroupUser::getUserId).toList();
+        Wrapper<User> userQueryWrapper = new QueryWrapper<User>()
+                .select("id").in("id", userIds);
+        List<User> users = userMapper.selectList(userQueryWrapper);
+        return users.isEmpty() ? List.of() : users.stream().map(m -> m.getId().toString()).toList();
+    }
+
+    @Override
+    public Long message(MessageDTO messageDTO) {
+        Message message = new Message();
+        message.setId(IdGen.genId());
+        message.setSenderUserId(messageDTO.getSenderUserId());
+        message.setReceiverUserId(messageDTO.getReceiverUserId());
+        message.setType(messageDTO.getType());
+        message.setContent(messageDTO.getContent());
+        message.setSendTime(new Date());
+        message.setDeliveryMethod(messageDTO.getDeliveryMethod());
+        int insert = messageMapper.insert(message);
+        if (insert > 0){
+            return message.getId();
+        }
+        throw new RuntimeException("insert error");
+    }
+
+    @Override
+    public Boolean offlineMessage(List<OfflineMessageDTO> offlineMessageList) {
+        List<OfflineMessage> offlineMessages = offlineMessageList.stream().map(OfflineMessage::new).toList();
+        return offlineMessageService.saveBatch(offlineMessages);
+    }
+
 }

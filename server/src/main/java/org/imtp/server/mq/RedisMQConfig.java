@@ -1,9 +1,11 @@
 package org.imtp.server.mq;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.connection.stream.MapRecord;
+import org.springframework.data.redis.connection.stream.ObjectRecord;
+import org.springframework.data.redis.connection.stream.ReadOffset;
 import org.springframework.data.redis.connection.stream.StreamOffset;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
@@ -21,19 +23,41 @@ import java.time.Duration;
  * @Date 2024/7/8 17:52
  */
 @Configuration
+@Slf4j
 public class RedisMQConfig {
+
+
+    @Bean
+    public StreamListener<String, ObjectRecord<String,ForwardMessage>> streamListener(){
+
+        return new DefaultStreamListener();
+    }
 
     //基于流的轻量级消息队列
     @Bean
-    public Subscription subscription(RedisConnectionFactory redisConnectionFactory,StreamListener<String, MapRecord<String, String, String>> defaultStreamListener) {
-        StreamMessageListenerContainer.StreamMessageListenerContainerOptions<String, MapRecord<String, String, String>> containerOptions = StreamMessageListenerContainer
+    public Subscription subscription(RedisConnectionFactory redisConnectionFactory) {
+        StreamMessageListenerContainer.StreamMessageListenerContainerOptions<String, ObjectRecord<String,ForwardMessage>> containerOptions = StreamMessageListenerContainer
                 .StreamMessageListenerContainerOptions
                 .builder()
                 .pollTimeout(Duration.ofMillis(100))
+                .targetType(ForwardMessage.class)
                 .build();
-        StreamMessageListenerContainer<String, MapRecord<String, String, String>> container = StreamMessageListenerContainer.create(redisConnectionFactory, containerOptions);
+
+        StreamMessageListenerContainer<String, ObjectRecord<String,ForwardMessage>> container = StreamMessageListenerContainer
+                .create(redisConnectionFactory, containerOptions);
+
+        StreamOffset<String> streamOffset = StreamOffset.create(Topic.MESSAGE_FORWARD, ReadOffset.lastConsumed());
+
+        StreamMessageListenerContainer.StreamReadRequest<String> readRequest = StreamMessageListenerContainer.StreamReadRequest.builder(streamOffset)
+                .cancelOnError((err) -> false)  // do not stop consuming after error
+                .errorHandler((err) -> log.error(err.getMessage()))
+                .build();
+
+        Subscription subscription = container.register(readRequest, streamListener());
+
+
         container.start();
-        return container.receive(StreamOffset.fromStart("my-stream"),defaultStreamListener);
+        return subscription;
     }
 
     //基于发布订阅的轻量级消息队列
