@@ -51,6 +51,7 @@ public class Header{
         this.cmd = cmd;
         this.length = length;
         this.groupFlag = groupFlag;
+        this.reserved = groupFlag ? setBitValue(this.reserved, 0, (byte) 1) : this.reserved;
     }
 
     public Header(ByteBuf byteBuf){
@@ -108,12 +109,7 @@ public class Header{
         byteBuf.writeByte(this.ver.getVer());
         byteBuf.writeLong(this.sender);
         byteBuf.writeLong(this.receiver);
-        if(groupFlag){
-            byte b = setBitValue(this.reserved, 0, (byte) 1);
-            byteBuf.writeByte(b);
-        }else {
-            byteBuf.writeByte(this.reserved);
-        }
+        byteBuf.writeByte(this.reserved);
         byteBuf.writeByte(this.cmd.getCmdCode());
         byteBuf.writeInt(this.length);
     }

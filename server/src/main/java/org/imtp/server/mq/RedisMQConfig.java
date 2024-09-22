@@ -27,38 +27,38 @@ import java.time.Duration;
 public class RedisMQConfig {
 
 
-    @Bean
-    public StreamListener<String, ObjectRecord<String,ForwardMessage>> streamListener(){
-
-        return new DefaultStreamListener();
-    }
-
-    //基于流的轻量级消息队列
-    @Bean
-    public Subscription subscription(RedisConnectionFactory redisConnectionFactory) {
-        StreamMessageListenerContainer.StreamMessageListenerContainerOptions<String, ObjectRecord<String,ForwardMessage>> containerOptions = StreamMessageListenerContainer
-                .StreamMessageListenerContainerOptions
-                .builder()
-                .pollTimeout(Duration.ofMillis(100))
-                .targetType(ForwardMessage.class)
-                .build();
-
-        StreamMessageListenerContainer<String, ObjectRecord<String,ForwardMessage>> container = StreamMessageListenerContainer
-                .create(redisConnectionFactory, containerOptions);
-
-        StreamOffset<String> streamOffset = StreamOffset.create(Topic.MESSAGE_FORWARD, ReadOffset.lastConsumed());
-
-        StreamMessageListenerContainer.StreamReadRequest<String> readRequest = StreamMessageListenerContainer.StreamReadRequest.builder(streamOffset)
-                .cancelOnError((err) -> false)  // do not stop consuming after error
-                .errorHandler((err) -> log.error(err.getMessage()))
-                .build();
-
-        Subscription subscription = container.register(readRequest, streamListener());
-
-
-        container.start();
-        return subscription;
-    }
+//    @Bean
+//    public StreamListener<String, ObjectRecord<String,ForwardMessage>> streamListener(){
+//
+//        return new DefaultStreamListener();
+//    }
+//
+//    //基于流的轻量级消息队列
+//    @Bean
+//    public Subscription subscription(RedisConnectionFactory redisConnectionFactory) {
+//        StreamMessageListenerContainer.StreamMessageListenerContainerOptions<String, ObjectRecord<String,ForwardMessage>> containerOptions = StreamMessageListenerContainer
+//                .StreamMessageListenerContainerOptions
+//                .builder()
+//                .pollTimeout(Duration.ofMillis(100))
+//                .targetType(ForwardMessage.class)
+//                .build();
+//
+//        StreamMessageListenerContainer<String, ObjectRecord<String,ForwardMessage>> container = StreamMessageListenerContainer
+//                .create(redisConnectionFactory, containerOptions);
+//
+//        StreamOffset<String> streamOffset = StreamOffset.create(Topic.MESSAGE_FORWARD, ReadOffset.lastConsumed());
+//
+//        StreamMessageListenerContainer.StreamReadRequest<String> readRequest = StreamMessageListenerContainer.StreamReadRequest.builder(streamOffset)
+//                .cancelOnError((err) -> false)  // do not stop consuming after error
+//                .errorHandler((err) -> log.error(err.getMessage()))
+//                .build();
+//
+//        Subscription subscription = container.register(readRequest, streamListener());
+//
+//
+//        container.start();
+//        return subscription;
+//    }
 
     //基于发布订阅的轻量级消息队列
     @Bean

@@ -75,7 +75,12 @@ public abstract class AbstractTextMessage extends Packet {
     @JsonIgnore
     @Override
     public int getBodyLength() {
-        return this.text.getBytes(StandardCharsets.UTF_8).length + 12 + 8;
+        return getBodyLength(this.text);
+    }
+
+    @JsonIgnore
+    public static int getBodyLength(String text){
+        return text.getBytes(StandardCharsets.UTF_8).length + 12 + 8;
     }
 
     @JsonIgnore

@@ -1,5 +1,7 @@
 package org.imtp.server.handler;
 
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -8,8 +10,12 @@ import io.netty.handler.codec.http.websocketx.*;
 import io.netty.util.AttributeKey;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.imtp.common.packet.*;
+import org.imtp.common.packet.CommandPacket;
+import org.imtp.common.packet.WebSocketAdapterMessage;
+import org.imtp.common.packet.WebSocketMessage;
+import org.imtp.common.packet.base.Header;
 import org.imtp.common.packet.base.Packet;
+import org.imtp.common.utils.CRC16Util;
 import org.imtp.common.utils.JsonUtil;
 import org.imtp.server.constant.ProjectConstant;
 import org.imtp.server.context.ChannelContextHolder;
@@ -31,69 +37,43 @@ public class WebSocketAdapterHandler extends SimpleChannelInboundHandler<WebSock
     private ChatService chatService;
 
     @Resource
-    private TextMessageHandler textMessageHandler;
-
-    @Resource
-    private ImageMessageHandler imageMessageHandler;
-
-    @Resource
-    private VideoMessageHandler videoMessageHandler;
-
-    @Resource
-    private FileMessageHandler fileMessageHandler;
+    private CommandHandler commandHandler;
 
     @Override
-    protected void channelRead0(ChannelHandlerContext ctx, WebSocketFrame msg) throws Exception {
-        if(msg instanceof TextWebSocketFrame textWebSocketFrame){
+    protected void channelRead0(ChannelHandlerContext ctx, WebSocketFrame msg) {
+        if (msg instanceof TextWebSocketFrame textWebSocketFrame) {
             String text = textWebSocketFrame.text();
             WebSocketMessage webSocketMessage = JsonUtil.parseObject(text, WebSocketMessage.class);
-            Packet packet;
-            switch (webSocketMessage.getType()){
-                case TEXT_MESSAGE :
-                    packet = new TextMessage(webSocketMessage);
-                    if (ctx.pipeline().get(TextMessageHandler.class) == null){
-                        ctx.pipeline().addLast(textMessageHandler).fireChannelRead(packet);
-                    }else {
-                        ctx.fireChannelRead(packet);
-                    }
-                    break;
-                case IMAGE_MESSAGE:
-                    packet = new ImageMessage(webSocketMessage);
-                    if (ctx.pipeline().get(ImageMessageHandler.class) == null){
-                        ctx.pipeline().addLast(imageMessageHandler).fireChannelRead(packet);
-                    }else {
-                        ctx.fireChannelRead(packet);
-                    }
-                    break;
-                case VIDEO_MESSAGE:
-                    packet = new VideoMessage(webSocketMessage);
-                    if (ctx.pipeline().get(VideoMessageHandler.class) == null){
-                        ctx.pipeline().addLast(videoMessageHandler).fireChannelRead(packet);
-                    }else {
-                        ctx.fireChannelRead(packet);
-                    }
-                    break;
-                case FILE_MESSAGE:
-                    packet = new FileMessage(webSocketMessage);
-                    if (ctx.pipeline().get(FileMessageHandler.class) == null){
-                        ctx.pipeline().addLast(fileMessageHandler).fireChannelRead(packet);
-                    }else {
-                        ctx.fireChannelRead(packet);
-                    }
-                    break;
-                default:
-                    throw new UnsupportedOperationException("Unsupported Operation");
+            WebSocketAdapterMessage webSocketAdapterMessage = new WebSocketAdapterMessage(webSocketMessage);
+            Header header = webSocketAdapterMessage.getHeader();
+            header.setLength(webSocketAdapterMessage.getBodyLength());
+            ByteBuf byteBuf = Unpooled.buffer();
+            byte[] data;
+            short receiveVerify;
+            try {
+                webSocketAdapterMessage.encodeBodyAsByteBuf(byteBuf);
+                data = new byte[byteBuf.readableBytes()];
+                byteBuf.readBytes(data);
+                receiveVerify = CRC16Util.calculateCRC(data);
+            }finally {
+                byteBuf.release();
             }
-        }else if (msg instanceof PingWebSocketFrame){
+            Packet packet = new CommandPacket(header, data, receiveVerify);
+            if (ctx.pipeline().get(CommandHandler.class) == null) {
+                ctx.pipeline().addLast(commandHandler).fireChannelRead(packet);
+            } else {
+                ctx.fireChannelRead(packet);
+            }
+        } else if (msg instanceof PingWebSocketFrame) {
             ctx.channel().writeAndFlush(new PongWebSocketFrame());
-        }else if (msg instanceof CloseWebSocketFrame){
+        } else if (msg instanceof CloseWebSocketFrame) {
             ctx.close();
         }
     }
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) {
-        log.warn("websocket server channelInactive: {}",ctx.channel().id().asLongText());
+        log.warn("websocket server channelInactive: {}", ctx.channel().id().asLongText());
         Channel channel = ctx.channel();
         channelInactiveHandle(channel);
     }
@@ -102,14 +82,14 @@ public class WebSocketAdapterHandler extends SimpleChannelInboundHandler<WebSock
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
         Channel channel = ctx.channel();
         channelInactiveHandle(channel);
-        log.error("exception message",cause);
+        log.error("exception message", cause);
         ctx.close();
     }
 
-    private void channelInactiveHandle(Channel channel){
+    private void channelInactiveHandle(Channel channel) {
         AttributeKey<String> attributeKey = AttributeKey.valueOf(ProjectConstant.CHANNEL_ATTR_LOGIN_USER);
         String userId = channel.attr(attributeKey).get();
-        log.warn("用户[{}]已断开连接",userId);
+        log.warn("用户[{}]已断开连接", userId);
         //移除用户在线状态
         chatService.userOffline(userId, channel.id().asLongText());
         //移除

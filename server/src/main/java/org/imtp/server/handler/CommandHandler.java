@@ -9,7 +9,6 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.util.AttributeKey;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.imtp.common.enums.ClientType;
 import org.imtp.common.enums.Command;
 import org.imtp.common.packet.*;
 import org.imtp.common.packet.base.Header;
@@ -18,8 +17,6 @@ import org.imtp.server.constant.ProjectConstant;
 import org.imtp.server.context.ChannelContextHolder;
 import org.imtp.server.service.ChatService;
 import org.springframework.stereotype.Component;
-
-import java.net.SocketException;
 
 /**
  * @Description 用于命令分发到具体处理器处理
@@ -36,6 +33,12 @@ public class CommandHandler extends SimpleChannelInboundHandler<Packet> {
 
     @Resource
     private ImageMessageHandler imageMessageHandler;
+
+    @Resource
+    private VideoMessageHandler videoMessageHandler;
+
+    @Resource
+    private FileMessageHandler fileMessageHandler;
 
     @Resource
     private UserFriendshipHandler userFriendshipHandler;
@@ -60,6 +63,38 @@ public class CommandHandler extends SimpleChannelInboundHandler<Packet> {
             ByteBuf byteBuf = Unpooled.wrappedBuffer(commandPacket.getBytes());
             try {
                 switch (cmd) {
+                    case TEXT_MESSAGE:
+                        packet = new TextMessage(byteBuf,header).additionTimestamp();
+                        if (channelHandlerContext.pipeline().get(TextMessageHandler.class) == null){
+                            channelHandlerContext.pipeline().addLast(textMessageHandler).fireChannelRead(packet);
+                        }else {
+                            channelHandlerContext.fireChannelRead(packet);
+                        }
+                        break;
+                    case IMAGE_MESSAGE:
+                        packet = new ImageMessage(byteBuf,header).additionTimestamp();
+                        if (channelHandlerContext.pipeline().get(ImageMessageHandler.class) == null){
+                            channelHandlerContext.pipeline().addLast(imageMessageHandler).fireChannelRead(packet);
+                        }else {
+                            channelHandlerContext.fireChannelRead(packet);
+                        }
+                        break;
+                    case VIDEO_MESSAGE:
+                        packet = new VideoMessage(byteBuf,header).additionTimestamp();
+                        if (channelHandlerContext.pipeline().get(VideoMessageHandler.class) == null){
+                            channelHandlerContext.pipeline().addLast(videoMessageHandler).fireChannelRead(packet);
+                        }else {
+                            channelHandlerContext.fireChannelRead(packet);
+                        }
+                        break;
+                    case FILE_MESSAGE:
+                        packet = new FileMessage(byteBuf,header).additionTimestamp();
+                        if (channelHandlerContext.pipeline().get(FileMessageHandler.class) == null){
+                            channelHandlerContext.pipeline().addLast(fileMessageHandler).fireChannelRead(packet);
+                        }else {
+                            channelHandlerContext.fireChannelRead(packet);
+                        }
+                        break;
                     case FRIENDSHIP_REQ:
                         packet = new FriendshipRequest(byteBuf,header);
                         if (channelHandlerContext.pipeline().get(UserFriendshipHandler.class) == null){
@@ -88,22 +123,6 @@ public class CommandHandler extends SimpleChannelInboundHandler<Packet> {
                         packet = new UserSessionRequest(byteBuf,header);
                         if (channelHandlerContext.pipeline().get(UserSessionHandler.class) == null){
                             channelHandlerContext.pipeline().addLast(userSessionHandler).fireChannelRead(packet);
-                        }else {
-                            channelHandlerContext.fireChannelRead(packet);
-                        }
-                        break;
-                    case TEXT_MESSAGE:
-                        packet = new TextMessage(byteBuf,header).additionTimestamp();
-                        if (channelHandlerContext.pipeline().get(TextMessageHandler.class) == null){
-                            channelHandlerContext.pipeline().addLast(textMessageHandler).fireChannelRead(packet);
-                        }else {
-                            channelHandlerContext.fireChannelRead(packet);
-                        }
-                        break;
-                    case IMAGE_MESSAGE:
-                        packet = new ImageMessage(byteBuf,header).additionTimestamp();
-                        if (channelHandlerContext.pipeline().get(ImageMessageHandler.class) == null){
-                            channelHandlerContext.pipeline().addLast(imageMessageHandler).fireChannelRead(packet);
                         }else {
                             channelHandlerContext.fireChannelRead(packet);
                         }

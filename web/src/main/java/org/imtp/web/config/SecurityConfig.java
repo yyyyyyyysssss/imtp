@@ -109,7 +109,8 @@ public class SecurityConfig {
                             .requestMatchers(
                                     "/logout",
                                     "/file/**",
-                                    "/service/discovery"
+                                    "/service/discovery",
+                                    "/social/**"
                             ).authenticated()
                             //刷新token
                             .requestMatchers("/refreshToken").hasAuthority("refresh_token")
