@@ -28,14 +28,18 @@ public class WebSocketMessage {
 
     private String content;
 
+    private MessageMetadata contentMetadata;
+
     @Override
     public String toString() {
         return "WebSocketMessage{" +
-                "type=" + type +
+                "ackId=" + ackId +
+                ", type=" + type +
                 ", sender=" + sender +
                 ", receiver=" + receiver +
                 ", deliveryMethod=" + deliveryMethod +
                 ", content='" + content + '\'' +
+                ", messageMetadata=" + contentMetadata +
                 '}';
     }
 }

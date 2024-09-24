@@ -4,10 +4,11 @@ import com.baomidou.mybatisplus.annotation.EnumValue;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.*;
 import org.imtp.common.enums.DeliveryMethod;
-import org.imtp.common.packet.base.Packet;
-import org.imtp.web.config.idwork.IdGen;
+import org.imtp.common.packet.MessageMetadata;
+
 import java.util.Date;
 
 /**
@@ -20,22 +21,8 @@ import java.util.Date;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@TableName("im_msg")
+@TableName(value = "im_msg",autoResultMap = true)
 public class Message {
-
-
-    public Message(Packet packet){
-        this.id = IdGen.genId();
-        this.senderUserId = packet.getSender();
-        this.receiverUserId = packet.getReceiver();
-        this.type = (int) packet.getHeader().getCmd().getCmdCode();
-        this.sendTime = new Date();
-        if(packet.isGroup()){
-            this.deliveryMethod = DeliveryMethod.GROUP;
-        }else {
-            this.deliveryMethod = DeliveryMethod.SINGLE;
-        }
-    }
 
     @TableId
     private Long id;
@@ -51,6 +38,9 @@ public class Message {
 
     @TableField("content")
     private String content;
+
+    @TableField(value = "content_metadata",typeHandler = JacksonTypeHandler.class)
+    private MessageMetadata contentMetadata;
 
     @TableField("send_time")
     private Date sendTime;

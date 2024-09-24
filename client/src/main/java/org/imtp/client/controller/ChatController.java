@@ -228,7 +228,7 @@ public class ChatController extends AbstractController{
             case IMAGE_MESSAGE:
                 String path = (String) object;
                 if (sessionEntity.getDeliveryMethod().equals(DeliveryMethod.SINGLE)){
-                    packet = new ImageMessage(path, ClientContextHolder.clientContext().id(), sessionEntity.getReceiverUserId(),ackId);
+                    packet = new ImageMessage(path, ClientContextHolder.clientContext().id(), sessionEntity.getReceiverUserId(),ackId,false);
                 }else {
                     packet = new ImageMessage(path, ClientContextHolder.clientContext().id(), sessionEntity.getReceiverUserId(),ackId,true);
                 }
@@ -275,7 +275,7 @@ public class ChatController extends AbstractController{
             case IMAGE_MESSAGE:
                 ImageMessage imageMessage = (ImageMessage) packet;
                 chatItemEntity = new ChatItemEntity();
-                chatItemEntity.setContent(imageMessage.getPath());
+                chatItemEntity.setContent(imageMessage.getUrl());
                 break;
             case MSG_RES:
                 MessageStateResponse messageStateResponse = (MessageStateResponse) packet;

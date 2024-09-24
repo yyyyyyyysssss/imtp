@@ -35,7 +35,7 @@ public class FileMessage extends AbstractTextMessage{
 
     }
 
-    public String getPath(){
+    public String getUrl(){
 
         return this.text;
     }

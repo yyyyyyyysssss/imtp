@@ -286,6 +286,7 @@ public class UserSocialServiceImpl implements UserSocialService {
         message.setReceiverUserId(messageDTO.getReceiverUserId());
         message.setType(messageDTO.getType());
         message.setContent(messageDTO.getContent());
+        message.setContentMetadata(messageDTO.getContentMetadata());
         message.setSendTime(new Date());
         message.setDeliveryMethod(messageDTO.getDeliveryMethod());
         int insert = messageMapper.insert(message);

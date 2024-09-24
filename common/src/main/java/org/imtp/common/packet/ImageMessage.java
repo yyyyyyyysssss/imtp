@@ -18,16 +18,16 @@ public class ImageMessage extends AbstractTextMessage{
         super(byteBuf, header);
     }
 
-    public ImageMessage(String path, long sender, long receiver, Long ackId, boolean groupFlag) {
-        super(path, sender, receiver, Command.IMAGE_MESSAGE, ackId, groupFlag);
+    public ImageMessage(String url, long sender, long receiver, Long ackId, boolean groupFlag) {
+        super(url, sender, receiver, Command.IMAGE_MESSAGE, ackId, groupFlag);
     }
 
     public ImageMessage(WebSocketMessage webSocketMessage){
         super(webSocketMessage.getContent(), webSocketMessage.getSender(), webSocketMessage.getReceiver(), Command.IMAGE_MESSAGE, webSocketMessage.getAckId(), webSocketMessage.getDeliveryMethod().equals(DeliveryMethod.GROUP));
     }
 
-    public ImageMessage(String path, long sender, long receiver, Long ackId) {
-        super(path, sender, receiver, Command.IMAGE_MESSAGE, ackId, false);
+    public ImageMessage(String url, long sender, long receiver, Long ackId) {
+        super(url, sender, receiver, Command.IMAGE_MESSAGE, ackId, false);
     }
 
     @Override
@@ -35,7 +35,7 @@ public class ImageMessage extends AbstractTextMessage{
 
     }
 
-    public String getPath(){
+    public String getUrl(){
 
         return this.text;
     }

@@ -3,6 +3,8 @@ package org.imtp.common.packet.common;
 import lombok.Getter;
 import lombok.Setter;
 import org.imtp.common.enums.DeliveryMethod;
+import org.imtp.common.packet.AbstractTextMessage;
+import org.imtp.common.packet.MessageMetadata;
 import org.imtp.common.packet.base.Packet;
 
 /**
@@ -25,6 +27,9 @@ public class MessageDTO {
         }else {
             this.deliveryMethod = DeliveryMethod.SINGLE;
         }
+        if (packet instanceof AbstractTextMessage abstractTextMessage){
+            this.contentMetadata = abstractTextMessage.getContentMetadata();
+        }
     }
 
     private Long id;
@@ -36,6 +41,8 @@ public class MessageDTO {
     private Integer type;
 
     private String content;
+
+    private MessageMetadata contentMetadata;
 
     private DeliveryMethod deliveryMethod;
 

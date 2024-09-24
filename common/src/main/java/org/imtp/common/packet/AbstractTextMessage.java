@@ -9,6 +9,7 @@ import lombok.Setter;
 import org.imtp.common.enums.Command;
 import org.imtp.common.packet.base.Header;
 import org.imtp.common.packet.base.Packet;
+import org.imtp.common.utils.JsonUtil;
 
 import java.nio.charset.StandardCharsets;
 
@@ -32,6 +33,9 @@ public abstract class AbstractTextMessage extends Packet {
 
     protected long timestamp;
 
+    //消息元信息
+    private MessageMetadata contentMetadata;
+
     public AbstractTextMessage(){
         super();
     }
@@ -44,15 +48,26 @@ public abstract class AbstractTextMessage extends Packet {
         this.text = new String(bytes, StandardCharsets.UTF_8);
         this.ackId = byteBuf.readLong();
         this.timestamp = byteBuf.readLong();
+        int messageMetadataLength = byteBuf.readInt();
+        if (messageMetadataLength > 0){
+            byte[] messageMetadataBytes = new byte[messageMetadataLength];
+            byteBuf.readBytes(messageMetadataBytes);
+            this.contentMetadata = JsonUtil.parseObject(messageMetadataBytes,MessageMetadata.class);
+        }
     }
 
     public AbstractTextMessage(String message, long sender, long receiver, Command command,Long ackId, boolean groupFlag) {
+        this(message,null,sender,receiver,command,ackId,groupFlag);
+    }
+
+    public AbstractTextMessage(String message,MessageMetadata messageMetadata, long sender, long receiver, Command command,Long ackId, boolean groupFlag) {
         super(sender, receiver, command,groupFlag);
         if(StringUtil.isNullOrEmpty(message) || StringUtil.length(message) > MAX_CHAR_LENGTH){
             throw new RuntimeException("messages cannot be empty or exceed the maximum length limit");
         }
         this.text = message;
         this.ackId = ackId;
+        this.contentMetadata = messageMetadata;
     }
 
     @Override
@@ -66,31 +81,34 @@ public abstract class AbstractTextMessage extends Packet {
         byteBuf.writeLong(this.ackId);
         //时间戳
         byteBuf.writeLong(timestamp);
+        //消息元信息长度
+        if (this.contentMetadata == null){
+            byteBuf.writeInt(0);
+        }else {
+            byte[] messageMetadataBytes = JsonUtil.toJSONString(contentMetadata).getBytes(StandardCharsets.UTF_8);
+            byteBuf.writeInt(messageMetadataBytes.length);
+            byteBuf.writeBytes(messageMetadataBytes);
+        }
         encodeBodyAsByteBuf0(byteBuf);
     }
 
     public abstract void encodeBodyAsByteBuf0(ByteBuf byteBuf);
 
-    //20 = 4字节内容长度+8字节应答id+8字节服务器时间戳
+    //20 = 4字节内容长度+8字节应答id+8字节服务器时间戳 + 4字节消息元信息长度
     @JsonIgnore
     @Override
     public int getBodyLength() {
-        return getBodyLength(this.text);
+        return this.text.getBytes(StandardCharsets.UTF_8).length + 4 + 8 + 8 + 4 + getBodyLength0();
     }
 
-    @JsonIgnore
-    public static int getBodyLength(String text){
-        return text.getBytes(StandardCharsets.UTF_8).length + 12 + 8;
+    public int getBodyLength0(){
+
+        return 0;
     }
 
     @JsonIgnore
     public String getMessage() {
         return text;
-    }
-
-    @JsonIgnore
-    public int getMAX_CHAR_LENGTH() {
-        return MAX_CHAR_LENGTH;
     }
 
     @JsonIgnore
@@ -101,5 +119,13 @@ public abstract class AbstractTextMessage extends Packet {
 
     public Long getTimestamp() {
         return timestamp;
+    }
+
+    public Long getAckId() {
+        return ackId;
+    }
+
+    public MessageMetadata getContentMetadata() {
+        return contentMetadata;
     }
 }
