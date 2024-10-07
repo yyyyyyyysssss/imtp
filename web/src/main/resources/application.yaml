@@ -78,8 +78,8 @@ auth:
   other-login:
     self:
       clientName: Self
-      clientId: 32b00b1e89af-90d2e0e46d20ebb92f6c
-      clientSecret: 123456
+      clientId: xxx
+      clientSecret: xxx
       redirectUrl: http://localhost:3000/login
       scope: userInfo+openid
       authCodeUrl: http://127.0.0.1:9090/oauth2/authorize?client_id=${auth.other-login.self.clientId}&scope=${auth.other-login.self.scope}&redirect_uri=${auth.other-login.self.redirectUrl}&response_type=code&state=Self
@@ -88,8 +88,8 @@ auth:
       userInfoUrl: http://127.0.0.1:9090/userinfo
     github:
       clientName: Github
-      clientId: bbf124ed2c08a0ea0ad0
-      clientSecret: 5c002c454a1f948f2f3d4d2dd37539c277c869ba
+      clientId: xxx
+      clientSecret: xxx
       redirectUrl: http://localhost:3000/login
       scope: user
       authCodeUrl: https://github.com/login/oauth/authorize?client_id=${auth.other-login.github.clientId}&redirect_uri=${auth.other-login.github.redirectUrl}&scope=${auth.other-login.github.scope}&state=Github
@@ -98,8 +98,8 @@ auth:
       userEmailsUrl: https://api.github.com/user/emails
     google:
       clientName: Google
-      clientId: 872533182595-jvksvqhqos743ebmthhifbk62759fpeg.apps.googleusercontent.com
-      clientSecret: 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
+      clientId: xxx
+      clientSecret: xxx
       redirectUrl: http://localhost:3000/login
       scope: https://www.googleapis.com/auth/userinfo.email+https://www.googleapis.com/auth/userinfo.profile+openid
       authCodeUrl: https://accounts.google.com/o/oauth2/v2/auth?client_id=${auth.other-login.google.clientId}&redirect_uri=${auth.other-login.google.redirectUrl}&scope=${auth.other-login.google.scope}&response_type=code&access_type=offline&prompt=consent&state=Google
@@ -107,8 +107,8 @@ auth:
       userInfoUrl: https://www.googleapis.com/oauth2/v3/userinfo
     microsoft:
       clientName: Microsoft
-      clientId: 6b53c058-f266-475c-b877-89b69c1f7886
-      clientSecret: t3u8Q~arctfWKy-L9DTOVO_feQDHdLGAnNZbccuA
+      clientId: xxx
+      clientSecret: xxx
       tenantId: c719f474-19d6-42af-a36f-1f264ac08653
       redirectUrl: http://localhost:3000/login
       scope: https://graph.microsoft.com/User.Read
