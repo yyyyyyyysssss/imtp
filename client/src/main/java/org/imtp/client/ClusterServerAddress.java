@@ -50,7 +50,7 @@ public class ClusterServerAddress implements ServerAddress{
 
     @Override
     public ServiceInfo serviceInfo() {
-        List<ServiceInfo> serviceInfos = okHttpClientHelper.doGet(config.getServiceDiscoveryUrl(), new TypeReference<List<ServiceInfo>>() {});
+        List<ServiceInfo> serviceInfos = okHttpClientHelper.doGet("/service/discovery", new TypeReference<List<ServiceInfo>>() {});
         return loadBalancer.nextService(serviceInfos);
     }
 }

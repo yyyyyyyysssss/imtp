@@ -28,9 +28,6 @@ public class UploadChunkDTO {
     //当前块索引
     private Integer chunkIndex;
 
-    //文件名称
-    private String filename;
-
     //文件
     private MultipartFile file;
 

@@ -1,4 +1,4 @@
-package org.imtp.client.entity;
+package org.imtp.common.packet.body;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
@@ -13,7 +13,7 @@ import org.imtp.common.enums.ClientType;
 @Getter
 @Setter
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class TokenEntity {
+public class TokenInfo {
 
     private Long userId;
 

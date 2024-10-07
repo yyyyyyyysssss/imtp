@@ -1,0 +1,31 @@
+.dialog-pane{
+    -fx-effect: innershadow(gaussian, #D0D0D0, 1, 1.0, 0, 0);
+    -fx-background-color: transparent;
+    -fx-border-width: 0px 0px 0px 0px;
+}
+
+.dialog-pane > .button-bar > .container {
+    -fx-padding: 0;
+}
+
+.dialog-pane .content {
+    -fx-padding: 0,0,0,0;
+}
+
+#rootStackPane{
+    -fx-padding: 20;
+}
+
+#closeVideo{
+    -fx-cursor: hand;
+}
+
+#closeVideo:hover{
+    -fx-background-color: gray;
+}
+
+#playToolMenu {
+    -fx-background-color: #6A7078;
+    -fx-opacity: 0.7;
+    -fx-cursor: hand;
+}

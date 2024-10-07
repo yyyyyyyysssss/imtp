@@ -418,6 +418,10 @@
   "name":"java.io.FilePermission"
 },
 {
+  "name":"java.io.Serializable",
+  "queryAllDeclaredMethods":true
+},
+{
   "name":"java.lang.Character",
   "methods":[{"name":"isIdeographic","parameterTypes":["int"] }]
 },
@@ -426,12 +430,27 @@
   "methods":[{"name":"forName","parameterTypes":["java.lang.Module","java.lang.String"] }, {"name":"getModule","parameterTypes":[] }]
 },
 {
+  "name":"java.lang.Comparable",
+  "queryAllDeclaredMethods":true
+},
+{
+  "name":"java.lang.Double",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true
+},
+{
   "name":"java.lang.Module",
   "methods":[{"name":"getDescriptor","parameterTypes":[] }, {"name":"getLayer","parameterTypes":[] }, {"name":"getName","parameterTypes":[] }, {"name":"getResourceAsStream","parameterTypes":["java.lang.String"] }]
 },
 {
   "name":"java.lang.ModuleLayer",
   "methods":[{"name":"boot","parameterTypes":[] }, {"name":"findModule","parameterTypes":["java.lang.String"] }]
+},
+{
+  "name":"java.lang.Number",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true
 },
 {
   "name":"java.lang.ProcessHandle",
@@ -443,6 +462,14 @@
 {
   "name":"java.lang.Thread",
   "fields":[{"name":"threadLocalRandomProbe"}]
+},
+{
+  "name":"java.lang.constant.Constable",
+  "queryAllDeclaredMethods":true
+},
+{
+  "name":"java.lang.constant.ConstantDesc",
+  "queryAllDeclaredMethods":true
 },
 {
   "name":"java.net.NetPermission"
@@ -492,6 +519,10 @@
 },
 {
   "name":"java.util.PropertyPermission"
+},
+{
+  "name":"java.util.concurrent.ForkJoinTask",
+  "fields":[{"name":"aux"}, {"name":"status"}]
 },
 {
   "name":"java.util.concurrent.atomic.AtomicBoolean",
@@ -674,6 +705,9 @@
 },
 {
   "name":"javafx.scene.input.Clipboard"
+},
+{
+  "name":"javafx.scene.input.Dragboard"
 },
 {
   "name":"javafx.scene.layout.AnchorPane",
@@ -929,6 +963,9 @@
   "methods":[{"name":"channelInactive","parameterTypes":["io.netty.channel.ChannelHandlerContext"] }]
 },
 {
+  "name":"org.imtp.client.handler.AuthenticationHandler"
+},
+{
   "name":"org.imtp.client.handler.ClientCmdHandlerHandler",
   "methods":[{"name":"channelActive","parameterTypes":["io.netty.channel.ChannelHandlerContext"] }]
 },
@@ -941,6 +978,11 @@
 },
 {
   "name":"org.imtp.common.codec.IMTPEncoder"
+},
+{
+  "name":"org.imtp.common.enums.ClientType",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true
 },
 {
   "name":"org.imtp.common.enums.DeliveryMethod",
@@ -959,6 +1001,13 @@
   "methods":[{"name":"getValue","parameterTypes":[] }]
 },
 {
+  "name":"org.imtp.common.packet.MessageMetadata",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[{"name":"<init>","parameterTypes":[] }, {"name":"getDuration","parameterTypes":[] }, {"name":"getDurationDesc","parameterTypes":[] }, {"name":"getHeight","parameterTypes":[] }, {"name":"getMediaType","parameterTypes":[] }, {"name":"getName","parameterTypes":[] }, {"name":"getPreviewUrl","parameterTypes":[] }, {"name":"getSize","parameterTypes":[] }, {"name":"getSizeDesc","parameterTypes":[] }, {"name":"getThumbnailUrl","parameterTypes":[] }, {"name":"getWidth","parameterTypes":[] }, {"name":"setDuration","parameterTypes":["java.lang.Long"] }, {"name":"setDurationDesc","parameterTypes":["java.lang.String"] }, {"name":"setHeight","parameterTypes":["java.lang.Double"] }, {"name":"setMediaType","parameterTypes":["java.lang.String"] }, {"name":"setName","parameterTypes":["java.lang.String"] }, {"name":"setPreviewUrl","parameterTypes":["java.lang.String"] }, {"name":"setSize","parameterTypes":["java.lang.Long"] }, {"name":"setSizeDesc","parameterTypes":["java.lang.String"] }, {"name":"setThumbnailUrl","parameterTypes":["java.lang.String"] }, {"name":"setWidth","parameterTypes":["java.lang.Double"] }]
+},
+{
   "name":"org.imtp.common.packet.body.LoginInfo",
   "allDeclaredFields":true,
   "queryAllDeclaredMethods":true,
@@ -973,11 +1022,18 @@
   "methods":[{"name":"<init>","parameterTypes":[] }, {"name":"setContent","parameterTypes":["java.lang.String"] }, {"name":"setDeliveryMethod","parameterTypes":["org.imtp.common.enums.DeliveryMethod"] }, {"name":"setId","parameterTypes":["java.lang.Long"] }, {"name":"setReceiver","parameterTypes":["java.lang.Long"] }, {"name":"setSendTime","parameterTypes":["java.lang.Long"] }, {"name":"setSender","parameterTypes":["java.lang.Long"] }, {"name":"setType","parameterTypes":["java.lang.Integer"] }]
 },
 {
+  "name":"org.imtp.common.packet.body.TokenInfo",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[{"name":"<init>","parameterTypes":[] }, {"name":"setAccessToken","parameterTypes":["java.lang.String"] }, {"name":"setClientType","parameterTypes":["org.imtp.common.enums.ClientType"] }, {"name":"setExpiration","parameterTypes":["java.lang.Long"] }, {"name":"setRefreshToken","parameterTypes":["java.lang.String"] }, {"name":"setRememberMeToken","parameterTypes":["java.lang.String"] }, {"name":"setUserId","parameterTypes":["java.lang.Long"] }]
+},
+{
   "name":"org.imtp.common.packet.body.UserFriendInfo",
   "allDeclaredFields":true,
   "queryAllDeclaredMethods":true,
   "queryAllDeclaredConstructors":true,
-  "methods":[{"name":"<init>","parameterTypes":[] }, {"name":"setAccount","parameterTypes":["java.lang.String"] }, {"name":"setAvatar","parameterTypes":["java.lang.String"] }, {"name":"setGender","parameterTypes":["java.lang.String"] }, {"name":"setGender","parameterTypes":["org.imtp.common.enums.Gender"] }, {"name":"setId","parameterTypes":["java.lang.Long"] }, {"name":"setNickname","parameterTypes":["java.lang.String"] }]
+  "methods":[{"name":"<init>","parameterTypes":[] }, {"name":"setAccount","parameterTypes":["java.lang.String"] }, {"name":"setAvatar","parameterTypes":["java.lang.String"] }, {"name":"setGender","parameterTypes":["java.lang.String"] }, {"name":"setGender","parameterTypes":["org.imtp.common.enums.Gender"] }, {"name":"setId","parameterTypes":["java.lang.Long"] }, {"name":"setNickname","parameterTypes":["java.lang.String"] }, {"name":"setNote","parameterTypes":["java.lang.String"] }, {"name":"setRegion","parameterTypes":["java.lang.String"] }, {"name":"setTagline","parameterTypes":["java.lang.String"] }]
 },
 {
   "name":"org.imtp.common.packet.body.UserGroupInfo",
@@ -999,6 +1055,13 @@
   "queryAllDeclaredMethods":true,
   "queryAllDeclaredConstructors":true,
   "methods":[{"name":"<init>","parameterTypes":[] }, {"name":"setAvatar","parameterTypes":["java.lang.String"] }, {"name":"setDeliveryMethod","parameterTypes":["org.imtp.common.enums.DeliveryMethod"] }, {"name":"setId","parameterTypes":["java.lang.Long"] }, {"name":"setLastMsgContent","parameterTypes":["java.lang.String"] }, {"name":"setLastMsgTime","parameterTypes":["java.lang.Long"] }, {"name":"setLastMsgType","parameterTypes":["org.imtp.common.enums.MessageType"] }, {"name":"setLastSendMsgUserId","parameterTypes":["java.lang.Long"] }, {"name":"setLastUserAvatar","parameterTypes":["java.lang.String"] }, {"name":"setLastUserName","parameterTypes":["java.lang.String"] }, {"name":"setName","parameterTypes":["java.lang.String"] }, {"name":"setReceiverUserId","parameterTypes":["java.lang.Long"] }, {"name":"setUserId","parameterTypes":["java.lang.Long"] }]
+},
+{
+  "name":"org.imtp.common.response.Result",
+  "allDeclaredFields":true,
+  "queryAllDeclaredMethods":true,
+  "queryAllDeclaredConstructors":true,
+  "methods":[{"name":"<init>","parameterTypes":[] }, {"name":"setCode","parameterTypes":["java.lang.Integer"] }, {"name":"setData","parameterTypes":["java.lang.Object"] }, {"name":"setMessage","parameterTypes":["java.lang.String"] }, {"name":"setSucceed","parameterTypes":["java.lang.Boolean"] }]
 },
 {
   "name":"sun.misc.Unsafe",

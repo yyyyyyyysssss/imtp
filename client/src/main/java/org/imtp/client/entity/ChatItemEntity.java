@@ -12,6 +12,7 @@ import org.imtp.client.context.DefaultClientUserChannelContext;
 import org.imtp.client.idwork.IdGen;
 import org.imtp.common.enums.DeliveryMethod;
 import org.imtp.common.enums.MessageType;
+import org.imtp.common.packet.MessageMetadata;
 
 import java.util.Date;
 
@@ -41,6 +42,8 @@ public class ChatItemEntity {
     private MessageType messageType;
 
     private DeliveryMethod deliveryMethod;
+
+    private MessageMetadata messageMetadata;
 
 
 

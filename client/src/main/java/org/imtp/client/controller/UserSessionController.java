@@ -295,6 +295,7 @@ public class UserSessionController extends AbstractController{
         sessionEntity.setLastSendMsgUserId(userSessionInfo.getLastSendMsgUserId());
         sessionEntity.setLastUserAvatar(userSessionInfo.getLastUserAvatar());
         sessionEntity.setLastUserName(userSessionInfo.getLastUserName());
+        sessionEntity.setLastMessageMetadata(userSessionInfo.getLastMessageMetadata());
         return sessionEntity;
     }
 

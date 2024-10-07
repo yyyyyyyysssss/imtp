@@ -19,15 +19,11 @@ public class ImageMessage extends AbstractTextMessage{
     }
 
     public ImageMessage(String url, long sender, long receiver, Long ackId, boolean groupFlag) {
-        super(url, sender, receiver, Command.IMAGE_MESSAGE, ackId, groupFlag);
+        this(url,null, sender, receiver, ackId, groupFlag);
     }
 
-    public ImageMessage(WebSocketMessage webSocketMessage){
-        super(webSocketMessage.getContent(), webSocketMessage.getSender(), webSocketMessage.getReceiver(), Command.IMAGE_MESSAGE, webSocketMessage.getAckId(), webSocketMessage.getDeliveryMethod().equals(DeliveryMethod.GROUP));
-    }
-
-    public ImageMessage(String url, long sender, long receiver, Long ackId) {
-        super(url, sender, receiver, Command.IMAGE_MESSAGE, ackId, false);
+    public ImageMessage(String url,MessageMetadata messageMetadata, long sender, long receiver, Long ackId, boolean groupFlag) {
+        super(url,messageMetadata, sender, receiver, Command.IMAGE_MESSAGE, ackId, groupFlag);
     }
 
     @Override

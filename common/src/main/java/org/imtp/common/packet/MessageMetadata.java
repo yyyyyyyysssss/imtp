@@ -14,9 +14,9 @@ import lombok.Setter;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class MessageMetadata {
 
-    private Integer width;
+    private Double width;
 
-    private Integer height;
+    private Double height;
 
     private String mediaType;
 

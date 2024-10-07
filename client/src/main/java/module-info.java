@@ -9,6 +9,7 @@ module client{
     requires javafx.controls;
     requires javafx.fxml;
     requires javafx.graphics;
+    requires javafx.media;
     requires io.netty.all;
     requires io.netty.buffer;
     requires io.netty.codec;

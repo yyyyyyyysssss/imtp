@@ -45,7 +45,7 @@ zookeeper:
   sessionTimeout: 3000
 
 minio:
-  endpoint: http://127.0.0.1:9000
+  endpoint: http://localhost:9000
   bucketName: y-chat-bucket
   accessKey: ldpiqxlrXrEtNB8SF79W
   secretKey: 7rfOUvkNu6ofE9VPWZj2w5V1rcanVGmNXNPNyl5j
@@ -57,16 +57,24 @@ mybatis-plus:
 
 
 auth:
+  # 基于请求头的身份认证
+  requestHeadAuthentications:
+    - antPath: /api/internal/**
+      apikey: 26662f07703c41d2a4994b8b30b101a9
+  # 用户设备最大token数量
   coexistToken: 1
+  # jwt token配置
   jwt:
     secretKey: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
     # 单位：s:秒 m:分钟 h:小时 d:天 默认 秒
     expiration: 24h
     refreshExpiration: 30d
+  # 记住密码
   rememberMe:
     secretKey: 209E335266556A586E3272357538782F413A4428472B4B6250645367566B5B76
     # 单位：s:秒 m:分钟 h:小时 d:天 默认 秒
     expiration: 7d
+  # oauh2 三方登录配置
   other-login:
     self:
       clientName: Self
@@ -80,8 +88,8 @@ auth:
       userInfoUrl: http://127.0.0.1:9090/userinfo
     github:
       clientName: Github
-      clientId: xxx
-      clientSecret: xxxx
+      clientId: bbf124ed2c08a0ea0ad0
+      clientSecret: 5c002c454a1f948f2f3d4d2dd37539c277c869ba
       redirectUrl: http://localhost:3000/login
       scope: user
       authCodeUrl: https://github.com/login/oauth/authorize?client_id=${auth.other-login.github.clientId}&redirect_uri=${auth.other-login.github.redirectUrl}&scope=${auth.other-login.github.scope}&state=Github
@@ -90,8 +98,8 @@ auth:
       userEmailsUrl: https://api.github.com/user/emails
     google:
       clientName: Google
-      clientId: xxx
-      clientSecret: xxx
+      clientId: 872533182595-jvksvqhqos743ebmthhifbk62759fpeg.apps.googleusercontent.com
+      clientSecret: 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
       redirectUrl: http://localhost:3000/login
       scope: https://www.googleapis.com/auth/userinfo.email+https://www.googleapis.com/auth/userinfo.profile+openid
       authCodeUrl: https://accounts.google.com/o/oauth2/v2/auth?client_id=${auth.other-login.google.clientId}&redirect_uri=${auth.other-login.google.redirectUrl}&scope=${auth.other-login.google.scope}&response_type=code&access_type=offline&prompt=consent&state=Google
@@ -99,8 +107,8 @@ auth:
       userInfoUrl: https://www.googleapis.com/oauth2/v3/userinfo
     microsoft:
       clientName: Microsoft
-      clientId: xxx
-      clientSecret: xxx
+      clientId: 6b53c058-f266-475c-b877-89b69c1f7886
+      clientSecret: t3u8Q~arctfWKy-L9DTOVO_feQDHdLGAnNZbccuA
       tenantId: c719f474-19d6-42af-a36f-1f264ac08653
       redirectUrl: http://localhost:3000/login
       scope: https://graph.microsoft.com/User.Read

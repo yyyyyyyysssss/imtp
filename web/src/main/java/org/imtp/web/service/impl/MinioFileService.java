@@ -63,14 +63,13 @@ public class MinioFileService implements FileService {
     @Override
     public boolean upload(UploadChunkDTO uploadChunkDTO) {
         String uploadId = uploadChunkDTO.getUploadId();
-        String filename = uploadChunkDTO.getFilename();
         Long totalSize = uploadChunkDTO.getTotalSize();
         Long totalChunk = uploadChunkDTO.getTotalChunk();
         Integer chunkIndex = uploadChunkDTO.getChunkIndex();
         Long chunkSize = uploadChunkDTO.getChunkSize();
         MultipartFile file = uploadChunkDTO.getFile();
         InputStream inputStream = null;
-        log.info("uploadId:{}, filename:{}, totalSize:{}, totalChunk:{}, chunkIndex:{}, chunkSize:{}", uploadId, filename, totalSize, totalChunk, chunkIndex, chunkSize);
+        log.info("uploadId:{}, totalSize:{}, totalChunk:{}, chunkIndex:{}, chunkSize:{}", uploadId, totalSize, totalChunk, chunkIndex, chunkSize);
         //写入临时文件
         String tmpFilePath = tmpdir + uploadId + ".tmp";
         try (RandomAccessFile raf = new RandomAccessFile(tmpFilePath, "rw")) {
@@ -102,6 +101,7 @@ public class MinioFileService implements FileService {
                 log.warn("任务不存在");
                 return false;
             }
+            String filename = fileUpload.getFileName();
             String fileSuffix = filename.substring(filename.lastIndexOf("."));
             String newFilename = UUID.randomUUID().toString().replaceAll("-","") + fileSuffix;
             String newFilePath = tmpdir + newFilename;

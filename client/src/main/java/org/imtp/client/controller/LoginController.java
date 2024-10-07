@@ -35,7 +35,7 @@ import org.imtp.client.SceneManagerHolder;
 import org.imtp.client.component.OKHttpClientHelper;
 import org.imtp.client.constant.FXMLResourceConstant;
 import org.imtp.client.constant.SendMessageListener;
-import org.imtp.client.entity.TokenEntity;
+import org.imtp.common.packet.body.TokenInfo;
 import org.imtp.client.handler.AuthenticationHandler;
 import org.imtp.client.util.EffectUtilities;
 import org.imtp.client.util.ResourceUtils;
@@ -192,7 +192,7 @@ public class LoginController extends AbstractController {
         loginRequest.put("username", u);
         loginRequest.put("credential", p);
         loginRequest.put("clientType", "APP");
-        okHttpClientHelper.doPost(config.getApiHost() + "/login", loginRequest, new Callback() {
+        okHttpClientHelper.doPost("/login", loginRequest, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
                 log.error("login error: ", e);
@@ -204,16 +204,15 @@ public class LoginController extends AbstractController {
                 if (response.isSuccessful()) {
                     if (body != null) {
                         String str = body.string();
-                        Result<TokenEntity> tokenResult = JsonUtil.parseObject(str, new TypeReference<Result<TokenEntity>>() {});
+                        Result<TokenInfo> tokenResult = JsonUtil.parseObject(str, new TypeReference<>() {});
                         if(!tokenResult.isSucceed()){
                             showErrMsg("登录失败，用户名或密码错误");
                             return;
                         }
-                        TokenEntity tokenEntity = tokenResult.getData();
+                        TokenInfo tokenInfo = tokenResult.getData();
                         if (client == null) {
-                            String accessToken = tokenEntity.getAccessToken();
-                            client = new Client((ChannelHandler) messageModel,accessToken);
-                            client.addListener(() -> loggingIn(accessToken));
+                            client = new Client((ChannelHandler) messageModel,tokenInfo);
+                            client.addListener(() -> loggingIn(tokenInfo.getAccessToken()));
                             //启动netty
                             new Thread(client).start();
                         } else {

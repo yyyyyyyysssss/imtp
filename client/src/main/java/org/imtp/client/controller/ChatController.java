@@ -17,7 +17,6 @@ import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
-import javafx.scene.control.TextArea;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
@@ -27,6 +26,7 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import javafx.stage.Window;
 import lombok.extern.slf4j.Slf4j;
+import org.imtp.client.component.ChunkedUploader;
 import org.imtp.client.context.ClientContextHolder;
 import org.imtp.client.entity.ChatItemEntity;
 import org.imtp.client.entity.SessionEntity;
@@ -36,22 +36,24 @@ import org.imtp.client.idwork.IdGen;
 import org.imtp.client.util.ResourceUtils;
 import org.imtp.common.enums.DeliveryMethod;
 import org.imtp.common.enums.MessageType;
-import org.imtp.common.packet.ImageMessage;
-import org.imtp.common.packet.MessageStateResponse;
-import org.imtp.common.packet.TextMessage;
+import org.imtp.common.packet.*;
 import org.imtp.common.packet.base.Packet;
 import org.imtp.common.packet.body.UserFriendInfo;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Files;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
-public class ChatController extends AbstractController{
+public class ChatController extends AbstractController {
 
     @FXML
     private VBox chatVbox;
@@ -83,7 +85,7 @@ public class ChatController extends AbstractController{
 
     private Image sendFailureImage;
 
-    private Map<Long,ChatItemEntity> ackChatItemEntityMap;
+    private Map<Long, ChatItemEntity> ackChatItemEntityMap;
 
     private UserFriendController userFriendController;
 
@@ -91,11 +93,11 @@ public class ChatController extends AbstractController{
 
     private ChatEmojiDialog dialog;
 
-    private Map<Long,RetryTask> retryTaskMap;
+    private Map<Long, RetryTask> retryTaskMap;
 
 
     @FXML
-    public void initialize(){
+    public void initialize() {
         URL sendFailImageUrl = ResourceUtils.classPathResource("/img/send_fail.png");
         sendFailureImage = new Image(sendFailImageUrl.toExternalForm());
 
@@ -122,7 +124,7 @@ public class ChatController extends AbstractController{
         chatListView.setCellFactory(c -> new ChatItemListCell());
         chatListView.setFocusTraversable(false);
         chatEmoteIcon.setOnMouseClicked(mouseEvent -> {
-            if (dialog == null){
+            if (dialog == null) {
                 dialog = new ChatEmojiDialog();
                 dialog.getDialogPane().addEventHandler(EmojiEvent.SELECTED, emojiEvent -> {
                     Emoji emoji = emojiEvent.getEmoji();
@@ -162,76 +164,96 @@ public class ChatController extends AbstractController{
     @Override
     public void initData(Object object) {
         this.sessionEntity = (SessionEntity) object;
-        if (sessionEntity != null && sessionEntity.getLastMsg() != null){
+        if (sessionEntity != null && sessionEntity.getLastMsg() != null) {
             addChatItem(sessionEntity);
         }
     }
 
-    private void sendMessage(){
+    private void sendMessage() {
         Set<Node> nodes = richTextArea.lookupAll(".text-flow");
         StringBuilder sb = new StringBuilder();
         int i = nodes.size();
-        for (Node node : nodes){
+        for (Node node : nodes) {
             ObservableList<Node> childrenNodes = ((TextFlow) node).getChildrenUnmodifiable();
-            for (Node n : childrenNodes){
-                if (n instanceof Text text){
+            for (Node n : childrenNodes) {
+                if (n instanceof Text text) {
                     sb.append(text.getText());
                 }
-                if (n instanceof ImageView imageView){
+                if (n instanceof ImageView imageView) {
                     String emojiUnified = (String) imageView.getProperties().get(EmojiImageUtils.IMAGE_VIEW_EMOJI_PROPERTY);
-                    if (emojiUnified != null){
+                    if (emojiUnified != null) {
                         Optional<Emoji> emojiOptional = EmojiData.emojiFromCodepoints(emojiUnified);
-                        if (emojiOptional.isPresent()){
+                        if (emojiOptional.isPresent()) {
                             Emoji emoji = emojiOptional.get();
                             sb.append(emoji.character());
                         }
-                    }else {
+                    } else {
                         String message = sb.toString();
-                        if (!message.isEmpty()){
-                            sendMessage(message,MessageType.TEXT_MESSAGE);
+                        if (!message.isEmpty()) {
+                            sendMessage(message, MessageType.TEXT_MESSAGE);
                         }
 
                         String url = imageView.getImage().getUrl();
-                        sendMessage(url,MessageType.IMAGE_MESSAGE);
+                        sendMessage(url, MessageType.IMAGE_MESSAGE);
                         sb = new StringBuilder();
                     }
                 }
             }
-            if (--i > 0 ){
+            if (--i > 0) {
                 sb.append(System.lineSeparator());
             }
         }
-        if (!sb.toString().isEmpty()){
-            sendMessage(sb.toString(),MessageType.TEXT_MESSAGE);
+        if (!sb.toString().isEmpty()) {
+            sendMessage(sb.toString(), MessageType.TEXT_MESSAGE);
         }
         richTextArea.getActionFactory().newDocument().execute(new ActionEvent());
     }
 
-    private void sendMessage(Object object,MessageType messageType){
+    private void sendMessage(Object object, MessageType messageType) {
         sessionEntity.setLastSendMsgUserId(ClientContextHolder.clientContext().id());
         ChatItemEntity selfChatItemEntity = ChatItemEntity.createSelfChatItemEntity();
         Long ackId = IdGen.genId();
-        Packet packet = null;
-        switch (messageType){
-            case TEXT_MESSAGE :
+        switch (messageType) {
+            case TEXT_MESSAGE:
                 String message = (String) object;
-                if (sessionEntity.getDeliveryMethod().equals(DeliveryMethod.SINGLE)){
-                    packet = new TextMessage(message, ClientContextHolder.clientContext().id(), sessionEntity.getReceiverUserId(),ackId);
-                }else {
-                    packet = new TextMessage(message, ClientContextHolder.clientContext().id(), sessionEntity.getReceiverUserId(),ackId,true);
+                Packet textPacket;
+                if (sessionEntity.getDeliveryMethod().equals(DeliveryMethod.SINGLE)) {
+                    textPacket = new TextMessage(message, ClientContextHolder.clientContext().id(), sessionEntity.getReceiverUserId(), ackId);
+                } else {
+                    textPacket = new TextMessage(message, ClientContextHolder.clientContext().id(), sessionEntity.getReceiverUserId(), ackId, true);
                 }
                 sessionEntity.setLastMsgType(messageType);
                 sessionEntity.setLastMsg(message);
                 selfChatItemEntity.setContent(message);
                 selfChatItemEntity.setMessageType(messageType);
+                //发送消息
+                send(textPacket);
                 break;
             case IMAGE_MESSAGE:
                 String path = (String) object;
-                if (sessionEntity.getDeliveryMethod().equals(DeliveryMethod.SINGLE)){
-                    packet = new ImageMessage(path, ClientContextHolder.clientContext().id(), sessionEntity.getReceiverUserId(),ackId,false);
-                }else {
-                    packet = new ImageMessage(path, ClientContextHolder.clientContext().id(), sessionEntity.getReceiverUserId(),ackId,true);
-                }
+                CompletableFuture<String> completableFuture = ChunkedUploader.uploadFile(path);
+                completableFuture
+                        .whenComplete((r, e) -> {
+                            if (e != null){
+                                log.error("upload chunk failed: ",e);
+                                selfChatItemEntity.setImage(sendFailureImage);
+                            }
+                        })
+                        .thenAccept(r -> {
+                            log.info("upload completed; accessUrl: {}",r);
+                            Packet imagePacket;
+                            MessageMetadata messageMetadata = baseMessageMetadata(path);
+                            Image image = new Image(path);
+                            messageMetadata.setWidth(image.getWidth());
+                            messageMetadata.setHeight(image.getHeight());
+                            if (sessionEntity.getDeliveryMethod().equals(DeliveryMethod.SINGLE)) {
+                                imagePacket = new ImageMessage(r,messageMetadata, ClientContextHolder.clientContext().id(), sessionEntity.getReceiverUserId(), ackId, false);
+                            } else {
+                                imagePacket = new ImageMessage(r,messageMetadata, ClientContextHolder.clientContext().id(), sessionEntity.getReceiverUserId(), ackId, true);
+                            }
+                            //发送消息
+                            send(imagePacket);
+                        });
                 sessionEntity.setLastMsgType(messageType);
                 sessionEntity.setLastMsg(path);
                 selfChatItemEntity.setContent(path);
@@ -240,54 +262,58 @@ public class ChatController extends AbstractController{
         }
         addChatItem(selfChatItemEntity);
         selfChatItemEntity.setImage(sendingImage);
-        ackChatItemEntityMap.put(ackId,selfChatItemEntity);
+        ackChatItemEntityMap.put(ackId, selfChatItemEntity);
         //联动会话框
-        chatVbox.fireEvent(new UserSessionEvent(UserSessionEvent.SEND_MESSAGE,sessionEntity));
-        //发送消息
-        send(packet);
+        chatVbox.fireEvent(new UserSessionEvent(UserSessionEvent.SEND_MESSAGE, sessionEntity));
         //异步等待消息回执
         EventLoop eventLoop = ClientContextHolder.clientContext().channel().eventLoop();
         RetryTask retryTask = new RetryTask();
         retryTask.setScheduledFuture(eventLoop.schedule(() -> {
             ChatItemEntity chatItemEntity = ackChatItemEntityMap.get(ackId);
-            if (chatItemEntity != null){
+            if (chatItemEntity != null) {
                 chatItemEntity.setImage(sendFailureImage);
             }
             retryTaskMap.remove(ackId);
-        },10, TimeUnit.SECONDS));
-        retryTaskMap.put(ackId,retryTask);
+        }, 10, TimeUnit.SECONDS));
+        retryTaskMap.put(ackId, retryTask);
     }
 
     @Override
     public void update(Object object) {
-        Packet packet = (Packet)object;
-        if (packet.getSender() != 0 && !packet.realSender().equals(sessionEntity.getReceiverUserId())){
+        Packet packet = (Packet) object;
+        if (packet.getSender() != 0 && !packet.realSender().equals(sessionEntity.getReceiverUserId())) {
             return;
         }
         ChatItemEntity chatItemEntity = null;
-        switch (packet.getHeader().getCmd()){
+        switch (packet.getHeader().getCmd()) {
             case TEXT_MESSAGE:
                 TextMessage textMessage = (TextMessage) packet;
                 chatItemEntity = new ChatItemEntity();
                 chatItemEntity.setContent(textMessage.getMessage());
-
                 break;
             case IMAGE_MESSAGE:
                 ImageMessage imageMessage = (ImageMessage) packet;
                 chatItemEntity = new ChatItemEntity();
                 chatItemEntity.setContent(imageMessage.getUrl());
+                chatItemEntity.setMessageMetadata(imageMessage.getContentMetadata());
+                break;
+            case VIDEO_MESSAGE:
+                VideoMessage videoMessage = (VideoMessage) packet;
+                chatItemEntity = new ChatItemEntity();
+                chatItemEntity.setContent(videoMessage.getUrl());
+                chatItemEntity.setMessageMetadata(videoMessage.getContentMetadata());
                 break;
             case MSG_RES:
                 MessageStateResponse messageStateResponse = (MessageStateResponse) packet;
                 ChatItemEntity cie = ackChatItemEntityMap.get(messageStateResponse.getAckId());
-                if (cie != null){
-                    switch (messageStateResponse.getState()){
-                        case DELIVERED :
-                            log.info("{},{}",messageStateResponse.getState(),messageStateResponse.getAckId());
+                if (cie != null) {
+                    switch (messageStateResponse.getState()) {
+                        case DELIVERED:
+                            log.info("{},{}", messageStateResponse.getState(), messageStateResponse.getAckId());
                             cie.imageProperty().set(null);
                             ackChatItemEntityMap.remove(messageStateResponse.getAckId());
                             RetryTask retryTask = retryTaskMap.get(messageStateResponse.getAckId());
-                            if (retryTask != null){
+                            if (retryTask != null) {
                                 retryTask.cancel();
                                 retryTaskMap.remove(messageStateResponse.getAckId());
                             }
@@ -296,15 +322,15 @@ public class ChatController extends AbstractController{
                 }
                 break;
         }
-        if (chatItemEntity == null){
+        if (chatItemEntity == null) {
             return;
         }
-        if (packet.isGroup()){
+        if (packet.isGroup()) {
             UserFriendInfo groupUserInfo = userGroupController.findGroupUserInfo(packet.getReceiver(), packet.getSender());
             String imageUrl = loadImageUrl(groupUserInfo.getAvatar());
             chatItemEntity.setAvatar(imageUrl);
             chatItemEntity.setName(groupUserInfo.getNickname());
-        }else {
+        } else {
             chatItemEntity.setAvatar(sessionEntity.getAvatar());
             chatItemEntity.setName(sessionEntity.getName());
         }
@@ -314,29 +340,30 @@ public class ChatController extends AbstractController{
         addChatItem(chatItemEntity);
     }
 
-    private void setListView(List<ChatItemEntity> chatItemEntities){
+    private void setListView(List<ChatItemEntity> chatItemEntities) {
         ObservableList<ChatItemEntity> chatItemEntityObservableList = FXCollections.observableArrayList(chatItemEntities);
         chatListView.setItems(chatItemEntityObservableList);
     }
 
-    private void addChatItem(SessionEntity sessionEntity){
+    private void addChatItem(SessionEntity sessionEntity) {
         ChatItemEntity chatItemEntity = new ChatItemEntity();
         chatItemEntity.setId(IdGen.genId());
         String imageUrl = loadImageUrl(sessionEntity.getLastUserAvatar());
         chatItemEntity.setAvatar(imageUrl);
         chatItemEntity.setName(sessionEntity.getLastUserName());
-        if (ClientContextHolder.clientContext().id().equals(sessionEntity.getLastSendMsgUserId())){
+        if (ClientContextHolder.clientContext().id().equals(sessionEntity.getLastSendMsgUserId())) {
             chatItemEntity.setSelf(true);
-        }else {
+        } else {
             chatItemEntity.setSelf(false);
         }
         chatItemEntity.setMessageType(sessionEntity.getLastMsgType());
         chatItemEntity.setContent(sessionEntity.getLastMsg());
         chatItemEntity.setDeliveryMethod(sessionEntity.getDeliveryMethod());
+        chatItemEntity.setMessageMetadata(sessionEntity.getLastMessageMetadata());
         addChatItem(chatItemEntity);
     }
 
-    private void addChatItem(ChatItemEntity chatItemEntity){
+    private void addChatItem(ChatItemEntity chatItemEntity) {
         ObservableList<ChatItemEntity> items = chatListView.getItems();
         int index = items.size();
         items.addLast(chatItemEntity);
@@ -352,6 +379,34 @@ public class ChatController extends AbstractController{
 
     public void setUserGroupController(UserGroupController userGroupController) {
         this.userGroupController = userGroupController;
+    }
+
+
+    private MessageMetadata baseMessageMetadata(String path){
+        if (path.startsWith("file:")) {
+            path = path.substring(6);
+        }
+        File file = new File(path);
+        MessageMetadata messageMetadata = new MessageMetadata();
+        messageMetadata.setName(file.getName());
+        long size = file.length();
+        messageMetadata.setSize(size);
+        String sizeDesc;
+        if (size > 1048576){
+            sizeDesc = String.format("%.1f",(double)size / (1024 * 1024)) + "M";
+        }else if (size > 1024) {
+            sizeDesc = String.format("%.1f",(double)size / 1024) + "K";
+        } else {
+            sizeDesc = size + "B";
+        }
+        messageMetadata.setSizeDesc(sizeDesc);
+        try {
+            messageMetadata.setMediaType(Files.probeContentType(file.toPath()));
+        } catch (IOException e) {
+            log.error("probeContentType error ",e);
+            messageMetadata.setMediaType("Unknown media type");
+        }
+        return messageMetadata;
     }
 
 }

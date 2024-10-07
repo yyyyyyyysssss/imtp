@@ -131,6 +131,7 @@ public class UserSocialServiceImpl implements UserSocialService {
                 userSessionInfo.setLastMsgContent(message.getContent());
                 userSessionInfo.setLastMsgTime(message.getSendTime().getTime());
                 userSessionInfo.setLastSendMsgUserId(message.getSenderUserId());
+                userSessionInfo.setLastMessageMetadata(message.getContentMetadata());
                 User user = Optional.ofNullable(userIdMap).map(m -> m.get(message.getSenderUserId())).orElse(null);
                 if(user != null){
                     userSessionInfo.setLastUserAvatar(user.getAvatar());

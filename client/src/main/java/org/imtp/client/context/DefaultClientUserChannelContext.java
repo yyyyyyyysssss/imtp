@@ -2,6 +2,7 @@ package org.imtp.client.context;
 
 import io.netty.channel.Channel;
 import org.imtp.client.Client;
+import org.imtp.common.packet.body.TokenInfo;
 import org.imtp.common.packet.body.UserInfo;
 
 /**
@@ -13,9 +14,12 @@ public class DefaultClientUserChannelContext extends AbstractClientChannelContex
 
     private UserInfo userInfo;
 
-    public DefaultClientUserChannelContext(Channel channel, Client client, UserInfo userInfo) {
+    private TokenInfo tokenInfo;
+
+    public DefaultClientUserChannelContext(Channel channel, Client client, UserInfo userInfo,TokenInfo tokenInfo) {
         super(channel,client);
         this.userInfo = userInfo;
+        this.tokenInfo = tokenInfo;
     }
 
 
@@ -30,5 +34,10 @@ public class DefaultClientUserChannelContext extends AbstractClientChannelContex
 
     public UserInfo getUserInfo() {
         return userInfo;
+    }
+
+
+    public TokenInfo getTokenInfo() {
+        return tokenInfo;
     }
 }

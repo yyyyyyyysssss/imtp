@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.DialogPane?>
+<?import javafx.scene.control.Slider?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.media.MediaView?>
+
+<DialogPane fx:id="videoPlayerDialogPane" style="-fx-background-color: #F5F5F5" stylesheets="@../css/VideoPlayerDialog.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
+    <content>
+        <StackPane fx:id="rootStackPane">
+            <children>
+                <MediaView fx:id="mediaView" />
+                <HBox fx:id="closeVideo" maxWidth="-Infinity" maxHeight="-Infinity" StackPane.alignment="TOP_RIGHT">
+                    <children>
+                        <ImageView fitWidth="16" fitHeight="16">
+                            <image>
+                                <Image url="@../img/close_16.png" />
+                            </image>
+                        </ImageView>
+                    </children>
+               <padding>
+                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+               </padding>
+                </HBox>
+                <HBox fx:id="playToolMenu" maxHeight="-Infinity" spacing="10.0" StackPane.alignment="BOTTOM_CENTER">
+                    <children>
+                        <HBox fx:id="playAndPause">
+                            <children>
+                                <ImageView fx:id="videoImageView" fitHeight="16" fitWidth="16" />
+                            </children>
+                        </HBox>
+                        <Slider fx:id="slider" HBox.hgrow="ALWAYS" />
+                    </children>
+                    <padding>
+                        <Insets bottom="5.0" left="10.0" right="10.0" top="5.0" />
+                    </padding>
+                    <StackPane.margin>
+                        <Insets left="20.0" right="20.0" />
+                    </StackPane.margin>
+                </HBox>
+            </children>
+        </StackPane>
+    </content>
+</DialogPane>

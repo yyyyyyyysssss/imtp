@@ -19,15 +19,11 @@ public class VideoMessage extends AbstractTextMessage{
     }
 
     public VideoMessage(String path, long sender, long receiver, Long ackId, boolean groupFlag) {
-        super(path, sender, receiver, Command.VIDEO_MESSAGE, ackId, groupFlag);
+        this(path,null, sender, receiver, ackId, groupFlag);
     }
 
-    public VideoMessage(WebSocketMessage webSocketMessage){
-        super(webSocketMessage.getContent(), webSocketMessage.getSender(), webSocketMessage.getReceiver(), Command.VIDEO_MESSAGE, webSocketMessage.getAckId(), webSocketMessage.getDeliveryMethod().equals(DeliveryMethod.GROUP));
-    }
-
-    public VideoMessage(String path, long sender, long receiver, Long ackId) {
-        super(path, sender, receiver, Command.VIDEO_MESSAGE, ackId, false);
+    public VideoMessage(String path,MessageMetadata messageMetadata, long sender, long receiver, Long ackId,boolean groupFlag) {
+        super(path,messageMetadata, sender, receiver, Command.VIDEO_MESSAGE, ackId, groupFlag);
     }
 
     @Override

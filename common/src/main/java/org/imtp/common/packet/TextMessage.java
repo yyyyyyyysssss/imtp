@@ -18,10 +18,6 @@ public class TextMessage extends AbstractTextMessage {
         super(message, sender, receiver, Command.TEXT_MESSAGE, ackId, groupFlag);
     }
 
-    public TextMessage(WebSocketMessage webSocketMessage) {
-        super(webSocketMessage.getContent(), webSocketMessage.getSender(), webSocketMessage.getReceiver(), Command.TEXT_MESSAGE, webSocketMessage.getAckId(), webSocketMessage.getDeliveryMethod().equals(DeliveryMethod.GROUP));
-    }
-
     public TextMessage(String message, long sender, long receiver, Long ackId) {
         super(message, sender, receiver, Command.TEXT_MESSAGE, ackId, false);
     }

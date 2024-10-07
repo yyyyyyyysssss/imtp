@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.imtp.common.enums.DeliveryMethod;
 import org.imtp.common.enums.MessageType;
+import org.imtp.common.packet.MessageMetadata;
 
 import java.util.Objects;
 
@@ -36,6 +37,8 @@ public class SessionEntity {
     private String lastUserName;
 
     private StringProperty count;
+
+    private MessageMetadata lastMessageMetadata;
 
     public StringProperty countProperty(){
         if (count == null){

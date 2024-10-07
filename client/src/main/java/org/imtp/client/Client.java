@@ -14,6 +14,7 @@ import org.imtp.client.handler.AuthenticationHandler;
 import org.imtp.common.codec.IMTPDecoder;
 import org.imtp.common.codec.IMTPEncoder;
 import org.imtp.common.packet.AuthenticationRequest;
+import org.imtp.common.packet.body.TokenInfo;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -27,7 +28,7 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class Client implements Runnable {
 
-    private String token;
+    private TokenInfo tokenInfo;
 
     private EventLoopGroup group;
 
@@ -43,12 +44,12 @@ public class Client implements Runnable {
 
     private Config config;
 
-    public Client(ChannelHandler channelHandler,String token) {
-        this(token,channelHandler,ClientType.WINDOW);
+    public Client(ChannelHandler channelHandler, TokenInfo tokenInfo) {
+        this(tokenInfo,channelHandler,ClientType.WINDOW);
     }
 
-    public Client(String token, ChannelHandler channelHandler, ClientType clientType) {
-        this.token = token;
+    public Client(TokenInfo tokenInfo, ChannelHandler channelHandler, ClientType clientType) {
+        this.tokenInfo = tokenInfo;
         this.clientType = clientType;
         this.channelHandler = channelHandler;
         this.group = new NioEventLoopGroup();
@@ -127,7 +128,7 @@ public class Client implements Runnable {
                     Channel channel = channelFuture.channel();
                     //初始化上下文对象
                     if (ClientContextHolder.clientContext() == null){
-                        ClientContextHolder.createClientContext(channel,this);
+                        ClientContextHolder.createClientContext(channel,this,tokenInfo);
                         if (connectListener != null){
                             connectListener.connected();
                         }
@@ -135,7 +136,7 @@ public class Client implements Runnable {
                         AuthenticationHandler authenticationHandler = channel.pipeline().get(AuthenticationHandler.class);
                         authenticationHandler.setClientCmdHandlerHandler(this.channelHandler);
                         ClientContextHolder.clientContext().resetChannel(channel);
-                        channel.writeAndFlush(new AuthenticationRequest(this.token));
+                        channel.writeAndFlush(new AuthenticationRequest(this.tokenInfo.getAccessToken()));
                     }
                 } else {
                     //每隔2秒重连

@@ -3,6 +3,7 @@ package org.imtp.client.component;
 import com.fasterxml.jackson.core.type.TypeReference;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
+import org.imtp.client.Config;
 import org.imtp.common.utils.JsonUtil;
 
 import javax.net.ssl.SSLContext;
@@ -29,8 +30,11 @@ public class OKHttpClientHelper {
 
     private static final Lock lock = new ReentrantLock();
 
+    private Config config;
+
     private OKHttpClientHelper() {
         this.okHttpClient = okHttpClient();
+        this.config = Config.getInstance();
     }
 
     public static OKHttpClientHelper getInstance() {
@@ -50,17 +54,16 @@ public class OKHttpClientHelper {
     public <T> T doGet(String url, TypeReference<T> typeReference) {
         Request request = new Request
                 .Builder()
-                .url(url)
+                .url(config.getApiHost() + url)
                 .get()
                 .build();
         return execute(request,typeReference);
     }
 
-    public <T> T doPost(String url,Object body,TypeReference<T> typeReference){
-        RequestBody requestBody = RequestBody.create(JsonUtil.toJSONString(body), MediaType.parse("application/json; charset=utf-8"));
+    public <T> T doPost(String url,RequestBody requestBody,TypeReference<T> typeReference){
         Request request = new Request
                 .Builder()
-                .url(url)
+                .url(config.getApiHost() + url)
                 .post(requestBody)
                 .build();
         return execute(request,typeReference);
@@ -70,7 +73,7 @@ public class OKHttpClientHelper {
         RequestBody requestBody = RequestBody.create(JsonUtil.toJSONString(body), MediaType.parse("application/json; charset=utf-8"));
         Request request = new Request
                 .Builder()
-                .url(url)
+                .url(config.getApiHost() + url)
                 .post(requestBody)
                 .build();
         execute(request,callback);
@@ -84,8 +87,8 @@ public class OKHttpClientHelper {
         try (Response response = okHttpClient.newCall(request).execute()) {
             ResponseBody body = response.body();
             if (response.isSuccessful()) {
-                if (body != null) {
-                    String str = body.string();
+                String str;
+                if (body != null && !(str = body.string()).isEmpty()) {
                     return JsonUtil.parseObject(str, typeReference);
                 }
                 return null;
@@ -113,6 +116,7 @@ public class OKHttpClientHelper {
                 .retryOnConnectionFailure(false)
                 .sslSocketFactory(createSSLSocketFactory(), new TrustAllCerts())
                 .hostnameVerifier((h, s) -> true)
+                .addInterceptor(new AuthorizationInterceptor())
                 .build();
 
     }

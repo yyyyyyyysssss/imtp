@@ -24,7 +24,7 @@ public abstract class AbstractTextMessage extends Packet {
 
     //最大字符长度
     @JsonIgnore
-    protected final int MAX_CHAR_LENGTH =2048;
+    protected final int MAX_CHAR_LENGTH = 2048;
 
     protected String text;
 
@@ -85,7 +85,7 @@ public abstract class AbstractTextMessage extends Packet {
         if (this.contentMetadata == null){
             byteBuf.writeInt(0);
         }else {
-            byte[] messageMetadataBytes = JsonUtil.toJSONString(contentMetadata).getBytes(StandardCharsets.UTF_8);
+            byte[] messageMetadataBytes = JsonUtil.toJSONString(this.contentMetadata).getBytes(StandardCharsets.UTF_8);
             byteBuf.writeInt(messageMetadataBytes.length);
             byteBuf.writeBytes(messageMetadataBytes);
         }
@@ -98,9 +98,14 @@ public abstract class AbstractTextMessage extends Packet {
     @JsonIgnore
     @Override
     public int getBodyLength() {
-        return this.text.getBytes(StandardCharsets.UTF_8).length + 4 + 8 + 8 + 4 + getBodyLength0();
+        int contentMetadataLength = 0;
+        if (this.contentMetadata != null){
+            contentMetadataLength = JsonUtil.toJSONString(this.contentMetadata).getBytes(StandardCharsets.UTF_8).length;
+        }
+        return this.text.getBytes(StandardCharsets.UTF_8).length + 4 + 8 + 8 + 4 + contentMetadataLength + getBodyLength0();
     }
 
+    @JsonIgnore
     public int getBodyLength0(){
 
         return 0;
@@ -127,5 +132,10 @@ public abstract class AbstractTextMessage extends Packet {
 
     public MessageMetadata getContentMetadata() {
         return contentMetadata;
+    }
+
+    @JsonIgnore
+    public int getMAX_CHAR_LENGTH() {
+        return MAX_CHAR_LENGTH;
     }
 }
