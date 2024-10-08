@@ -1,7 +1,8 @@
-![image](https://github.com/yyyyyyyysssss/imtp/blob/master/client/src/main/resources/img/readme_login.png)
+![image](https://github.com/yyyyyyyysssss/imtp/blob/master/client/src/main/resources/img/readme_chat.gif)
 ![image](https://github.com/yyyyyyyysssss/imtp/blob/master/client/src/main/resources/img/readme_single.png)
 ![image](https://github.com/yyyyyyyysssss/imtp/blob/master/client/src/main/resources/img/readme_group.png)
-![image](https://github.com/yyyyyyyysssss/imtp/blob/master/client/src/main/resources/img/readme_emoji.png)
+
+IMTP是一款基于TCP的即时通讯系统。它包含服务端、PC客户端(windows、linux、macos)、WEB浏览器端，且多端互通。
 
 **<big>协议定义</big>**
 <table class="MsoTableGrid" border="1" cellspacing="0" cellpadding="0" width="614" style="width:460.45pt;border-collapse:collapse;border:none;mso-border-alt:
@@ -76,66 +77,3 @@
  </tr>
  <!--[endif]-->
 </tbody></table>
-
-说明：  
-  a、当消息为群组消息时接收端标识为群组的唯一标识  
-  b、校验位采用CRC16算法只对消息体数据进行校验  
-
-**<big>如何运行</big>**\
-说明：\
-  a、需要mysql数据库，数据库脚本以及初始数据位于服务器资源目录下\
-  b、客户端需要JDK21环境以及JavaFx21环境，本地镜像打包则需要Graalvm21环境
-# 服务器
-在父pom执行：
-```
-mvn clean install -N
-```
-将common模块打包到本地maven仓库,在common模块执行:
-```
-mvn clean install
-```
-编译打包server模块,在server模块执行:
-```
-mvn clean package
-java -jar target\imtp-server.jar
-```
-
-
-# 客户端
-在父pom执行：
-```
-mvn clean install -N
-```
-将common模块打包到本地maven仓库,在common模块执行:
-```
-mvn clean install
-```
-
-## JavaFx窗体方式运行
-### 以jar方式启动
-在client模块下打包并执行:
-```
-mvn clean package -Pjar
-java -jar target\imtp-client.jar
-```
-
-### 本地镜像打包启动(需要Graalvm21环境)
-```
-mvn clean gluonfx:build
-```
-## 命令行方式运行
-编译打包命令行客户端并执行,在client模块执行(-u 表示账号,目前只支持数字,默认有三个用户。分别为: 147、258、369)):
-```
-mvn clean package -Pconsole
-java -jar target\imtp-client.jar -u 147 -p 123456
-```
-目前客户端实现了命令行式的消息发送。可选操作如下:  
--r 消息接收人(对方账号)  
--g 群聊消息  
--t 消息主体(可省略)   
--h 查看可选参数
-例如  
-```
--r 258 你好       #表示向258用户发送 `你好` 消息
--rg 100 大家好   #表示向群组100发送 `大家好`消息
-```

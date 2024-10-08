@@ -60,7 +60,7 @@ export const WebSocketProvider = ({ children }) => {
 
     useEffect(() => {
         start();
-        return () => socket.close();
+        return () => socket?.close();
     },[]);
 
     return (

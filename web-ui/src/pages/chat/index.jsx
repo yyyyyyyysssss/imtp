@@ -242,12 +242,12 @@ const Chat = forwardRef((props, ref) => {
         }
     }
     //添加会话
-    const addUserSession = (userItem) => {
+    const addUserSession = async (userItem) => {
         const item = data.find(item => item.receiverUserId === userItem.id);
         if (item) {
             moveToTop(item);
         } else {
-            const userSessionItem  = createUserSession(userItem);
+            const userSessionItem  = await createUserSession(userItem);
             moveToTop(userSessionItem);
         }
     }
