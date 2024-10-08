@@ -54,6 +54,8 @@ public class ChatItemController extends AbstractController {
     @FXML
     private TextFlow chatItemTextFlow;
 
+    private static Image fileIcon = new Image(ResourceUtils.classPathResource("/img/icons8-file-50.png").toExternalForm());
+
     private ImageView imageView;
 
     private Image videoPlayerIcon;
@@ -187,14 +189,20 @@ public class ChatItemController extends AbstractController {
                 chatItemTextFlow.setBackground(null);
                 String path = chatItemEntity.getContent();
                 MessageMetadata imageMessageMetadata = chatItemEntity.getMessageMetadata();
-                ImageView imageIV = createImageMessageView(path, imageMessageMetadata);
-                textFlowChildren.add(imageIV);
+                Node imageNode = createImageMessageNode(chatItemEntity, imageMessageMetadata);
+                textFlowChildren.add(imageNode);
                 break;
             case VIDEO_MESSAGE:
                 chatItemTextFlow.setBackground(null);
                 MessageMetadata videoMessageMetadata = chatItemEntity.getMessageMetadata();
-                Node videoNode = createVideoMessageView(chatItemEntity.getContent(), videoMessageMetadata);
+                Node videoNode = createVideoMessageNode(chatItemEntity, videoMessageMetadata);
                 textFlowChildren.add(videoNode);
+                break;
+            case FILE_MESSAGE:
+                chatItemTextFlow.setBackground(null);
+                MessageMetadata fileMessageMetadata = chatItemEntity.getMessageMetadata();
+                Node fileNode = createFileMessageNode(chatItemEntity, fileMessageMetadata);
+                textFlowChildren.add(fileNode);
                 break;
         }
     }
@@ -221,7 +229,8 @@ public class ChatItemController extends AbstractController {
         return text;
     }
 
-    private ImageView createImageMessageView(String url, MessageMetadata messageMetadata) {
+    private Node createImageMessageNode(ChatItemEntity chatItemEntity, MessageMetadata messageMetadata) {
+        String url = chatItemEntity.getContent();
         double height = messageMetadata.getHeight();
         double width = messageMetadata.getWidth();
         ImageView iv = new ImageView(url);
@@ -234,10 +243,16 @@ public class ChatItemController extends AbstractController {
         return iv;
     }
 
-    private Node createVideoMessageView(String url, MessageMetadata messageMetadata) {
+    private Node createVideoMessageNode(ChatItemEntity chatItemEntity, MessageMetadata messageMetadata) {
+        String url = chatItemEntity.getContent();
         double height = messageMetadata.getHeight();
         double width = messageMetadata.getWidth();
-        ImageView iv = new ImageView(messageMetadata.getThumbnailUrl());
+        ImageView iv;
+        if (chatItemEntity.isSelf() && (messageMetadata.getThumbnailUrl() == null || messageMetadata.getThumbnailUrl().isEmpty())){
+            iv = new ImageView(chatItemEntity.getSelfVideoThumbnailImage());
+        }else {
+            iv = new ImageView(messageMetadata.getThumbnailUrl());
+        }
         iv.setPreserveRatio(true);
         iv.setStyle("-fx-effect: dropshadow(three-pass-box, lightgray, 1, 0.5, 0, 0);");
         if (width > max_width_video) {
@@ -272,6 +287,25 @@ public class ChatItemController extends AbstractController {
         });
 
         return anchorPane;
+    }
+
+    private Node createFileMessageNode(ChatItemEntity chatItemEntity, MessageMetadata messageMetadata){
+        VBox leftVBox = new VBox();
+        leftVBox.setStyle("-fx-border-radius: 5;-fx-background-color: white;-fx-effect: dropshadow(three-pass-box, rgba(149, 157, 165, 0.2), 10, 0, 0, 0);");
+        leftVBox.setPadding(new Insets(5,5,5,5));
+        leftVBox.setAlignment(Pos.CENTER_LEFT);
+        leftVBox.setSpacing(15);
+        leftVBox.setMinWidth(200);
+        leftVBox.setMaxWidth(200);
+        leftVBox.setMinHeight(75);
+        leftVBox.setMaxHeight(75);
+
+        Label nameLabel = new Label(messageMetadata.getName());
+        nameLabel.setWrapText(true);
+        Label sizeLabel = new Label(messageMetadata.getSizeDesc());
+        leftVBox.getChildren().addAll(nameLabel,sizeLabel);
+
+        return leftVBox;
     }
 
     @Override

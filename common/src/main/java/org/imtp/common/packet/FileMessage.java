@@ -18,16 +18,13 @@ public class FileMessage extends AbstractTextMessage{
         super(byteBuf, header);
     }
 
-    public FileMessage(String path, long sender, long receiver, Long ackId, boolean groupFlag) {
-        super(path, sender, receiver, Command.FILE_MESSAGE, ackId, groupFlag);
+
+    public FileMessage(String url, long sender, long receiver, Long ackId, boolean groupFlag) {
+        this(url,null, sender, receiver, ackId, groupFlag);
     }
 
-    public FileMessage(WebSocketMessage webSocketMessage){
-        super(webSocketMessage.getContent(), webSocketMessage.getSender(), webSocketMessage.getReceiver(), Command.FILE_MESSAGE, webSocketMessage.getAckId(), webSocketMessage.getDeliveryMethod().equals(DeliveryMethod.GROUP));
-    }
-
-    public FileMessage(String path, long sender, long receiver, Long ackId) {
-        super(path, sender, receiver, Command.FILE_MESSAGE, ackId, false);
+    public FileMessage(String url,MessageMetadata messageMetadata, long sender, long receiver, Long ackId, boolean groupFlag) {
+        super(url,messageMetadata, sender, receiver, Command.FILE_MESSAGE, ackId, groupFlag);
     }
 
     @Override

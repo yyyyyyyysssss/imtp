@@ -13,7 +13,7 @@
     <content>
         <StackPane fx:id="rootStackPane">
             <children>
-                <MediaView fx:id="mediaView" />
+                <MediaView fx:id="mediaView"/>
                 <HBox fx:id="closeVideo" maxWidth="-Infinity" maxHeight="-Infinity" StackPane.alignment="TOP_RIGHT">
                     <children>
                         <ImageView fitWidth="16" fitHeight="16">

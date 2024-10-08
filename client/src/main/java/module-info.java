@@ -36,6 +36,8 @@ module client{
     requires com.gluonhq.emoji;
     requires com.gluonhq.richtextarea;
     requires okhttp3;
+    requires org.bytedeco.javacv;
+    requires java.desktop;
 
     exports org.imtp.client;
     exports org.imtp.client.component;

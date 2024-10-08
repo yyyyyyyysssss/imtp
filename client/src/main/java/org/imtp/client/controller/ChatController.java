@@ -19,13 +19,22 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.image.WritableImage;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
+import javafx.scene.media.MediaView;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
+import javafx.stage.FileChooser;
 import javafx.stage.Window;
+import javafx.util.Duration;
 import lombok.extern.slf4j.Slf4j;
+import org.bytedeco.javacv.FFmpegFrameGrabber;
+import org.bytedeco.javacv.Frame;
+import org.bytedeco.javacv.Java2DFrameConverter;
 import org.imtp.client.component.ChunkedUploader;
 import org.imtp.client.context.ClientContextHolder;
 import org.imtp.client.entity.ChatItemEntity;
@@ -40,14 +49,16 @@ import org.imtp.common.packet.*;
 import org.imtp.common.packet.base.Packet;
 import org.imtp.common.packet.body.UserFriendInfo;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.nio.file.Paths;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
@@ -150,6 +161,18 @@ public class ChatController extends AbstractController {
             }
         });
 
+
+        //选择文件
+        chatFileIcon.setOnMouseClicked(m -> {
+            FileChooser fileChooser = new FileChooser();
+            File file = fileChooser.showOpenDialog(chatVbox.getScene().getWindow());
+            if (file != null){
+                String path = file.toURI().toString();
+                MessageType messageType = messageTypeByPath(path);
+                sendMessage(path, messageType);
+            }
+        });
+
         chatListView.prefWidthProperty().bind(chatVbox.widthProperty());
         chatEmojiHBox.prefWidthProperty().bind(chatVbox.widthProperty());
         richTextArea.prefWidthProperty().bind(chatVbox.widthProperty());
@@ -177,7 +200,13 @@ public class ChatController extends AbstractController {
             ObservableList<Node> childrenNodes = ((TextFlow) node).getChildrenUnmodifiable();
             for (Node n : childrenNodes) {
                 if (n instanceof Text text) {
-                    sb.append(text.getText());
+                    String msg;
+                    if ((msg = text.getText()).startsWith("file:")) {
+                        MessageType messageType = messageTypeByPath(msg);
+                        sendMessage(msg, messageType);
+                    } else {
+                        sb.append(msg);
+                    }
                 }
                 if (n instanceof ImageView imageView) {
                     String emojiUnified = (String) imageView.getProperties().get(EmojiImageUtils.IMAGE_VIEW_EMOJI_PROPERTY);
@@ -209,60 +238,176 @@ public class ChatController extends AbstractController {
         richTextArea.getActionFactory().newDocument().execute(new ActionEvent());
     }
 
+    private MessageType messageTypeByPath(String path) {
+        String mediaType = mediaType(path);
+        if (mediaType.startsWith("video/")) {
+            return MessageType.VIDEO_MESSAGE;
+        } else if (mediaType.startsWith("image/")) {
+            return MessageType.IMAGE_MESSAGE;
+        } else {
+            return MessageType.FILE_MESSAGE;
+        }
+    }
+
     private void sendMessage(Object object, MessageType messageType) {
         sessionEntity.setLastSendMsgUserId(ClientContextHolder.clientContext().id());
         ChatItemEntity selfChatItemEntity = ChatItemEntity.createSelfChatItemEntity();
         Long ackId = IdGen.genId();
+        Packet packet = null;
         switch (messageType) {
             case TEXT_MESSAGE:
                 String message = (String) object;
-                Packet textPacket;
                 if (sessionEntity.getDeliveryMethod().equals(DeliveryMethod.SINGLE)) {
-                    textPacket = new TextMessage(message, ClientContextHolder.clientContext().id(), sessionEntity.getReceiverUserId(), ackId);
+                    packet = new TextMessage(message, ClientContextHolder.clientContext().id(), sessionEntity.getReceiverUserId(), ackId);
                 } else {
-                    textPacket = new TextMessage(message, ClientContextHolder.clientContext().id(), sessionEntity.getReceiverUserId(), ackId, true);
+                    packet = new TextMessage(message, ClientContextHolder.clientContext().id(), sessionEntity.getReceiverUserId(), ackId, true);
                 }
                 sessionEntity.setLastMsgType(messageType);
                 sessionEntity.setLastMsg(message);
                 selfChatItemEntity.setContent(message);
                 selfChatItemEntity.setMessageType(messageType);
-                //发送消息
-                send(textPacket);
+                //发送
+                sendMessage(packet,selfChatItemEntity,ackId);
                 break;
             case IMAGE_MESSAGE:
-                String path = (String) object;
-                CompletableFuture<String> completableFuture = ChunkedUploader.uploadFile(path);
-                completableFuture
+                String imagePath = (String) object;
+                MessageMetadata imageMessageMetadata = baseMessageMetadata(imagePath);
+                Image image = new Image(imagePath);
+                imageMessageMetadata.setWidth(image.getWidth());
+                imageMessageMetadata.setHeight(image.getHeight());
+                CompletableFuture<String> imageCompletableFuture = ChunkedUploader.uploadFile(imagePath);
+                imageCompletableFuture
                         .whenComplete((r, e) -> {
-                            if (e != null){
-                                log.error("upload chunk failed: ",e);
+                            if (e != null) {
+                                log.error("upload chunk failed: ", e);
                                 selfChatItemEntity.setImage(sendFailureImage);
                             }
                         })
                         .thenAccept(r -> {
-                            log.info("upload completed; accessUrl: {}",r);
+                            log.info("upload completed; accessUrl: {}", r);
                             Packet imagePacket;
-                            MessageMetadata messageMetadata = baseMessageMetadata(path);
-                            Image image = new Image(path);
-                            messageMetadata.setWidth(image.getWidth());
-                            messageMetadata.setHeight(image.getHeight());
                             if (sessionEntity.getDeliveryMethod().equals(DeliveryMethod.SINGLE)) {
-                                imagePacket = new ImageMessage(r,messageMetadata, ClientContextHolder.clientContext().id(), sessionEntity.getReceiverUserId(), ackId, false);
+                                imagePacket = new ImageMessage(r, imageMessageMetadata, ClientContextHolder.clientContext().id(), sessionEntity.getReceiverUserId(), ackId, false);
                             } else {
-                                imagePacket = new ImageMessage(r,messageMetadata, ClientContextHolder.clientContext().id(), sessionEntity.getReceiverUserId(), ackId, true);
+                                imagePacket = new ImageMessage(r, imageMessageMetadata, ClientContextHolder.clientContext().id(), sessionEntity.getReceiverUserId(), ackId, true);
                             }
                             //发送消息
                             send(imagePacket);
                         });
                 sessionEntity.setLastMsgType(messageType);
-                sessionEntity.setLastMsg(path);
-                selfChatItemEntity.setContent(path);
+                sessionEntity.setLastMsg(imagePath);
+                selfChatItemEntity.setContent(imagePath);
+                selfChatItemEntity.setMessageMetadata(imageMessageMetadata);
                 selfChatItemEntity.setMessageType(messageType);
+                //发送
+                sendMessage(null,selfChatItemEntity,ackId);
                 break;
+            case VIDEO_MESSAGE:
+                String videoPath = (String) object;
+                MessageMetadata videoMessageMetadata = baseMessageMetadata(videoPath);
+                try (FFmpegFrameGrabber grabber = new FFmpegFrameGrabber(videoPath.substring(6))){
+                    grabber.start();
+                    int width = grabber.getImageWidth();
+                    int height = grabber.getImageHeight();
+                    long duration = grabber.getLengthInTime() / 1000000;
+                    grabber.setFrameNumber(1);
+                    Frame frame = grabber.grabImage();
+                    Java2DFrameConverter java2DFrameConverter = new Java2DFrameConverter();
+                    BufferedImage bi = java2DFrameConverter.convert(frame);
+                    Java2DFrameConverter.copy(frame, bi);
+                    ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                    ImageIO.write(bi,"png",byteArrayOutputStream);
+                    selfChatItemEntity.setSelfVideoThumbnailImage(new Image(new ByteArrayInputStream(byteArrayOutputStream.toByteArray())));
+
+                    int m = (int) Math.floor((double) duration / 60);
+                    int s = (int) Math.floor(duration % 60);
+                    String durationDesc = String.format("%02d",m) + ":" + String.format("%02d",s);
+                    log.info("width:{} height:{} duration:{}",width,height,durationDesc);
+                    videoMessageMetadata.setWidth(width * 1.0);
+                    videoMessageMetadata.setHeight(height * 1.0);
+                    videoMessageMetadata.setDuration(duration);
+                    videoMessageMetadata.setDurationDesc(durationDesc);
+
+                    CompletableFuture<String> videoCompletableFuture = ChunkedUploader.uploadFile(videoPath);
+                    videoCompletableFuture
+                            .whenComplete((r, e) -> {
+                                if (e != null) {
+                                    log.error("upload chunk failed: ", e);
+                                    selfChatItemEntity.setImage(sendFailureImage);
+                                }
+                            })
+                            .thenAccept(r -> {
+                                log.info("upload completed; accessUrl: {}", r);
+                                String fileName = UUID.randomUUID().toString().replaceAll("-","") + ".png";
+                                ChunkedUploader.uploadFile(new ByteArrayInputStream(byteArrayOutputStream.toByteArray()),fileName)
+                                        .thenAccept(ru -> {
+                                            log.info("thumbnailUrl: {} ",ru);
+                                            videoMessageMetadata.setThumbnailUrl(ru);
+                                            Packet videoPacket;
+                                            if (sessionEntity.getDeliveryMethod().equals(DeliveryMethod.SINGLE)) {
+                                                videoPacket = new VideoMessage(r, videoMessageMetadata, ClientContextHolder.clientContext().id(), sessionEntity.getReceiverUserId(), ackId, false);
+                                            } else {
+                                                videoPacket = new VideoMessage(r, videoMessageMetadata, ClientContextHolder.clientContext().id(), sessionEntity.getReceiverUserId(), ackId, true);
+                                            }
+                                            //发送消息
+                                            send(videoPacket);
+                                        });
+                            });
+
+                    sessionEntity.setLastMsgType(messageType);
+                    sessionEntity.setLastMsg(videoPath);
+                    selfChatItemEntity.setContent(videoPath);
+                    selfChatItemEntity.setMessageMetadata(videoMessageMetadata);
+                    selfChatItemEntity.setMessageType(messageType);
+                    //发送
+                    sendMessage(null,selfChatItemEntity,ackId);
+
+                    java2DFrameConverter.close();
+                    grabber.stop();
+                }catch (Exception exception){
+                    log.error("javacv error: ",exception);
+                }
+                break;
+            case FILE_MESSAGE:
+                String filePath = (String) object;
+                MessageMetadata fileMessageMetadata = baseMessageMetadata(filePath);
+                CompletableFuture<String> fileCompletableFuture = ChunkedUploader.uploadFile(filePath);
+                fileCompletableFuture
+                        .whenComplete((r, e) -> {
+                            if (e != null) {
+                                log.error("upload chunk failed: ", e);
+                                selfChatItemEntity.setImage(sendFailureImage);
+                            }
+                        })
+                        .thenAccept(r -> {
+                            log.info("upload completed; accessUrl: {}", r);
+                            Packet imagePacket;
+                            if (sessionEntity.getDeliveryMethod().equals(DeliveryMethod.SINGLE)) {
+                                imagePacket = new FileMessage(r, fileMessageMetadata, ClientContextHolder.clientContext().id(), sessionEntity.getReceiverUserId(), ackId, false);
+                            } else {
+                                imagePacket = new FileMessage(r, fileMessageMetadata, ClientContextHolder.clientContext().id(), sessionEntity.getReceiverUserId(), ackId, true);
+                            }
+                            //发送消息
+                            send(imagePacket);
+                        });
+                sessionEntity.setLastMsgType(messageType);
+                sessionEntity.setLastMsg(filePath);
+                selfChatItemEntity.setContent(filePath);
+                selfChatItemEntity.setMessageMetadata(fileMessageMetadata);
+                selfChatItemEntity.setMessageType(messageType);
+                //发送
+                sendMessage(null,selfChatItemEntity,ackId);
         }
+    }
+
+    private void sendMessage(Packet packet,ChatItemEntity selfChatItemEntity,Long ackId){
         addChatItem(selfChatItemEntity);
         selfChatItemEntity.setImage(sendingImage);
         ackChatItemEntityMap.put(ackId, selfChatItemEntity);
+        if (packet != null){
+            //发送消息
+            send(packet);
+        }
         //联动会话框
         chatVbox.fireEvent(new UserSessionEvent(UserSessionEvent.SEND_MESSAGE, sessionEntity));
         //异步等待消息回执
@@ -302,6 +447,12 @@ public class ChatController extends AbstractController {
                 chatItemEntity = new ChatItemEntity();
                 chatItemEntity.setContent(videoMessage.getUrl());
                 chatItemEntity.setMessageMetadata(videoMessage.getContentMetadata());
+                break;
+            case FILE_MESSAGE:
+                FileMessage fileMessage = (FileMessage) packet;
+                chatItemEntity = new ChatItemEntity();
+                chatItemEntity.setContent(fileMessage.getUrl());
+                chatItemEntity.setMessageMetadata(fileMessage.getContentMetadata());
                 break;
             case MSG_RES:
                 MessageStateResponse messageStateResponse = (MessageStateResponse) packet;
@@ -382,7 +533,7 @@ public class ChatController extends AbstractController {
     }
 
 
-    private MessageMetadata baseMessageMetadata(String path){
+    private MessageMetadata baseMessageMetadata(String path) {
         if (path.startsWith("file:")) {
             path = path.substring(6);
         }
@@ -392,21 +543,33 @@ public class ChatController extends AbstractController {
         long size = file.length();
         messageMetadata.setSize(size);
         String sizeDesc;
-        if (size > 1048576){
-            sizeDesc = String.format("%.1f",(double)size / (1024 * 1024)) + "M";
-        }else if (size > 1024) {
-            sizeDesc = String.format("%.1f",(double)size / 1024) + "K";
+        if (size > 1048576) {
+            sizeDesc = String.format("%.1f", (double) size / (1024 * 1024)) + "M";
+        } else if (size > 1024) {
+            sizeDesc = String.format("%.1f", (double) size / 1024) + "K";
         } else {
             sizeDesc = size + "B";
         }
         messageMetadata.setSizeDesc(sizeDesc);
-        try {
-            messageMetadata.setMediaType(Files.probeContentType(file.toPath()));
-        } catch (IOException e) {
-            log.error("probeContentType error ",e);
-            messageMetadata.setMediaType("Unknown media type");
-        }
+        String mediaType = mediaType(file);
+        messageMetadata.setMediaType(mediaType);
         return messageMetadata;
+    }
+
+    private String mediaType(String path) {
+        if (path.startsWith("file:")) {
+            path = path.substring(6);
+        }
+        return mediaType(new File(path));
+    }
+
+    private String mediaType(File file) {
+        try {
+            return Files.probeContentType(file.toPath());
+        } catch (IOException e) {
+            log.error("probeContentType error ", e);
+            return "unknown";
+        }
     }
 
 }

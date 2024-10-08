@@ -3,6 +3,10 @@
   "includes":[{
     "pattern":"\\QMETA-INF/fonts.mf\\E"
   }, {
+    "pattern":"\\QMETA-INF/maven/org.bytedeco/ffmpeg/pom.properties\\E"
+  }, {
+    "pattern":"\\QMETA-INF/maven/org.bytedeco/javacpp/pom.properties\\E"
+  }, {
     "pattern":"\\QMETA-INF/services/ch.qos.logback.classic.spi.Configurator\\E"
   }, {
     "pattern":"\\QMETA-INF/services/java.lang.System$LoggerFinder\\E"
@@ -17,6 +21,16 @@
   }, {
     "pattern":"\\QMETA-INF/services/java.time.zone.ZoneRulesProvider\\E"
   }, {
+    "pattern":"\\QMETA-INF/services/javax.imageio.spi.ImageInputStreamSpi\\E"
+  }, {
+    "pattern":"\\QMETA-INF/services/javax.imageio.spi.ImageOutputStreamSpi\\E"
+  }, {
+    "pattern":"\\QMETA-INF/services/javax.imageio.spi.ImageReaderSpi\\E"
+  }, {
+    "pattern":"\\QMETA-INF/services/javax.imageio.spi.ImageTranscoderSpi\\E"
+  }, {
+    "pattern":"\\QMETA-INF/services/javax.imageio.spi.ImageWriterSpi\\E"
+  }, {
     "pattern":"\\QMETA-INF/services/javax.xml.parsers.SAXParserFactory\\E"
   }, {
     "pattern":"\\QMETA-INF/services/javax.xml.stream.XMLInputFactory\\E"
@@ -30,6 +44,1684 @@
     "pattern":"\\Qlogback.scmo\\E"
   }, {
     "pattern":"\\Qlogback.xml\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/api-ms-win-core-console-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/api-ms-win-core-console-l1-2-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/api-ms-win-core-datetime-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/api-ms-win-core-debug-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/api-ms-win-core-errorhandling-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/api-ms-win-core-file-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/api-ms-win-core-file-l1-2-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/api-ms-win-core-file-l2-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/api-ms-win-core-handle-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/api-ms-win-core-heap-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/api-ms-win-core-interlocked-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/api-ms-win-core-libraryloader-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/api-ms-win-core-localization-l1-2-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/api-ms-win-core-memory-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/api-ms-win-core-namedpipe-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/api-ms-win-core-processenvironment-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/api-ms-win-core-processthreads-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/api-ms-win-core-processthreads-l1-1-1.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/api-ms-win-core-profile-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/api-ms-win-core-rtlsupport-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/api-ms-win-core-string-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/api-ms-win-core-synch-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/api-ms-win-core-synch-l1-2-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/api-ms-win-core-sysinfo-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/api-ms-win-core-timezone-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/api-ms-win-core-util-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/api-ms-win-crt-conio-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/api-ms-win-crt-convert-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/api-ms-win-crt-environment-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/api-ms-win-crt-filesystem-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/api-ms-win-crt-heap-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/api-ms-win-crt-locale-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/api-ms-win-crt-math-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/api-ms-win-crt-multibyte-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/api-ms-win-crt-private-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/api-ms-win-crt-process-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/api-ms-win-crt-runtime-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/api-ms-win-crt-stdio-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/api-ms-win-crt-string-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/api-ms-win-crt-time-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/api-ms-win-crt-utility-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/avcodec-60.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/avcodec.60.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/avcodec.dll.60\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/avcodec.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/avdevice-60.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/avdevice.60.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/avdevice.dll.60\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/avdevice.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/avfilter-9.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/avfilter.9.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/avfilter.dll.9\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/avfilter.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/avformat-60.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/avformat.60.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/avformat.dll.60\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/avformat.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/avutil-58.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/avutil.58.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/avutil.dll.58\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/avutil.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/concrt140.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/jniavcodec.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/jniavdevice.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/jniavfilter.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/jniavformat.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/jniavutil.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/jnipostproc.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/jniswresample.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/jniswscale.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/msvcp140.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/msvcp140_1.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/postproc-57.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/postproc.57.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/postproc.dll.57\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/postproc.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/swresample-4.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/swresample.4.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/swresample.dll.4\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/swresample.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/swscale-7.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/swscale.7.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/swscale.dll.7\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/swscale.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/ucrtbase.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/vcomp140.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/vcruntime140.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/vcruntime140_1.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/api-ms-win-core-console-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/api-ms-win-core-console-l1-2-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/api-ms-win-core-datetime-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/api-ms-win-core-debug-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/api-ms-win-core-errorhandling-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/api-ms-win-core-file-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/api-ms-win-core-file-l1-2-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/api-ms-win-core-file-l2-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/api-ms-win-core-handle-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/api-ms-win-core-heap-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/api-ms-win-core-interlocked-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/api-ms-win-core-libraryloader-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/api-ms-win-core-localization-l1-2-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/api-ms-win-core-memory-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/api-ms-win-core-namedpipe-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/api-ms-win-core-processenvironment-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/api-ms-win-core-processthreads-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/api-ms-win-core-processthreads-l1-1-1.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/api-ms-win-core-profile-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/api-ms-win-core-rtlsupport-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/api-ms-win-core-string-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/api-ms-win-core-synch-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/api-ms-win-core-synch-l1-2-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/api-ms-win-core-sysinfo-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/api-ms-win-core-timezone-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/api-ms-win-core-util-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/api-ms-win-crt-conio-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/api-ms-win-crt-convert-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/api-ms-win-crt-environment-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/api-ms-win-crt-filesystem-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/api-ms-win-crt-heap-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/api-ms-win-crt-locale-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/api-ms-win-crt-math-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/api-ms-win-crt-multibyte-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/api-ms-win-crt-private-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/api-ms-win-crt-process-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/api-ms-win-crt-runtime-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/api-ms-win-crt-stdio-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/api-ms-win-crt-string-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/api-ms-win-crt-time-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/api-ms-win-crt-utility-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/avcodec-60.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/avcodec.60.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/avcodec.dll.60\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/avcodec.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/avdevice-60.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/avdevice.60.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/avdevice.dll.60\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/avdevice.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/avfilter-9.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/avfilter.9.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/avfilter.dll.9\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/avfilter.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/avformat-60.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/avformat.60.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/avformat.dll.60\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/avformat.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/avutil-58.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/avutil.58.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/avutil.dll.58\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/avutil.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/concrt140.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/jniavcodec.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/jniavdevice.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/jniavfilter.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/jniavformat.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/jniavutil.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/jnipostproc.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/jniswresample.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/jniswscale.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/msvcp140.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/msvcp140_1.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/postproc-57.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/postproc.57.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/postproc.dll.57\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/postproc.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/swresample-4.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/swresample.4.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/swresample.dll.4\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/swresample.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/swscale-7.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/swscale.7.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/swscale.dll.7\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/swscale.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/ucrtbase.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/vcomp140.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/vcruntime140.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/vcruntime140_1.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64-gpl/api-ms-win-core-console-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64-gpl/api-ms-win-core-console-l1-2-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64-gpl/api-ms-win-core-datetime-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64-gpl/api-ms-win-core-debug-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64-gpl/api-ms-win-core-errorhandling-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64-gpl/api-ms-win-core-file-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64-gpl/api-ms-win-core-file-l1-2-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64-gpl/api-ms-win-core-file-l2-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64-gpl/api-ms-win-core-handle-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64-gpl/api-ms-win-core-heap-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64-gpl/api-ms-win-core-interlocked-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64-gpl/api-ms-win-core-libraryloader-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64-gpl/api-ms-win-core-localization-l1-2-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64-gpl/api-ms-win-core-memory-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64-gpl/api-ms-win-core-namedpipe-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64-gpl/api-ms-win-core-processenvironment-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64-gpl/api-ms-win-core-processthreads-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64-gpl/api-ms-win-core-processthreads-l1-1-1.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64-gpl/api-ms-win-core-profile-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64-gpl/api-ms-win-core-rtlsupport-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64-gpl/api-ms-win-core-string-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64-gpl/api-ms-win-core-synch-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64-gpl/api-ms-win-core-synch-l1-2-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64-gpl/api-ms-win-core-sysinfo-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64-gpl/api-ms-win-core-timezone-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64-gpl/api-ms-win-core-util-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64-gpl/api-ms-win-crt-conio-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64-gpl/api-ms-win-crt-convert-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64-gpl/api-ms-win-crt-environment-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64-gpl/api-ms-win-crt-filesystem-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64-gpl/api-ms-win-crt-heap-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64-gpl/api-ms-win-crt-locale-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64-gpl/api-ms-win-crt-math-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64-gpl/api-ms-win-crt-multibyte-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64-gpl/api-ms-win-crt-private-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64-gpl/api-ms-win-crt-process-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64-gpl/api-ms-win-crt-runtime-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64-gpl/api-ms-win-crt-stdio-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64-gpl/api-ms-win-crt-string-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64-gpl/api-ms-win-crt-time-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64-gpl/api-ms-win-crt-utility-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64-gpl/avcodec-60.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64-gpl/avcodec.60.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64-gpl/avcodec.dll.60\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64-gpl/avcodec.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64-gpl/avdevice-60.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64-gpl/avdevice.60.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64-gpl/avdevice.dll.60\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64-gpl/avdevice.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64-gpl/avfilter-9.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64-gpl/avfilter.9.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64-gpl/avfilter.dll.9\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64-gpl/avfilter.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64-gpl/avformat-60.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64-gpl/avformat.60.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64-gpl/avformat.dll.60\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64-gpl/avformat.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64-gpl/avutil-58.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64-gpl/avutil.58.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64-gpl/avutil.dll.58\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64-gpl/avutil.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64-gpl/concrt140.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64-gpl/jniavcodec.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64-gpl/jniavdevice.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64-gpl/jniavfilter.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64-gpl/jniavformat.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64-gpl/jniavutil.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64-gpl/jnipostproc.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64-gpl/jniswresample.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64-gpl/jniswscale.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64-gpl/msvcp140.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64-gpl/msvcp140_1.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64-gpl/postproc-57.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64-gpl/postproc.57.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64-gpl/postproc.dll.57\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64-gpl/postproc.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64-gpl/swresample-4.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64-gpl/swresample.4.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64-gpl/swresample.dll.4\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64-gpl/swresample.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64-gpl/swscale-7.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64-gpl/swscale.7.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64-gpl/swscale.dll.7\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64-gpl/swscale.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64-gpl/ucrtbase.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64-gpl/vcomp140.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64-gpl/vcruntime140.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64-gpl/vcruntime140_1.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64/api-ms-win-core-console-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64/api-ms-win-core-console-l1-2-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64/api-ms-win-core-datetime-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64/api-ms-win-core-debug-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64/api-ms-win-core-errorhandling-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64/api-ms-win-core-file-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64/api-ms-win-core-file-l1-2-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64/api-ms-win-core-file-l2-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64/api-ms-win-core-handle-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64/api-ms-win-core-heap-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64/api-ms-win-core-interlocked-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64/api-ms-win-core-libraryloader-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64/api-ms-win-core-localization-l1-2-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64/api-ms-win-core-memory-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64/api-ms-win-core-namedpipe-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64/api-ms-win-core-processenvironment-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64/api-ms-win-core-processthreads-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64/api-ms-win-core-processthreads-l1-1-1.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64/api-ms-win-core-profile-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64/api-ms-win-core-rtlsupport-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64/api-ms-win-core-string-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64/api-ms-win-core-synch-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64/api-ms-win-core-synch-l1-2-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64/api-ms-win-core-sysinfo-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64/api-ms-win-core-timezone-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64/api-ms-win-core-util-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64/api-ms-win-crt-conio-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64/api-ms-win-crt-convert-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64/api-ms-win-crt-environment-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64/api-ms-win-crt-filesystem-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64/api-ms-win-crt-heap-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64/api-ms-win-crt-locale-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64/api-ms-win-crt-math-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64/api-ms-win-crt-multibyte-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64/api-ms-win-crt-private-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64/api-ms-win-crt-process-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64/api-ms-win-crt-runtime-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64/api-ms-win-crt-stdio-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64/api-ms-win-crt-string-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64/api-ms-win-crt-time-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64/api-ms-win-crt-utility-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64/avcodec-60.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64/avcodec.60.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64/avcodec.dll.60\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64/avcodec.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64/avdevice-60.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64/avdevice.60.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64/avdevice.dll.60\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64/avdevice.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64/avfilter-9.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64/avfilter.9.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64/avfilter.dll.9\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64/avfilter.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64/avformat-60.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64/avformat.60.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64/avformat.dll.60\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64/avformat.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64/avutil-58.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64/avutil.58.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64/avutil.dll.58\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64/avutil.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64/concrt140.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64/jniavcodec.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64/jniavdevice.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64/jniavfilter.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64/jniavformat.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64/jniavutil.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64/jnipostproc.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64/jniswresample.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64/jniswscale.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64/msvcp140.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64/msvcp140_1.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64/postproc-57.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64/postproc.57.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64/postproc.dll.57\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64/postproc.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64/swresample-4.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64/swresample.4.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64/swresample.dll.4\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64/swresample.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64/swscale-7.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64/swscale.7.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64/swscale.dll.7\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64/swscale.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64/ucrtbase.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64/vcomp140.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64/vcruntime140.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/ffmpeg/windows-x86_64/vcruntime140_1.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/javacpp/windows-x86_64/jnijavacpp.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64-gpl/api-ms-win-core-console-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64-gpl/api-ms-win-core-console-l1-2-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64-gpl/api-ms-win-core-datetime-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64-gpl/api-ms-win-core-debug-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64-gpl/api-ms-win-core-errorhandling-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64-gpl/api-ms-win-core-file-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64-gpl/api-ms-win-core-file-l1-2-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64-gpl/api-ms-win-core-file-l2-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64-gpl/api-ms-win-core-handle-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64-gpl/api-ms-win-core-heap-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64-gpl/api-ms-win-core-interlocked-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64-gpl/api-ms-win-core-libraryloader-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64-gpl/api-ms-win-core-localization-l1-2-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64-gpl/api-ms-win-core-memory-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64-gpl/api-ms-win-core-namedpipe-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64-gpl/api-ms-win-core-processenvironment-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64-gpl/api-ms-win-core-processthreads-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64-gpl/api-ms-win-core-processthreads-l1-1-1.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64-gpl/api-ms-win-core-profile-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64-gpl/api-ms-win-core-rtlsupport-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64-gpl/api-ms-win-core-string-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64-gpl/api-ms-win-core-synch-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64-gpl/api-ms-win-core-synch-l1-2-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64-gpl/api-ms-win-core-sysinfo-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64-gpl/api-ms-win-core-timezone-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64-gpl/api-ms-win-core-util-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64-gpl/api-ms-win-crt-conio-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64-gpl/api-ms-win-crt-convert-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64-gpl/api-ms-win-crt-environment-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64-gpl/api-ms-win-crt-filesystem-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64-gpl/api-ms-win-crt-heap-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64-gpl/api-ms-win-crt-locale-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64-gpl/api-ms-win-crt-math-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64-gpl/api-ms-win-crt-multibyte-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64-gpl/api-ms-win-crt-private-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64-gpl/api-ms-win-crt-process-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64-gpl/api-ms-win-crt-runtime-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64-gpl/api-ms-win-crt-stdio-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64-gpl/api-ms-win-crt-string-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64-gpl/api-ms-win-crt-time-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64-gpl/api-ms-win-crt-utility-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64-gpl/avcodec-60.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64-gpl/avcodec.60.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64-gpl/avcodec.dll.60\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64-gpl/avcodec.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64-gpl/avdevice-60.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64-gpl/avdevice.60.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64-gpl/avdevice.dll.60\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64-gpl/avdevice.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64-gpl/avfilter-9.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64-gpl/avfilter.9.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64-gpl/avfilter.dll.9\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64-gpl/avfilter.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64-gpl/avformat-60.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64-gpl/avformat.60.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64-gpl/avformat.dll.60\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64-gpl/avformat.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64-gpl/avutil-58.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64-gpl/avutil.58.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64-gpl/avutil.dll.58\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64-gpl/avutil.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64-gpl/concrt140.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64-gpl/jniavcodec.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64-gpl/jniavdevice.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64-gpl/jniavfilter.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64-gpl/jniavformat.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64-gpl/jniavutil.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64-gpl/jnipostproc.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64-gpl/jniswresample.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64-gpl/jniswscale.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64-gpl/msvcp140.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64-gpl/msvcp140_1.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64-gpl/postproc-57.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64-gpl/postproc.57.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64-gpl/postproc.dll.57\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64-gpl/postproc.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64-gpl/swresample-4.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64-gpl/swresample.4.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64-gpl/swresample.dll.4\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64-gpl/swresample.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64-gpl/swscale-7.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64-gpl/swscale.7.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64-gpl/swscale.dll.7\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64-gpl/swscale.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64-gpl/ucrtbase.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64-gpl/vcomp140.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64-gpl/vcruntime140.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64-gpl/vcruntime140_1.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64/api-ms-win-core-console-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64/api-ms-win-core-console-l1-2-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64/api-ms-win-core-datetime-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64/api-ms-win-core-debug-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64/api-ms-win-core-errorhandling-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64/api-ms-win-core-file-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64/api-ms-win-core-file-l1-2-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64/api-ms-win-core-file-l2-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64/api-ms-win-core-handle-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64/api-ms-win-core-heap-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64/api-ms-win-core-interlocked-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64/api-ms-win-core-libraryloader-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64/api-ms-win-core-localization-l1-2-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64/api-ms-win-core-memory-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64/api-ms-win-core-namedpipe-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64/api-ms-win-core-processenvironment-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64/api-ms-win-core-processthreads-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64/api-ms-win-core-processthreads-l1-1-1.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64/api-ms-win-core-profile-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64/api-ms-win-core-rtlsupport-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64/api-ms-win-core-string-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64/api-ms-win-core-synch-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64/api-ms-win-core-synch-l1-2-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64/api-ms-win-core-sysinfo-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64/api-ms-win-core-timezone-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64/api-ms-win-core-util-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64/api-ms-win-crt-conio-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64/api-ms-win-crt-convert-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64/api-ms-win-crt-environment-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64/api-ms-win-crt-filesystem-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64/api-ms-win-crt-heap-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64/api-ms-win-crt-locale-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64/api-ms-win-crt-math-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64/api-ms-win-crt-multibyte-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64/api-ms-win-crt-private-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64/api-ms-win-crt-process-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64/api-ms-win-crt-runtime-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64/api-ms-win-crt-stdio-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64/api-ms-win-crt-string-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64/api-ms-win-crt-time-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64/api-ms-win-crt-utility-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64/avcodec.60.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64/avcodec.dll.60\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64/avcodec.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64/avdevice.60.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64/avdevice.dll.60\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64/avdevice.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64/avfilter.9.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64/avfilter.dll.9\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64/avfilter.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64/avformat.60.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64/avformat.dll.60\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64/avformat.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64/avutil.58.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64/avutil.dll.58\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64/avutil.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64/concrt140.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64/jnipostproc.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64/msvcp140.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64/msvcp140_1.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64/postproc-57.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64/postproc.57.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64/postproc.dll.57\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64/postproc.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64/swresample.4.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64/swresample.dll.4\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64/swresample.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64/swscale.7.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64/swscale.dll.7\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64/swscale.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64/ucrtbase.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64/vcomp140.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64/vcruntime140.dll\\E"
+  }, {
+    "pattern":"\\Qorg/bytedeco/windows-x86_64/vcruntime140_1.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64-gpl/api-ms-win-core-console-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64-gpl/api-ms-win-core-console-l1-2-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64-gpl/api-ms-win-core-datetime-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64-gpl/api-ms-win-core-debug-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64-gpl/api-ms-win-core-errorhandling-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64-gpl/api-ms-win-core-file-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64-gpl/api-ms-win-core-file-l1-2-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64-gpl/api-ms-win-core-file-l2-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64-gpl/api-ms-win-core-handle-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64-gpl/api-ms-win-core-heap-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64-gpl/api-ms-win-core-interlocked-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64-gpl/api-ms-win-core-libraryloader-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64-gpl/api-ms-win-core-localization-l1-2-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64-gpl/api-ms-win-core-memory-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64-gpl/api-ms-win-core-namedpipe-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64-gpl/api-ms-win-core-processenvironment-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64-gpl/api-ms-win-core-processthreads-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64-gpl/api-ms-win-core-processthreads-l1-1-1.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64-gpl/api-ms-win-core-profile-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64-gpl/api-ms-win-core-rtlsupport-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64-gpl/api-ms-win-core-string-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64-gpl/api-ms-win-core-synch-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64-gpl/api-ms-win-core-synch-l1-2-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64-gpl/api-ms-win-core-sysinfo-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64-gpl/api-ms-win-core-timezone-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64-gpl/api-ms-win-core-util-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64-gpl/api-ms-win-crt-conio-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64-gpl/api-ms-win-crt-convert-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64-gpl/api-ms-win-crt-environment-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64-gpl/api-ms-win-crt-filesystem-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64-gpl/api-ms-win-crt-heap-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64-gpl/api-ms-win-crt-locale-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64-gpl/api-ms-win-crt-math-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64-gpl/api-ms-win-crt-multibyte-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64-gpl/api-ms-win-crt-private-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64-gpl/api-ms-win-crt-process-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64-gpl/api-ms-win-crt-runtime-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64-gpl/api-ms-win-crt-stdio-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64-gpl/api-ms-win-crt-string-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64-gpl/api-ms-win-crt-time-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64-gpl/api-ms-win-crt-utility-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64-gpl/avcodec-60.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64-gpl/avcodec.60.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64-gpl/avcodec.dll.60\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64-gpl/avcodec.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64-gpl/avdevice-60.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64-gpl/avdevice.60.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64-gpl/avdevice.dll.60\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64-gpl/avdevice.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64-gpl/avfilter-9.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64-gpl/avfilter.9.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64-gpl/avfilter.dll.9\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64-gpl/avfilter.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64-gpl/avformat-60.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64-gpl/avformat.60.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64-gpl/avformat.dll.60\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64-gpl/avformat.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64-gpl/avutil-58.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64-gpl/avutil.58.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64-gpl/avutil.dll.58\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64-gpl/avutil.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64-gpl/concrt140.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64-gpl/jniavcodec.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64-gpl/jniavdevice.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64-gpl/jniavfilter.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64-gpl/jniavformat.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64-gpl/jniavutil.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64-gpl/jnipostproc.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64-gpl/jniswresample.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64-gpl/jniswscale.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64-gpl/msvcp140.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64-gpl/msvcp140_1.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64-gpl/postproc-57.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64-gpl/postproc.57.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64-gpl/postproc.dll.57\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64-gpl/postproc.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64-gpl/swresample-4.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64-gpl/swresample.4.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64-gpl/swresample.dll.4\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64-gpl/swresample.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64-gpl/swscale-7.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64-gpl/swscale.7.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64-gpl/swscale.dll.7\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64-gpl/swscale.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64-gpl/ucrtbase.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64-gpl/vcomp140.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64-gpl/vcruntime140.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64-gpl/vcruntime140_1.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64/api-ms-win-core-console-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64/api-ms-win-core-console-l1-2-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64/api-ms-win-core-datetime-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64/api-ms-win-core-debug-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64/api-ms-win-core-errorhandling-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64/api-ms-win-core-file-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64/api-ms-win-core-file-l1-2-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64/api-ms-win-core-file-l2-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64/api-ms-win-core-handle-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64/api-ms-win-core-heap-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64/api-ms-win-core-interlocked-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64/api-ms-win-core-libraryloader-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64/api-ms-win-core-localization-l1-2-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64/api-ms-win-core-memory-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64/api-ms-win-core-namedpipe-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64/api-ms-win-core-processenvironment-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64/api-ms-win-core-processthreads-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64/api-ms-win-core-processthreads-l1-1-1.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64/api-ms-win-core-profile-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64/api-ms-win-core-rtlsupport-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64/api-ms-win-core-string-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64/api-ms-win-core-synch-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64/api-ms-win-core-synch-l1-2-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64/api-ms-win-core-sysinfo-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64/api-ms-win-core-timezone-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64/api-ms-win-core-util-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64/api-ms-win-crt-conio-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64/api-ms-win-crt-convert-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64/api-ms-win-crt-environment-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64/api-ms-win-crt-filesystem-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64/api-ms-win-crt-heap-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64/api-ms-win-crt-locale-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64/api-ms-win-crt-math-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64/api-ms-win-crt-multibyte-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64/api-ms-win-crt-private-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64/api-ms-win-crt-process-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64/api-ms-win-crt-runtime-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64/api-ms-win-crt-stdio-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64/api-ms-win-crt-string-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64/api-ms-win-crt-time-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64/api-ms-win-crt-utility-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64/avcodec.60.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64/avcodec.dll.60\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64/avcodec.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64/avdevice.60.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64/avdevice.dll.60\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64/avdevice.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64/avfilter.9.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64/avfilter.dll.9\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64/avfilter.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64/avformat.60.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64/avformat.dll.60\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64/avformat.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64/avutil.58.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64/avutil.dll.58\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64/avutil.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64/concrt140.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64/jnipostproc.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64/msvcp140.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64/msvcp140_1.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64/postproc-57.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64/postproc.57.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64/postproc.dll.57\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64/postproc.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64/swresample.4.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64/swresample.dll.4\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64/swresample.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64/swscale.7.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64/swscale.dll.7\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64/swscale.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64/ucrtbase.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64/vcomp140.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64/vcruntime140.dll\\E"
+  }, {
+    "pattern":"\\Qorg/windows-x86_64/vcruntime140_1.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64-gpl/api-ms-win-core-console-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64-gpl/api-ms-win-core-console-l1-2-0.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64-gpl/api-ms-win-core-datetime-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64-gpl/api-ms-win-core-debug-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64-gpl/api-ms-win-core-errorhandling-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64-gpl/api-ms-win-core-file-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64-gpl/api-ms-win-core-file-l1-2-0.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64-gpl/api-ms-win-core-file-l2-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64-gpl/api-ms-win-core-handle-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64-gpl/api-ms-win-core-heap-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64-gpl/api-ms-win-core-interlocked-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64-gpl/api-ms-win-core-libraryloader-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64-gpl/api-ms-win-core-localization-l1-2-0.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64-gpl/api-ms-win-core-memory-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64-gpl/api-ms-win-core-namedpipe-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64-gpl/api-ms-win-core-processenvironment-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64-gpl/api-ms-win-core-processthreads-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64-gpl/api-ms-win-core-processthreads-l1-1-1.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64-gpl/api-ms-win-core-profile-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64-gpl/api-ms-win-core-rtlsupport-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64-gpl/api-ms-win-core-string-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64-gpl/api-ms-win-core-synch-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64-gpl/api-ms-win-core-synch-l1-2-0.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64-gpl/api-ms-win-core-sysinfo-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64-gpl/api-ms-win-core-timezone-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64-gpl/api-ms-win-core-util-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64-gpl/api-ms-win-crt-conio-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64-gpl/api-ms-win-crt-convert-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64-gpl/api-ms-win-crt-environment-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64-gpl/api-ms-win-crt-filesystem-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64-gpl/api-ms-win-crt-heap-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64-gpl/api-ms-win-crt-locale-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64-gpl/api-ms-win-crt-math-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64-gpl/api-ms-win-crt-multibyte-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64-gpl/api-ms-win-crt-private-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64-gpl/api-ms-win-crt-process-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64-gpl/api-ms-win-crt-runtime-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64-gpl/api-ms-win-crt-stdio-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64-gpl/api-ms-win-crt-string-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64-gpl/api-ms-win-crt-time-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64-gpl/api-ms-win-crt-utility-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64-gpl/avcodec-60.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64-gpl/avcodec.60.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64-gpl/avcodec.dll.60\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64-gpl/avcodec.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64-gpl/avdevice-60.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64-gpl/avdevice.60.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64-gpl/avdevice.dll.60\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64-gpl/avdevice.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64-gpl/avfilter-9.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64-gpl/avfilter.9.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64-gpl/avfilter.dll.9\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64-gpl/avfilter.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64-gpl/avformat-60.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64-gpl/avformat.60.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64-gpl/avformat.dll.60\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64-gpl/avformat.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64-gpl/avutil-58.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64-gpl/avutil.58.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64-gpl/avutil.dll.58\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64-gpl/avutil.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64-gpl/concrt140.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64-gpl/jniavcodec.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64-gpl/jniavdevice.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64-gpl/jniavfilter.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64-gpl/jniavformat.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64-gpl/jniavutil.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64-gpl/jnipostproc.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64-gpl/jniswresample.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64-gpl/jniswscale.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64-gpl/msvcp140.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64-gpl/msvcp140_1.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64-gpl/postproc-57.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64-gpl/postproc.57.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64-gpl/postproc.dll.57\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64-gpl/postproc.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64-gpl/swresample-4.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64-gpl/swresample.4.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64-gpl/swresample.dll.4\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64-gpl/swresample.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64-gpl/swscale-7.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64-gpl/swscale.7.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64-gpl/swscale.dll.7\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64-gpl/swscale.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64-gpl/ucrtbase.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64-gpl/vcomp140.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64-gpl/vcruntime140.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64-gpl/vcruntime140_1.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64/api-ms-win-core-console-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64/api-ms-win-core-console-l1-2-0.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64/api-ms-win-core-datetime-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64/api-ms-win-core-debug-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64/api-ms-win-core-errorhandling-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64/api-ms-win-core-file-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64/api-ms-win-core-file-l1-2-0.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64/api-ms-win-core-file-l2-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64/api-ms-win-core-handle-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64/api-ms-win-core-heap-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64/api-ms-win-core-interlocked-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64/api-ms-win-core-libraryloader-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64/api-ms-win-core-localization-l1-2-0.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64/api-ms-win-core-memory-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64/api-ms-win-core-namedpipe-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64/api-ms-win-core-processenvironment-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64/api-ms-win-core-processthreads-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64/api-ms-win-core-processthreads-l1-1-1.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64/api-ms-win-core-profile-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64/api-ms-win-core-rtlsupport-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64/api-ms-win-core-string-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64/api-ms-win-core-synch-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64/api-ms-win-core-synch-l1-2-0.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64/api-ms-win-core-sysinfo-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64/api-ms-win-core-timezone-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64/api-ms-win-core-util-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64/api-ms-win-crt-conio-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64/api-ms-win-crt-convert-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64/api-ms-win-crt-environment-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64/api-ms-win-crt-filesystem-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64/api-ms-win-crt-heap-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64/api-ms-win-crt-locale-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64/api-ms-win-crt-math-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64/api-ms-win-crt-multibyte-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64/api-ms-win-crt-private-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64/api-ms-win-crt-process-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64/api-ms-win-crt-runtime-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64/api-ms-win-crt-stdio-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64/api-ms-win-crt-string-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64/api-ms-win-crt-time-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64/api-ms-win-crt-utility-l1-1-0.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64/avcodec.60.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64/avcodec.dll.60\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64/avcodec.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64/avdevice.60.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64/avdevice.dll.60\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64/avdevice.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64/avfilter.9.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64/avfilter.dll.9\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64/avfilter.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64/avformat.60.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64/avformat.dll.60\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64/avformat.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64/avutil.58.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64/avutil.dll.58\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64/avutil.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64/concrt140.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64/jnipostproc.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64/msvcp140.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64/msvcp140_1.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64/postproc-57.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64/postproc.57.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64/postproc.dll.57\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64/postproc.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64/swresample.4.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64/swresample.dll.4\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64/swresample.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64/swscale.7.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64/swscale.dll.7\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64/swscale.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64/ucrtbase.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64/vcomp140.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64/vcruntime140.dll\\E"
+  }, {
+    "pattern":"\\Qwindows-x86_64/vcruntime140_1.dll\\E"
   }, {
     "pattern":"client:\\Qcss/*.css\\E"
   }, {
@@ -50,6 +1742,8 @@
     "pattern":"client:\\Qfxml/UserSession.fxml\\E"
   }, {
     "pattern":"client:\\Qfxml/UserSessionItem.fxml\\E"
+  }, {
+    "pattern":"client:\\Qfxml/VideoPlayerDialog.fxml\\E"
   }, {
     "pattern":"client:\\Qimg/*.gif\\E"
   }, {
@@ -75,6 +1769,12 @@
   }, {
     "pattern":"client:\\Qimg/home_group_icon_selected.png\\E"
   }, {
+    "pattern":"client:\\Qimg/icons8-pause-30.png\\E"
+  }, {
+    "pattern":"client:\\Qimg/icons8-play-30.png\\E"
+  }, {
+    "pattern":"client:\\Qimg/icons8-replay-24.png\\E"
+  }, {
     "pattern":"client:\\Qimg/loading.gif\\E"
   }, {
     "pattern":"client:\\Qimg/send_fail.png\\E"
@@ -85,17 +1785,23 @@
   }, {
     "pattern":"client:\\Qimg/tmp.jpg\\E"
   }, {
+    "pattern":"client:\\Qimg/video_play_48.png\\E"
+  }, {
     "pattern":"com.gluonhq.emoji:\\Qcom/gluonhq/emoji/emoji.csv\\E"
   }, {
     "pattern":"com.gluonhq.emoji:\\Qcom/gluonhq/emoji/util/sheet_apple_64.png\\E"
   }, {
     "pattern":"com.gluonhq.richtextarea:\\Qcom/gluonhq/richtextarea/rich-text-area.css\\E"
   }, {
+    "pattern":"java.base:\\Qjdk/internal/icu/impl/data/icudt72b/nfc.nrm\\E"
+  }, {
     "pattern":"java.base:\\Qjdk/internal/icu/impl/data/icudt72b/ubidi.icu\\E"
   }, {
     "pattern":"java.base:\\Qjdk/internal/icu/impl/data/icudt72b/uprops.icu\\E"
   }, {
     "pattern":"java.base:\\Qsun/net/idn/uidna.spp\\E"
+  }, {
+    "pattern":"java.base:\\Qsun/net/www/content-types.properties\\E"
   }, {
     "pattern":"java.base:\\Qsun/text/resources/LineBreakIteratorData\\E"
   }, {
@@ -199,13 +1905,19 @@
   }, {
     "pattern":"javafx.graphics:\\Qcom/sun/prism/d3d/hlsl/FillRoundRect_Color.obj\\E"
   }, {
+    "pattern":"javafx.graphics:\\Qcom/sun/prism/d3d/hlsl/FillRoundRect_LinearGradient_PAD.obj\\E"
+  }, {
     "pattern":"javafx.graphics:\\Qcom/sun/prism/d3d/hlsl/Mask_TextureSuper.obj\\E"
+  }, {
+    "pattern":"javafx.graphics:\\Qcom/sun/prism/d3d/hlsl/Solid_LinearGradient_PAD.obj\\E"
   }, {
     "pattern":"javafx.graphics:\\Qcom/sun/prism/d3d/hlsl/Solid_TextureFirstPassLCD.obj\\E"
   }, {
     "pattern":"javafx.graphics:\\Qcom/sun/prism/d3d/hlsl/Solid_TextureRGB.obj\\E"
   }, {
     "pattern":"javafx.graphics:\\Qcom/sun/prism/d3d/hlsl/Solid_TextureSecondPassLCD.obj\\E"
+  }, {
+    "pattern":"javafx.graphics:\\Qcom/sun/prism/d3d/hlsl/Solid_TextureYV12.obj\\E"
   }, {
     "pattern":"javafx.graphics:\\Qcom/sun/prism/d3d/hlsl/Texture_Color.obj\\E"
   }, {
@@ -214,6 +1926,10 @@
     "pattern":"javafx.graphics:\\Qcom/sun/scenario/effect/impl/hw/d3d/hlsl/Blend_SRC_ATOP.obj\\E"
   }, {
     "pattern":"javafx.graphics:\\Qcom/sun/scenario/effect/impl/hw/d3d/hlsl/InvertMask.obj\\E"
+  }, {
+    "pattern":"javafx.graphics:\\Qcom/sun/scenario/effect/impl/hw/d3d/hlsl/LinearConvolveShadow_12.obj\\E"
+  }, {
+    "pattern":"javafx.graphics:\\Qcom/sun/scenario/effect/impl/hw/d3d/hlsl/LinearConvolveShadow_16.obj\\E"
   }, {
     "pattern":"javafx.graphics:\\Qcom/sun/scenario/effect/impl/hw/d3d/hlsl/LinearConvolveShadow_4.obj\\E"
   }, {
@@ -238,8 +1954,374 @@
     "pattern":"javafx.graphics:\\Qvcruntime140.dll\\E"
   }, {
     "pattern":"javafx.graphics:\\Qvcruntime140_1.dll\\E"
+  }, {
+    "pattern":"javafx.media:\\Qfxplugins.dll\\E"
+  }, {
+    "pattern":"javafx.media:\\Qglib-lite.dll\\E"
+  }, {
+    "pattern":"javafx.media:\\Qgstreamer-lite.dll\\E"
+  }, {
+    "pattern":"javafx.media:\\Qjfxmedia.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/api-ms-win-core-console-l1-1-0.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/api-ms-win-core-console-l1-2-0.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/api-ms-win-core-datetime-l1-1-0.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/api-ms-win-core-debug-l1-1-0.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/api-ms-win-core-errorhandling-l1-1-0.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/api-ms-win-core-file-l1-1-0.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/api-ms-win-core-file-l1-2-0.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/api-ms-win-core-file-l2-1-0.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/api-ms-win-core-handle-l1-1-0.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/api-ms-win-core-heap-l1-1-0.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/api-ms-win-core-interlocked-l1-1-0.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/api-ms-win-core-libraryloader-l1-1-0.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/api-ms-win-core-localization-l1-2-0.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/api-ms-win-core-memory-l1-1-0.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/api-ms-win-core-namedpipe-l1-1-0.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/api-ms-win-core-processenvironment-l1-1-0.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/api-ms-win-core-processthreads-l1-1-0.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/api-ms-win-core-processthreads-l1-1-1.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/api-ms-win-core-profile-l1-1-0.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/api-ms-win-core-rtlsupport-l1-1-0.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/api-ms-win-core-string-l1-1-0.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/api-ms-win-core-synch-l1-1-0.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/api-ms-win-core-synch-l1-2-0.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/api-ms-win-core-sysinfo-l1-1-0.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/api-ms-win-core-timezone-l1-1-0.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/api-ms-win-core-util-l1-1-0.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/api-ms-win-crt-conio-l1-1-0.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/api-ms-win-crt-convert-l1-1-0.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/api-ms-win-crt-environment-l1-1-0.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/api-ms-win-crt-filesystem-l1-1-0.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/api-ms-win-crt-heap-l1-1-0.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/api-ms-win-crt-locale-l1-1-0.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/api-ms-win-crt-math-l1-1-0.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/api-ms-win-crt-multibyte-l1-1-0.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/api-ms-win-crt-private-l1-1-0.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/api-ms-win-crt-process-l1-1-0.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/api-ms-win-crt-runtime-l1-1-0.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/api-ms-win-crt-stdio-l1-1-0.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/api-ms-win-crt-string-l1-1-0.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/api-ms-win-crt-time-l1-1-0.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/api-ms-win-crt-utility-l1-1-0.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/avcodec-60.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/avcodec.60.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/avcodec.dll.60\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/avcodec.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/avdevice-60.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/avdevice.60.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/avdevice.dll.60\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/avdevice.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/avfilter-9.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/avfilter.9.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/avfilter.dll.9\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/avfilter.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/avformat-60.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/avformat.60.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/avformat.dll.60\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/avformat.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/avutil-58.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/avutil.58.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/avutil.dll.58\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/avutil.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/concrt140.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/jniavcodec.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/jniavdevice.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/jniavfilter.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/jniavformat.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/jniavutil.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/jnipostproc.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/jniswresample.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/jniswscale.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/msvcp140.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/msvcp140_1.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/postproc-57.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/postproc.57.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/postproc.dll.57\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/postproc.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/swresample-4.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/swresample.4.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/swresample.dll.4\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/swresample.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/swscale-7.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/swscale.7.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/swscale.dll.7\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/swscale.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/ucrtbase.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/vcomp140.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/vcruntime140.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64-gpl/vcruntime140_1.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/api-ms-win-core-console-l1-1-0.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/api-ms-win-core-console-l1-2-0.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/api-ms-win-core-datetime-l1-1-0.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/api-ms-win-core-debug-l1-1-0.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/api-ms-win-core-errorhandling-l1-1-0.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/api-ms-win-core-file-l1-1-0.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/api-ms-win-core-file-l1-2-0.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/api-ms-win-core-file-l2-1-0.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/api-ms-win-core-handle-l1-1-0.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/api-ms-win-core-heap-l1-1-0.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/api-ms-win-core-interlocked-l1-1-0.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/api-ms-win-core-libraryloader-l1-1-0.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/api-ms-win-core-localization-l1-2-0.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/api-ms-win-core-memory-l1-1-0.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/api-ms-win-core-namedpipe-l1-1-0.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/api-ms-win-core-processenvironment-l1-1-0.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/api-ms-win-core-processthreads-l1-1-0.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/api-ms-win-core-processthreads-l1-1-1.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/api-ms-win-core-profile-l1-1-0.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/api-ms-win-core-rtlsupport-l1-1-0.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/api-ms-win-core-string-l1-1-0.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/api-ms-win-core-synch-l1-1-0.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/api-ms-win-core-synch-l1-2-0.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/api-ms-win-core-sysinfo-l1-1-0.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/api-ms-win-core-timezone-l1-1-0.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/api-ms-win-core-util-l1-1-0.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/api-ms-win-crt-conio-l1-1-0.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/api-ms-win-crt-convert-l1-1-0.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/api-ms-win-crt-environment-l1-1-0.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/api-ms-win-crt-filesystem-l1-1-0.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/api-ms-win-crt-heap-l1-1-0.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/api-ms-win-crt-locale-l1-1-0.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/api-ms-win-crt-math-l1-1-0.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/api-ms-win-crt-multibyte-l1-1-0.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/api-ms-win-crt-private-l1-1-0.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/api-ms-win-crt-process-l1-1-0.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/api-ms-win-crt-runtime-l1-1-0.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/api-ms-win-crt-stdio-l1-1-0.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/api-ms-win-crt-string-l1-1-0.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/api-ms-win-crt-time-l1-1-0.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/api-ms-win-crt-utility-l1-1-0.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/avcodec-60.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/avcodec.60.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/avcodec.dll.60\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/avcodec.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/avdevice-60.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/avdevice.60.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/avdevice.dll.60\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/avdevice.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/avfilter-9.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/avfilter.9.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/avfilter.dll.9\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/avfilter.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/avformat-60.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/avformat.60.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/avformat.dll.60\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/avformat.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/avutil-58.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/avutil.58.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/avutil.dll.58\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/avutil.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/concrt140.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/jniavcodec.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/jniavdevice.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/jniavfilter.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/jniavformat.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/jniavutil.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/jnipostproc.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/jniswresample.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/jniswscale.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/msvcp140.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/msvcp140_1.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/postproc-57.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/postproc.57.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/postproc.dll.57\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/postproc.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/swresample-4.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/swresample.4.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/swresample.dll.4\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/swresample.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/swscale-7.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/swscale.7.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/swscale.dll.7\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/swscale.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/ucrtbase.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/vcomp140.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/vcruntime140.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.ffmpeg:\\Qorg/bytedeco/ffmpeg/global/windows-x86_64/vcruntime140_1.dll\\E"
+  }, {
+    "pattern":"org.bytedeco.javacpp:\\Qorg/bytedeco/javacpp/properties/windows-x86_64.properties\\E"
+  }, {
+    "pattern":"org.bytedeco.javacpp:\\Qorg/bytedeco/javacpp/windows-x86_64/jnijavacpp.dll\\E"
   }]},
   "bundles":[{
+    "name":"MediaErrors"
+  }, {
     "name":"com.gluonhq.richtextarea.rich-text-area",
     "locales":["", "und"]
   }, {
@@ -254,5 +2336,8 @@
   }, {
     "name":"config",
     "locales":["", "und"]
+  }, {
+    "name":"sun.awt.resources.awt",
+    "classNames":["sun.awt.resources.awt", "sun.awt.resources.awt_zh_CN"]
   }]
 }

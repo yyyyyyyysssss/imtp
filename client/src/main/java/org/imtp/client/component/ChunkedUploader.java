@@ -6,9 +6,8 @@ import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import org.imtp.common.response.Result;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
+
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -55,48 +54,73 @@ public class ChunkedUploader {
             path = path.substring(6);
         }
         File file = new File(path);
-        //前置获取uploadId
-        return CompletableFuture.supplyAsync(() -> {
-            Result<String> uploadIdResult = okHttpClientHelper.doGet("/file/uploadId?filename=" + file.getName() + "&totalSize=" + file.length(), new TypeReference<>() {
-            });
-            return uploadIdResult.getData();
-        //多任务上传分片
-        },uploadExecutor).thenCompose(uploadId -> {
-            long length = file.length();
-            int totalChunk = (int) Math.ceil((double) length / chunkSize);
-            log.info("文件名称:{}, 文件总大小:{}, 总块数:{}", file.getName(), convertBytesToMB(length), totalChunk);
-            List<CompletableFuture<Void>> futures = new ArrayList<>(totalChunk);
-            try (FileInputStream fis = new FileInputStream(file)) {
-                byte[] buffer;
-                for (int i = 0; i < totalChunk; i++) {
-                    if (fis.available() <= chunkSize) {
-                        buffer = new byte[fis.available()];
-                    } else {
-                        buffer = new byte[chunkSize];
+        try {
+            return uploadFile(new FileInputStream(file),file.getName(),chunkSize);
+        } catch (FileNotFoundException e) {
+            log.error("upload error: ",e);
+            throw new RuntimeException("upload error");
+        }
+    }
+
+    public static CompletableFuture<String> uploadFile(InputStream inputStream,String fileName){
+
+        return uploadFile(inputStream,fileName,CHUNK_SIZE);
+    }
+
+    public static CompletableFuture<String> uploadFile(InputStream inputStream,String fileName, int chunkSize){
+        try {
+            int length = inputStream.available();
+            //前置获取uploadId
+            return CompletableFuture.supplyAsync(() -> {
+                Result<String> uploadIdResult = okHttpClientHelper.doGet("/file/uploadId?filename=" + fileName + "&totalSize=" + length, new TypeReference<>() {
+                });
+                return uploadIdResult.getData();
+                //多任务上传分片
+            },uploadExecutor).thenCompose(uploadId -> {
+                int totalChunk = (int) Math.ceil((double) length / chunkSize);
+                log.info("文件名称:{}, 文件总大小:{}, 总块数:{}", fileName, convertBytesToMB(length), totalChunk);
+                List<CompletableFuture<Void>> futures = new ArrayList<>(totalChunk);
+                try {
+                    byte[] buffer;
+                    for (int i = 0; i < totalChunk; i++) {
+                        if (inputStream.available() <= chunkSize) {
+                            buffer = new byte[inputStream.available()];
+                        } else {
+                            buffer = new byte[chunkSize];
+                        }
+                        int n = inputStream.read(buffer);
+                        if (n == -1) {
+                            break;
+                        }
+                        byte[] finalBuffer = buffer;
+                        final int finalI = i;
+                        CompletableFuture<Void> completableFuture = CompletableFuture.runAsync(() -> {
+                            uploadChunk(finalBuffer, uploadId, length, totalChunk, chunkSize, finalI);
+                        },uploadExecutor);
+                        futures.add(completableFuture);
                     }
-                    int n = fis.read(buffer);
-                    if (n == -1) {
-                        break;
+                } catch (IOException ioException) {
+                    log.error("UploadFile Exception ", ioException);
+                    return CompletableFuture.failedFuture(ioException);
+                }finally {
+                    try {
+                        inputStream.close();
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
                     }
-                    byte[] finalBuffer = buffer;
-                    final int finalI = i;
-                    CompletableFuture<Void> completableFuture = CompletableFuture.runAsync(() -> {
-                        uploadChunk(finalBuffer, uploadId, length, totalChunk, chunkSize, finalI);
-                    },uploadExecutor);
-                    futures.add(completableFuture);
                 }
-            } catch (IOException ioException) {
-                log.error("UploadFile Exception ", ioException);
-                return CompletableFuture.failedFuture(ioException);
-            }
-            //等待分片任务完成后获取访问的url
-            return CompletableFuture
-                    .allOf(futures.toArray(new CompletableFuture[0]))
-                    .thenApply(t -> {
-                        Result<String> result = okHttpClientHelper.doGet("/file/accessUrl?uploadId=" + uploadId, new TypeReference<>() {});
-                        return result.getData();
-                    });
-        });
+                //等待分片任务完成后获取访问的url
+                return CompletableFuture
+                        .allOf(futures.toArray(new CompletableFuture[0]))
+                        .thenApply(t -> {
+                            Result<String> result = okHttpClientHelper.doGet("/file/accessUrl?uploadId=" + uploadId, new TypeReference<>() {});
+                            return result.getData();
+                        });
+            });
+        }catch (Exception e){
+            log.error("upload error: ",e);
+            throw new RuntimeException("upload error");
+        }
     }
 
     private static void uploadChunk(byte[] chunkData, String uploadId, long totalSize, int totalChunk, int chunkSize, Integer chunkIndex) {

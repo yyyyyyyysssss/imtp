@@ -45,6 +45,8 @@ public class ChatItemEntity {
 
     private MessageMetadata messageMetadata;
 
+    private Image selfVideoThumbnailImage;
+
 
 
     public ObjectProperty<Image> imageProperty() {
