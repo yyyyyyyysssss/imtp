@@ -1,0 +1,151 @@
+/* 滚动条整体 */
+::-webkit-scrollbar {
+    width: 5px;
+}
+
+/* 滚动条轨道 */
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    /* 轨道背景色 */
+    border-radius: 10px;
+    /* 轨道圆角 */
+}
+
+/* 滚动条滑块 */
+::-webkit-scrollbar-thumb {
+    background: #D2D2D2;
+    /* 滑块背景色 */
+    border-radius: 10px;
+    /* 滑块圆角 */
+}
+
+/* 滚动条滑块悬停 */
+::-webkit-scrollbar-thumb:hover {
+    background: #BABABA;
+    /* 滑块悬停背景色 */
+}
+
+.root-layout {
+    overflow: 'hidden';
+}
+
+//整体
+.home-panel-tabs .group-panel-tabs .ant-tabs {
+    height: 100%;
+}
+
+//左侧
+.home-panel-tabs .group-panel-tabs .ant-tabs-nav {
+    width: 25%;
+    background-color: #F5F5F5;
+    overflow: hidden;
+}
+
+//左侧列表
+.home-panel-tabs .group-panel-tabs .ant-tabs-nav .ant-tabs-nav-list{
+    max-height: 685px;
+    overflow: hidden;
+    scrollbar-gutter: stable;
+    margin-top: 0px;
+}
+
+.home-panel-tabs .group-panel-tabs .ant-tabs-nav .ant-tabs-nav-list:hover{
+    overflow: auto;
+}
+
+.home-panel-tabs .group-panel-tabs .ant-tabs-nav .ant-tabs-nav-list .ant-tabs-tab{
+    margin-left: -15px !important;
+    justify-content: left;
+}
+
+.home-panel-tabs .group-panel-tabs .ant-tabs-nav .ant-tabs-nav-list .ant-tabs-tab:hover{
+    background-color: #DDDAD9;
+}
+//当前活动的tab
+.home-panel-tabs .group-panel-tabs .ant-tabs-nav .ant-tabs-nav-list .ant-tabs-tab-active{
+    background-color: #C8C6C5;
+}
+//底部滚动按钮隐藏
+.home-panel-tabs .group-panel-tabs .ant-tabs-nav .ant-tabs-nav-operations{
+    display: none;
+}
+
+//右侧内容
+.home-panel-tabs .group-panel-tabs .ant-tabs-content-holder {
+    width: 75%;
+    background-color: #F5F5F5;
+    margin-left: 0px !important;
+}
+
+.group-content{
+    margin-top: 50px;
+}
+
+.group-content-nickname{
+    font-size: 16px;
+}
+
+.group-content-label{
+    color: grey;
+    font-size: 12px;
+}
+
+.group-tabs{
+    overflow: auto;
+}
+
+.group-name{
+    margin-left: 10px;
+    color: #000000;
+}
+
+.group-more-ops-img:hover{
+    background-color:#DDDAD9;
+}
+
+.group-content-div{
+    height: 64px;
+    width: 64px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.group-content-remark-label{
+    color: grey;
+    font-size: 16px;
+}
+
+.group-content-remark-value{
+    color: #000000;
+    font-size: 16px;
+    word-wrap: break-word;
+    white-space: normal;
+    max-width: 200px;
+}
+
+.ant-divider{
+    margin: 0px !important;
+}
+
+.group-content-divider{
+    margin-top: 10px !important;
+}
+
+.group-content-send-img{
+    width: 30px;
+    height: 30px;
+}
+
+.group-content-send-flex{
+    padding: 7px;
+}
+
+.group-content-send-flex:hover{
+    background-color: lightgray;
+}
+
+.group-content-send-label{
+    color: #9AA5BE;
+    user-select: none;
+}
