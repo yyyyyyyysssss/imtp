@@ -8,11 +8,15 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
+import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.SnapshotParameters;
 import javafx.scene.control.Label;
+import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.image.WritableImage;
 import javafx.scene.layout.*;
 import javafx.scene.paint.*;
 import javafx.scene.shape.Rectangle;
@@ -27,6 +31,7 @@ import org.imtp.common.packet.MessageMetadata;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * @Description
@@ -234,12 +239,16 @@ public class ChatItemController extends AbstractController {
         double height = messageMetadata.getHeight();
         double width = messageMetadata.getWidth();
         ImageView iv = new ImageView(url);
-        iv.setStyle("-fx-effect: dropshadow(three-pass-box, lightgray, 1, 0.5, 0, 0);");
+        iv.setStyle("-fx-effect: dropshadow(three-pass-box, rgba(149, 157, 165, 0.2), 10, 0, 0, 0);");
         if (width > max_width_image) {
             iv.setFitWidth(max_width_image);
             double h = max_width_image * height / width;
             iv.setFitHeight(h);
         }
+        Rectangle clip = new Rectangle(iv.getFitWidth(), iv.getFitHeight());
+        clip.setArcWidth(15);
+        clip.setArcHeight(15);
+        iv.setClip(clip);
         return iv;
     }
 
@@ -248,21 +257,27 @@ public class ChatItemController extends AbstractController {
         double height = messageMetadata.getHeight();
         double width = messageMetadata.getWidth();
         ImageView iv;
-        if (chatItemEntity.isSelf() && (messageMetadata.getThumbnailUrl() == null || messageMetadata.getThumbnailUrl().isEmpty())){
+        if (chatItemEntity.isSelf() && (messageMetadata.getThumbnailUrl() == null || messageMetadata.getThumbnailUrl().isEmpty())) {
             iv = new ImageView(chatItemEntity.getSelfVideoThumbnailImage());
-        }else {
+        } else {
             iv = new ImageView(messageMetadata.getThumbnailUrl());
         }
         iv.setPreserveRatio(true);
-        iv.setStyle("-fx-effect: dropshadow(three-pass-box, lightgray, 1, 0.5, 0, 0);");
+        iv.setStyle("-fx-effect: dropshadow(three-pass-box, rgba(149, 157, 165, 0.2), 10, 0, 0, 0);");
         if (width > max_width_video) {
             iv.setFitWidth(max_width_video);
             double h = max_width_video * height / width;
             iv.setFitHeight(h);
         }
+        Rectangle clip = new Rectangle(iv.getFitWidth(), iv.getFitHeight());
+        clip.setArcWidth(15);
+        clip.setArcHeight(15);
+        iv.setClip(clip);
 
         //创建渐变矩形
         Rectangle gradientRect = new Rectangle(0, 0, iv.getFitWidth(), 50);
+        gradientRect.setArcWidth(15);
+        gradientRect.setArcHeight(15);
         gradientRect.setFill(GRADIENT_PAINT);
 
         StackPane stackPane = new StackPane();
@@ -283,29 +298,50 @@ public class ChatItemController extends AbstractController {
         anchorPane.setOnMouseClicked(m -> {
             log.info("video player");
             VideoPlayerDialog videoPlayerDialog = VideoPlayerDialog.getInstance();
-            videoPlayerDialog.showPane(url,messageMetadata.getWidth(),messageMetadata.getHeight());
+            videoPlayerDialog.showPane(url, messageMetadata.getWidth(), messageMetadata.getHeight());
         });
-
         return anchorPane;
     }
 
-    private Node createFileMessageNode(ChatItemEntity chatItemEntity, MessageMetadata messageMetadata){
+    private Node createFileMessageNode(ChatItemEntity chatItemEntity, MessageMetadata messageMetadata) {
         VBox leftVBox = new VBox();
-        leftVBox.setStyle("-fx-border-radius: 5;-fx-background-color: white;-fx-effect: dropshadow(three-pass-box, rgba(149, 157, 165, 0.2), 10, 0, 0, 0);");
-        leftVBox.setPadding(new Insets(5,5,5,5));
+        leftVBox.setPadding(new Insets(3, 3, 3, 3));
         leftVBox.setAlignment(Pos.CENTER_LEFT);
-        leftVBox.setSpacing(15);
-        leftVBox.setMinWidth(200);
-        leftVBox.setMaxWidth(200);
-        leftVBox.setMinHeight(75);
-        leftVBox.setMaxHeight(75);
+        leftVBox.setMinWidth(140);
+        leftVBox.setMaxWidth(140);
+        leftVBox.setMinHeight(70);
+        leftVBox.setMaxHeight(70);
 
+        Region region = new Region();
         Label nameLabel = new Label(messageMetadata.getName());
+        nameLabel.setStyle("-fx-font-size: 13");
         nameLabel.setWrapText(true);
-        Label sizeLabel = new Label(messageMetadata.getSizeDesc());
-        leftVBox.getChildren().addAll(nameLabel,sizeLabel);
 
-        return leftVBox;
+        Label sizeLabel = new Label(messageMetadata.getSizeDesc());
+        sizeLabel.setStyle("-fx-font-size: 12;-fx-text-fill: gray");
+        leftVBox.getChildren().addAll(nameLabel, region, sizeLabel);
+        VBox.setVgrow(region, Priority.ALWAYS);
+
+
+        ImageView imageView = new ImageView(fileIcon);
+        imageView.setFitHeight(40);
+        imageView.setFitWidth(40);
+
+//        HBox hBox = new HBox();
+//        hBox.setStyle("-fx-background-color: white;-fx-background-radius: 6, 0;-fx-background-insets: 0, 4;-fx-effect: dropshadow(three-pass-box, rgba(149, 157, 165, 0.2), 10, 0, 0, 0);");
+//        hBox.setPadding(new Insets(5, 5, 5, 5));
+//        hBox.setAlignment(Pos.CENTER);
+//        hBox.setSpacing(10);
+//        hBox.getChildren().addAll(leftVBox, imageView);
+
+        BorderPane borderPane = new BorderPane();
+        borderPane.setStyle("-fx-background-color: white;-fx-background-radius: 6, 0;-fx-background-insets: 0, 4;-fx-effect: dropshadow(three-pass-box, rgba(149, 157, 165, 0.2), 10, 0, 0, 0);");
+        borderPane.setPadding(new Insets(5, 5, 5, 5));
+        borderPane.setLeft(leftVBox);
+        borderPane.setRight(imageView);
+        borderPane.setAlignment(imageView,Pos.CENTER);
+
+        return borderPane;
     }
 
     @Override

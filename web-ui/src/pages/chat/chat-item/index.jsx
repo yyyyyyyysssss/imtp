@@ -436,7 +436,7 @@ const ChatItem = (props) => {
                 <div style={{ cursor: 'pointer', order: self ? 1 : 0  }} onClick={() => otherFileMessageClick(content, fileName)}>
                     <Flex align='center' className={`other-file-message ${self ? 'other-file-message-right' : 'other-file-message-left'}`} justify={self ? 'end' : 'start'} gap="middle" style={{ width: '200px', height: '80px', order: self ? 1 : 0 }}>
                         <Flex style={{ width: '150px', overflow: 'hidden' }} gap="small" vertical>
-                            <label style={{ wordWrap: 'break-word' }}>{fileName}</label>
+                            <label className='other-file-filename-ellipsis' style={{ wordWrap: 'break-word' }}>{fileName}</label>
                             <label style={{ fontSize: '12px', color: 'gray' }}>{overview}</label>
                         </Flex>
                         <Icon component={FileOutlined} style={{ color: 'gray', fontSize: '40px' }} />

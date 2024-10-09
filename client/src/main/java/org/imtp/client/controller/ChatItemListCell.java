@@ -41,13 +41,6 @@ public class ChatItemListCell extends ListCell<ChatItemEntity> {
     protected void updateItem(ChatItemEntity chatItemEntity, boolean b) {
         Platform.runLater(() -> {
             super.updateItem(chatItemEntity, b);
-//            if (b || chatItemEntity == null){
-//                setGraphic(null);
-//                setText(null);
-//            }else {
-//                controller.initData(chatItemEntity);
-//                setGraphic(hBox);
-//            }
         });
     }
 }

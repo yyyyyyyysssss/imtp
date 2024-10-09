@@ -88,26 +88,30 @@ const Login = () => {
         }
     }, [form])
 
-    const phoneVerification = (_, val) => {
+    const emailVerification = (_, val) => {
         if (loginMethod === "1") {
             return Promise.resolve();
         }
-        const phoneReg = /^(?:\+?86)?1(?:3\d{3}|5[^4\D]\d{2}|8\d{3}|7(?:[235-8]\d{2}|4(?:0\d|1[0-2]|9\d))|9[0-35-9]\d{2}|66\d{2})\d{6}$/;
-        const validateResult = phoneReg.test(val)
+        // const phoneReg = /^(?:\+?86)?1(?:3\d{3}|5[^4\D]\d{2}|8\d{3}|7(?:[235-8]\d{2}|4(?:0\d|1[0-2]|9\d))|9[0-35-9]\d{2}|66\d{2})\d{6}$/;
+        const emailReg = /^\w+(-+.\w+)*@\w+(-.\w+)*.\w+(-.\w+)*$/;
+        const validateResult = emailReg.test(val)
         if (!validateResult) {
-            return Promise.reject("手机号不合法");
+            return Promise.reject("邮箱不合法");
         }
         return Promise.resolve();
     }
     // 发送验证码
     const handleWithVerificationCode = async () => {
-        // const phone = form.getFieldValue('phone');
-        // httpWrapper
-        //     .get('/sendEmailVerificationCode', {
-        //         params: {
-        //             email: phone
-        //         }
-        //     });
+        const email = form.getFieldValue('email');
+        if(!email){
+            return message.error("邮箱不可为空");
+        }
+        httpWrapper
+            .get('/sendEmailVerificationCode', {
+                params: {
+                    email: email
+                }
+            });
         let ti = verificationCode.time;
         setVerificationCode({
             disabled: true,
@@ -203,7 +207,7 @@ const Login = () => {
             }
         } else {
             loginRequest = {
-                username: values.phone,
+                username: values.email,
                 credential: values.verificationCode,
                 loginType: 'EMAIL',
                 rememberMe: values.rememberMe ? 1 : null
@@ -269,13 +273,13 @@ const Login = () => {
                                     <Input.Password size="large" placeholder="密码" prefix={<LockOutlined />} />
                                 </Form.Item>
                             </TabPane>
-                            <TabPane tab="手机号登录" key="2">
-                                <Form.Item name="phone" validateTrigger="onBlur" rules={[
+                            <TabPane tab="邮箱登录" key="2">
+                                <Form.Item name="email" validateTrigger="onBlur" rules={[
                                     {
-                                        validator: phoneVerification
+                                        validator: emailVerification
                                     }
                                 ]}>
-                                    <Input allowClear size="large" placeholder="手机号" prefix={<MobileOutlined />} />
+                                    <Input allowClear size="large" placeholder="邮箱" prefix={<MobileOutlined />} />
                                 </Form.Item>
                                 <Flex gap='small'>
                                     <Form.Item name="verificationCode" rules={[

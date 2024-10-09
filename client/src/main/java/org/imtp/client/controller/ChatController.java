@@ -51,11 +51,11 @@ import org.imtp.common.packet.body.UserFriendInfo;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
+import java.net.URI;
 import java.net.URL;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
@@ -167,9 +167,9 @@ public class ChatController extends AbstractController {
             FileChooser fileChooser = new FileChooser();
             File file = fileChooser.showOpenDialog(chatVbox.getScene().getWindow());
             if (file != null){
-                String path = file.toURI().toString();
-                MessageType messageType = messageTypeByPath(path);
-                sendMessage(path, messageType);
+                String filePath = file.toURI().toString().replaceAll("%20"," ");
+                MessageType messageType = messageTypeByPath(filePath);
+                sendMessage(filePath, messageType);
             }
         });
 
