@@ -39,6 +39,7 @@ import org.imtp.client.component.ChunkedUploader;
 import org.imtp.client.context.ClientContextHolder;
 import org.imtp.client.entity.ChatItemEntity;
 import org.imtp.client.entity.SessionEntity;
+import org.imtp.client.enums.MessageStatus;
 import org.imtp.client.event.EmojiEvent;
 import org.imtp.client.event.UserSessionEvent;
 import org.imtp.client.idwork.IdGen;
@@ -281,6 +282,9 @@ public class ChatController extends AbstractController {
                             if (e != null) {
                                 log.error("upload chunk failed: ", e);
                                 selfChatItemEntity.setImage(sendFailureImage);
+                                Platform.runLater(() -> {
+                                    selfChatItemEntity.messageStatusProperty().set(MessageStatus.FAILED);
+                                });
                             }
                         })
                         .thenAccept(r -> {
@@ -291,11 +295,13 @@ public class ChatController extends AbstractController {
                             } else {
                                 imagePacket = new ImageMessage(r, imageMessageMetadata, ClientContextHolder.clientContext().id(), sessionEntity.getReceiverUserId(), ackId, true);
                             }
+                            selfChatItemEntity.messageStatusProperty().set(MessageStatus.SENT);
                             //发送消息
                             send(imagePacket);
                         });
                 sessionEntity.setLastMsgType(messageType);
                 sessionEntity.setLastMsg(imagePath);
+                selfChatItemEntity.setMessageStatus(MessageStatus.PENDING);
                 selfChatItemEntity.setContent(imagePath);
                 selfChatItemEntity.setMessageMetadata(imageMessageMetadata);
                 selfChatItemEntity.setMessageType(messageType);
@@ -334,6 +340,9 @@ public class ChatController extends AbstractController {
                                 if (e != null) {
                                     log.error("upload chunk failed: ", e);
                                     selfChatItemEntity.setImage(sendFailureImage);
+                                    Platform.runLater(() -> {
+                                        selfChatItemEntity.messageStatusProperty().set(MessageStatus.FAILED);
+                                    });
                                 }
                             })
                             .thenAccept(r -> {
@@ -349,6 +358,7 @@ public class ChatController extends AbstractController {
                                             } else {
                                                 videoPacket = new VideoMessage(r, videoMessageMetadata, ClientContextHolder.clientContext().id(), sessionEntity.getReceiverUserId(), ackId, true);
                                             }
+                                            selfChatItemEntity.messageStatusProperty().set(MessageStatus.SENT);
                                             //发送消息
                                             send(videoPacket);
                                         });
@@ -356,6 +366,7 @@ public class ChatController extends AbstractController {
 
                     sessionEntity.setLastMsgType(messageType);
                     sessionEntity.setLastMsg(videoPath);
+                    selfChatItemEntity.setMessageStatus(MessageStatus.PENDING);
                     selfChatItemEntity.setContent(videoPath);
                     selfChatItemEntity.setMessageMetadata(videoMessageMetadata);
                     selfChatItemEntity.setMessageType(messageType);

@@ -7,7 +7,7 @@
 <?import javafx.scene.text.TextFlow?>
 <HBox fx:id="chatItemHBox" stylesheets="@../css/ChatItem.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.imtp.client.controller.ChatItemController">
    <children>
-      <ImageView fx:id="chatItemImageView" fitHeight="40.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true" />
+      <ImageView fx:id="chatItemImageView" fitHeight="40.0" fitWidth="40.0" pickOnBounds="true"/>
       <VBox fx:id="chatItemVBox" alignment="CENTER_LEFT">
          <Label fx:id="sendNameLabel" />
          <HBox fx:id="chatItemLabelHBox" alignment="CENTER_LEFT" spacing="5">

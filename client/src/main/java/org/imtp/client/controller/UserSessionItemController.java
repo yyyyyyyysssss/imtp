@@ -12,6 +12,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.StrokeType;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
@@ -58,6 +59,11 @@ public class UserSessionItemController extends AbstractController{
         alertCircle.setFill(Color.RED);
         alertCircle.relocate(0, 0);
         alertCircle.setVisible(false);
+
+        Rectangle clip = new Rectangle(50, 50);
+        clip.setArcWidth(15);
+        clip.setArcHeight(15);
+        sessionImg.setClip(clip);
 
         messageCount.setBoundsType(TextBoundsType.VISUAL);
         double W = messageCount.getBoundsInLocal().getWidth();

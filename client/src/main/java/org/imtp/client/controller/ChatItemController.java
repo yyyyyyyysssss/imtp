@@ -13,7 +13,9 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.control.Label;
+import javafx.scene.control.ProgressIndicator;
 import javafx.scene.effect.DropShadow;
+import javafx.scene.effect.GaussianBlur;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
@@ -24,6 +26,7 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import lombok.extern.slf4j.Slf4j;
 import org.imtp.client.entity.ChatItemEntity;
+import org.imtp.client.enums.MessageStatus;
 import org.imtp.client.util.ResourceUtils;
 import org.imtp.common.enums.DeliveryMethod;
 import org.imtp.common.packet.MessageMetadata;
@@ -61,9 +64,11 @@ public class ChatItemController extends AbstractController {
 
     private static Image fileIcon = new Image(ResourceUtils.classPathResource("/img/icons8-file-50.png").toExternalForm());
 
+    private static Image loadingIcon = new Image(ResourceUtils.classPathResource("/img/video-loading50.gif").toExternalForm());
+
     private ImageView imageView;
 
-    private Image videoPlayerIcon;
+    private static final Image videoPlayerIcon = new Image(ResourceUtils.classPathResource("/img/video_play_48.png").toExternalForm());
 
     private static final Insets FIVE_BOTTOM = new Insets(0, 0, 5, 0);
 
@@ -97,9 +102,6 @@ public class ChatItemController extends AbstractController {
         imageView = new ImageView();
         imageView.setFitWidth(15);
         imageView.setFitHeight(15);
-
-        URL videoPlayerIconUrl = ResourceUtils.classPathResource("/img/video_play_48.png");
-        videoPlayerIcon = new Image(videoPlayerIconUrl.toExternalForm());
 
         chatItemHBox.widthProperty().addListener(new ChangeListener<Number>() {
             @Override
@@ -245,11 +247,55 @@ public class ChatItemController extends AbstractController {
             double h = max_width_image * height / width;
             iv.setFitHeight(h);
         }
+
+        AnchorPane anchorPane = new AnchorPane();
+
+        StackPane stackPane = new StackPane();
+
         Rectangle clip = new Rectangle(iv.getFitWidth(), iv.getFitHeight());
         clip.setArcWidth(15);
         clip.setArcHeight(15);
         iv.setClip(clip);
-        return iv;
+
+        MessageStatus messageStatus;
+        Rectangle gradientRect;
+        if ((messageStatus = chatItemEntity.getMessageStatus()) != null && messageStatus.equals(MessageStatus.PENDING)){
+            gradientRect = new Rectangle(0, 0, iv.getFitWidth(), iv.getFitHeight());
+            gradientRect.setFill(new Color(0, 0, 0, 0.7));
+            gradientRect.setArcWidth(15);
+            gradientRect.setArcHeight(15);
+            //加载中
+            ProgressIndicator progressIndicator = new ProgressIndicator();
+            stackPane.getChildren().addAll(iv,progressIndicator);
+
+            anchorPane.getChildren().addAll(stackPane, gradientRect);
+            AnchorPane.setBottomAnchor(gradientRect, 0.0);
+        }else {
+            gradientRect = null;
+            stackPane.getChildren().addAll(iv);
+            anchorPane.getChildren().addAll(stackPane);
+        }
+        //监听消息状态变化
+        chatItemEntity.messageStatusProperty().addListener((observable,oldVal,newVal) -> {
+            if (MessageStatus.SENT.equals(newVal)){
+                Platform.runLater(() -> {
+                    stackPane.getChildren().clear();
+                    anchorPane.getChildren().clear();
+                    stackPane.getChildren().addAll(iv);
+                    anchorPane.getChildren().add(stackPane);
+                });
+            }else if(MessageStatus.FAILED.equals(newVal)){
+                Platform.runLater(() -> {
+                    stackPane.getChildren().clear();
+                    anchorPane.getChildren().clear();
+                    stackPane.getChildren().addAll(iv);
+                    anchorPane.getChildren().addAll(stackPane, gradientRect);
+                    AnchorPane.setBottomAnchor(gradientRect, 0.0);
+                });
+            }
+        });
+
+        return anchorPane;
     }
 
     private Node createVideoMessageNode(ChatItemEntity chatItemEntity, MessageMetadata messageMetadata) {
@@ -274,31 +320,75 @@ public class ChatItemController extends AbstractController {
         clip.setArcHeight(15);
         iv.setClip(clip);
 
-        //创建渐变矩形
-        Rectangle gradientRect = new Rectangle(0, 0, iv.getFitWidth(), 50);
-        gradientRect.setArcWidth(15);
-        gradientRect.setArcHeight(15);
-        gradientRect.setFill(GRADIENT_PAINT);
-
-        StackPane stackPane = new StackPane();
-        stackPane.getChildren().addAll(iv, new ImageView(videoPlayerIcon));
-
+        AnchorPane anchorPane = new AnchorPane();
+        //时长
         Label label = new Label(messageMetadata.getDurationDesc());
         label.setStyle("-fx-text-fill: white");
 
-        AnchorPane anchorPane = new AnchorPane();
-        anchorPane.getChildren().addAll(stackPane, gradientRect, label);
+        StackPane stackPane = new StackPane();
+        //创建渐变矩形
+        Rectangle gradientRect;
+        MessageStatus messageStatus;
+        if ((messageStatus = chatItemEntity.getMessageStatus()) != null && messageStatus.equals(MessageStatus.PENDING)){
+            gradientRect = new Rectangle(0, 0, iv.getFitWidth(), iv.getFitHeight());
+            gradientRect.setFill(new Color(0, 0, 0, 0.7));
+            gradientRect.setArcWidth(15);
+            gradientRect.setArcHeight(15);
+            //加载中
+            ProgressIndicator progressIndicator = new ProgressIndicator();
+            stackPane.getChildren().addAll(iv,progressIndicator);
+            anchorPane.getChildren().addAll(stackPane, gradientRect);
 
-        //时间放在右下角
-        AnchorPane.setRightAnchor(label, 10.0);
-        AnchorPane.setBottomAnchor(label, 10.0);
+            AnchorPane.setBottomAnchor(gradientRect, 0.0);
+        }else {
+            gradientRect = new Rectangle(0, 0, iv.getFitWidth(), 50);
+            gradientRect.setFill(GRADIENT_PAINT);
+            gradientRect.setArcWidth(15);
+            gradientRect.setArcHeight(15);
+            stackPane.getChildren().addAll(iv,new ImageView(videoPlayerIcon));
+            anchorPane.setOnMouseClicked(m -> {
+                log.info("video player");
+                VideoPlayerDialog videoPlayerDialog = VideoPlayerDialog.getInstance();
+                videoPlayerDialog.showPane(url, messageMetadata.getWidth(), messageMetadata.getHeight());
+            });
 
-        AnchorPane.setBottomAnchor(gradientRect, 0.0);
+            anchorPane.getChildren().addAll(stackPane, gradientRect, label);
+            //时间放在右下角
+            AnchorPane.setRightAnchor(label, 10.0);
+            AnchorPane.setBottomAnchor(label, 10.0);
+            AnchorPane.setBottomAnchor(gradientRect, 0.0);
+        }
 
-        anchorPane.setOnMouseClicked(m -> {
-            log.info("video player");
-            VideoPlayerDialog videoPlayerDialog = VideoPlayerDialog.getInstance();
-            videoPlayerDialog.showPane(url, messageMetadata.getWidth(), messageMetadata.getHeight());
+        //监听消息状态变化
+        chatItemEntity.messageStatusProperty().addListener((observable,oldVal,newVal) -> {
+            if (MessageStatus.SENT.equals(newVal)){
+                Platform.runLater(() -> {
+                    gradientRect.setHeight(50);
+                    gradientRect.setFill(GRADIENT_PAINT);
+
+                    stackPane.getChildren().clear();
+                    stackPane.getChildren().addAll(iv,new ImageView(videoPlayerIcon));
+
+                    anchorPane.getChildren().clear();
+                    anchorPane.getChildren().addAll(stackPane, gradientRect, label);
+                    //时间放在右下角
+                    AnchorPane.setRightAnchor(label, 10.0);
+                    AnchorPane.setBottomAnchor(label, 10.0);
+                    AnchorPane.setBottomAnchor(gradientRect, 0.0);
+                    anchorPane.setOnMouseClicked(m -> {
+                        log.info("video player");
+                        VideoPlayerDialog videoPlayerDialog = VideoPlayerDialog.getInstance();
+                        videoPlayerDialog.showPane(url, messageMetadata.getWidth(), messageMetadata.getHeight());
+                    });
+                });
+            }else if(MessageStatus.FAILED.equals(newVal)){
+                Platform.runLater(() -> {
+                    anchorPane.getChildren().clear();
+                    stackPane.getChildren().clear();
+                    stackPane.getChildren().addAll(iv);
+                    anchorPane.getChildren().addAll(stackPane, gradientRect);
+                });
+            }
         });
         return anchorPane;
     }
@@ -326,13 +416,6 @@ public class ChatItemController extends AbstractController {
         ImageView imageView = new ImageView(fileIcon);
         imageView.setFitHeight(40);
         imageView.setFitWidth(40);
-
-//        HBox hBox = new HBox();
-//        hBox.setStyle("-fx-background-color: white;-fx-background-radius: 6, 0;-fx-background-insets: 0, 4;-fx-effect: dropshadow(three-pass-box, rgba(149, 157, 165, 0.2), 10, 0, 0, 0);");
-//        hBox.setPadding(new Insets(5, 5, 5, 5));
-//        hBox.setAlignment(Pos.CENTER);
-//        hBox.setSpacing(10);
-//        hBox.getChildren().addAll(leftVBox, imageView);
 
         BorderPane borderPane = new BorderPane();
         borderPane.setStyle("-fx-background-color: white;-fx-background-radius: 6, 0;-fx-background-insets: 0, 4;-fx-effect: dropshadow(three-pass-box, rgba(149, 157, 165, 0.2), 10, 0, 0, 0);");

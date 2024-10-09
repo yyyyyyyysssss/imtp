@@ -7,6 +7,8 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Text;
 import lombok.extern.slf4j.Slf4j;
 import org.imtp.client.constant.Callback;
 import org.imtp.client.entity.GroupEntity;
@@ -24,7 +26,7 @@ public class UserGroupDetailsController extends AbstractController{
     private ImageView groupDetailsImg;
 
     @FXML
-    private Label groupName;
+    private Text groupName;
 
     @FXML
     private ImageView groupSendMessage;
@@ -51,6 +53,12 @@ public class UserGroupDetailsController extends AbstractController{
         groupSendMessagePane.setOnMouseClicked(mouseEvent -> {
             callback.callback(groupEntity.getId());
         });
+
+        Rectangle clip = new Rectangle(100, 100);
+        clip.setArcWidth(15);
+        clip.setArcHeight(15);
+        groupDetailsImg.setClip(clip);
+
     }
 
 

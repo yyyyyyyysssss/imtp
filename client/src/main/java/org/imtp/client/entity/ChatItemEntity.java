@@ -1,6 +1,7 @@
 package org.imtp.client.entity;
 
-import javafx.beans.property.*;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.image.Image;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,12 +10,11 @@ import lombok.Setter;
 import org.imtp.client.component.ClassPathImageUrlParse;
 import org.imtp.client.context.ClientContextHolder;
 import org.imtp.client.context.DefaultClientUserChannelContext;
+import org.imtp.client.enums.MessageStatus;
 import org.imtp.client.idwork.IdGen;
 import org.imtp.common.enums.DeliveryMethod;
 import org.imtp.common.enums.MessageType;
 import org.imtp.common.packet.MessageMetadata;
-
-import java.util.Date;
 
 /**
  * @Description
@@ -47,7 +47,7 @@ public class ChatItemEntity {
 
     private Image selfVideoThumbnailImage;
 
-
+    private ObjectProperty<MessageStatus> messageStatus = new SimpleObjectProperty<>();
 
     public ObjectProperty<Image> imageProperty() {
         return image;
@@ -59,6 +59,19 @@ public class ChatItemEntity {
 
     public Image getImage() {
         return image.get();
+    }
+
+
+    public ObjectProperty<MessageStatus> messageStatusProperty() {
+        return messageStatus;
+    }
+
+    public void setMessageStatus(MessageStatus messageStatus) {
+        this.messageStatus.set(messageStatus);
+    }
+
+    public MessageStatus getMessageStatus() {
+        return messageStatus.get();
     }
 
 

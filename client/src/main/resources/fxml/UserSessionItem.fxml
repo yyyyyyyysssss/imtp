@@ -3,21 +3,17 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.image.ImageView?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.Region?>
-<?import javafx.scene.layout.StackPane?>
-<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.*?>
 <?import javafx.scene.shape.Circle?>
-
 <?import javafx.scene.text.Text?>
 <HBox prefWidth="205.0" stylesheets="@../css/UserSessionItem.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.imtp.client.controller.UserSessionItemController">
     <children>
-        <ImageView fx:id="sessionImg" fitHeight="40.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true" />
-        <VBox prefHeight="40.0" prefWidth="165.0">
+        <ImageView fx:id="sessionImg" fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" style="-fx-effect: dropshadow(three-pass-box, rgba(149, 157, 165, 0.2), 10, 0, 0, 0);"/>
+        <VBox prefHeight="50.0" prefWidth="155.0">
             <children>
-                <HBox prefWidth="165.0">
+                <HBox prefWidth="155.0">
                     <children>
-                        <Label fx:id="nameLabel">
+                        <Label fx:id="nameLabel" style="-fx-font-size: 14px">
                             <padding>
                                 <Insets left="5.0" />
                             </padding>
@@ -27,8 +23,8 @@
                         </Label>
                     </children>
                 </HBox>
-                <Region prefWidth="165.0" VBox.vgrow="ALWAYS" />
-                <HBox prefWidth="165.0" alignment="BOTTOM_LEFT">
+                <Region prefWidth="155.0" VBox.vgrow="ALWAYS" />
+                <HBox prefWidth="155.0" alignment="BOTTOM_LEFT">
                     <children>
                         <Label fx:id="lastMsg" style="-fx-text-fill: Grey" maxWidth="120">
                             <padding>

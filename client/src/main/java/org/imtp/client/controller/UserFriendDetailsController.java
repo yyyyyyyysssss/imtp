@@ -10,6 +10,8 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Text;
 import lombok.extern.slf4j.Slf4j;
 import org.imtp.client.component.ClassPathImageUrlParse;
 import org.imtp.client.component.ImageUrlParse;
@@ -31,7 +33,7 @@ public class UserFriendDetailsController extends AbstractController{
     private ImageView friendDetailsImg;
 
     @FXML
-    private Label friendName;
+    private Text friendName;
 
     @FXML
     private ImageView friendGender;
@@ -76,6 +78,12 @@ public class UserFriendDetailsController extends AbstractController{
         friendSendMessagePane.setOnMouseClicked(mouseEvent -> {
             callback.callback(friendEntity.getId());
         });
+
+
+        Rectangle clip = new Rectangle(100, 100);
+        clip.setArcWidth(15);
+        clip.setArcHeight(15);
+        friendDetailsImg.setClip(clip);
     }
 
 
