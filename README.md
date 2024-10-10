@@ -1,4 +1,4 @@
-IMTP是一款基于TCP的即时通讯系统。它包含服务端、PC客户端(windows、linux、macos)、WEB浏览器端，且多端互通。
+IMTP是一款跨平台分布式即时通讯系统。它包含服务端、PC客户端(windows、linux、macos)、WEB浏览器端，且多端互通。
 支持普通文本、表情、图片、视频、文件等消息。
 
 ![image](https://github.com/yyyyyyyysssss/imtp/blob/master/client/src/main/resources/img/readme_chat.gif)
