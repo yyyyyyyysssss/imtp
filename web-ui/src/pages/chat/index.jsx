@@ -23,16 +23,12 @@ const SENT = "SENT";
 const DELIVERED = "DELIVERED";
 
 const Chat = forwardRef((props, ref) => {
-    const {socket,userInfo} = useWebSocket();
-    const userInfoRef = useRef();
-    useEffect(() => {
-        userInfoRef.current = userInfo;
-    },[userInfo]);
+    const {socket} = useWebSocket();
     useImperativeHandle(ref, () => ({
         addUserSession: addUserSession
     }));
     const { style } = props;
-    const { setHeadName, findUserInfoByGroup,findGroupByGroupId, findUserInfoByFriendId } = useContext(HomeContext);
+    const { setHeadName,userInfo, findUserInfoByGroup,findGroupByGroupId, findUserInfoByFriendId } = useContext(HomeContext);
     //视频弹出框
     const [videoOpen, setVideoOpen] = useState(false);
     //视频播放选项
@@ -206,6 +202,7 @@ const Chat = forwardRef((props, ref) => {
         setData(prevData => {
             const msgResUserSessionItem = prevData.find(f => f.id === userSessionId);
             const chatItemData = msgResUserSessionItem.chatItemData;
+            console.log(chatItemData);
             const newArr = chatItemData.map(item => item.id === chatItemMsg.id ? {...chatItemMsg} : item);
             return prevData.map(m => m.id === msgResUserSessionItem.id ? {...msgResUserSessionItem,chatItemData: newArr} : m);
         });
@@ -253,7 +250,7 @@ const Chat = forwardRef((props, ref) => {
     }
 
     const createUserSession = async (userItem) => {
-        const userId = userInfoRef.current.id;
+        const userId = userInfo.id;
         const userSessionReq = {
             senderUserId: userId,
             receiverUserId: userItem.id,

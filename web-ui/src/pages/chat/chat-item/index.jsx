@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback, useContext} from 'react'
+import React, { useState, useRef, useEffect, useCallback, useContext } from 'react'
 import './index.less'
 import Picker from '@emoji-mart/react'
 import Icon, { FileOutlined, LoadingOutlined } from '@ant-design/icons';
@@ -12,12 +12,13 @@ import { v4 as uuidv4 } from 'uuid';
 import emoteImg from '../../../assets/img/emote_icon.png'
 import videoPlayIcon from '../../../assets/img/video-play-48.png'
 import videoLoadingIcon from '../../../assets/img/video-loading50 .gif'
+import sendFailIcon from '../../../assets/img/send_fail.png'
 import { EditorContent, useEditor } from '@tiptap/react'
 import HardBreak from '@tiptap/extension-hard-break'
 import { StarterKit } from '@tiptap/starter-kit';
 import emojiMartData from '@emoji-mart/data'
 import Uploader from '../../../components/Uploader';
-import { ChatPanelContext, useWebSocket } from '../../../context';
+import { ChatPanelContext, HomeContext, useWebSocket } from '../../../context';
 import SnowflakeIdWorker from '../../../components/SnowflakeIdWorker';
 
 const { Content } = Layout;
@@ -25,6 +26,7 @@ const { Content } = Layout;
 const PENDING = "PENDING";
 const SENT = "SENT";
 const DELIVERED = "DELIVERED";
+const FAILED = "FAILED";
 
 const TEXT_MESSAGE = 1;
 const IMAGE_MESSAGE = 4;
@@ -36,17 +38,17 @@ const SINGLE = "SINGLE";
 const snowflake = new SnowflakeIdWorker(1);
 
 const ChatItem = (props) => {
-    const {socket,userInfo} = useWebSocket();
+    const { socket } = useWebSocket();
     const socketRef = useRef();
-    const userInfoRef = useRef();
     useEffect(() => {
         socketRef.current = socket;
-        userInfoRef.current =   userInfo;
-    },[socket,userInfo]);
-    const { handleVideoPlay,handleSenderMessage,updateChatItem } = useContext(ChatPanelContext);
-    const {userSessionItem } = props;
+    }, [socket]);
+    const { userInfo } = useContext(HomeContext);
+    const { handleVideoPlay, handleSenderMessage, updateChatItem } = useContext(ChatPanelContext);
+    const { userSessionItem } = props;
     //聊天内容
     const [chatContentData, setChatContentData] = useState([]);
+    const chatContentDataRef = useRef(null);
     const chatContentRef = useRef(null);
     //监听数据变化并滚动到末尾
     useEffect(() => {
@@ -55,6 +57,7 @@ const ChatItem = (props) => {
                 chatContentRef.current.scrollToRow(chatContentData.length - 1);
             });
         }
+        chatContentDataRef.current = chatContentData;
     }, [chatContentData]);
     useEffect(() => {
         const { selectTab, userSessionItem } = props;
@@ -317,15 +320,17 @@ const ChatItem = (props) => {
             blur = 'blur(5px)';
         } else {
             preview = true;
-            blur = 'blur(0px)';    
+            blur = 'blur(0px)';
         }
-        if(status === DELIVERED){
+        if (status === DELIVERED) {
             icon = <LoadingOutlined style={{ fontSize: '15px', order: self ? 0 : 1, display: 'none' }} />;
-        }else {
+        } else if (status === FAILED) {
+            icon = <img src={sendFailIcon} alt='' style={{ width: '20px', height: '20px', order: self ? 0 : 1 }} />;
+        } else {
             icon = <LoadingOutlined style={{ fontSize: '15px', order: self ? 0 : 1 }} />;
         }
         return (
-            <Flex gap="small">
+            <Flex gap="small" justify='center' align='center'>
                 <div style={{ order: self ? 1 : 0 }}>
                     <AntdImage
                         className='image-message'
@@ -356,13 +361,15 @@ const ChatItem = (props) => {
             videoIcon = videoPlayIcon;
             durationDesc = msg.contentMetadata.durationDesc;
         }
-        if(status === DELIVERED){
+        if (status === DELIVERED) {
             icon = <LoadingOutlined style={{ fontSize: '15px', order: self ? 0 : 1, display: 'none' }} />;
-        }else {
+        } else if (status === FAILED) {
+            icon = <img src={sendFailIcon} alt='' style={{ width: '20px', height: '20px', order: self ? 0 : 1 }} />;
+        } else {
             icon = <LoadingOutlined style={{ fontSize: '15px', order: self ? 0 : 1 }} />;
         }
         return (
-            <Flex gap="small">
+            <Flex gap="small" justify='center' align='center'>
                 <div
                     style={{ order: self ? 1 : 0 }}
                     className='video-div'
@@ -398,9 +405,11 @@ const ChatItem = (props) => {
         const content = msg.content;
         const status = msg.status;
         let icon;
-        if(status === DELIVERED){
+        if (status === DELIVERED) {
             icon = <LoadingOutlined style={{ fontSize: '15px', order: self ? 0 : 1, display: 'none' }} />;
-        }else {
+        } else if (status === FAILED) {
+            icon = <img src={sendFailIcon} alt='' style={{ width: '20px', height: '20px', order: self ? 0 : 1 }} />;
+        } else {
             icon = <LoadingOutlined style={{ fontSize: '15px', order: self ? 0 : 1 }} />;
         }
         return (
@@ -426,14 +435,16 @@ const ChatItem = (props) => {
             overview = fileSizeDesc;
         }
         let icon;
-        if(status === DELIVERED){
+        if (status === DELIVERED) {
             icon = <LoadingOutlined style={{ fontSize: '15px', order: self ? 0 : 1, display: 'none' }} />;
-        }else {
+        } else if (status === FAILED) {
+            icon = <img src={sendFailIcon} alt='' style={{ width: '20px', height: '20px', order: self ? 0 : 1 }} />;
+        } else {
             icon = <LoadingOutlined style={{ fontSize: '15px', order: self ? 0 : 1 }} />;
         }
         return (
-            <Flex gap="small">
-                <div style={{ cursor: 'pointer', order: self ? 1 : 0  }} onClick={() => otherFileMessageClick(content, fileName)}>
+            <Flex gap="small" justify='center' align='center'>
+                <div style={{ cursor: 'pointer', order: self ? 1 : 0 }} onClick={() => otherFileMessageClick(content, fileName)}>
                     <Flex align='center' className={`other-file-message ${self ? 'other-file-message-right' : 'other-file-message-left'}`} justify={self ? 'end' : 'start'} gap="middle" style={{ width: '200px', height: '80px', order: self ? 1 : 0 }}>
                         <Flex style={{ width: '150px', overflow: 'hidden' }} gap="small" vertical>
                             <label className='other-file-filename-ellipsis' style={{ wordWrap: 'break-word' }}>{fileName}</label>
@@ -518,7 +529,7 @@ const ChatItem = (props) => {
                     const imageWidth = item.attrs.width;
                     const imageSizeDesc = formatFileSize(imageSize);
                     const imageType = imageFile.type;
-                    const imageMsg = gMessage(IMAGE_MESSAGE,dataUrl);
+                    const imageMsg = gMessage(IMAGE_MESSAGE, dataUrl);
                     msg = {
                         ...imageMsg,
                         contentMetadata: {
@@ -534,16 +545,11 @@ const ChatItem = (props) => {
                         .then((url) => {
                             msg.status = SENT;
                             msg.content = url;
-                            updateChatItem(userSessionItem.id,msg);
-                            socketRef.current.send(JSON.stringify({
-                                ackId: msg.ackId,
-                                type: msg.type,
-                                sender: msg.sender,
-                                receiver: msg.receiver,
-                                deliveryMethod: msg.deliveryMethod,
-                                content: msg.content,
-                                contentMetadata: msg.contentMetadata
-                            }));
+                            const sendFlag = realSendMessage(msg);
+                            if (!sendFlag) {
+                                msg.status = FAILED;
+                            }
+                            updateChatItem(userSessionItem.id, msg);
                         })
                     break;
                 case 'fileNode':
@@ -552,7 +558,7 @@ const ChatItem = (props) => {
                     const fileSizeDesc = formatFileSize(fileSize);
                     const fileType = item.attrs.type;
                     const file = item.attrs.file;
-                    const fileMsg = gMessage(FILE_MESSAGE,'');
+                    const fileMsg = gMessage(FILE_MESSAGE, '');
                     msg = {
                         ...fileMsg,
                         contentMetadata: {
@@ -566,16 +572,11 @@ const ChatItem = (props) => {
                         .then((url) => {
                             msg.status = SENT;
                             msg.content = url;
-                            updateChatItem(userSessionItem.id,msg);
-                            socketRef.current.send(JSON.stringify({
-                                ackId: msg.ackId,
-                                type: msg.type,
-                                sender: msg.sender,
-                                receiver: msg.receiver,
-                                deliveryMethod: msg.deliveryMethod,
-                                content: msg.content,
-                                contentMetadata: msg.contentMetadata
-                            }));
+                            const sendFlag = realSendMessage(msg);
+                            if (!sendFlag) {
+                                msg.status = FAILED;
+                            }
+                            updateChatItem(userSessionItem.id, msg);
                         })
                     break;
                 case 'videoNode':
@@ -591,7 +592,7 @@ const ChatItem = (props) => {
                     const seconds = Math.floor(videoDuration % 60);
                     const formattedDuration = `${minutes}:${seconds.toString().padStart(2, '0')}`;
                     console.log(`video height: ${videoHeight} video width: ${videoWidth} video duration: ${formattedDuration}`);
-                    const videoMsg = gMessage(VIDEO_MESSAGE,'');
+                    const videoMsg = gMessage(VIDEO_MESSAGE, '');
                     msg = {
                         ...videoMsg,
                         contentMetadata: {
@@ -612,31 +613,26 @@ const ChatItem = (props) => {
                                 .then(
                                     ({ poster }) => {
                                         const thumbnailName = uuidv4() + '.png';
-                                        const thumbnailFile = dataURLtoFile(poster,thumbnailName)
+                                        const thumbnailFile = dataURLtoFile(poster, thumbnailName)
                                         uploadFile(thumbnailFile)
-                                        .then((url) => {
-                                            msg.status = SENT;
-                                            msg.contentMetadata.thumbnailUrl = url;
-                                            updateChatItem(userSessionItem.id,msg);
-                                            socketRef.current.send(JSON.stringify({
-                                                ackId: msg.ackId,
-                                                type: msg.type,
-                                                sender: msg.sender,
-                                                receiver: msg.receiver,
-                                                deliveryMethod: msg.deliveryMethod,
-                                                content: msg.content,
-                                                contentMetadata: msg.contentMetadata
-                                            }));
-                                        });
-                                        
+                                            .then((url) => {
+                                                msg.status = SENT;
+                                                msg.contentMetadata.thumbnailUrl = url;
+                                                const sendFlag = realSendMessage(msg);
+                                                if (!sendFlag) {
+                                                    msg.status = FAILED;
+                                                }
+                                                updateChatItem(userSessionItem.id, msg);
+                                            });
+
                                     }
                                 )
                         })
                     break;
                 case 'paragraph':
                     const content = item?.content;
-                    if(!content){
-                       continue;
+                    if (!content) {
+                        continue;
                     }
                     let textMessage = [];
                     for (const c of content) {
@@ -647,28 +643,48 @@ const ChatItem = (props) => {
                         }
                     }
                     const text = textMessage.join("");
-                    msg = gMessage(TEXT_MESSAGE,text);
-                    socketRef.current.send(JSON.stringify({
-                        ackId: msg.ackId,
-                        type: msg.type,
-                        sender: msg.sender,
-                        receiver: msg.receiver,
-                        deliveryMethod: msg.deliveryMethod,
-                        content: msg.content
-                    }));
+                    msg = gMessage(TEXT_MESSAGE, text);
+                    const sendFlag = realSendMessage(msg);
+                    if (!sendFlag) {
+                        msg.status = FAILED;
+                    }
                     break;
                 default:
                     message.error('未知的消息类型');
                     continue;
             }
-            handleSenderMessage(msg,userSessionItem.id);
+            handleSenderMessage(msg, userSessionItem.id);
         }
         if (editorFlag) {
             editor.commands.clearContent();
         }
     }
 
-    const gMessage = (type,content) => {
+    const realSendMessage = (msg) => {
+        if (socketRef.current.readyState === WebSocket.OPEN) {
+            socketRef.current.send(JSON.stringify({
+                ackId: msg.ackId,
+                type: msg.type,
+                sender: msg.sender,
+                receiver: msg.receiver,
+                deliveryMethod: msg.deliveryMethod,
+                content: msg.content,
+                contentMetadata: msg.contentMetadata
+            }));
+            setInterval(() => {
+                const chatData = chatContentDataRef.current.filter(f => f.id === msg.id);
+                if (chatData && chatData.status === PENDING) {
+                    msg.status = FAILED;
+                    updateChatItem(userSessionItem.id, msg);
+                }
+            }, 10000);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    const gMessage = (type, content) => {
         const msg = {
             id: uuidv4(),
             type: type,
@@ -679,7 +695,7 @@ const ChatItem = (props) => {
             self: true,
             ackId: snowflake.nextId(),
             timestamp: new Date().getTime(),
-            avatar: userInfoRef.current.avatar,
+            avatar: userInfo.avatar,
             name: userSessionItem.name,
             content: content
         }

@@ -31,6 +31,15 @@ public class UserSocialController {
     private UserSocialService userSocialService;
 
 
+    @GetMapping("/userInfo")
+    public Result<?> userInfo() throws AccessDeniedException {
+        User user = currentLoginUser();
+        if(user == null){
+            throw new AccessDeniedException("Access Denied");
+        }
+        return ResultGenerator.ok(user);
+    }
+
     @GetMapping("/userInfo/{userId}")
     public Result<?> userInfo(@PathVariable(name = "userId") String userId) throws AccessDeniedException {
         User user = currentLoginUser();

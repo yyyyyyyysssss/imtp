@@ -19,8 +19,6 @@ export const WebSocketProvider = ({ children }) => {
 
     const [socket,setSocket] = useState(null);
 
-    const [userInfo,setUserInfo] = useState(null);
-
     const start = () => {
         const ws = new WebSocket(WEB_SEOCKET_SERVER_URL);
         ws.onopen = () => {
@@ -34,8 +32,6 @@ export const WebSocketProvider = ({ children }) => {
             if(header){
                 if(header.cmd === AUTHORIZATION_RES){
                     const authenticated = obj.authenticated;
-                    const userInfo = obj.userInfo;
-                    setUserInfo(userInfo);
                     if(authenticated){
                         console.log('Websocket Server 身份认证成功');
                     }else{
@@ -64,7 +60,7 @@ export const WebSocketProvider = ({ children }) => {
     },[]);
 
     return (
-        <WebSocketContext.Provider value={{socket,userInfo}}>
+        <WebSocketContext.Provider value={{socket}}>
             {children}
         </WebSocketContext.Provider>
     );

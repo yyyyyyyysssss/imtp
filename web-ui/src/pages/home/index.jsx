@@ -2,7 +2,6 @@ import React, { useEffect, useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Flex, Tabs, Input } from "antd"
 import { SearchOutlined } from '@ant-design/icons';
-import tmpImg from '../../assets/img/tmp.jpg'
 import homeChatIcon from '../../assets/img/home_chat_icon.png'
 import homeChatIconSelected from '../../assets/img/home_chat_icon_selected.png'
 import homeFriendIcon from '../../assets/img/home_friend_icon.png'
@@ -12,7 +11,7 @@ import homeGroupIconSelected from '../../assets/img/home_group_icon_selected.png
 import Chat from '../chat'
 import Friend from '../friend'
 import Group from '../group'
-import { HomeContext, WebSocketProvider,useWebSocket } from '../../context'
+import { HomeContext} from '../../context'
 import Cookies from 'js-cookie'
 import httpWrapper from '../../api/axiosWrapper'
 import closeImg from '../../assets/img/close_16.png'
@@ -25,13 +24,22 @@ const FRIEND_PANEL = "FRIEND_PANEL";
 const GROUP_PANEL = "GROUP_PANEL";
 
 const Home = () => {
-    const {userInfo} = useWebSocket();
+    const [userInfo,setUserInfo] = useState();
     const [userAvatar,setUserAvatar] = useState();
+
     useEffect(() => {
-        if(userInfo){
-            setUserAvatar(userInfo.avatar);
-        }
-    },[userInfo]);
+        httpWrapper
+        .get('/social/userInfo')
+        .then(
+            (res) => {
+                setUserInfo(res.data);
+                setUserAvatar(res.data.avatar);
+            },
+            (error) => {
+                console.log(error)
+            }
+        );
+    },[])
     //聊天组件引用
     const chatRef = useRef();
     //好友组件引用
@@ -112,7 +120,7 @@ const Home = () => {
                             </Flex>
                         </Flex>
                         <Flex>
-                            <HomeContext.Provider value={{ setHeadName, addUserSession,findUserInfoByGroup,findGroupByGroupId,findUserInfoByFriendId }}>
+                            <HomeContext.Provider value={{ setHeadName,userInfo, addUserSession,findUserInfoByGroup,findGroupByGroupId,findUserInfoByFriendId }}>
                                 {/* <WebSocketProvider> */}
                                     <div className='home-panel-tabs'>
                                         <Tabs
