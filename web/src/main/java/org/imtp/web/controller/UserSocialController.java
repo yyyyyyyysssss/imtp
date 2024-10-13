@@ -10,12 +10,12 @@ import org.imtp.common.response.ResultGenerator;
 import org.imtp.web.domain.dto.UserSessionDTO;
 import org.imtp.web.domain.entity.User;
 import org.imtp.web.service.UserSocialService;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.nio.file.AccessDeniedException;
 import java.util.List;
 
 /**
