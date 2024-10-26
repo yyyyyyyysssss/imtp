@@ -20,8 +20,7 @@
         <common.version>1.0.0-SNAPSHOT</common.version>
         <javafx.version>21</javafx.version>
         <javafx.plugin.version>0.0.8</javafx.plugin.version>
-        <gluonfx.plugin.version>1.0.22</gluonfx.plugin.version>
-        <gluonfx.plugin.version>1.0.22</gluonfx.plugin.version>
+        <gluonfx.plugin.version>1.0.23</gluonfx.plugin.version>
         <lombok.version>1.18.30</lombok.version>
     </properties>
 
@@ -86,6 +85,16 @@
             <groupId>org.bytedeco</groupId>
             <artifactId>javacv-platform</artifactId>
             <version>1.5.10</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.bytedeco</groupId>
+                    <artifactId>opencv-platform</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.bytedeco</groupId>
+                    <artifactId>openblas-platform</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
 
@@ -164,7 +173,7 @@
                     </attachList>
                     <nativeImageArgs>
                         <nativeImageArg>-H:TraceClassInitialization=true</nativeImageArg>
-                        <nativeImageArg>--initialize-at-build-time=ch.qos.logback,org.slf4j.LoggerFactory</nativeImageArg>
+                        <nativeImageArg>--initialize-at-build-time=ch.qos.logback,org.slf4j.LoggerFactory,org.slf4j.helpers</nativeImageArg>
                         <nativeImageArg>--trace-object-instantiation=java.io.FileDescriptor</nativeImageArg>
                         <nativeImageArg>--initialize-at-run-time=io.netty</nativeImageArg>
                     </nativeImageArgs>
@@ -208,6 +217,7 @@
             <properties>
                 <dump.link>management_ext.lib,psapi.lib</dump.link>
                 <enableSWRendering>false</enableSWRendering>
+                <javacpp.platform>windows-x86_64</javacpp.platform>
             </properties>
             <build>
                 <resources>
@@ -234,6 +244,7 @@
             <properties>
                 <dump.link>missing_symbols_linux64.o</dump.link>
                 <enableSWRendering>true</enableSWRendering>
+                <javacpp.platform>linux-x86_64</javacpp.platform>
             </properties>
             <build>
                 <resources>

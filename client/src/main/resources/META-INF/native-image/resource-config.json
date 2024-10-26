@@ -1,8 +1,6 @@
 {
   "resources":{
   "includes":[{
-    "pattern":"\\QMETA-INF/fonts.mf\\E"
-  }, {
     "pattern":"\\QMETA-INF/maven/org.bytedeco/ffmpeg/pom.properties\\E"
   }, {
     "pattern":"\\QMETA-INF/maven/org.bytedeco/javacpp/pom.properties\\E"
@@ -1729,6 +1727,8 @@
   }, {
     "pattern":"client:\\Qfxml/Chat.fxml\\E"
   }, {
+    "pattern":"client:\\Qfxml/ChatEmojiDialog.fxml\\E"
+  }, {
     "pattern":"client:\\Qfxml/ChatItem.fxml\\E"
   }, {
     "pattern":"client:\\Qfxml/Home.fxml\\E"
@@ -1736,6 +1736,8 @@
     "pattern":"client:\\Qfxml/Login.fxml\\E"
   }, {
     "pattern":"client:\\Qfxml/UserFriend.fxml\\E"
+  }, {
+    "pattern":"client:\\Qfxml/UserFriendItem.fxml\\E"
   }, {
     "pattern":"client:\\Qfxml/UserGroup.fxml\\E"
   }, {
@@ -1769,6 +1771,8 @@
   }, {
     "pattern":"client:\\Qimg/home_group_icon_selected.png\\E"
   }, {
+    "pattern":"client:\\Qimg/icons8-file-50.png\\E"
+  }, {
     "pattern":"client:\\Qimg/icons8-pause-30.png\\E"
   }, {
     "pattern":"client:\\Qimg/icons8-play-30.png\\E"
@@ -1784,6 +1788,8 @@
     "pattern":"client:\\Qimg/taskbar_icon.png\\E"
   }, {
     "pattern":"client:\\Qimg/tmp.jpg\\E"
+  }, {
+    "pattern":"client:\\Qimg/video-loading50.gif\\E"
   }, {
     "pattern":"client:\\Qimg/video_play_48.png\\E"
   }, {
@@ -1925,11 +1931,15 @@
   }, {
     "pattern":"javafx.graphics:\\Qcom/sun/scenario/effect/impl/hw/d3d/hlsl/Blend_SRC_ATOP.obj\\E"
   }, {
+    "pattern":"javafx.graphics:\\Qcom/sun/scenario/effect/impl/hw/d3d/hlsl/Blend_SRC_IN.obj\\E"
+  }, {
     "pattern":"javafx.graphics:\\Qcom/sun/scenario/effect/impl/hw/d3d/hlsl/InvertMask.obj\\E"
   }, {
     "pattern":"javafx.graphics:\\Qcom/sun/scenario/effect/impl/hw/d3d/hlsl/LinearConvolveShadow_12.obj\\E"
   }, {
     "pattern":"javafx.graphics:\\Qcom/sun/scenario/effect/impl/hw/d3d/hlsl/LinearConvolveShadow_16.obj\\E"
+  }, {
+    "pattern":"javafx.graphics:\\Qcom/sun/scenario/effect/impl/hw/d3d/hlsl/LinearConvolveShadow_32.obj\\E"
   }, {
     "pattern":"javafx.graphics:\\Qcom/sun/scenario/effect/impl/hw/d3d/hlsl/LinearConvolveShadow_4.obj\\E"
   }, {
@@ -2320,10 +2330,11 @@
     "pattern":"org.bytedeco.javacpp:\\Qorg/bytedeco/javacpp/windows-x86_64/jnijavacpp.dll\\E"
   }]},
   "bundles":[{
-    "name":"MediaErrors"
+    "name":"MediaErrors",
+    "locales":["zh-CN"]
   }, {
     "name":"com.gluonhq.richtextarea.rich-text-area",
-    "locales":["", "und"]
+    "locales":["", "und", "zh-CN"]
   }, {
     "name":"com.sun.javafx.tk.quantum.QuantumMessagesBundle",
     "locales":["", "und", "zh-CN"]
@@ -2335,9 +2346,10 @@
     "locales":["", "und", "zh-CN"]
   }, {
     "name":"config",
-    "locales":["", "und"]
+    "locales":["", "und", "zh-CN"]
   }, {
     "name":"sun.awt.resources.awt",
+    "locales":["zh-CN"],
     "classNames":["sun.awt.resources.awt", "sun.awt.resources.awt_zh_CN"]
   }]
 }

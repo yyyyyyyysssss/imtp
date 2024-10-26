@@ -1,0 +1,191 @@
+[
+{
+  "name":"[Lcom.sun.glass.ui.Screen;"
+},
+{
+  "name":"[Ljava.lang.String;"
+},
+{
+  "name":"com.sun.glass.ui.CommonDialogs",
+  "methods":[{"name":"createFileChooserResult","parameterTypes":["java.lang.String[]","com.sun.glass.ui.CommonDialogs$ExtensionFilter[]","int"] }]
+},
+{
+  "name":"com.sun.glass.ui.CommonDialogs$ExtensionFilter",
+  "methods":[{"name":"extensionsToArray","parameterTypes":[] }, {"name":"getDescription","parameterTypes":[] }]
+},
+{
+  "name":"com.sun.glass.ui.Cursor",
+  "methods":[{"name":"getNativeCursor","parameterTypes":[] }, {"name":"getType","parameterTypes":[] }]
+},
+{
+  "name":"com.sun.glass.ui.Screen",
+  "methods":[{"name":"<init>","parameterTypes":["long","int","int","int","int","int","int","int","int","int","int","int","int","int","int","int","float","float","float","float"] }]
+},
+{
+  "name":"com.sun.glass.ui.Size",
+  "methods":[{"name":"<init>","parameterTypes":["int","int"] }]
+},
+{
+  "name":"com.sun.javafx.font.directwrite.D2D1_COLOR_F",
+  "fields":[{"name":"a"}, {"name":"b"}, {"name":"g"}, {"name":"r"}],
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"com.sun.javafx.font.directwrite.D2D1_MATRIX_3X2_F",
+  "fields":[{"name":"_11"}, {"name":"_12"}, {"name":"_21"}, {"name":"_22"}, {"name":"_31"}, {"name":"_32"}],
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"com.sun.javafx.font.directwrite.D2D1_PIXEL_FORMAT",
+  "fields":[{"name":"alphaMode"}, {"name":"format"}],
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"com.sun.javafx.font.directwrite.D2D1_POINT_2F",
+  "fields":[{"name":"x"}, {"name":"y"}],
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"com.sun.javafx.font.directwrite.D2D1_RENDER_TARGET_PROPERTIES",
+  "fields":[{"name":"dpiX"}, {"name":"dpiY"}, {"name":"minLevel"}, {"name":"pixelFormat"}, {"name":"type"}, {"name":"usage"}],
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"com.sun.javafx.font.directwrite.DWRITE_GLYPH_METRICS",
+  "fields":[{"name":"advanceHeight"}, {"name":"advanceWidth"}, {"name":"bottomSideBearing"}, {"name":"leftSideBearing"}, {"name":"rightSideBearing"}, {"name":"topSideBearing"}, {"name":"verticalOriginY"}],
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"com.sun.javafx.font.directwrite.DWRITE_GLYPH_RUN",
+  "fields":[{"name":"advanceOffset"}, {"name":"ascenderOffset"}, {"name":"bidiLevel"}, {"name":"fontEmSize"}, {"name":"fontFace"}, {"name":"glyphAdvances"}, {"name":"glyphIndices"}, {"name":"isSideways"}],
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"com.sun.javafx.font.directwrite.DWRITE_MATRIX",
+  "fields":[{"name":"dx"}, {"name":"dy"}, {"name":"m11"}, {"name":"m12"}, {"name":"m21"}, {"name":"m22"}],
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"com.sun.javafx.font.directwrite.RECT",
+  "fields":[{"name":"bottom"}, {"name":"left"}, {"name":"right"}, {"name":"top"}],
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"com.sun.javafx.iio.common.ImageLoaderImpl",
+  "methods":[{"name":"emitWarning","parameterTypes":["java.lang.String"] }]
+},
+{
+  "name":"com.sun.javafx.iio.jpeg.JPEGImageLoader",
+  "methods":[{"name":"setInputAttributes","parameterTypes":["int","int","int","int","int","byte[]"] }, {"name":"setOutputAttributes","parameterTypes":["int","int"] }, {"name":"updateImageProgress","parameterTypes":["int"] }]
+},
+{
+  "name":"com.sun.media.jfxmedia.locator.ConnectionHolder",
+  "fields":[{"name":"buffer"}],
+  "methods":[{"name":"closeConnection","parameterTypes":[] }, {"name":"isRandomAccess","parameterTypes":[] }, {"name":"isSeekable","parameterTypes":[] }, {"name":"needBuffer","parameterTypes":[] }, {"name":"property","parameterTypes":["int","int"] }, {"name":"readBlock","parameterTypes":["long","int"] }, {"name":"readNextBlock","parameterTypes":[] }, {"name":"seek","parameterTypes":["long"] }]
+},
+{
+  "name":"com.sun.media.jfxmedia.locator.Locator",
+  "methods":[{"name":"createConnectionHolder","parameterTypes":[] }, {"name":"getStringLocation","parameterTypes":[] }]
+},
+{
+  "name":"com.sun.media.jfxmedia.logging.Logger",
+  "methods":[{"name":"logMsg","parameterTypes":["int","java.lang.String"] }, {"name":"logMsg","parameterTypes":["int","java.lang.String","java.lang.String","java.lang.String"] }]
+},
+{
+  "name":"com.sun.media.jfxmediaimpl.NativeMediaPlayer",
+  "methods":[{"name":"sendAudioSpectrumEvent","parameterTypes":["double","double","boolean"] }, {"name":"sendAudioTrack","parameterTypes":["boolean","long","java.lang.String","int","java.lang.String","int","int","float"] }, {"name":"sendBufferProgressEvent","parameterTypes":["double","long","long","long"] }, {"name":"sendDurationUpdateEvent","parameterTypes":["double"] }, {"name":"sendFrameSizeChangedEvent","parameterTypes":["int","int"] }, {"name":"sendMarkerEvent","parameterTypes":["java.lang.String","double"] }, {"name":"sendNewFrameEvent","parameterTypes":["long"] }, {"name":"sendPlayerHaltEvent","parameterTypes":["java.lang.String","double"] }, {"name":"sendPlayerMediaErrorEvent","parameterTypes":["int"] }, {"name":"sendPlayerStateEvent","parameterTypes":["int","double"] }, {"name":"sendSubtitleTrack","parameterTypes":["boolean","long","java.lang.String","int","java.lang.String"] }, {"name":"sendVideoTrack","parameterTypes":["boolean","long","java.lang.String","int","int","int","float","boolean"] }, {"name":"sendWarning","parameterTypes":["int","java.lang.String"] }]
+},
+{
+  "name":"com.sun.media.jfxmediaimpl.platform.gstreamer.GSTMediaPlayer"
+},
+{
+  "name":"com.sun.prism.impl.PrismSettings",
+  "fields":[{"name":"disableD3D9Ex"}, {"name":"forceGPU"}, {"name":"isVsyncEnabled"}, {"name":"verbose"}]
+},
+{
+  "name":"java.awt.Insets",
+  "fields":[{"name":"bottom"}, {"name":"left"}, {"name":"right"}, {"name":"top"}],
+  "methods":[{"name":"<init>","parameterTypes":["int","int","int","int"] }]
+},
+{
+  "name":"java.awt.Toolkit",
+  "methods":[{"name":"getDefaultToolkit","parameterTypes":[] }, {"name":"getFontMetrics","parameterTypes":["java.awt.Font"] }]
+},
+{
+  "name":"java.awt.image.BufferedImage",
+  "fields":[{"name":"colorModel"}, {"name":"imageType"}, {"name":"raster"}],
+  "methods":[{"name":"getRGB","parameterTypes":["int","int","int","int","int[]","int","int"] }, {"name":"setRGB","parameterTypes":["int","int","int","int","int[]","int","int"] }]
+},
+{
+  "name":"java.awt.image.ColorModel",
+  "fields":[{"name":"colorSpace"}, {"name":"colorSpaceType"}, {"name":"isAlphaPremultiplied"}, {"name":"is_sRGB"}, {"name":"nBits"}, {"name":"numComponents"}, {"name":"supportsAlpha"}, {"name":"transparency"}],
+  "methods":[{"name":"getRGBdefault","parameterTypes":[] }]
+},
+{
+  "name":"java.awt.image.Raster",
+  "fields":[{"name":"dataBuffer"}, {"name":"height"}, {"name":"minX"}, {"name":"minY"}, {"name":"numBands"}, {"name":"numDataElements"}, {"name":"sampleModel"}, {"name":"sampleModelTranslateX"}, {"name":"sampleModelTranslateY"}, {"name":"width"}]
+},
+{
+  "name":"java.awt.image.SampleModel",
+  "fields":[{"name":"height"}, {"name":"width"}],
+  "methods":[{"name":"getPixels","parameterTypes":["int","int","int","int","int[]","java.awt.image.DataBuffer"] }, {"name":"setPixels","parameterTypes":["int","int","int","int","int[]","java.awt.image.DataBuffer"] }]
+},
+{
+  "name":"java.io.InputStream",
+  "methods":[{"name":"read","parameterTypes":["byte[]","int","int"] }, {"name":"skip","parameterTypes":["long"] }]
+},
+{
+  "name":"java.lang.Class",
+  "methods":[{"name":"forName","parameterTypes":["java.lang.String","boolean","java.lang.ClassLoader"] }]
+},
+{
+  "name":"java.lang.Object",
+  "methods":[{"name":"toString","parameterTypes":[] }]
+},
+{
+  "name":"java.lang.Runnable",
+  "methods":[{"name":"run","parameterTypes":[] }]
+},
+{
+  "name":"java.lang.SecurityManager",
+  "fields":[{"name":"initialized"}]
+},
+{
+  "name":"java.lang.String",
+  "methods":[{"name":"<init>","parameterTypes":["byte[]"] }, {"name":"<init>","parameterTypes":["byte[]","java.nio.charset.Charset"] }, {"name":"getBytes","parameterTypes":[] }, {"name":"getBytes","parameterTypes":["java.nio.charset.Charset"] }, {"name":"toLowerCase","parameterTypes":["java.util.Locale"] }]
+},
+{
+  "name":"java.nio.Buffer",
+  "fields":[{"name":"capacity"}, {"name":"limit"}, {"name":"position"}],
+  "methods":[{"name":"array","parameterTypes":[] }, {"name":"arrayOffset","parameterTypes":[] }]
+},
+{
+  "name":"java.nio.charset.Charset",
+  "methods":[{"name":"forName","parameterTypes":["java.lang.String"] }]
+},
+{
+  "name":"java.util.ArrayList",
+  "methods":[{"name":"<init>","parameterTypes":["int"] }, {"name":"add","parameterTypes":["java.lang.Object"] }]
+},
+{
+  "name":"java.util.HashMap",
+  "methods":[{"name":"containsKey","parameterTypes":["java.lang.Object"] }, {"name":"put","parameterTypes":["java.lang.Object","java.lang.Object"] }]
+},
+{
+  "name":"org.bytedeco.javacpp.Loader",
+  "methods":[{"name":"putMemberOffset","parameterTypes":["java.lang.String","java.lang.String","int"] }]
+},
+{
+  "name":"org.bytedeco.javacpp.Pointer",
+  "fields":[{"name":"address"}, {"name":"capacity"}, {"name":"deallocator"}, {"name":"limit"}, {"name":"position"}],
+  "methods":[{"name":"init","parameterTypes":["long","long","long","long"] }]
+},
+{
+  "name":"org.bytedeco.javacpp.Pointer$NativeDeallocator",
+  "fields":[{"name":"ownerAddress"}]
+},
+{
+  "name":"sun.awt.image.ByteComponentRaster",
+  "fields":[{"name":"data"}, {"name":"dataOffsets"}, {"name":"pixelStride"}, {"name":"scanlineStride"}, {"name":"type"}]
+}
+]
