@@ -34,11 +34,27 @@ spring:
     username: 1085385084@qq.com
     password: bwmuexbfttocibja
     from: 1085385084@qq.com
+  cloud:
+    openfeign:
+      circuitbreaker:
+        enabled: true
+      client:
+        config:
+          default:
+            loggerLevel: basic
+            connect-timeout: 5000
+            read-timeout: 5000
+      httpclient:
+        hc5:
+          enabled: true
+        max-connections: 500
+        max-connections-per-route: 100
 
 
 logging:
   level:
-    org.springframework.security: trace
+    org.imtp.web.feign: debug
+    org.springframework.security: debug
 
 zookeeper:
   servers: 127.0.0.1:2181

@@ -1,6 +1,8 @@
 package org.imtp.web.controller;
 
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
 import org.imtp.common.packet.body.OfflineMessageInfo;
 import org.imtp.common.packet.body.UserFriendInfo;
 import org.imtp.common.packet.body.UserGroupInfo;
@@ -23,6 +25,7 @@ import java.util.List;
  * @Author ys
  * @Date 2024/9/3 17:37
  */
+@Slf4j
 @RestController
 @RequestMapping("/social")
 public class UserSocialController {
@@ -41,6 +44,7 @@ public class UserSocialController {
     }
 
     @GetMapping("/userInfo/{userId}")
+    @CircuitBreaker(name = "commonBreaker",fallbackMethod = "userSocialFallbackMethod")
     public Result<?> userInfo(@PathVariable(name = "userId") String userId) throws AccessDeniedException {
         User user = currentLoginUser();
         checkUserId(user,userId);
@@ -48,6 +52,7 @@ public class UserSocialController {
     }
 
     @GetMapping("/userSession/{userId}")
+    @CircuitBreaker(name = "commonBreaker",fallbackMethod = "userSocialFallbackMethod")
     public Result<?> userSession(@PathVariable(name = "userId") String userId) throws AccessDeniedException {
         checkUserId(userId);
         List<UserSessionInfo> userSessionInfos = userSocialService.userSession(userId);
@@ -55,12 +60,14 @@ public class UserSocialController {
     }
 
     @PostMapping("/userSession")
+    @CircuitBreaker(name = "slowCallBreaker")
     public Result<?> userSession(@RequestBody @Validated UserSessionDTO userSessionDTO){
         String id = userSocialService.userSession(userSessionDTO);
         return ResultGenerator.ok(id);
     }
 
     @GetMapping("/userFriend/{userId}")
+    @CircuitBreaker(name = "commonBreaker",fallbackMethod = "userSocialFallbackMethod")
     public Result<?> userFriend(@PathVariable(name = "userId") String userId) throws AccessDeniedException {
         checkUserId(userId);
         List<UserFriendInfo> userFriendInfos = userSocialService.userFriend(userId);
@@ -68,6 +75,7 @@ public class UserSocialController {
     }
 
     @GetMapping("/userGroup/{userId}")
+    @CircuitBreaker(name = "commonBreaker",fallbackMethod = "userSocialFallbackMethod")
     public Result<?> userGroup(@PathVariable(name = "userId") String userId) throws AccessDeniedException {
         checkUserId(userId);
         List<UserGroupInfo> groupInfos = userSocialService.userGroup(userId);
@@ -75,6 +83,7 @@ public class UserSocialController {
     }
 
     @GetMapping("/offlineMessage/{userId}")
+    @CircuitBreaker(name = "commonBreaker",fallbackMethod = "userSocialFallbackMethod")
     public Result<?> offlineMessage(@PathVariable(name = "userId") String userId)  throws AccessDeniedException {
         checkUserId(userId);
         List<OfflineMessageInfo> offlineMessageInfos = userSocialService.offlineMessage(userId);
@@ -95,6 +104,11 @@ public class UserSocialController {
     private User currentLoginUser(){
         SecurityContext securityContext = SecurityContextHolder.getContext();
         return (User) securityContext.getAuthentication().getPrincipal();
+    }
+
+    public Result<?> userSocialFallbackMethod(String userId,Exception exception){
+        log.error("用户:[{}]社交关系查询接口异常: ",userId,exception);
+        return ResultGenerator.failed();
     }
 
 }

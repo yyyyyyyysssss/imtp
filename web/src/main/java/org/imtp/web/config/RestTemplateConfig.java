@@ -68,6 +68,10 @@ public class RestTemplateConfig {
                     .setConnectionManager(
                             PoolingHttpClientConnectionManagerBuilder
                                     .create()
+                                    //所有路由最大连接数
+                                    .setMaxConnTotal(2000)
+                                    //单路由并发连接数
+                                    .setMaxConnPerRoute(100)
                                     .setSSLSocketFactory(
                                             SSLConnectionSocketFactoryBuilder
                                                     .create()
