@@ -102,7 +102,7 @@ public class User implements UserDetails, CredentialsContainer {
 
     @Override
     public void eraseCredentials() {
-        this.password = null;
+
     }
 
     public void setAuthorities(Collection<? extends GrantedAuthority> authorities) {

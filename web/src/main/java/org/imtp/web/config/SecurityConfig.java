@@ -191,9 +191,14 @@ public class SecurityConfig {
     }
 
     @Bean
+    public RefreshTokenServices refreshTokenServices(){
+        return new RefreshTokenServices(authProperties.getJwt().getSecretKey(),userService,redisTemplate);
+    }
+
+    @Bean
     public RefreshTokenAuthenticationFilter refreshTokenAuthenticationFilter() {
 
-        return new RefreshTokenAuthenticationFilter(bearerTokenResolver(), tokenService);
+        return new RefreshTokenAuthenticationFilter(bearerTokenResolver(), refreshTokenServices());
     }
 
     //基于请求头的认证

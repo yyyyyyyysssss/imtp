@@ -5,12 +5,14 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.imtp.web.config.RedisSecurityContextRepository;
+import org.imtp.web.config.RefreshTokenServices;
 import org.imtp.web.enums.TokenType;
 import org.imtp.web.service.TokenService;
 import org.imtp.web.utils.JwtUtil;
 import org.imtp.web.utils.PayloadInfo;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -32,15 +34,15 @@ public class RefreshTokenAuthenticationFilter extends OncePerRequestFilter {
 
     private BearerTokenResolver bearerTokenResolver;
 
-    private TokenService tokenService;
+    private RefreshTokenServices tokenService;
 
     private final RequestMatcher tokenEndpointMatcher;
 
     private final GrantedAuthority grantedAuthority = () -> "refresh_token";
 
-    public RefreshTokenAuthenticationFilter(BearerTokenResolver bearerTokenResolver,TokenService tokenService){
+    public RefreshTokenAuthenticationFilter(BearerTokenResolver bearerTokenResolver, RefreshTokenServices refreshTokenServices){
         this.bearerTokenResolver = bearerTokenResolver;
-        this.tokenService = tokenService;
+        this.tokenService = refreshTokenServices;
         this.tokenEndpointMatcher = new AntPathRequestMatcher("/refreshToken", HttpMethod.GET.name());
     }
 
@@ -58,10 +60,9 @@ public class RefreshTokenAuthenticationFilter extends OncePerRequestFilter {
         }
         //设置请求属性  由RedisSecurityContextRepository加载SecurityContext
         if (securityContext != null) {
-            if (tokenService.isValid(token,TokenType.REFRESH_TOKEN)) {
-                UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(null, null, Collections.singleton(grantedAuthority));
-                authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                securityContext.setAuthentication(authenticationToken);
+            Authentication authentication = tokenService.tokenValid(token);
+            if (authentication != null) {
+                securityContext.setAuthentication(authentication);
             }
         }
         filterChain.doFilter(request,response);

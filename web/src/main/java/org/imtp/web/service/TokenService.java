@@ -9,8 +9,6 @@ public interface TokenService {
 
     TokenInfo generate(User user, ClientType clientType);
 
-    TokenInfo refreshToken(String token);
-
     void revokeToken(String token);
 
     void revokeUserAllTokens(String userId);

@@ -3,6 +3,7 @@ package org.imtp.web.service.impl;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.imtp.web.config.AuthProperties;
+import org.imtp.web.config.RefreshTokenServices;
 import org.imtp.web.config.idwork.IdGen;
 import org.imtp.web.config.redis.RedisKey;
 import org.imtp.web.config.redis.RedisWrapper;
@@ -11,8 +12,10 @@ import org.imtp.web.domain.entity.User;
 import org.imtp.common.enums.ClientType;
 import org.imtp.web.enums.TokenType;
 import org.imtp.web.service.TokenService;
+import org.imtp.web.utils.EncryptUtil;
 import org.imtp.web.utils.JwtUtil;
 import org.imtp.web.utils.PayloadInfo;
+import org.springframework.security.web.authentication.rememberme.TokenBasedRememberMeServices;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
@@ -40,8 +43,8 @@ public class JWTTokenServiceImpl implements TokenService {
     }
 
     private TokenInfo generate(Long userId, ClientType clientType) {
-        String accessToken = JwtUtil.genToken(userId.toString(),clientType);
-        String refreshToken = JwtUtil.genRefreshToken(userId.toString(),clientType);
+        String accessToken = generateAccessToken(userId,clientType);
+        String refreshToken = generateRefreshToken(userId,clientType);
         PayloadInfo payloadInfo = JwtUtil.extractPayloadInfo(accessToken);
         TokenInfo token = TokenInfo.builder()
                 .id(IdGen.genId())
@@ -64,26 +67,17 @@ public class JWTTokenServiceImpl implements TokenService {
             redisWrapper.removeZSet(key,array);
         }
         //token过期时间作为score 刷新token过期时间作为key的过期时间
-        redisWrapper.addZSet(key, payloadInfo.getId(), payloadInfo.getExpiration(), Duration.ofMillis(payloadInfo.getExpiration()));
+        long expirationAt = payloadInfo.getExpiration();
+        long expiration = expirationAt - System.currentTimeMillis();
+        redisWrapper.addZSet(key, payloadInfo.getId(), payloadInfo.getExpiration(), Duration.ofMillis(expiration));
         return token;
-    }
-
-    @Override
-    public TokenInfo refreshToken(String refreshToken) {
-        PayloadInfo payloadInfo = JwtUtil.extractPayloadInfo(refreshToken);
-        String userId = payloadInfo.getSubject();
-        ClientType clientType = payloadInfo.getClientType();
-        TokenInfo tokenInfo = generate(Long.parseLong(userId), clientType);
-        Long expiration = payloadInfo.getExpiration() - authProperties.getJwt().getExpiration() * 1000;
-        revokeToken(payloadInfo.getId(),expiration);
-        return tokenInfo;
     }
 
     @Override
     public void revokeToken(String token) {
         PayloadInfo payloadInfo = JwtUtil.extractPayloadInfo(token);
-        Long expiration = payloadInfo.getExpiration() - authProperties.getJwt().getExpiration() * 1000;
-        revokeToken(payloadInfo.getId(),expiration);
+        long expiration = payloadInfo.getExpiration() - System.currentTimeMillis();
+        revokeToken(payloadInfo.getId(),expiration / 1000);
     }
 
     private void revokeToken(String tokenId,Long expiration) {
@@ -110,5 +104,18 @@ public class JWTTokenServiceImpl implements TokenService {
 
     private String key(Long userId, ClientType clientType) {
         return RedisKey.USER_TOKEN + userId + ":" + clientType;
+    }
+
+    private String generateAccessToken(Long userId,ClientType clientType){
+
+        return JwtUtil.genToken(userId.toString(),clientType);
+    }
+
+    private String generateRefreshToken(Long userId,ClientType clientType){
+        Long configExpiration = authProperties.getJwt().getRefreshExpiration();
+        long timestamp = configExpiration * 1000;
+        long expiration = System.currentTimeMillis() + timestamp;
+        String encryptStr = EncryptUtil.sha256(userId.toString(), Long.toString(expiration),clientType.name(), authProperties.getJwt().getSecretKey());
+        return EncryptUtil.base64Encode(userId.toString(), Long.toString(expiration),clientType.name(), RefreshTokenServices.RefreshTokenAlgorithm.SHA256.name(), encryptStr);
     }
 }

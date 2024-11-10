@@ -4,11 +4,13 @@ import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.imtp.common.enums.ClientType;
 import org.imtp.web.config.EmailAuthenticationProvider;
 import org.imtp.web.config.EmailAuthenticationToken;
 import org.imtp.web.config.RedisSecurityContextRepository;
 import org.imtp.common.response.Result;
 import org.imtp.common.response.ResultGenerator;
+import org.imtp.web.config.RefreshAuthenticationToken;
 import org.imtp.web.domain.dto.EmailInfo;
 import org.imtp.web.domain.dto.LoginDTO;
 import org.imtp.web.domain.entity.TokenInfo;
@@ -22,6 +24,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -92,15 +95,11 @@ public class LoginController {
 
     @GetMapping("/refreshToken")
     public Result<?> refreshToken() {
-        String tokenStr = bearerTokenResolver.resolve(request);
-        TokenInfo token = tokenService.refreshToken(tokenStr);
-        Long userId = token.getUserId();
-        UserDetails userDetails = userService.loadUserByUserId(userId);
-        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userDetails.getUsername(), null, userDetails.getAuthorities());
         SecurityContext securityContext = SecurityContextHolder.getContext();
-        securityContext.setAuthentication(authenticationToken);
-        saveSecurityContext(userId, securityContext);
-        return ResultGenerator.ok(new LoginVO(token));
+        RefreshAuthenticationToken refreshAuthenticationToken = (RefreshAuthenticationToken) securityContext.getAuthentication();
+        String clientType = refreshAuthenticationToken.getClientType();
+        TokenInfo tokenInfo = loginService.login(refreshAuthenticationToken, false, ClientType.valueOf(clientType));
+        return ResultGenerator.ok(tokenInfo);
     }
 
     @GetMapping("/sendEmailVerificationCode")
@@ -117,11 +116,5 @@ public class LoginController {
         emailService.sendHtmlEmail(emailInfo, "EmailVerificationCode", variable);
         return ResultGenerator.ok();
     }
-
-    private void saveSecurityContext(Long userId, SecurityContext securityContext) {
-        request.setAttribute(RedisSecurityContextRepository.DEFAULT_REQUEST_ATTR_NAME, userId.toString());
-        securityContextRepository.saveContext(securityContext, request, response);
-    }
-
 
 }
