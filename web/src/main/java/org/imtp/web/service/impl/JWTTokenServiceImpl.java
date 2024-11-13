@@ -39,10 +39,7 @@ public class JWTTokenServiceImpl implements TokenService {
 
     @Override
     public TokenInfo generate(User user, ClientType clientType) {
-        return generate(user.getId(), clientType);
-    }
-
-    private TokenInfo generate(Long userId, ClientType clientType) {
+        Long userId = user.getId();
         String accessToken = generateAccessToken(userId,clientType);
         String refreshToken = generateRefreshToken(userId,clientType);
         PayloadInfo payloadInfo = JwtUtil.extractPayloadInfo(accessToken);

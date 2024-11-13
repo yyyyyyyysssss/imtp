@@ -67,7 +67,7 @@ public class RefreshTokenServices {
             return null;
         }
         log.info("签名校验成功");
-        return new RefreshAuthenticationToken(userId,actualTokenSignature,clientType, Collections.singleton(grantedAuthority));
+        return new RefreshAuthenticationToken(userDetails,actualTokenSignature,clientType, Collections.singleton(grantedAuthority));
     }
 
 

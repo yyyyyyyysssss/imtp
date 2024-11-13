@@ -57,20 +57,19 @@ public class LoginService {
         if ((authenticate = SecurityContextHolder.getContext().getAuthentication()) == null || authenticate instanceof AnonymousAuthenticationToken) {
             authenticate = authenticationManager.authenticate(authenticationToken);
         }
+        User user = (User)authenticate.getPrincipal();
         //如果是刷新token
         if (authenticate instanceof RefreshAuthenticationToken){
-            String userId = (String) authenticate.getPrincipal();
-            UserDetails userDetails = userService.loadUserByUserId(Long.parseLong(userId));
-            authenticate = UsernamePasswordAuthenticationToken.authenticated(userDetails, null, userDetails.getAuthorities());
+            authenticate = UsernamePasswordAuthenticationToken.authenticated(user, null, user.getAuthorities());
+        }
+        //记住我token
+        String rememberMeToken = null;
+        if (rememberMe || authenticate instanceof RememberMeAuthenticationToken){
+            rememberMeToken = rememberMeToken(user.getUsername(), user.getPassword());
         }
         //生成token
-        User user = (User)authenticate.getPrincipal();
         TokenInfo tokenInfo = tokenService.generate(user, clientType);
-        //记住我token
-        if (rememberMe || authenticate instanceof RememberMeAuthenticationToken){
-            String rememberMeToken = rememberMeToken(user.getUsername(), user.getPassword());
-            tokenInfo.setRememberMeToken(rememberMeToken);
-        }
+        tokenInfo.setRememberMeToken(rememberMeToken);
         //序列化securityContext
         saveSecurityContext(user.getId(),authenticate);
         return tokenInfo;

@@ -38,8 +38,6 @@ public class RefreshTokenAuthenticationFilter extends OncePerRequestFilter {
 
     private final RequestMatcher tokenEndpointMatcher;
 
-    private final GrantedAuthority grantedAuthority = () -> "refresh_token";
-
     public RefreshTokenAuthenticationFilter(BearerTokenResolver bearerTokenResolver, RefreshTokenServices refreshTokenServices){
         this.bearerTokenResolver = bearerTokenResolver;
         this.tokenService = refreshTokenServices;

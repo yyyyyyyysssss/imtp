@@ -45,24 +45,6 @@ import java.util.Map;
 public class LoginController {
 
     @Resource
-    private TokenService tokenService;
-
-    @Resource
-    private UserService userService;
-
-    @Resource
-    private BearerTokenResolver bearerTokenResolver;
-
-    @Resource
-    private RedisSecurityContextRepository securityContextRepository;
-
-    @Resource
-    private HttpServletRequest request;
-
-    @Resource
-    private HttpServletResponse response;
-
-    @Resource
     private LoginService loginService;
 
     @Resource
