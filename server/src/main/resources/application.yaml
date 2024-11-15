@@ -23,5 +23,8 @@ im:
       zookeeper:
         servers: 127.0.0.1:2181
         sessionTimeout: 3000
-    host: 172.30.112.1
+    host: 0.0.0.0
     port: 2921
+    websocket:
+      host: 0.0.0.0
+      port: 8080

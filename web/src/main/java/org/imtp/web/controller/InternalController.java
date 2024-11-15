@@ -44,7 +44,7 @@ public class InternalController {
             userInfo.setUsername(user.getUsername());
             userInfo.setNickname(user.getNickname());
             userInfo.setAvatar(user.getAvatar());
-            userInfo.setGender(user.getGender().name());
+            userInfo.setGender(user.getGender() != null ? user.getGender().name() : null);
             return ResultGenerator.ok(userInfo);
         }else {
             return ResultGenerator.failed();

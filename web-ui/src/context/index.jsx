@@ -1,5 +1,6 @@
 import { createContext,useState,useEffect,useContext } from 'react'
 import Cookies from 'js-cookie'
+import env from '../env';
 
 export const HomeContext = createContext();
 
@@ -13,14 +14,13 @@ export const GroupPanelContext  = createContext();
 const AUTHORIZATION_RES = -120;
 
 // websocket
-const WEB_SEOCKET_SERVER_URL = "ws://localhost:8080/im";
 const WebSocketContext = createContext();
 export const WebSocketProvider = ({ children }) => {
 
     const [socket,setSocket] = useState(null);
 
     const start = () => {
-        const ws = new WebSocket(WEB_SEOCKET_SERVER_URL);
+        const ws = new WebSocket(env.wobsocketUrl);
         ws.onopen = () => {
             console.log('WebSocket connection opened');
             const token = Cookies.get("accessToken");

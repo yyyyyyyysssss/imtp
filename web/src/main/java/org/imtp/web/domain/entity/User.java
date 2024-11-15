@@ -153,7 +153,7 @@ public class User implements UserDetails, CredentialsContainer {
             user.setNickname(nickname);
             user.setNote(note);
             user.setTagline(tagline);
-            user.setGender(Gender.valueOf(gender));
+            user.setGender(gender != null ? Gender.valueOf(gender) : null);
             user.setAvatar(avatar);
             user.setEmail(email);
             user.setPhone(phone);

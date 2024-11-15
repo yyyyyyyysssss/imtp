@@ -3,10 +3,11 @@ import Cookies from 'js-cookie'
 import { message } from "antd"
 import router from '../router/router';
 import { jwtDecode } from 'jwt-decode'
+import env from "../env";
 
 
 const httpWrapper = axios.create({
-    baseURL: 'http://127.0.0.1:9090',
+    baseURL: env.apiUrl,
     timeout: 60000
 })
 

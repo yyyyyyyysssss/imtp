@@ -695,7 +695,7 @@ const ChatItem = (props) => {
             self: true,
             ackId: snowflake.nextId(),
             timestamp: new Date().getTime(),
-            avatar: userInfo.avatar,
+            avatar: userInfo?.avatar,
             name: userSessionItem.name,
             content: content
         }

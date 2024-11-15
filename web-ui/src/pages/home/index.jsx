@@ -1,21 +1,21 @@
-import React, { useEffect, useState, useRef } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { Flex, Tabs, Input } from "antd"
 import { SearchOutlined } from '@ant-design/icons';
-import homeChatIcon from '../../assets/img/home_chat_icon.png'
-import homeChatIconSelected from '../../assets/img/home_chat_icon_selected.png'
-import homeFriendIcon from '../../assets/img/home_friend_icon.png'
-import homeFriendIconSelected from '../../assets/img/home_friend_icon_selected.png'
-import homeGroupIcon from '../../assets/img/home_group_icon.png'
-import homeGroupIconSelected from '../../assets/img/home_group_icon_selected.png'
-import Chat from '../chat'
-import Friend from '../friend'
-import Group from '../group'
-import { HomeContext} from '../../context'
-import Cookies from 'js-cookie'
-import httpWrapper from '../../api/axiosWrapper'
-import closeImg from '../../assets/img/close_16.png'
-import './index.less'
+import { Flex, Input, Tabs } from "antd";
+import Cookies from 'js-cookie';
+import React, { useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import httpWrapper from '../../api/axiosWrapper';
+import closeImg from '../../assets/img/close_16.png';
+import homeChatIcon from '../../assets/img/home_chat_icon.png';
+import homeChatIconSelected from '../../assets/img/home_chat_icon_selected.png';
+import homeFriendIcon from '../../assets/img/home_friend_icon.png';
+import homeFriendIconSelected from '../../assets/img/home_friend_icon_selected.png';
+import homeGroupIcon from '../../assets/img/home_group_icon.png';
+import homeGroupIconSelected from '../../assets/img/home_group_icon_selected.png';
+import { HomeContext } from '../../context';
+import Chat from '../chat';
+import Friend from '../friend';
+import Group from '../group';
+import './index.less';
 
 const { TabPane } = Tabs;
 
@@ -24,22 +24,22 @@ const FRIEND_PANEL = "FRIEND_PANEL";
 const GROUP_PANEL = "GROUP_PANEL";
 
 const Home = () => {
-    const [userInfo,setUserInfo] = useState();
-    const [userAvatar,setUserAvatar] = useState();
+    const [userInfo, setUserInfo] = useState();
+    const [userAvatar, setUserAvatar] = useState();
 
     useEffect(() => {
         httpWrapper
-        .get('/social/userInfo')
-        .then(
-            (res) => {
-                setUserInfo(res.data);
-                setUserAvatar(res.data.avatar);
-            },
-            (error) => {
-                console.log(error)
-            }
-        );
-    },[])
+            .get('/social/userInfo')
+            .then(
+                (res) => {
+                    setUserInfo(res.data);
+                    setUserAvatar(res.data.avatar);
+                },
+                (error) => {
+                    console.log(error)
+                }
+            );
+    }, [])
     //聊天组件引用
     const chatRef = useRef();
     //好友组件引用
@@ -61,9 +61,9 @@ const Home = () => {
         switchPanel(CHAT_PANEL);
         chatRef.current.addUserSession(user);
     }
-    
-    const findUserInfoByGroup = (groupId,id) => {
-        return groupRef.current.findUserInfoByGroup(groupId,id);
+
+    const findUserInfoByGroup = (groupId, id) => {
+        return groupRef.current.findUserInfoByGroup(groupId, id);
     }
 
     const findGroupByGroupId = (groupId) => {
@@ -120,31 +120,29 @@ const Home = () => {
                             </Flex>
                         </Flex>
                         <Flex>
-                            <HomeContext.Provider value={{ setHeadName,userInfo, addUserSession,findUserInfoByGroup,findGroupByGroupId,findUserInfoByFriendId }}>
-                                {/* <WebSocketProvider> */}
-                                    <div className='home-panel-tabs'>
-                                        <Tabs
-                                            key="home-tabs"
-                                            activeKey={panel}
-                                            tabPosition='left'
-                                            indicator={{ size: 0 }}
-                                            centered
-                                            size='large'
-                                            onChange={(key) => switchPanel(key)}
-                                            
-                                        >
-                                            <TabPane forceRender={true} key={CHAT_PANEL} tab={<img className='panel-img-icon' src={panel === CHAT_PANEL ? homeChatIconSelected : homeChatIcon} alt='' />}>
-                                                <Chat ref={chatRef} style={{ height: '685px', width: '950px' }} />
-                                            </TabPane>
-                                            <TabPane forceRender={true} key={FRIEND_PANEL} tab={<img className='panel-img-icon' src={panel === FRIEND_PANEL ? homeFriendIconSelected : homeFriendIcon} alt='' />} >
-                                                <Friend ref={friendRef} style={{ height: '685px', width: '950px' }} />
-                                            </TabPane>
-                                            <TabPane forceRender={true} key={GROUP_PANEL} tab={<img className='panel-img-icon' src={panel === GROUP_PANEL ? homeGroupIconSelected : homeGroupIcon} alt='' />} >
-                                                <Group ref={groupRef} style={{ height: '685px', width: '950px' }} />
-                                            </TabPane>
-                                        </Tabs>
-                                    </div>
-                                {/* </WebSocketProvider> */}
+                            <HomeContext.Provider value={{ setHeadName, userInfo, addUserSession, findUserInfoByGroup, findGroupByGroupId, findUserInfoByFriendId }}>
+                                <div className='home-panel-tabs'>
+                                    <Tabs
+                                        key="home-tabs"
+                                        activeKey={panel}
+                                        tabPosition='left'
+                                        indicator={{ size: 0 }}
+                                        centered
+                                        size='large'
+                                        onChange={(key) => switchPanel(key)}
+
+                                    >
+                                        <TabPane forceRender={true} key={CHAT_PANEL} tab={<img className='panel-img-icon' src={panel === CHAT_PANEL ? homeChatIconSelected : homeChatIcon} alt='' />}>
+                                            <Chat ref={chatRef} style={{ height: '685px', width: '950px' }} />
+                                        </TabPane>
+                                        <TabPane forceRender={true} key={FRIEND_PANEL} tab={<img className='panel-img-icon' src={panel === FRIEND_PANEL ? homeFriendIconSelected : homeFriendIcon} alt='' />} >
+                                            <Friend ref={friendRef} style={{ height: '685px', width: '950px' }} />
+                                        </TabPane>
+                                        <TabPane forceRender={true} key={GROUP_PANEL} tab={<img className='panel-img-icon' src={panel === GROUP_PANEL ? homeGroupIconSelected : homeGroupIcon} alt='' />} >
+                                            <Group ref={groupRef} style={{ height: '685px', width: '950px' }} />
+                                        </TabPane>
+                                    </Tabs>
+                                </div>
                             </HomeContext.Provider>
                         </Flex>
                     </Flex>

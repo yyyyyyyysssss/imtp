@@ -23,6 +23,8 @@ public class ServerProperties {
 
     private Configuration configuration = new Configuration();
 
+    private WebSocketConfig websocket = new WebSocketConfig();
+
     @Override
     public String toString() {
         return "ServerProperties{" +
@@ -36,6 +38,15 @@ public class ServerProperties {
     class Configuration{
         private ServerModel model;
         private String id;
+    }
+
+    @Getter
+    @Setter
+    class WebSocketConfig{
+
+        private String host;
+
+        private Integer port;
     }
 
 }

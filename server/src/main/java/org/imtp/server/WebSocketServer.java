@@ -64,7 +64,7 @@ public class WebSocketServer {
                             pipeline.addLast(authorizationHandler);
                         }
                     });
-            channelFuture = serverBootstrap.bind("127.0.0.1", 8080).sync();
+            channelFuture = serverBootstrap.bind(serverProperties.getWebsocket().getHost(), serverProperties.getWebsocket().getPort()).sync();
             channelFuture.addListener((ChannelFutureListener) channelFuture -> {
                 if (channelFuture.isSuccess()){
                     log.info("WebSocket Server started");

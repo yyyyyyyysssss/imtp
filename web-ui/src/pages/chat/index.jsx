@@ -202,7 +202,6 @@ const Chat = forwardRef((props, ref) => {
         setData(prevData => {
             const msgResUserSessionItem = prevData.find(f => f.id === userSessionId);
             const chatItemData = msgResUserSessionItem.chatItemData;
-            console.log(chatItemData);
             const newArr = chatItemData.map(item => item.id === chatItemMsg.id ? {...chatItemMsg} : item);
             return prevData.map(m => m.id === msgResUserSessionItem.id ? {...msgResUserSessionItem,chatItemData: newArr} : m);
         });

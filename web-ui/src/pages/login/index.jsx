@@ -33,7 +33,7 @@ const Login = () => {
     const [verificationCode, setVerificationCode] = useState({
         disabled: false,
         tips: '获取验证码',
-        time: 5
+        time: 60
     });
 
     //其它登录方式回调处理
