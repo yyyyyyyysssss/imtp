@@ -1,6 +1,9 @@
 package org.imtp.web.service;
 
-import org.imtp.web.domain.dto.UploadChunkDTO;
+import org.imtp.web.domain.dto.FileInfoDTO;
+import org.imtp.web.domain.dto.FileChunkDTO;
+import org.imtp.web.domain.vo.FileUploadProgressVO;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * @Description
@@ -9,10 +12,16 @@ import org.imtp.web.domain.dto.UploadChunkDTO;
  */
 public interface FileService {
 
-    String uploadId(String filename,Long totalSize);
+    String uploadId(FileInfoDTO fileInfoDTO);
 
-    boolean upload(UploadChunkDTO uploadChunkDTO);
+    boolean uploadChunk(FileChunkDTO fileChunkDTO);
+
+    FileUploadProgressVO uploadProgress(String uploadId);
 
     String accessUrl(String uploadId);
+
+    String temporaryUrl(String uploadId);
+
+    String simpleUpload(MultipartFile file);
 
 }

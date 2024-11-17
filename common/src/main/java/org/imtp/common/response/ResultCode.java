@@ -8,6 +8,10 @@ public enum ResultCode {
     IDENTITY_AUTHENTICATION_EXCEPTION(4001, "身份认证失败"),
     ACCESS_AUTHORIZED_EXCEPTION(4003, "未经授权的访问"),
     PARAM_VALIDATION_EXCEPTION(1003,"参数校验失败"),
+
+    MINIO_EXCEPTION(6012,"Minio操作异常"),
+
+    DATABASE_EXCEPTION(5070,"数据库操作异常"),
     ;
     private int code;
     private String message;

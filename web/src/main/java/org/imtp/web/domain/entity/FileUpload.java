@@ -7,6 +7,8 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.Tolerate;
+import org.imtp.web.enums.FileStorageType;
 import org.imtp.web.enums.FileUploadStatus;
 import java.util.Date;
 
@@ -21,14 +23,34 @@ import java.util.Date;
 @Builder
 public class FileUpload {
 
+    @Tolerate
+    public FileUpload(){
+
+    }
+
     @TableId(value = "id", type = IdType.INPUT)
     private Long id;
+
+    @TableField("upload_id")
+    private String uploadId;
+
+    @TableField("file_name")
+    private String fileName;
+
+    @TableField("file_type")
+    private String fileType;
 
     @TableField("total_size")
     private Long totalSize;
 
-    @TableField("file_name")
-    private String fileName;
+    @TableField("total_chunk")
+    private Integer totalChunk;
+
+    @TableField("chunk_size")
+    private Integer chunkSize;
+
+    @TableField("uploaded_chunk_count")
+    private Integer uploadedChunkCount;
 
     @TableField("etag")
     private String etag;
@@ -38,6 +60,9 @@ public class FileUpload {
 
     @TableField("status")
     private FileUploadStatus status;
+
+    @TableField("storage_type")
+    private FileStorageType storageType;
 
     @TableField("create_time")
     private Date createTime;

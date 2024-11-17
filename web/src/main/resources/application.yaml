@@ -2,6 +2,12 @@ server:
   port: 9090
 
 spring:
+  output:
+    ansi:
+      enabled: always
+  threads:
+    virtual:
+      enabled: true
   main:
     allow-circular-references: true
   datasource:
@@ -53,9 +59,9 @@ spring:
 
 logging:
   level:
+    org.imtp.web: debug
     org.imtp.web.feign: debug
-    org.springframework.security: debug
-
+    org.springframework.security: info
 zookeeper:
   servers: 127.0.0.1:2181
   sessionTimeout: 3000
@@ -151,7 +157,7 @@ resilience4j:
         recordExceptions: #记录为失败并因此增加失败率的异常列表。除⾮通过ignoreExceptions显式忽略，否则与列表中某个匹配或继承的异常都将被视为失败。 如果指定异常列表，则所有其他异常均视为成功，除⾮它们被ignoreExceptions显式忽略
           - java.lang.Exception
         ignore-exceptions:
-          - org.imtp.web.config.BusinessException
+          - org.imtp.web.config.exception.BusinessException
           - org.springframework.security.core.AuthenticationException
           - org.springframework.security.access.AccessDeniedException
     instances:
@@ -196,7 +202,7 @@ resilience4j:
         maxAttempts: 3
         waitDuration: 500ms
         retryExceptions:
-          - org.imtp.web.config.RetryException
+          - org.imtp.web.config.exception.RetryException
     instances:
       # 公共重试器: 当抛出RetryException异常时进行重试，重试3次，间隔500毫秒
       commonRetry:

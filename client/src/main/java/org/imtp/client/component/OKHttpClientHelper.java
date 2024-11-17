@@ -60,6 +60,16 @@ public class OKHttpClientHelper {
         return execute(request,typeReference);
     }
 
+    public <T> T doPost(String url,Object body,TypeReference<T> typeReference){
+        RequestBody requestBody = RequestBody.create(JsonUtil.toJSONString(body), MediaType.parse("application/json; charset=utf-8"));
+        Request request = new Request
+                .Builder()
+                .url(config.getApiHost() + url)
+                .post(requestBody)
+                .build();
+        return execute(request,typeReference);
+    }
+
     public <T> T doPost(String url,RequestBody requestBody,TypeReference<T> typeReference){
         Request request = new Request
                 .Builder()

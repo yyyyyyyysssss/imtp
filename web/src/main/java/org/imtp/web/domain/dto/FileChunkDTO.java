@@ -11,7 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
  */
 @Getter
 @Setter
-public class UploadChunkDTO {
+public class FileChunkDTO {
 
     //id
     private String uploadId;

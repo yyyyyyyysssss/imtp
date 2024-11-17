@@ -19,14 +19,19 @@ const Uploader = forwardRef((props,ref) => {
     }))
     //上传文件
     const uploadFile = async (file) => {
+        const totalSize = file.size;
+        const filename = file.name;
+        const chunks = splitFile(file, sliceSize);
+        const totalChunk = chunks.length;
         let uploadId = file.key;
         if (!uploadId) {
             await httpWrapper
-                .get('/file/uploadId', {
-                    params: {
-                        filename: file.name,
-                        totalSize: file.size
-                    }
+                .post('/file/uploadId', {
+                    filename: file.name,
+                    fileType: file.type,
+                    totalSize: file.size,
+                    totalChunk: totalChunk,
+                    chunkSize: sliceSize
                 })
                 .then(
                     (res) => {
@@ -38,10 +43,6 @@ const Uploader = forwardRef((props,ref) => {
                     }
                 );
         }
-        const totalSize = file.size;
-        const filename = file.name;
-        const chunks = splitFile(file, sliceSize);
-        const totalChunk = chunks.length;
         console.log(`文件名称: ${filename}; 文件总大小: ${(totalSize / (1024 * 1024)).toFixed(2)}MB; 总块数: ${totalChunk}`);
         // 存储所有分片上传的 Promise
         const uploadPromises = [];
@@ -79,7 +80,7 @@ const Uploader = forwardRef((props,ref) => {
     const uploadByFormData = (uploadFormData) => {
         return new Promise((resolve) => {
             httpWrapper
-                .post("/file/upload", uploadFormData, {
+                .post("/file/upload/chunk", uploadFormData, {
                     headers: {
                         "Content-Type": "multipart/form-data"
                     }

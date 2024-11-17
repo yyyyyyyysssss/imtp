@@ -1,4 +1,4 @@
-package org.imtp.web.config;
+package org.imtp.web.config.exception;
 
 import jakarta.validation.ValidationException;
 import lombok.extern.slf4j.Slf4j;
@@ -54,6 +54,20 @@ public class GlobalExceptionHandler {
     public Result<?> businessException(BusinessException e){
         log.error("业务异常: ",e);
         return ResultGenerator.failed(e.getCode(),e.getReason());
+    }
+
+    @ResponseStatus(HttpStatus.OK)
+    @ExceptionHandler(MinioException.class)
+    public Result<?> minioException(MinioException e){
+        log.error("minio操作异常: ",e);
+        return ResultGenerator.failed(ResultCode.MINIO_EXCEPTION,e.getMessage());
+    }
+
+    @ResponseStatus(HttpStatus.OK)
+    @ExceptionHandler(DatabaseException.class)
+    public Result<?> databaseException(DatabaseException e){
+        log.error("数据库操作异常: ",e);
+        return ResultGenerator.failed(ResultCode.DATABASE_EXCEPTION,e.getMessage());
     }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)

@@ -1,4 +1,4 @@
-package org.imtp.web.config;
+package org.imtp.web.config.exception;
 
 import org.imtp.common.response.ResultCode;
 

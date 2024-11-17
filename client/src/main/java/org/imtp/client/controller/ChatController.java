@@ -348,7 +348,7 @@ public class ChatController extends AbstractController {
                             .thenAccept(r -> {
                                 log.info("upload completed; accessUrl: {}", r);
                                 String fileName = UUID.randomUUID().toString().replaceAll("-","") + ".png";
-                                ChunkedUploader.uploadFile(new ByteArrayInputStream(byteArrayOutputStream.toByteArray()),fileName)
+                                ChunkedUploader.uploadFile(new ByteArrayInputStream(byteArrayOutputStream.toByteArray()),fileName,"image/png")
                                         .thenAccept(ru -> {
                                             log.info("thumbnailUrl: {} ",ru);
                                             videoMessageMetadata.setThumbnailUrl(ru);

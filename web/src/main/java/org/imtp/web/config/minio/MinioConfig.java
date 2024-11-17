@@ -1,5 +1,6 @@
 package org.imtp.web.config.minio;
 
+import io.minio.MinioAsyncClient;
 import io.minio.MinioClient;
 import lombok.Getter;
 import lombok.Setter;
@@ -31,6 +32,15 @@ public class MinioConfig {
     @Bean
     public MinioClient minioClient(){
         return MinioClient
+                .builder()
+                .endpoint(endpoint)
+                .credentials(accessKey,secretKey)
+                .build();
+    }
+
+    @Bean
+    public MinioAsyncClient minioAsyncClient(){
+        return MinioAsyncClient
                 .builder()
                 .endpoint(endpoint)
                 .credentials(accessKey,secretKey)

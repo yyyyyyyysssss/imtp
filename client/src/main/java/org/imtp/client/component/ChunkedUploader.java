@@ -1,6 +1,8 @@
 package org.imtp.client.component;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -8,8 +10,11 @@ import okhttp3.RequestBody;
 import org.imtp.common.response.Result;
 
 import java.io.*;
+import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -55,29 +60,36 @@ public class ChunkedUploader {
         }
         File file = new File(path);
         try {
-            return uploadFile(new FileInputStream(file),file.getName(),chunkSize);
+            String fileType = mediaType(file);
+            return uploadFile(new FileInputStream(file),file.getName(),fileType,chunkSize);
         } catch (FileNotFoundException e) {
             log.error("upload error: ",e);
             throw new RuntimeException("upload error");
         }
     }
 
-    public static CompletableFuture<String> uploadFile(InputStream inputStream,String fileName){
+    public static CompletableFuture<String> uploadFile(InputStream inputStream,String fileName,String fileType){
 
-        return uploadFile(inputStream,fileName,CHUNK_SIZE);
+        return uploadFile(inputStream,fileName,fileType,CHUNK_SIZE);
     }
 
-    public static CompletableFuture<String> uploadFile(InputStream inputStream,String fileName, int chunkSize){
+    public static CompletableFuture<String> uploadFile(InputStream inputStream,String fileName,String fileType, int chunkSize){
         try {
-            int length = inputStream.available();
+            long length = inputStream.available();
+            int totalChunk = (int) Math.ceil((double) length / chunkSize);
+            FileInfoDTO fileInfoDTO = new FileInfoDTO();
+            fileInfoDTO.setFilename(fileName);
+            fileInfoDTO.setFileType(fileType);
+            fileInfoDTO.setTotalSize(length);
+            fileInfoDTO.setTotalChunk(totalChunk);
+            fileInfoDTO.setChunkSize(chunkSize);
             //前置获取uploadId
             return CompletableFuture.supplyAsync(() -> {
-                Result<String> uploadIdResult = okHttpClientHelper.doGet("/file/uploadId?filename=" + fileName + "&totalSize=" + length, new TypeReference<>() {
+                Result<String> uploadIdResult = okHttpClientHelper.doPost("/file/uploadId",fileInfoDTO, new TypeReference<>() {
                 });
                 return uploadIdResult.getData();
                 //多任务上传分片
             },uploadExecutor).thenCompose(uploadId -> {
-                int totalChunk = (int) Math.ceil((double) length / chunkSize);
                 log.info("文件名称:{}, 文件总大小:{}, 总块数:{}", fileName, convertBytesToMB(length), totalChunk);
                 List<CompletableFuture<Void>> futures = new ArrayList<>(totalChunk);
                 try {
@@ -135,13 +147,40 @@ public class ChunkedUploader {
                 .addFormDataPart("chunkIndex", chunkIndex + "")
                 .addFormDataPart("file", "", requestBody)
                 .build();
-        okHttpClientHelper.doPost("/file/upload", multipartBody, new TypeReference<Void>() {
+        okHttpClientHelper.doPost("/file/upload/chunk", multipartBody, new TypeReference<Void>() {
         });
     }
 
 
     private static String convertBytesToMB(long size) {
         return String.format("%.2f", (double) size / (1024 * 1024)) + "MB";
+    }
+
+    private static String mediaType(File file) {
+        try {
+            return Files.probeContentType(file.toPath());
+        } catch (IOException e) {
+            log.error("probeContentType error ", e);
+            return "unknown";
+        }
+    }
+
+    @Getter
+    @Setter
+    public static class FileInfoDTO {
+        //文件名称
+        private String filename;
+
+        private String fileType;
+
+        //文件总大小
+        private Long totalSize;
+
+        //总块数
+        private Integer totalChunk;
+
+        //每块的大小(最后一块文件大小小于等于该值)
+        private Integer chunkSize;
     }
 
 }
