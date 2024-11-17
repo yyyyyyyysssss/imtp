@@ -7,6 +7,7 @@ import org.imtp.common.packet.common.OfflineMessageDTO;
 import org.imtp.common.response.Result;
 import org.imtp.common.response.ResultGenerator;
 import org.imtp.web.domain.entity.User;
+import org.imtp.web.enums.TokenType;
 import org.imtp.web.service.TokenService;
 import org.imtp.web.service.UserService;
 import org.imtp.web.service.UserSocialService;
@@ -35,7 +36,7 @@ public class InternalController {
 
     @GetMapping("/tokenValid")
     public Result<UserInfo> tokenValid(@RequestParam("token") String token){
-        boolean valid = tokenService.isValid(token);
+        boolean valid = tokenService.isValid(token, TokenType.ACCESS_TOKEN);
         if (valid){
             String userId = JwtUtil.extractPayloadInfo(token).getSubject();
             User user = userService.findByUserId(userId);

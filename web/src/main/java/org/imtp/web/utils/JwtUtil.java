@@ -92,7 +92,7 @@ public class JwtUtil {
         long currentTimeMillis = System.currentTimeMillis();
         long expirationTimestamp = currentTimeMillis + (expiration * 1000);
         PayloadInfo payloadInfo = PayloadInfo.builder()
-                .id(UUID.randomUUID().toString())
+                .id(UUID.randomUUID().toString().replaceAll("-",""))
                 .subject(subject)
                 .clientType(clientType)
                 .tokenType(tokenType)

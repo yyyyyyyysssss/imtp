@@ -3,6 +3,7 @@ package org.imtp.web.config.redis;
 import jakarta.annotation.Resource;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
@@ -75,6 +76,10 @@ public class RedisWrapper {
     public Set<Object> rangeAllZSet(String key){
 
         return redisTemplate.opsForZSet().range(key,0,-1);
+    }
+
+    public Set<ZSetOperations.TypedTuple<Object>> rangeAllScoreZSet(String key){
+        return redisTemplate.opsForZSet().rangeWithScores(key, 0, -1);
     }
 
     public Set<Object> rangeByScoreZSet(String key,double min, double max){
