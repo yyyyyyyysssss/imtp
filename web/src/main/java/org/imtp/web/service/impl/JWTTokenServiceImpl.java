@@ -44,9 +44,7 @@ public class JWTTokenServiceImpl implements TokenService {
     public TokenInfo generate(User user, ClientType clientType) {
         Long userId = user.getId();
         String accessToken = generateAccessToken(userId,clientType);
-        Tuple2<String,String> tuple2 = generateRefreshToken(userId,clientType);
-        String refreshToken = tuple2.getV1();
-        String refreshTokenId = tuple2.getV2();
+        String refreshToken = generateRefreshToken(userId,clientType);
         PayloadInfo payloadInfo = JwtUtil.extractPayloadInfo(accessToken);
         TokenInfo token = TokenInfo.builder()
                 .id(IdGen.genId())
@@ -65,9 +63,7 @@ public class JWTTokenServiceImpl implements TokenService {
             Object[] array = Arrays.copyOfRange(tokens.toArray(),0, delQty);
             for (int i = 0; i < delQty; i++) {
                 TokenDTO tokenDTO = (TokenDTO) array[i];
-                String atId = tokenDTO.getAccessTokenId();
-                long expiration = tokenDTO.getExpiration() - System.currentTimeMillis();
-                revokeToken(atId,expiration / 1000);
+                revokeToken(tokenDTO);
             }
             redisWrapper.removeZSet(key,array);
         }
@@ -76,7 +72,7 @@ public class JWTTokenServiceImpl implements TokenService {
         long expiration = expirationAt - System.currentTimeMillis();
         TokenDTO tokenDTO = new TokenDTO();
         tokenDTO.setAccessTokenId(payloadInfo.getId());
-        tokenDTO.setRefreshTokenId(refreshTokenId);
+        tokenDTO.setRefreshToken(refreshToken);
         tokenDTO.setExpiration(payloadInfo.getExpiration());
         redisWrapper.addZSet(key, tokenDTO, payloadInfo.getExpiration(), Duration.ofMillis(expiration));
         return token;
@@ -85,8 +81,29 @@ public class JWTTokenServiceImpl implements TokenService {
     @Override
     public void revokeToken(String token) {
         PayloadInfo payloadInfo = JwtUtil.extractPayloadInfo(token);
-        long expiration = payloadInfo.getExpiration() - System.currentTimeMillis();
-        revokeToken(payloadInfo.getId(),expiration / 1000);
+        String userId = payloadInfo.getSubject();
+        String key = key(Long.parseLong(userId), payloadInfo.getClientType());
+        Set<Object> tokens = redisWrapper.rangeAllZSet(key);
+        for (Object object : tokens){
+            TokenDTO tokenDTO = (TokenDTO) object;
+            if (tokenDTO.getAccessTokenId().equals(payloadInfo.getId())){
+                revokeToken(tokenDTO);
+                redisWrapper.removeZSet(key,tokenDTO);
+            }
+        }
+    }
+
+    private void revokeToken(TokenDTO tokenDTO){
+        long currentTimeMillis = System.currentTimeMillis();
+        //accessToken 加入黑名单
+        String atId = tokenDTO.getAccessTokenId();
+        long accessTokenExpiration = tokenDTO.getExpiration() - currentTimeMillis;
+        revokeToken(atId,accessTokenExpiration / 1000);
+        //refreshToken 加入黑名单
+        String rt = tokenDTO.getRefreshToken();
+        String[] rtStr = EncryptUtil.base64Decode(rt).split(":");
+        long refreshTokenExpiration = Long.parseLong(rtStr[1]) - currentTimeMillis;
+        revokeToken(rtStr[4],refreshTokenExpiration / 1000);
     }
 
     private void revokeToken(String tokenId,Long expiration) {
@@ -120,12 +137,11 @@ public class JWTTokenServiceImpl implements TokenService {
         return JwtUtil.genToken(userId.toString(),clientType);
     }
 
-    private Tuple2<String,String> generateRefreshToken(Long userId, ClientType clientType){
+    private String generateRefreshToken(Long userId, ClientType clientType){
         Long configExpiration = authProperties.getJwt().getRefreshExpiration();
         long timestamp = configExpiration * 1000;
         long expiration = System.currentTimeMillis() + timestamp;
         String encryptStr = EncryptUtil.sha256(userId.toString(), Long.toString(expiration),clientType.name(), authProperties.getJwt().getSecretKey());
-        String token = EncryptUtil.base64Encode(userId.toString(), Long.toString(expiration), clientType.name(), RefreshTokenServices.RefreshTokenAlgorithm.SHA256.name(), encryptStr);
-        return new Tuple2<>(token,encryptStr);
+        return EncryptUtil.base64Encode(userId.toString(), Long.toString(expiration), clientType.name(), RefreshTokenServices.RefreshTokenAlgorithm.SHA256.name(), encryptStr);
     }
 }

@@ -192,7 +192,7 @@ public class SecurityConfig {
 
     @Bean
     public RefreshTokenServices refreshTokenServices(){
-        return new RefreshTokenServices(authProperties.getJwt().getSecretKey(),userService,redisTemplate);
+        return new RefreshTokenServices(authProperties.getJwt().getSecretKey(),userService,tokenService);
     }
 
     @Bean
