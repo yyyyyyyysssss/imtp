@@ -5,7 +5,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.layout.BorderPane?>
 <HBox fx:id="userSessionHBox" stylesheets="@../css/UserSession.css" xmlns="http://javafx.com/javafx/21"
-      xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.imtp.client.controller.UserSessionController">
+      xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.imtp.desktop.controller.UserSessionController">
     <children>
         <VBox>
             <children>

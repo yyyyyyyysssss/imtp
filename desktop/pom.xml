@@ -153,7 +153,7 @@
                 <artifactId>javafx-maven-plugin</artifactId>
                 <version>${javafx.plugin.version}</version>
                 <configuration>
-                    <mainClass>org.imtp.client.MainApp</mainClass>
+                    <mainClass>org.imtp.desktop.MainApp</mainClass>
                 </configuration>
             </plugin>
 
@@ -163,7 +163,7 @@
                 <artifactId>gluonfx-maven-plugin</artifactId>
                 <version>${gluonfx.plugin.version}</version>
                 <configuration>
-                    <mainClass>org.imtp.client.MainApp</mainClass>
+                    <mainClass>org.imtp.desktop.MainApp</mainClass>
                     <enableSWRendering>${enableSWRendering}</enableSWRendering>
                     <attachList>
                         <list>display</list>
@@ -178,20 +178,20 @@
                         <nativeImageArg>--initialize-at-run-time=io.netty</nativeImageArg>
                     </nativeImageArgs>
                     <reflectionList>
-                        <list>org.imtp.client.controller.LoginController</list>
-                        <list>org.imtp.client.controller.HomeController</list>
-                        <list>org.imtp.client.controller.UserSessionController</list>
-                        <list>org.imtp.client.controller.UserSessionItemController</list>
-                        <list>org.imtp.client.controller.ChatController</list>
-                        <list>org.imtp.client.controller.ChatItemController</list>
-                        <list>org.imtp.client.controller.UserFriendController</list>
-                        <list>org.imtp.client.controller.UserFriendItemController</list>
-                        <list>org.imtp.client.controller.UserFriendDetailsController</list>
-                        <list>org.imtp.client.controller.UserGroupController</list>
-                        <list>org.imtp.client.controller.UserGroupDetailsController</list>
-                        <list>org.imtp.client.controller.UserGroupItemController</list>
-                        <list>org.imtp.client.controller.ChatEmojiDialog</list>
-                        <list>org.imtp.client.controller.HeadClose</list>
+                        <list>org.imtp.desktop.controller.LoginController</list>
+                        <list>org.imtp.desktop.controller.HomeController</list>
+                        <list>org.imtp.desktop.controller.UserSessionController</list>
+                        <list>org.imtp.desktop.controller.UserSessionItemController</list>
+                        <list>org.imtp.desktop.controller.ChatController</list>
+                        <list>org.imtp.desktop.controller.ChatItemController</list>
+                        <list>org.imtp.desktop.controller.UserFriendController</list>
+                        <list>org.imtp.desktop.controller.UserFriendItemController</list>
+                        <list>org.imtp.desktop.controller.UserFriendDetailsController</list>
+                        <list>org.imtp.desktop.controller.UserGroupController</list>
+                        <list>org.imtp.desktop.controller.UserGroupDetailsController</list>
+                        <list>org.imtp.desktop.controller.UserGroupItemController</list>
+                        <list>org.imtp.desktop.controller.ChatEmojiDialog</list>
+                        <list>org.imtp.desktop.controller.HeadClose</list>
                         <list>com.sun.scenario.effect.impl.sw.java.JSWInvertMaskPeer</list>
                         <list>com.sun.scenario.effect.impl.sw.java.JSWBlend_SRC_ATOPPeer</list>
                     </reflectionList>
@@ -285,7 +285,7 @@
                                     <createDependencyReducedPom>false</createDependencyReducedPom>
                                     <transformers>
                                         <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                            <mainClass>org.imtp.client.Launcher</mainClass>
+                                            <mainClass>org.imtp.desktop.Launcher</mainClass>
                                         </transformer>
                                     </transformers>
                                     <filters>
@@ -324,7 +324,7 @@
                                     <createDependencyReducedPom>false</createDependencyReducedPom>
                                     <transformers>
                                         <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                            <mainClass>org.imtp.client.Client</mainClass>
+                                            <mainClass>org.imtp.desktop.Client</mainClass>
                                         </transformer>
                                     </transformers>
                                     <filters>

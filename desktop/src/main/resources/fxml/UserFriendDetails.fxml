@@ -5,7 +5,7 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Text?>
-<HBox fx:id="userFriendDetailsHBox" alignment="CENTER" stylesheets="@../css/UserFriendDetails.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.imtp.client.controller.UserFriendDetailsController">
+<HBox fx:id="userFriendDetailsHBox" alignment="CENTER" stylesheets="@../css/UserFriendDetails.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.imtp.desktop.controller.UserFriendDetailsController">
     <children>
       <VBox alignment="TOP_CENTER" prefHeight="200.0" prefWidth="300.0">
          <children>

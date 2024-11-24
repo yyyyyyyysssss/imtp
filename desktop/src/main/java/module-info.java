@@ -39,20 +39,20 @@ module client{
     requires org.bytedeco.javacv;
     requires java.desktop;
 
-    exports org.imtp.client;
-    exports org.imtp.client.component;
-    exports org.imtp.client.constant;
-    exports org.imtp.client.context;
-    exports org.imtp.client.controller;
-    exports org.imtp.client.entity;
-    exports org.imtp.client.enums;
-    exports org.imtp.client.event;
-    exports org.imtp.client.handler;
-    exports org.imtp.client.idwork;
-    exports org.imtp.client.model;
-    exports org.imtp.client.util;
-    exports org.imtp.client.view;
+    exports org.imtp.desktop;
+    exports org.imtp.desktop.component;
+    exports org.imtp.desktop.constant;
+    exports org.imtp.desktop.context;
+    exports org.imtp.desktop.controller;
+    exports org.imtp.desktop.entity;
+    exports org.imtp.desktop.enums;
+    exports org.imtp.desktop.event;
+    exports org.imtp.desktop.handler;
+    exports org.imtp.desktop.idwork;
+    exports org.imtp.desktop.model;
+    exports org.imtp.desktop.util;
+    exports org.imtp.desktop.view;
 
-    opens org.imtp.client.controller to javafx.fxml;
-    opens org.imtp.client to javafx.fxml;
+    opens org.imtp.desktop.controller to javafx.fxml;
+    opens org.imtp.desktop to javafx.fxml;
 }

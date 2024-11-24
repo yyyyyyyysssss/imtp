@@ -3,7 +3,7 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
-<HBox spacing="20" alignment="TOP_RIGHT" stylesheets="@../css/HeadClose.css" fx:controller="org.imtp.client.controller.HeadClose" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml">
+<HBox spacing="20" alignment="TOP_RIGHT" stylesheets="@../css/HeadClose.css" fx:controller="org.imtp.desktop.controller.HeadClose" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml">
     <children>
         <VBox fx:id="headMinimizeVBxo">
             <children>
