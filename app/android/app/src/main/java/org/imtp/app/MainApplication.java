@@ -1,4 +1,4 @@
-package com.app;
+package org.imtp.app;
 
 import static com.facebook.react.defaults.DefaultReactHost.getDefaultReactHost;
 
