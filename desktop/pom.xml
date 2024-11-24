@@ -8,7 +8,7 @@
     </parent>
 
     <groupId>org.imtp</groupId>
-    <artifactId>client</artifactId>
+    <artifactId>desktop</artifactId>
     <description>客户端</description>
 
     <name>client</name>

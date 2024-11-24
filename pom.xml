@@ -10,7 +10,7 @@
     <name>imtp</name>
     <url>http://maven.apache.org</url>
     <modules>
-        <module>client</module>
+        <module>desktop</module>
         <module>server</module>
         <module>web</module>
         <module>common</module>
