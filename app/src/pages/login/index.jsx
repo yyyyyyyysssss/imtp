@@ -1,4 +1,4 @@
-import { Input, Flex, Pressable, NativeBaseProvider, Text, VStack, Button, Checkbox, HStack, Center, Box } from 'native-base';
+import { Input, Flex, Pressable, NativeBaseProvider, Text, VStack, Button, Checkbox, HStack, Center, Box, Image } from 'native-base';
 import React, { useState } from 'react';
 import { StyleSheet, useWindowDimensions, View } from 'react-native';
 import { TabView, SceneMap } from 'react-native-tab-view';
@@ -34,29 +34,20 @@ const Login = () => {
             <NativeBaseProvider>
                 <Flex style={styles.containerH} alignItems='center' direction="row">
                     <Flex gap={20} style={styles.containerV} alignItems='center' direction="column">
-                        {/* <VStack height="75%">
-                            <TabView
-                                style={styles.tabs}
-                                navigationState={{ index, routes }}
-                                renderScene={renderScene}
-                                onIndexChange={setIndex}
-                                initialLayout={{ width: layout.width / 3 * 2,height: 0 }}
-                            />
-                        </VStack> */}
-                        <VStack>
-                            
+                        <VStack  alignItems="center" justifyContent="flex-end" style={styles.loginHead}>
+                            <Image source={require('../../assets/img/icon.png')}/>
                         </VStack>
-                        <VStack space={5}>
-                            <Input borderRadius={14} style={styles.username} shadow={5} _light={{
-                                bg: "#f2f2f2",
+                        <VStack style={{flex:1}} space={5}>
+                            <Input borderRadius={14} style={styles.username} _light={{
+                                // bg: "#f2f2f2",
                             }} height={55} w={{
                                 base: "75%",
                                 md: "25%"
                             }}
                                 placeholder="用户名" />
 
-                            <Input borderRadius={14} style={styles.password} shadow={5} _light={{
-                                bg: "#f2f2f2",
+                            <Input borderRadius={14} style={styles.password} _light={{
+                                // bg: "#f2f2f2",
                             }} height={55} w={{
                                 base: "75%",
                                 md: "25%"
@@ -71,21 +62,21 @@ const Login = () => {
                                 <Text style={styles.forgotPassword}>忘记密码?</Text>
                             </HStack>
                             <Button style={styles.loginBtn} borderRadius={12} height={55} _text={{ fontSize: 20 }}>登录</Button>
+                            <HStack space={10} justifyContent='center' alignItems="center" style={styles.threePartyLogin}>
+                                <Box style={styles.threePartyLoginBox} p="2">
+                                    <GoogleIcon size={35} />
+                                </Box>
+                                <Box style={styles.threePartyLoginBox} p="2">
+                                    <AntDesignIcon name="github" size={35} />
+                                </Box>
+                                <Box style={styles.threePartyLoginBox} p="2">
+                                    <MicrosoftIcon size={35} />
+                                </Box>
+                            </HStack>
                         </VStack>
-                        <HStack space={10} alignItems="center" style={styles.threePartyLogin}>
-                            <Box style={styles.threePartyLoginBox} p="3">
-                                <GoogleIcon size={35} />
-                            </Box>
-                            <Box style={styles.threePartyLoginBox} p="3">
-                                <AntDesignIcon name="github" size={35} />
-                            </Box>
-                            <Box style={styles.threePartyLoginBox} p="3">
-                                <MicrosoftIcon size={35} />
-                            </Box>
-                        </HStack>
-                        <HStack>
-                            <Text>没有账号?创建一个</Text>
-                        </HStack>
+                        <VStack style={styles.loginBottom} space={5} justifyContent='flex-end' alignItems="center">
+                            <Text style={styles.loginBottomText}>没有账号?<Text style={styles.loginBottomCreateAccount}>创建一个</Text></Text>
+                        </VStack>
                     </Flex>
                 </Flex>
             </NativeBaseProvider>
@@ -103,7 +94,12 @@ const styles = StyleSheet.create({
         backgroundColor: '#ffffff'
     },
     containerV: {
-        flex: 1
+        flex: 1,
+        marginTop: 50
+    },
+    loginHead:{
+        flex: 1,
+        width: '100%',
     },
     username: {
         fontSize: 18
@@ -116,15 +112,25 @@ const styles = StyleSheet.create({
         fontSize: 15
     },
     loginBtn: {
-        backgroundColor: "#6c56f2"
+        backgroundColor: "#70BFFF"
     },
     threePartyLogin: {
-        padding: 10,
+        padding: 10
     },
     threePartyLoginBox: {
         borderColor: '#f3f0f3',
         borderWidth: 2,
-        borderRadius: 12
+        borderRadius: 100
+    },
+    loginBottom:{
+        flex:1,
+        paddingBottom: 20,
+    },
+    loginBottomText: {
+        fontSize: 16
+    },
+    loginBottomCreateAccount: {
+        color: "#70BFFF"
     }
 })
 
