@@ -1,83 +1,117 @@
-import { Input, Flex, Pressable, NativeBaseProvider, Text, VStack, Button, Checkbox, HStack, Center, Box, Image } from 'native-base';
+import { Input, Flex, Pressable, NativeBaseProvider, Text, VStack, Button, Checkbox, HStack, Center, Box, Image, FormControl, KeyboardAvoidingView, ScrollView } from 'native-base';
 import React, { useState } from 'react';
-import { StyleSheet, useWindowDimensions, View } from 'react-native';
-import { TabView, SceneMap } from 'react-native-tab-view';
+import { StyleSheet, useWindowDimensions } from 'react-native';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import AntDesignIcon from 'react-native-vector-icons/AntDesign';
 import { GoogleIcon, MicrosoftIcon } from '../../component/CustomIcon';
+import { useForm, Controller } from 'react-hook-form';
 
 const Login = () => {
     const [show, setShow] = useState(false);
 
     const layout = useWindowDimensions();
-    const [index, setIndex] = useState(0);
 
-    const [routes] = useState([
-        { key: 'account', title: 'Account Login' },
-        { key: 'phone', title: 'Phone Login' },
-    ]);
-
-    const renderScene = ({ route }) => {
-        switch (route.key) {
-            case 'account':
-                return (
-                    <Button>A</Button>
-                )
-            case 'phone':
-                return (
-                    <Button>B</Button>
-                )
+    const { control, handleSubmit, formState: { errors } } = useForm({
+        defaultValues: {
+            username: "",
+            password: ""
         }
-    }
+    });
+
+    const onSubmit = (data) => {
+        console.log('submiting with ', data);
+    };
+
     return (
         <>
             <NativeBaseProvider>
                 <Flex style={styles.containerH} alignItems='center' direction="row">
-                    <Flex gap={20} style={styles.containerV} alignItems='center' direction="column">
-                        <VStack  alignItems="center" justifyContent="flex-end" style={styles.loginHead}>
-                            <Image source={require('../../assets/img/icon.png')}/>
-                        </VStack>
-                        <VStack style={{flex:1}} space={5}>
-                            <Input borderRadius={14} style={styles.username} _light={{
-                                // bg: "#f2f2f2",
-                            }} height={55} w={{
-                                base: "75%",
-                                md: "25%"
-                            }}
-                                placeholder="用户名" />
+                    <ScrollView>
+                        <Flex gap={20} style={styles.containerV} alignItems='center' direction="column">
+                            <VStack alignItems="center" justifyContent="flex-end" style={styles.loginHead}>
+                                <Image source={require('../../assets/img/icon.png')} />
+                            </VStack>
+                            <VStack style={{ flex: 1 }} space={5}>
+                                <VStack style={{ flex: 1 }} space={8}>
+                                    <FormControl isRequired isInvalid={errors?.username}>
+                                        <Controller
+                                            control={control}
+                                            render={({ field: { onChange, onBlur, value } }) => (
+                                                <Input
+                                                    onBlur={onBlur}
+                                                    value={value}
+                                                    onChangeText={onChange}
+                                                    borderRadius={14}
+                                                    style={styles.usernameInput}
+                                                    height={55}
+                                                    w={{
+                                                        base: "100%",
+                                                        md: "25%"
+                                                    }}
+                                                    placeholder="用户名" />
+                                            )}
+                                            name="username"
+                                            rules={{ required: '请输入用户名' }}
+                                        />
+                                        <FormControl.ErrorMessage style={styles.errorMessage}>
+                                            {errors?.username?.message}
+                                        </FormControl.ErrorMessage>
+                                    </FormControl>
 
-                            <Input borderRadius={14} style={styles.password} _light={{
-                                // bg: "#f2f2f2",
-                            }} height={55} w={{
-                                base: "75%",
-                                md: "25%"
-                            }} InputRightElement={
-                                <Pressable style={{ marginRight: 8 }} onPress={() => setShow(!show)}>
-                                    <MaterialIcon name={show ? "visibility" : "visibility-off"} size={28} mr="2" color="gray" />
-                                </Pressable>
-                            }
-                                type={show ? "text" : "password"}
-                                placeholder="密码" />
-                            <HStack justifyContent="flex-end">
-                                <Text style={styles.forgotPassword}>忘记密码?</Text>
-                            </HStack>
-                            <Button style={styles.loginBtn} borderRadius={12} height={55} _text={{ fontSize: 20 }}>登录</Button>
-                            <HStack space={10} justifyContent='center' alignItems="center" style={styles.threePartyLogin}>
-                                <Box style={styles.threePartyLoginBox} p="2">
-                                    <GoogleIcon size={35} />
-                                </Box>
-                                <Box style={styles.threePartyLoginBox} p="2">
-                                    <AntDesignIcon name="github" size={35} />
-                                </Box>
-                                <Box style={styles.threePartyLoginBox} p="2">
-                                    <MicrosoftIcon size={35} />
-                                </Box>
-                            </HStack>
-                        </VStack>
-                        <VStack style={styles.loginBottom} space={5} justifyContent='flex-end' alignItems="center">
-                            <Text style={styles.loginBottomText}>没有账号?<Text style={styles.loginBottomCreateAccount}>创建一个</Text></Text>
-                        </VStack>
-                    </Flex>
+                                    <FormControl isRequired isInvalid={errors?.password}>
+                                        <Controller
+                                            control={control}
+                                            render={({ field: { onChange, onBlur, value } }) => (
+                                                <Input
+                                                    onBlur={onBlur}
+                                                    value={value}
+                                                    onChangeText={onChange}
+                                                    borderRadius={14}
+                                                    style={styles.passwordInput}
+                                                    height={55}
+                                                    w={{
+                                                        base: "100%",
+                                                        md: "25%"
+                                                    }}
+                                                    InputRightElement={
+                                                        <Pressable style={{ marginRight: 8 }} onPress={() => setShow(!show)}>
+                                                            <MaterialIcon name={show ? "visibility" : "visibility-off"} size={28} mr="2" color="gray" />
+                                                        </Pressable>
+                                                    }
+                                                    type={show ? "text" : "password"}
+                                                    placeholder="密码" />
+                                            )}
+                                            name="password"
+                                            rules={{ required: '请输入密码' }}
+                                        />
+                                        <FormControl.ErrorMessage style={styles.errorMessage}>
+                                            {errors?.password?.message}
+                                        </FormControl.ErrorMessage>
+                                    </FormControl>
+                                </VStack>
+
+                                <HStack justifyContent="flex-end">
+                                    <Text style={styles.forgotPassword}>忘记密码?</Text>
+                                </HStack>
+                                <Button style={styles.loginBtn} onPress={handleSubmit(onSubmit)} borderRadius={12} height={55} _text={{ fontSize: 20 }}>登录</Button>
+                                <HStack space={10} justifyContent='center' alignItems="center" style={styles.threePartyLogin}>
+                                    <Box style={styles.threePartyLoginBox} p="2">
+                                        <GoogleIcon size={35} />
+                                    </Box>
+                                    <Box style={styles.threePartyLoginBox} p="2">
+                                        <AntDesignIcon name="github" size={35} />
+                                    </Box>
+                                    <Box style={styles.threePartyLoginBox} p="2">
+                                        <MicrosoftIcon size={35} />
+                                    </Box>
+                                </HStack>
+                            </VStack>
+                            <VStack style={styles.loginBottom} space={5} justifyContent='flex-end' alignItems="center">
+                                <Text style={styles.loginBottomText}>没有账号?<Text style={styles.loginBottomCreateAccount}>创建一个</Text></Text>
+                            </VStack>
+                        </Flex>
+                    </ScrollView>
+
                 </Flex>
             </NativeBaseProvider>
         </>
@@ -95,17 +129,22 @@ const styles = StyleSheet.create({
     },
     containerV: {
         flex: 1,
-        marginTop: 50
     },
-    loginHead:{
+    loginHead: {
         flex: 1,
         width: '100%',
     },
-    username: {
+    usernameInput: {
         fontSize: 18
     },
-    password: {
+    passwordInput: {
         fontSize: 18
+    },
+    errorMessage: {
+        position: 'absolute',
+        top: '100%',
+        left: 0,
+        fontSize: 12
     },
     forgotPassword: {
         color: '#958d99',
@@ -122,9 +161,8 @@ const styles = StyleSheet.create({
         borderWidth: 2,
         borderRadius: 100
     },
-    loginBottom:{
-        flex:1,
-        paddingBottom: 20,
+    loginBottom: {
+        flex: 1,
     },
     loginBottomText: {
         fontSize: 16
