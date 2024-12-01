@@ -1,4 +1,5 @@
 import { NativeBaseProvider, Text } from 'native-base';
+import { createStaticNavigation } from '@react-navigation/native';
 import React, { useState } from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Chat from '../chat';
@@ -37,14 +38,7 @@ const BottomTabNavigator = createBottomTabNavigator({
     }
 })
 
-const Navigation = createStaticNavigation(BottomTabNavigator)
-
-const Home = () => {
-
-    return (
-        <Navigation/>
-    )
-}
+const Home = BottomTabNavigator;
 
 export default Home;
 
