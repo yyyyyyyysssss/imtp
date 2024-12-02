@@ -5,8 +5,11 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Login from './src/pages/login';
 import Chat from './src/pages/chat';
+import ChatItem from './src/pages/chat/chat-item';
 import Friend from './src/pages/friend';
+import FriendItem from './src/pages/friend/friend-item';
 import Group from './src/pages/group';
+import GroupItem from './src/pages/group/group-item';
 import Me from './src/pages/me';
 
 const Home = createBottomTabNavigator({
@@ -23,11 +26,6 @@ const Home = createBottomTabNavigator({
         tabBarIcon: ({ focused, color, size }) => (
           focused ?
             <VStack>
-              {/* <Badge colorScheme="danger" rounded="full" mb={-4} mr={-4} zIndex={1} variant="solid" alignSelf="flex-end" _text={{
-                fontSize: 8
-              }}>
-                2
-              </Badge> */}
               <Image alt='' color={color} size={size} source={require('./src/assets/img/chat-icon-50-selected.png')} />
             </VStack>
             :
@@ -95,8 +93,29 @@ const RootStack = createNativeStackNavigator({
     Home: {
       screen: Home,
       options: {
-        headerShown: false,
-        headerTitleAlign: 'center'
+        headerShown: false
+      }
+    },
+    ChatItem: {
+      screen: ChatItem,
+      options: {
+        title: '张三',
+        headerTitleAlign: 'center',
+        headerTitleStyle: {
+          fontWeight: 'bold'
+        }
+      }
+    },
+    FriendItem: {
+      screen: FriendItem,
+      options: {
+        title: ''
+      }
+    },
+    GroupItem: {
+      screen: GroupItem,
+      options: {
+        title: ''
       }
     }
   }

@@ -1,11 +1,18 @@
-import { Text } from 'native-base';
+import { Button } from 'native-base';
 import React, { useState } from 'react';
+import {useNavigation,} from '@react-navigation/native';
 
 const Friend = () => {
+    const navigation = useNavigation();
+
+    const toFriendItem = () => {
+        navigation.navigate('FriendItem')
+    }
+
 
     return (
         <>
-            <Text>This is Friend</Text>
+            <Button onPress={toFriendItem}>This is Friend</Button>
         </>
     )
 }
