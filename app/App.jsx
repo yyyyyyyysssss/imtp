@@ -11,6 +11,9 @@ import FriendItem from './src/pages/friend/friend-item';
 import Group from './src/pages/group';
 import GroupItem from './src/pages/group/group-item';
 import Me from './src/pages/me';
+import { AddIcon } from './src/component/CustomIcon';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import Feather from 'react-native-vector-icons/Feather';
 
 const Home = createBottomTabNavigator({
   initialRouteName: 'Chat',
@@ -23,6 +26,12 @@ const Home = createBottomTabNavigator({
         headerTitleStyle: {
           fontWeight: 'bold'
         },
+        headerStyle: {
+          borderBottomWidth: 0,
+          elevation: 0,
+          shadowOpacity: 0,
+          backgroundColor: '#F5F5F5'
+        },
         tabBarIcon: ({ focused, color, size }) => (
           focused ?
             <VStack>
@@ -31,6 +40,9 @@ const Home = createBottomTabNavigator({
             :
             <Image alt='' color={color} size={size} source={require('./src/assets/img/chat-icon-50.png')} />
         ),
+        headerRight: () => (
+          <Ionicons style={{marginRight: 12}} name="add-circle-outline" size={28}/>
+        )
       }
     },
     Friend: {
@@ -39,13 +51,16 @@ const Home = createBottomTabNavigator({
         title: '好友',
         headerTitleAlign: 'center',
         headerTitleStyle: {
-          fontWeight: 'bold'
+          fontWeight: 'bold',
         },
         tabBarIcon: ({ focused, color, size }) => (
           focused ?
             <Image alt='' color={color} size={size} source={require('./src/assets/img/friend-icon-50-selected.png')} />
             :
             <Image alt='' color={color} size={size} source={require('./src/assets/img/friend-icon-50.png')} />
+        ),
+        headerRight: () => (
+          <Image alt='' size={7} mr={4} source={require('./src/assets/img/add-friend-icon-50.png')} />
         )
       }
     },
@@ -62,6 +77,9 @@ const Home = createBottomTabNavigator({
             <Image alt='' color={color} size={size} source={require('./src/assets/img/group-icon-50-selected.png')} />
             :
             <Image alt='' color={color} size={size} source={require('./src/assets/img/group-icon-50.png')} />
+        ),
+        headerRight: () => (
+          <Image alt='' size={7} mr={4} source={require('./src/assets/img/add-group-icon-50.png')} />
         )
       }
     },
@@ -103,19 +121,28 @@ const RootStack = createNativeStackNavigator({
         headerTitleAlign: 'center',
         headerTitleStyle: {
           fontWeight: 'bold'
-        }
+        },
+        headerRight: () => (
+          <Feather name='more-horizontal' size={28}/>
+        )
       }
     },
     FriendItem: {
       screen: FriendItem,
       options: {
-        title: ''
+        title: '',
+        headerRight: () => (
+          <Feather name='more-horizontal' size={28}/>
+        )
       }
     },
     GroupItem: {
       screen: GroupItem,
       options: {
-        title: ''
+        title: '',
+        headerRight: () => (
+          <Feather name='more-horizontal' size={28}/>
+        )
       }
     }
   }
