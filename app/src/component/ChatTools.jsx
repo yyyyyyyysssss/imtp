@@ -8,7 +8,7 @@ const ChatTools = () => {
     const toast = useToast()
 
     const addFriend = () => {
-        showToast('添加好友')
+        showToast(global.apiUrl)
     }
 
     const sweep = () => {

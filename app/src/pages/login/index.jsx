@@ -5,6 +5,8 @@ import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import AntDesignIcon from 'react-native-vector-icons/AntDesign';
 import { GoogleIcon, MicrosoftIcon } from '../../component/CustomIcon';
 import { useForm, Controller } from 'react-hook-form';
+import api from '../../api/api';
+import { showToast } from '../../component/Utils';
 
 const Login = () => {
     const [show, setShow] = useState(false);
@@ -20,6 +22,34 @@ const Login = () => {
 
     const onSubmit = (data) => {
         console.log('submiting with ', data);
+        let loginRequest = {
+            username: data.username,
+            credential: data.password,
+            loginType: 'NORMAL',
+        }
+        fetch('http://10.0.2.2:9090/login',{
+            method: 'post',
+            headers: {'content-type': 'application/json'},
+            body: JSON.stringify(loginRequest)
+        }).then(
+            (res) => {
+                res.json().then(r => {
+                    console.log(r)
+                })
+            }
+        )
+        // api
+        // .post('/login',loginRequest)
+        // .then(
+        //     (res) => {
+        //         console.log('login result: ',res.data)
+        //     },
+        //     (error) => {
+        //         if (error.response && error.response.status === 401) {
+        //             showToast('用户名或密码错误')
+        //         }
+        //     }
+        // )
     };
 
     return (

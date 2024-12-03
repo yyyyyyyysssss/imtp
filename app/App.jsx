@@ -101,7 +101,7 @@ const Home = createBottomTabNavigator({
 })
 
 const RootStack = createNativeStackNavigator({
-  initialRouteName: 'Home',
+  initialRouteName: 'Login',
   screens: {
     Login: {
       screen: Login,
