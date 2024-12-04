@@ -13,7 +13,6 @@ public class EncryptUtil {
 
     public static String sha256(String... data) {
         String waitEncryptStr = getWaitEncryptStr(data);
-        log.debug("待加密字符串:{}",waitEncryptStr);
         MessageDigest messageDigest;
         String shaStr = "";
         try {
@@ -23,7 +22,6 @@ public class EncryptUtil {
         } catch (NoSuchAlgorithmException e) {
             log.error("getSHA256Str error: ", e);
         }
-        log.debug("加密后字符串:{}",shaStr);
         return shaStr;
     }
 

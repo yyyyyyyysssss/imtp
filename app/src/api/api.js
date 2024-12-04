@@ -1,8 +1,9 @@
 import axios from "axios";
 import { showToast } from "../component/Utils";
 
+
 const api = axios.create({
-    baseURL: global.apiUrl,
+    baseURL: 'http://10.0.2.2:9090',
     timeout: 60000
 })
 
@@ -24,7 +25,7 @@ api.interceptors.response.use(
     },
     (error) => {
         if(error.response){
-            if(error.response.status === 401){
+            if(error.response.status === 401 && error.response.config.url != '/login'){
                 return showToast('身份认证失败')
             }
             if (error.response.status === 403) {

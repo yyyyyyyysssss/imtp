@@ -1,17 +1,22 @@
-import { Input, Flex, Pressable, NativeBaseProvider, Text, VStack, Button, Checkbox, HStack, Center, Box, Image, FormControl, KeyboardAvoidingView, ScrollView } from 'native-base';
+import { Input, Flex, Pressable, Text, VStack, Button, HStack, Box, Image, FormControl, ScrollView } from 'native-base';
 import React, { useState } from 'react';
-import { StyleSheet, useWindowDimensions } from 'react-native';
+import { StyleSheet } from 'react-native';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import AntDesignIcon from 'react-native-vector-icons/AntDesign';
 import { GoogleIcon, MicrosoftIcon } from '../../component/CustomIcon';
 import { useForm, Controller } from 'react-hook-form';
 import api from '../../api/api';
 import { showToast } from '../../component/Utils';
+import Storage from '../../storage/storage';
+import { useNavigation, } from '@react-navigation/native';
 
 const Login = () => {
+
+    const navigation = useNavigation();
+
     const [show, setShow] = useState(false);
 
-    const layout = useWindowDimensions();
+    const [loading, setLoading] = useState(false)
 
     const { control, handleSubmit, formState: { errors } } = useForm({
         defaultValues: {
@@ -20,36 +25,56 @@ const Login = () => {
         }
     });
 
+    const createAccount = () => {
+        showToast('Create Account')
+    }
+
+    const googleLogin = () => {
+        showToast('Google Login')
+    }
+
+    const githubLogin = () => {
+        showToast('Github Login')
+    }
+
+    const MicrosoftLogin = () => {
+        showToast('Microsoft Login')
+    }
+
+    const phoneLogin = () => {
+        showToast('Phone Login')
+    }
+
+    const forgotPassword = () => {
+        showToast('Forgot Password')
+    }
+
     const onSubmit = (data) => {
         console.log('submiting with ', data);
         let loginRequest = {
             username: data.username,
             credential: data.password,
             loginType: 'NORMAL',
+            clientType: 'APP'
         }
-        fetch('http://10.0.2.2:9090/login',{
-            method: 'post',
-            headers: {'content-type': 'application/json'},
-            body: JSON.stringify(loginRequest)
-        }).then(
-            (res) => {
-                res.json().then(r => {
-                    console.log(r)
-                })
-            }
-        )
-        // api
-        // .post('/login',loginRequest)
-        // .then(
-        //     (res) => {
-        //         console.log('login result: ',res.data)
-        //     },
-        //     (error) => {
-        //         if (error.response && error.response.status === 401) {
-        //             showToast('用户名或密码错误')
-        //         }
-        //     }
-        // )
+        setLoading(true)
+        api.post('/login', loginRequest)
+            .then(
+                (res) => {
+                    console.log('login result: ', res.data)
+                    Storage.save('token', res.data)
+                        .then(() => {
+                            setLoading(false)
+                            navigation.navigate('Home')
+                        })
+                },
+                (error) => {
+                    if (error.response && error.response.status === 401) {
+                        showToast('用户名或密码错误')
+                        setLoading(false)
+                    }
+                }
+            )
     };
 
     return (
@@ -77,6 +102,7 @@ const Login = () => {
                                                     base: "100%",
                                                     md: "25%"
                                                 }}
+                                                isReadOnly={loading}
                                                 placeholder="用户名" />
                                         )}
                                         name="username"
@@ -108,6 +134,7 @@ const Login = () => {
                                                     </Pressable>
                                                 }
                                                 type={show ? "text" : "password"}
+                                                isReadOnly={loading}
                                                 placeholder="密码" />
                                         )}
                                         name="password"
@@ -119,25 +146,43 @@ const Login = () => {
                                 </FormControl>
                             </VStack>
                             <HStack justifyContent="space-between">
-                                <Text style={styles.forgotPassword}>使用短信验证码</Text>
-                                <Text style={styles.forgotPassword}>忘记密码?</Text>
+                                <Pressable onPress={phoneLogin} isDisabled={loading}>
+                                    <Text style={styles.forgotPassword}>使用短信验证码</Text>
+                                </Pressable>
+                                <Pressable onPress={forgotPassword} isDisabled={loading}>
+                                    <Text style={styles.forgotPassword}>忘记密码?</Text>
+                                </Pressable>
                             </HStack>
-                            <Button style={styles.loginBtn} onPress={handleSubmit(onSubmit)} borderRadius={12} height={55} _text={{ fontSize: 20 }}>登录</Button>
+                            <Button isLoading={loading} isLoadingText='登录中' style={styles.loginBtn} onPress={handleSubmit(onSubmit)} borderRadius={12} height={55} _text={{ fontSize: 20 }}>
+                                登录
+                            </Button>
                             <HStack space={10} justifyContent='center' alignItems="center" style={styles.threePartyLogin}>
-                                <Box style={styles.threePartyLoginBox} p="2">
-                                    <GoogleIcon size={35} />
-                                </Box>
-                                <Box style={styles.threePartyLoginBox} p="2">
-                                    <AntDesignIcon name="github" size={35} />
-                                </Box>
-                                <Box style={styles.threePartyLoginBox} p="2">
-                                    <MicrosoftIcon size={35} />
-                                </Box>
+                                <Pressable onPress={googleLogin} isDisabled={loading}>
+                                    <Box style={styles.threePartyLoginBox} p="2">
+                                        <GoogleIcon size={35} />
+                                    </Box>
+                                </Pressable>
+
+                                <Pressable onPress={githubLogin} isDisabled={loading}>
+                                    <Box style={styles.threePartyLoginBox} p="2">
+                                        <AntDesignIcon name="github" size={35} />
+                                    </Box>
+                                </Pressable>
+
+                                <Pressable onPress={MicrosoftLogin} isDisabled={loading}>
+                                    <Box onPress={MicrosoftLogin} style={styles.threePartyLoginBox} p="2">
+                                        <MicrosoftIcon size={35} />
+                                    </Box>
+                                </Pressable>
+
                             </HStack>
                         </VStack>
-                        <VStack style={styles.loginBottom} space={5} justifyContent='flex-end' alignItems="center">
-                            <Text style={styles.loginBottomText}>没有账号?<Text style={styles.loginBottomCreateAccount}>创建一个</Text></Text>
-                        </VStack>
+                        <HStack style={styles.loginBottom} justifyContent='flex-end' alignItems="center">
+                            <Text style={styles.loginBottomText}>没有账号?</Text>
+                            <Pressable onPress={createAccount} isDisabled={loading}>
+                                <Text style={styles.loginBottomCreateAccount}>创建一个</Text>
+                            </Pressable>
+                        </HStack>
                     </Flex>
                 </ScrollView>
             </Flex>
