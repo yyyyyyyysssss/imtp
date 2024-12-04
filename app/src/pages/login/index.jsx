@@ -1,5 +1,5 @@
 import { Input, Flex, Pressable, Text, VStack, Button, HStack, Box, Image, FormControl, ScrollView } from 'native-base';
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { StyleSheet } from 'react-native';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import AntDesignIcon from 'react-native-vector-icons/AntDesign';
@@ -9,8 +9,11 @@ import api from '../../api/api';
 import { showToast } from '../../component/Utils';
 import Storage from '../../storage/storage';
 import { useNavigation, } from '@react-navigation/native';
+import { AuthContext } from '../../context';
 
 const Login = () => {
+
+    const {signIn} = useContext(AuthContext)
 
     const navigation = useNavigation();
 
@@ -61,11 +64,11 @@ const Login = () => {
         api.post('/login', loginRequest)
             .then(
                 (res) => {
-                    console.log('login result: ', res.data)
-                    Storage.save('token', res.data)
+                    const userToken = res.data
+                    Storage.save('userToken', userToken)
                         .then(() => {
                             setLoading(false)
-                            navigation.navigate('Home')
+                            signIn(userToken)
                         })
                 },
                 (error) => {

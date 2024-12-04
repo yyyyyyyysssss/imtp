@@ -1,5 +1,6 @@
 import axios from "axios";
 import { showToast } from "../component/Utils";
+import Storage from "../storage/storage";
 
 
 const api = axios.create({
@@ -8,7 +9,12 @@ const api = axios.create({
 })
 
 api.interceptors.request.use(
-    (req) => {
+    async (req) => {
+        const usetToken = await Storage.get('userToken')
+        if(usetToken){
+            const {accessToken} = usetToken
+            req.headers['Authorization'] = `Bearer ${accessToken}`
+        }
         return req;
     },
     (error) => {
@@ -18,20 +24,20 @@ api.interceptors.request.use(
 
 api.interceptors.response.use(
     (res) => {
-        if(res.status == 200){
+        if (res.status == 200) {
             return res.data
         }
         return Promise.reject(res)
     },
     (error) => {
-        if(error.response){
-            if(error.response.status === 401 && error.response.config.url != '/login'){
+        if (error.response) {
+            if (error.response.status === 401 && error.response.config.url != '/login' && error.response.config.url != '/logout') {
                 return showToast('身份认证失败')
             }
             if (error.response.status === 403) {
                 return showToast("无权限访问");
             }
-            if(error.response.status === 500){
+            if (error.response.status === 500) {
                 return showToast(error.message);
             }
         }

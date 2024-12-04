@@ -1,8 +1,9 @@
-import React from 'react';
-import { NativeBaseProvider, Image, VStack, Badge, Stack, Menu, Pressable, Box } from 'native-base';
-import { createStaticNavigation, NavigationContainer } from '@react-navigation/native';
+import React, { useEffect, useMemo, useState } from 'react';
+import { NativeBaseProvider, Image, VStack } from 'native-base';
+import { createStaticNavigation } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import Splash from './src/pages/Splash';
 import Login from './src/pages/login';
 import Chat from './src/pages/chat';
 import ChatItem from './src/pages/chat/chat-item';
@@ -11,12 +12,11 @@ import FriendItem from './src/pages/friend/friend-item';
 import Group from './src/pages/group';
 import GroupItem from './src/pages/group/group-item';
 import Me from './src/pages/me';
-import Ionicons from 'react-native-vector-icons/Ionicons';
 import Feather from 'react-native-vector-icons/Feather';
-import AntDesign from 'react-native-vector-icons/AntDesign';
 import ChatTools from './src/component/ChatTools';
-
-const Tab = createBottomTabNavigator();
+import { AuthContext, SignInContext, useIsSignedIn, useIsSignedOut } from './src/context';
+import Storage from './src/storage/storage';
+import { NativeBaseConfigProvider } from 'native-base/lib/typescript/core/NativeBaseContext';
 
 const Home = createBottomTabNavigator({
   initialRouteName: 'Chat',
@@ -43,7 +43,7 @@ const Home = createBottomTabNavigator({
             :
             <Image alt='' color={color} size={size} source={require('./src/assets/img/chat-icon-50.png')} />
         ),
-        headerRight: () => <ChatTools/>
+        headerRight: () => <ChatTools />
       }
     },
     Friend: {
@@ -101,49 +101,62 @@ const Home = createBottomTabNavigator({
 })
 
 const RootStack = createNativeStackNavigator({
-  initialRouteName: 'Login',
-  screens: {
-    Login: {
-      screen: Login,
-      options: {
-        headerShown: false
-      }
-    },
-    Home: {
-      screen: Home,
-      options: {
-        headerShown: false
-      }
-    },
-    ChatItem: {
-      screen: ChatItem,
-      options: {
-        title: '张三',
-        headerTitleAlign: 'center',
-        headerTitleStyle: {
-          fontWeight: 'bold'
+  groups: {
+    // 登录情况下可以访问的页面
+    SignedIn: {
+      if: useIsSignedIn,
+      screens: {
+        Home: {
+          if: useIsSignedIn,
+          screen: Home,
+          options: {
+            headerShown: false
+          }
         },
-        headerRight: () => (
-          <Feather name='more-horizontal' size={28} />
-        )
+        ChatItem: {
+          screen: ChatItem,
+          options: {
+            title: '张三',
+            headerTitleAlign: 'center',
+            headerTitleStyle: {
+              fontWeight: 'bold'
+            },
+            headerRight: () => (
+              <Feather name='more-horizontal' size={28} />
+            )
+          }
+        },
+        FriendItem: {
+          screen: FriendItem,
+          options: {
+            title: '',
+            headerRight: () => (
+              <Feather name='more-horizontal' size={28} />
+            )
+          }
+        },
+        GroupItem: {
+          screen: GroupItem,
+          options: {
+            title: '',
+            headerRight: () => (
+              <Feather name='more-horizontal' size={28} />
+            )
+          }
+        }
       }
     },
-    FriendItem: {
-      screen: FriendItem,
-      options: {
-        title: '',
-        headerRight: () => (
-          <Feather name='more-horizontal' size={28} />
-        )
-      }
-    },
-    GroupItem: {
-      screen: GroupItem,
-      options: {
-        title: '',
-        headerRight: () => (
-          <Feather name='more-horizontal' size={28} />
-        )
+    // 未登录情况下可以访问的页面
+    SignedOut: {
+      if: useIsSignedOut,
+      screens: {
+        Login: {
+          if: useIsSignedOut,
+          screen: Login,
+          options: {
+            headerShown: false
+          }
+        },
       }
     }
   }
@@ -153,61 +166,48 @@ const Navigation = createStaticNavigation(RootStack)
 
 const App = () => {
 
+  const [userToken, setUserToken] = useState(null)
+
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    const bootstrapAsync = async () => {
+      let userToken = await Storage.get('userToken');
+      if (userToken) {
+        setUserToken(userToken)
+      }
+      setIsLoading(false)
+    }
+    bootstrapAsync()
+  }, [])
+
+  const authContext = useMemo(() => ({
+    signIn: async (token) => {
+      setUserToken(token)
+    },
+    signOut: async () => {
+      setUserToken(null)
+    }
+  }))
+
+  //未确认用户是否已登录之前显示启动页
+  if (isLoading) {
+    return (
+      <NativeBaseProvider>
+        <Splash />
+      </NativeBaseProvider>
+    )
+  }
+
+  const isSignedIn = userToken != null;
+
   return (
     <NativeBaseProvider>
-      <Navigation />
-      {/* <NavigationContainer>
-        <RootStack.Navigator initialRouteName='Home'>
-          <RootStack.Screen
-            name='Login'
-            component={Login}
-            options={{
-              headerShown: false
-            }}
-          />
-          <RootStack.Screen
-            name='Home'
-            component={HomeTab}
-            options={{
-              headerShown: false
-            }}
-          />
-          <RootStack.Screen
-            name='ChatItem'
-            component={ChatItem}
-            options={{
-              title: '张三',
-              headerTitleAlign: 'center',
-              headerTitleStyle: {
-                fontWeight: 'bold'
-              },
-              headerRight: () => (
-                <Feather name='more-horizontal' size={28} />
-              )
-            }}
-          />
-          <RootStack.Screen
-            name='FriendItem'
-            component={FriendItem}
-            options={{
-              title: '',
-              headerRight: () => (
-                <Feather name='more-horizontal' size={28} />
-              )
-            }}
-          />
-          <RootStack.Screen
-            name='GroupItem'
-            component={GroupItem}
-            options={{
-              title: '',
-              headerRight: () => (
-                <Feather name='more-horizontal' size={28} />
-              )
-            }}
-          />
-        </RootStack.Navigator>
-      </NavigationContainer> */}
+      <AuthContext.Provider value={authContext}>
+        <SignInContext.Provider value={isSignedIn}>
+          <Navigation />
+        </SignInContext.Provider>
+      </AuthContext.Provider>
     </NativeBaseProvider>
 
   )
