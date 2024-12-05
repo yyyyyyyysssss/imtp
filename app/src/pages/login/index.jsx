@@ -62,7 +62,6 @@ const Login = () => {
                 async (res) => {
                     const userToken = res.data
                     await signIn(userToken)
-                    setLoading(false)
                 },
                 (error) => {
                     if (error.response && error.response.status === 401) {
