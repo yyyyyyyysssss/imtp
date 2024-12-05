@@ -1,18 +1,24 @@
 import axios from "axios";
-import { showToast } from "../component/Utils";
+import { showToast } from "../components/Utils";
 import Storage from "../storage/storage";
+import global from "../../global";
 
 
 const api = axios.create({
-    baseURL: 'http://10.0.2.2:9090',
+    baseURL: global.apiUrl,
     timeout: 60000
 })
 
 api.interceptors.request.use(
     async (req) => {
-        const usetToken = await Storage.get('userToken')
-        if(usetToken){
-            const {accessToken} = usetToken
+        const {userToken,userInfo} = await Storage.multiGet(['userToken','userInfo'])
+        if(userToken){
+            const path = req.url;
+            //用户id路径参数解析
+            if(path.includes("{userId}")){
+                req.url = path.replaceAll("{userId}",userInfo.id);
+            }
+            const {accessToken} = userToken
             req.headers['Authorization'] = `Bearer ${accessToken}`
         }
         return req;

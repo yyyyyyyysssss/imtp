@@ -3,19 +3,16 @@ import React, { useContext, useState } from 'react';
 import { StyleSheet } from 'react-native';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import AntDesignIcon from 'react-native-vector-icons/AntDesign';
-import { GoogleIcon, MicrosoftIcon } from '../../component/CustomIcon';
+import { GoogleIcon, MicrosoftIcon } from '../../components/CustomIcon';
 import { useForm, Controller } from 'react-hook-form';
 import api from '../../api/api';
-import { showToast } from '../../component/Utils';
+import { showToast } from '../../components/Utils';
 import Storage from '../../storage/storage';
-import { useNavigation, } from '@react-navigation/native';
 import { AuthContext } from '../../context';
 
 const Login = () => {
 
-    const {signIn} = useContext(AuthContext)
-
-    const navigation = useNavigation();
+    const { signIn } = useContext(AuthContext)
 
     const [show, setShow] = useState(false);
 
@@ -53,7 +50,6 @@ const Login = () => {
     }
 
     const onSubmit = (data) => {
-        console.log('submiting with ', data);
         let loginRequest = {
             username: data.username,
             credential: data.password,
@@ -63,13 +59,10 @@ const Login = () => {
         setLoading(true)
         api.post('/login', loginRequest)
             .then(
-                (res) => {
+                async (res) => {
                     const userToken = res.data
-                    Storage.save('userToken', userToken)
-                        .then(() => {
-                            setLoading(false)
-                            signIn(userToken)
-                        })
+                    await signIn(userToken)
+                    setLoading(false)
                 },
                 (error) => {
                     if (error.response && error.response.status === 401) {

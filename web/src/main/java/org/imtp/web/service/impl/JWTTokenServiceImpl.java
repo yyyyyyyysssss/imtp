@@ -115,6 +115,9 @@ public class JWTTokenServiceImpl implements TokenService {
     public boolean isValid(String token, TokenType tokenType) {
         switch (tokenType){
             case ACCESS_TOKEN :
+                if(!JwtUtil.verifier(token)){
+                    return false;
+                }
                 PayloadInfo payloadInfo = JwtUtil.extractPayloadInfo(token);
                 return !redisWrapper.hasKey(RedisKey.TOKEN_BLACKLIST + payloadInfo.getId())
                         && JwtUtil.verifier(token)
@@ -122,6 +125,10 @@ public class JWTTokenServiceImpl implements TokenService {
             case REFRESH_TOKEN:
                 String base64DecodeStr = EncryptUtil.base64Decode(token);
                 String[] tokens = base64DecodeStr.split(":");
+                long tokenExpiryTime = Long.parseLong(tokens[1]);
+                if (tokenExpiryTime < System.currentTimeMillis()){
+                    return false;
+                }
                 return !redisWrapper.hasKey(RedisKey.TOKEN_BLACKLIST + tokens[4]);
             default:
                 throw new UnsupportedOperationException("不支持的token类型: " + tokenType);

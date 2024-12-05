@@ -1,22 +1,24 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { NativeBaseProvider, Image, VStack } from 'native-base';
+import React, { useEffect, useMemo } from 'react';
+import { Image, VStack } from 'native-base';
 import { createStaticNavigation } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import Splash from './src/pages/Splash';
-import Login from './src/pages/login';
-import Chat from './src/pages/chat';
-import ChatItem from './src/pages/chat/chat-item';
-import Friend from './src/pages/friend';
-import FriendItem from './src/pages/friend/friend-item';
-import Group from './src/pages/group';
-import GroupItem from './src/pages/group/group-item';
-import Me from './src/pages/me';
+import Splash from './pages/Splash';
+import Login from './pages/login';
+import Chat from './pages/chat';
+import ChatItem from './pages/chat/chat-item';
+import Friend from './pages/friend';
+import FriendItem from './pages/friend/friend-item';
+import Group from './pages/group';
+import GroupItem from './pages/group/group-item';
+import Me from './pages/me';
 import Feather from 'react-native-vector-icons/Feather';
-import ChatTools from './src/component/ChatTools';
-import { AuthContext, SignInContext, useIsSignedIn, useIsSignedOut } from './src/context';
-import Storage from './src/storage/storage';
-import { NativeBaseConfigProvider } from 'native-base/lib/typescript/core/NativeBaseContext';
+import ChatTools from './components/ChatTools';
+import { AuthContext, SignInContext, useIsSignedIn, useIsSignedOut } from './context';
+import Storage from './storage/storage';
+import api from './api/api';
+import { useSelector, useDispatch } from 'react-redux'
+import { restoreToken, signIn, signOut } from './redux/slices/authSlice';
 
 const Home = createBottomTabNavigator({
   initialRouteName: 'Chat',
@@ -38,10 +40,10 @@ const Home = createBottomTabNavigator({
         tabBarIcon: ({ focused, color, size }) => (
           focused ?
             <VStack>
-              <Image alt='' color={color} size={size} source={require('./src/assets/img/chat-icon-50-selected.png')} />
+              <Image alt='' color={color} size={size} source={require('./assets/img/chat-icon-50-selected.png')} />
             </VStack>
             :
-            <Image alt='' color={color} size={size} source={require('./src/assets/img/chat-icon-50.png')} />
+            <Image alt='' color={color} size={size} source={require('./assets/img/chat-icon-50.png')} />
         ),
         headerRight: () => <ChatTools />
       }
@@ -54,14 +56,20 @@ const Home = createBottomTabNavigator({
         headerTitleStyle: {
           fontWeight: 'bold',
         },
+        headerStyle: {
+          borderBottomWidth: 0,
+          elevation: 0,
+          shadowOpacity: 0,
+          backgroundColor: '#F5F5F5'
+        },
         tabBarIcon: ({ focused, color, size }) => (
           focused ?
-            <Image alt='' color={color} size={size} source={require('./src/assets/img/friend-icon-50-selected.png')} />
+            <Image alt='' color={color} size={size} source={require('./assets/img/friend-icon-50-selected.png')} />
             :
-            <Image alt='' color={color} size={size} source={require('./src/assets/img/friend-icon-50.png')} />
+            <Image alt='' color={color} size={size} source={require('./assets/img/friend-icon-50.png')} />
         ),
         headerRight: () => (
-          <Image alt='' size={7} mr={4} source={require('./src/assets/img/add-friend-icon-50.png')} />
+          <Image alt='' size={7} mr={4} source={require('./assets/img/add-friend-icon-50.png')} />
         )
       }
     },
@@ -73,14 +81,20 @@ const Home = createBottomTabNavigator({
         headerTitleStyle: {
           fontWeight: 'bold'
         },
+        headerStyle: {
+          borderBottomWidth: 0,
+          elevation: 0,
+          shadowOpacity: 0,
+          backgroundColor: '#F5F5F5'
+        },
         tabBarIcon: ({ focused, color, size }) => (
           focused ?
-            <Image alt='' color={color} size={size} source={require('./src/assets/img/group-icon-50-selected.png')} />
+            <Image alt='' color={color} size={size} source={require('./assets/img/group-icon-50-selected.png')} />
             :
-            <Image alt='' color={color} size={size} source={require('./src/assets/img/group-icon-50.png')} />
+            <Image alt='' color={color} size={size} source={require('./assets/img/group-icon-50.png')} />
         ),
         headerRight: () => (
-          <Image alt='' size={7} mr={4} source={require('./src/assets/img/add-group-icon-50.png')} />
+          <Image alt='' size={7} mr={4} source={require('./assets/img/add-group-icon-50.png')} />
         )
       }
     },
@@ -91,9 +105,9 @@ const Home = createBottomTabNavigator({
         headerShown: false,
         tabBarIcon: ({ focused, color, size }) => (
           focused ?
-            <Image alt='' color={color} size={size} source={require('./src/assets/img/me-icon-50-selected.png')} />
+            <Image alt='' color={color} size={size} source={require('./assets/img/me-icon-50-selected.png')} />
             :
-            <Image alt='' color={color} size={size} source={require('./src/assets/img/me-icon-50.png')} />
+            <Image alt='' color={color} size={size} source={require('./assets/img/me-icon-50.png')} />
         )
       }
     }
@@ -166,50 +180,78 @@ const Navigation = createStaticNavigation(RootStack)
 
 const App = () => {
 
-  const [userToken, setUserToken] = useState(null)
-
-  const [isLoading, setIsLoading] = useState(true)
+  const { userToken, isLoading } = useSelector(state => state.auth)
+  const dispatch = useDispatch()
 
   useEffect(() => {
     const bootstrapAsync = async () => {
       let userToken = await Storage.get('userToken');
       if (userToken) {
-        setUserToken(userToken)
+        //验证token是否有效
+        api.get('/open/tokenValid', {
+          params: {
+            token: userToken.accessToken,
+            tokenType: 'ACCESS_TOKEN'
+          }
+        }).then(
+          (res) => {
+            const { active, userInfo } = res.data
+            if (!active) {
+              Storage.multiRemove('userToken', 'userInfo')
+            } else {
+              Storage.save('userInfo', userInfo)
+            }
+            dispatch(restoreToken({ token: userToken, userInfo: userInfo }))
+          }
+        )
+      } else {
+        dispatch(restoreToken({ token: null }))
       }
-      setIsLoading(false)
     }
     bootstrapAsync()
   }, [])
 
   const authContext = useMemo(() => ({
     signIn: async (token) => {
-      setUserToken(token)
+      //登录之后获取用户信息
+      Storage.save('userToken', token)
+        .then(() => {
+          api.get('/social/userInfo')
+            .then(
+              (res) => {
+                const userInfo = res.data
+                Storage.save('userInfo', userInfo)
+                  .then(() => {
+                    dispatch(signIn({ token: token, userInfo: userInfo }))
+                  })
+
+              }
+            )
+        })
     },
     signOut: async () => {
-      setUserToken(null)
+      Storage.remove('userToken', 'userInfo')
+        .then(() => {
+          dispatch(signOut())
+        })
     }
   }))
 
   //未确认用户是否已登录之前显示启动页
   if (isLoading) {
     return (
-      <NativeBaseProvider>
-        <Splash />
-      </NativeBaseProvider>
+      <Splash />
     )
   }
 
   const isSignedIn = userToken != null;
 
   return (
-    <NativeBaseProvider>
-      <AuthContext.Provider value={authContext}>
-        <SignInContext.Provider value={isSignedIn}>
-          <Navigation />
-        </SignInContext.Provider>
-      </AuthContext.Provider>
-    </NativeBaseProvider>
-
+    <AuthContext.Provider value={authContext}>
+      <SignInContext.Provider value={isSignedIn}>
+        <Navigation />
+      </SignInContext.Provider>
+    </AuthContext.Provider>
   )
 }
 

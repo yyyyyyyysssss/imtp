@@ -102,7 +102,8 @@ public class SecurityConfig {
                                     "/oauth/**",
                                     "/oauth2/consent",
                                     "/oauth2/activate",
-                                    "/activated"
+                                    "/activated",
+                                    "/open/**"
                             )
                             .permitAll()
                             //只需要通过身份认证就能访问的路径
