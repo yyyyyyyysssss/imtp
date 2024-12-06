@@ -1,4 +1,4 @@
-import { Button, Center, FlatList, Avatar, Input, Pressable, VStack, HStack, Box, Text, View } from 'native-base';
+import { Button, Center, FlatList, Avatar, Input, Pressable, VStack, HStack, Box, Text, Flex, Divider, View } from 'native-base';
 import React, { useEffect, useState } from 'react';
 import { useNavigation, } from '@react-navigation/native';
 import AntDesignIcon from 'react-native-vector-icons/AntDesign';
@@ -6,6 +6,7 @@ import { StyleSheet } from 'react-native';
 import api from '../../api/api';
 import { useDispatch, useSelector } from 'react-redux';
 import { initSession, addSession } from '../../redux/slices/chatSlice';
+import { formatChatDate } from '../../utils';
 
 
 const Chat = () => {
@@ -47,30 +48,50 @@ const Chat = () => {
                     />
                 </Center>
                 <Center>
-                    {/* <Button onPress={toChatItem}>This is Chat</Button> */}
                     <FlatList
                         style={styles.userSessionList}
                         contentContainerStyle={{
 
                         }}
-                        ItemSeparatorComponent={() => <View style={{ height: 15 }} />}
+                        ItemSeparatorComponent={() =>
+                            <HStack space={4} alignItems='flex-end' justifyContent='center' style={styles.userSessionListItemSeparator} >
+                                <HStack flex={1} />
+                                <HStack flex={6}>
+                                    <Divider style={styles.userSessionListItemSeparatorDivider} />
+                                </HStack>
+                            </HStack>
+                        }
                         data={userSessions}
                         renderItem={({ item }) => {
                             return (
-                                <HStack space={3}>
-                                    <Avatar size="56px" _image={{
-                                        borderRadius: 8
-                                    }} source={{ uri: item.avatar }} />
-                                    <HStack flex={1}>
-                                        <VStack flex={1} justifyContent='space-between'>
-                                            <Text>{item.name}</Text>
-                                            <Text>{item.lastMsgContent}</Text>
-                                        </VStack>
-                                        <VStack flex={1} alignItems='flex-end' style={{paddingRight: 5}}>
-                                            <Text>{item.lastMsgTime}</Text>
-                                        </VStack>
-                                    </HStack>
-                                </HStack>
+                                <Pressable
+                                    onPress={toChatItem}
+                                >
+                                    {({ isHovered, isFocused, isPressed }) => {
+                                        return (
+                                            <VStack style={{ backgroundColor: isPressed ? '#C8C6C5' : 'transparent',padding: 10 }}>
+                                                <HStack space={4}>
+                                                    <HStack flex={1}>
+                                                        <Avatar size="60px" _image={{
+                                                            borderRadius: 8
+                                                        }} source={{ uri: item.avatar }} />
+                                                    </HStack>
+                                                    <HStack flex={6}>
+                                                        <VStack flex={1} justifyContent='space-between'>
+                                                            <Text style={styles.userSessionName}>{item.name}</Text>
+                                                            <Text style={styles.userSessionLastMsg}>{item.lastMsgContent}</Text>
+                                                        </VStack>
+                                                        <VStack flex={1} alignItems='flex-end'>
+                                                            <Text style={styles.userSessionLastTime}>{formatChatDate(item.lastMsgTime)}</Text>
+                                                        </VStack>
+                                                    </HStack>
+                                                </HStack>
+                                            </VStack>
+
+                                        )
+                                    }}
+
+                                </Pressable>
                             )
                         }}
                         keyExtractor={item => item.id}
@@ -94,9 +115,31 @@ const styles = StyleSheet.create({
     userSessionList: {
         width: '100%',
         height: '100%',
-        padding: 10
     },
-    lastMsgVStack: {}
+    userSessionListItemSeparator: {
+
+    },
+    userSessionListItemSeparatorDivider: {
+        height: 1,
+        backgroundColor: '#D3D3D3',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.1,
+        shadowRadius: 2,
+    },
+    userSessionName: {
+        color: '#000000',
+        fontWeight: '300',
+        fontSize: 16
+    },
+    userSessionLastMsg: {
+        color: 'gray',
+        fontSize: 13
+    },
+    userSessionLastTime: {
+        color: 'gray',
+        fontSize: 13
+    }
 })
 
 export default Chat;

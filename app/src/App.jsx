@@ -131,13 +131,15 @@ const RootStack = createNativeStackNavigator({
           screen: ChatItem,
           options: {
             title: '张三',
+            headerShown: false,
             headerTitleAlign: 'center',
             headerTitleStyle: {
               fontWeight: 'bold'
             },
             headerRight: () => (
               <Feather name='more-horizontal' size={28} />
-            )
+            ),
+            animation: 'slide_from_right'
           }
         },
         FriendItem: {
@@ -197,11 +199,11 @@ const App = () => {
           (res) => {
             const { active, userInfo } = res.data
             if (!active) {
-              Storage.multiRemove('userToken', 'userInfo')
+              Storage.multiRemove(['userToken', 'userInfo'])
             } else {
               Storage.save('userInfo', userInfo)
+              dispatch(restoreToken({ token: userToken, userInfo: userInfo }))
             }
-            dispatch(restoreToken({ token: userToken, userInfo: userInfo }))
           }
         )
       } else {
