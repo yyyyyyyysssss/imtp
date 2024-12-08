@@ -19,8 +19,9 @@ import Storage from './storage/storage';
 import api from './api/api';
 import { useSelector, useDispatch } from 'react-redux'
 import { restoreToken, signIn, signOut } from './redux/slices/authSlice';
+import Home from './pages/home';
 
-const Home = createBottomTabNavigator({
+const HomeTab = createBottomTabNavigator({
   initialRouteName: 'Chat',
   screens: {
     Chat: {
@@ -130,16 +131,9 @@ const RootStack = createNativeStackNavigator({
         ChatItem: {
           screen: ChatItem,
           options: {
-            title: '张三',
             headerShown: false,
-            headerTitleAlign: 'center',
-            headerTitleStyle: {
-              fontWeight: 'bold'
-            },
-            headerRight: () => (
-              <Feather name='more-horizontal' size={28} />
-            ),
-            animation: 'slide_from_right'
+            animation: 'slide_from_right',
+            gestureEnabled: true
           }
         },
         FriendItem: {

@@ -14,3 +14,7 @@ export const useIsSignedOut = () => {
     const isSignedIn = useContext(SignInContext)
     return !isSignedIn;
 }
+
+
+
+export const ImageContext  = createContext();

@@ -41,4 +41,7 @@ public class UserSessionInfo {
 
     private MessageMetadata lastMessageMetadata;
 
+    //未读消息数量
+    private Integer unreadMessageCount;
+
 }

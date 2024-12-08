@@ -1,8 +1,8 @@
-import { Button, Center, Input, Pressable, VStack } from 'native-base';
+import { Button, Center, Input, Pressable, VStack,Image } from 'native-base';
 import React, { useState } from 'react';
 import { useNavigation, } from '@react-navigation/native';
-import AntDesignIcon from 'react-native-vector-icons/AntDesign';
 import { StyleSheet } from 'react-native';
+import Search from '../../components/Search';
 
 const Friend = () => {
     const navigation = useNavigation();
@@ -15,20 +15,7 @@ const Friend = () => {
     return (
         <>
             <VStack style={styles.rootVStack} space={3}>
-                <Center style={styles.searchCenter}>
-                    <Input
-                        borderWidth="0"
-                        backgroundColor='white'
-                        size='lg'
-                        shadow={1}
-                        InputLeftElement={
-                            <Pressable style={{ marginLeft: 8 }}>
-                                <AntDesignIcon name='search1' size={18} color="gray" />
-                            </Pressable>
-                        }
-                        placeholder='搜索'
-                    />
-                </Center>
+                <Search/>
                 <Center>
                     <Button onPress={toFriendItem}>This is Friend</Button>
                 </Center>
