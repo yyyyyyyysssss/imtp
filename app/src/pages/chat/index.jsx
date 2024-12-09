@@ -3,13 +3,14 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useNavigation, } from '@react-navigation/native';
 import { StyleSheet } from 'react-native';
 import api from '../../api/api';
-import { useDispatch, useSelector,shallowEqual } from 'react-redux';
+import { useDispatch, useSelector, shallowEqual } from 'react-redux';
 import { initSession, addSession, selectSession, removeSession, incrUnreadCount, decrUnreadCount } from '../../redux/slices/chatSlice';
 import { formatChatDate } from '../../utils';
 import { SwipeListView } from 'react-native-swipe-list-view';
 import { showToast } from '../../components/Utils';
 import Search from '../../components/Search';
 import SwipeItemOperation from '../../components/SwipeItemOperation';
+import UserSessionItem from '../../components/UserSessionItem';
 
 
 const initData = [
@@ -88,7 +89,7 @@ const initData = [
 const Chat = () => {
     const navigation = useNavigation();
 
-    const userSessions = useSelector(state => state.chat.userSessions,shallowEqual)
+    const userSessions = useSelector(state => state.chat.userSessions, shallowEqual)
     const dispatch = useDispatch()
 
     console.log('Chat')
@@ -109,12 +110,12 @@ const Chat = () => {
     }, [])
 
     const toChatItem = (userSession) => {
+        console.log('toChatItem')
         dispatch(selectSession(userSession))
         navigation.navigate('ChatItem')
     }
 
     const itemSeparator = useCallback(() => {
-
         return (
             <HStack space={7} alignItems='flex-end' justifyContent='center' style={styles.userSessionListItemSeparator} >
                 <HStack flex={1}>
@@ -127,8 +128,7 @@ const Chat = () => {
         )
     }, [])
 
-    const renderItem = useCallback(({ item, index }) => {
-        console.log('renderItem',index)
+    const renderItem = ({ item, index }) => {
         return (
             <Pressable
                 onPress={() => toChatItem(item)}
@@ -136,42 +136,23 @@ const Chat = () => {
                 {({ isHovered, isFocused, isPressed }) => {
                     return (
                         <VStack style={{ backgroundColor: isPressed ? '#C8C6C5' : '#F5F5F5', padding: 10 }}>
-                            <HStack space={5}>
-                                <HStack flex={1}>
-                                    <Avatar size="60px" _image={{
-                                        borderRadius: 8
-                                    }} source={{ uri: item.avatar }} >
-                                        {
-                                            item.unreadMessageCount > 0 && (
-                                                <Avatar.Badge mb={10} mr={-3} size={7} zIndex={1} bg="red.500" justifyContent='center' alignItems='center'>
-                                                    <Text fontSize={12} fontWeight='bold' color='white'>{item.unreadMessageCount > 99 ? '99+' : item.unreadMessageCount}</Text>
-                                                </Avatar.Badge>
-                                            )
-                                        }
-
-                                    </Avatar>
-                                </HStack>
-                                <HStack flex={6}>
-                                    <VStack flex={1} justifyContent='space-between'>
-                                        <Text style={styles.userSessionName}>{item.name}</Text>
-                                        <Text style={styles.userSessionLastMsg}>{item.lastMsgContent}</Text>
-                                    </VStack>
-                                    <VStack flex={1} alignItems='flex-end'>
-                                        <Text style={styles.userSessionLastTime}>{formatChatDate(item.lastMsgTime)}</Text>
-                                    </VStack>
-                                </HStack>
-                            </HStack>
+                            <UserSessionItem
+                                avatar={item.avatar}
+                                name={item.name}
+                                lastMsgType={item.lastMsgType}
+                                lastMsgContent={item.lastMsgContent}
+                                lastMsgTime={item.lastMsgTime}
+                                unreadMessageCount={item.unreadMessageCount}
+                            />
                         </VStack>
-
                     )
                 }}
 
             </Pressable>
         )
-    }, [userSessions])
+    }
 
     const renderHiddenItem = (data, rowMap) => {
-
         return (
             <HStack flex="1" pl="2" justifyContent='flex-end'>
                 <Pressable
@@ -214,8 +195,8 @@ const Chat = () => {
                     keyExtractor={item => item.id}
                     data={userSessions}
                     renderItem={renderItem}
-                    renderHiddenItem={renderHiddenItem}
                     ItemSeparatorComponent={itemSeparator}
+                    renderHiddenItem={renderHiddenItem}
                     rightOpenValue={-120}
                     disableRightSwipe={true}
                     onRowDidOpen={onRowDidOpen}

@@ -64,6 +64,11 @@ const Message = React.memo(({ message }) => {
             </VStack>
         </HStack>
     )
+}, (prevProps, nextProps) => {
+
+    return prevProps.message.status === nextProps.message.status &&
+        prevProps.message.content === nextProps.message.content && 
+        prevProps.message.contentMetadata.thumbnailUrl === nextProps.message.contentMetadata.thumbnailUrl
 })
 
 const styles = StyleSheet.create({

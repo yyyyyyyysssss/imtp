@@ -1,11 +1,30 @@
 import { Image, Pressable } from 'native-base';
-import React, { useContext } from 'react';
+import React, { useState } from 'react';
 import { ImageContext } from '../context';
+import { Modal, StyleSheet } from 'react-native';
+import ImageViewer from 'react-native-image-zoom-viewer';
 
 
 const ImageMessage = ({ content, contentMetadata }) => {
 
-    const { showOriginalImage } = useContext(ImageContext)
+    const [showImage, setShowImage] = useState({
+        isVisible: false,
+        imageUrl: null
+    })
+
+    const showOriginalImage = (url) => {
+        setShowImage({
+            isVisible: true,
+            imageUrl: url
+        })
+    }
+
+    const closeModal = () => {
+        setShowImage({
+            isVisible: false,
+            imageUrl: null
+        })
+    }
 
     return (
         <>
@@ -21,6 +40,26 @@ const ImageMessage = ({ content, contentMetadata }) => {
                     }}
                     alt=''
                 />
+            </Pressable>
+            <Pressable
+                onPress={closeModal}
+            >
+                <Modal
+                    visible={showImage.isVisible}
+                    transparent={true}
+                    onRequestClose={closeModal}
+                >
+                    <ImageViewer
+                        onClick={closeModal}
+                        onSwipeDown={closeModal} // 下滑关闭 Modal
+                        enableSwipeDown={true}
+                        imageUrls={[
+                            {
+                                url: showImage.imageUrl
+                            }
+                        ]}
+                    />
+                </Modal>
             </Pressable>
         </>
     )

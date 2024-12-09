@@ -2,7 +2,7 @@ import { Box, Text } from 'native-base';
 import React, { useEffect, } from 'react';
 
 const Notification = React.memo(({ children, size = 20, count }) => {
-    
+
     return (
         <Box position='relative'>
             {children}
@@ -34,6 +34,6 @@ const Notification = React.memo(({ children, size = 20, count }) => {
 
         </Box>
     )
-})
+}, (prevProps, nextProps) => prevProps.count === nextProps.count)
 
 export default Notification;

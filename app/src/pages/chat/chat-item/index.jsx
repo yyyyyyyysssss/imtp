@@ -5,15 +5,13 @@ import ItemHeader from '../../../components/ItemHeader';
 import { useDispatch, useSelector } from 'react-redux';
 import { showToast } from '../../../components/Utils';
 import Message from '../../../components/Message';
-import ImageViewer from 'react-native-image-zoom-viewer';
-import { ImageContext } from '../../../context';
 
 
 const initData = [
     {
         id: '1',
         type: 1,
-        avatar: 'http://localhost:9000/y-chat-bucket/a21f5d18bb074b16b0e5288264f7ec82.jpg',
+        avatar: 'http://localhost:9000/y-chat-bucket/d4b0fb7c889d466183188f286ca03446.jpg',
         name: '卡卡罗特',
         content: '在嘛？弗利萨要来毁灭地球了，快回来拯救地球',
         deliveryMethod: 'SINGLE',
@@ -47,9 +45,9 @@ const initData = [
     {
         id: '3',
         type: 4,
-        avatar: 'http://localhost:9000/y-chat-bucket/0e258bedd82e44a380f82817b48f3ca6.jpeg',
+        avatar: 'http://localhost:9000/y-chat-bucket/0e258bedd82e44a380f82817b48f3ca6.jpg',
         name: '比克大魔王',
-        content: 'http://localhost:9000/y-chat-bucket/d4b0fb7c889d466183188f286ca03446.jpg',
+        content: 'http://localhost:9000/y-chat-bucket/0e258bedd82e44a380f82817b48f3ca6.jpg',
         deliveryMethod: 'GROUP',
         status: 'PENDING',
         self: true,
@@ -69,11 +67,10 @@ const initData = [
 
 const ChatItem = () => {
 
-    const selectedUserSession  = useSelector(state => state.chat.selectedUserSession)
-    const dispatch = useDispatch()
+    console.log('ChatItem')
 
-    const [isVisible, setIsVisible] = useState(false)
-    const [imageUrl, setImageUrl] = useState(null)
+    const selectedUserSession = useSelector(state => state.chat.selectedUserSession)
+    const dispatch = useDispatch()
 
 
     const moreOps = () => {
@@ -87,24 +84,11 @@ const ChatItem = () => {
         )
     }, [])
 
-    const showOriginalImage = (url) => {
-        setImageUrl(url)
-        setIsVisible(true)
-    }
-
-    const closeModal = () => {
-        setIsVisible(false)
-        setImageUrl(null)
-    }
-
-    const renderItem = useCallback(({ item, index }) => {
-
+    const renderItem = ({ item, index }) => {
         return (
-            <ImageContext.Provider value={{showOriginalImage}}>
-                <Message message={item} />
-            </ImageContext.Provider>
+            <Message message={item} />
         )
-    }, [initData])
+    }
 
     return (
         <>
@@ -122,26 +106,6 @@ const ChatItem = () => {
 
                 </HStack>
             </VStack>
-            <Pressable
-                onPress={closeModal}
-            >
-                <Modal
-                    visible={isVisible}
-                    transparent={true}
-                    onRequestClose={closeModal}
-                >
-                    <ImageViewer
-                        onClick={closeModal}
-                        onSwipeDown={closeModal} // 下滑关闭 Modal
-                        enableSwipeDown={true}
-                        imageUrls={[
-                            {
-                                url: imageUrl
-                            }
-                        ]}
-                    />
-                </Modal>
-            </Pressable>
         </>
     )
 }
