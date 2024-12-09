@@ -1,10 +1,11 @@
-import { Avatar, FlatList, HStack, Pressable, Text, View, VStack } from 'native-base';
+import { Avatar, FlatList, HStack, Input, Pressable, Text, View, VStack, Box } from 'native-base';
 import React, { useCallback, useState } from 'react';
 import { Modal, StyleSheet } from 'react-native';
 import ItemHeader from '../../../components/ItemHeader';
 import { useDispatch, useSelector } from 'react-redux';
 import { showToast } from '../../../components/Utils';
 import Message from '../../../components/Message';
+import ChatItemFooter from '../../../components/ChatItemFooter';
 
 
 const initData = [
@@ -45,9 +46,9 @@ const initData = [
     {
         id: '3',
         type: 4,
-        avatar: 'http://localhost:9000/y-chat-bucket/0e258bedd82e44a380f82817b48f3ca6.jpg',
+        avatar: 'http://localhost:9000/y-chat-bucket/0e258bedd82e44a380f82817b48f3ca6.jpeg',
         name: '比克大魔王',
-        content: 'http://localhost:9000/y-chat-bucket/0e258bedd82e44a380f82817b48f3ca6.jpg',
+        content: 'http://localhost:9000/y-chat-bucket/a21f5d18bb074b16b0e5288264f7ec82.jpg',
         deliveryMethod: 'GROUP',
         status: 'PENDING',
         self: true,
@@ -102,9 +103,9 @@ const ChatItem = () => {
                         renderItem={renderItem}
                     />
                 </HStack>
-                <HStack flex={0.8} style={styles.footerHstack}>
-
-                </HStack>
+                {/* <HStack flex={0.8} style={styles.footerHstack} justifyContent='center'> */}
+                    <ChatItemFooter flex={0.8}/>
+                {/* </HStack> */}
             </VStack>
         </>
     )
@@ -121,7 +122,10 @@ const styles = StyleSheet.create({
         padding: 10
     },
     footerHstack: {
-        backgroundColor: 'yellow'
+
+    },
+    footerHstackInput: {
+
     }
 })
 
