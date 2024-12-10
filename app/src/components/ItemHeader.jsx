@@ -19,7 +19,7 @@ const ItemHeader = ({ title, moreOps, flex }) => {
 
     return (
         <>
-            <Box flex={flex} style={{ overflow: 'hidden', paddingBottom: 5 }}>
+            <Box style={{ overflow: 'hidden', paddingBottom: 5,height: 65 }}>
                 <HStack
                     flex={1}
                     justifyContent='center'

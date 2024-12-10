@@ -6,7 +6,7 @@ import TextMessage from './TextMessage';
 import ImageMessage from './ImageMessage';
 
 
-const Message = React.memo(({ message }) => {
+const Message = React.memo(({ style,message }) => {
 
     const { type, name, avatar, deliveryMethod, self, status, content, contentMetadata } = message
 
@@ -43,7 +43,7 @@ const Message = React.memo(({ message }) => {
     }, [])
 
     return (
-        <HStack space={3} reversed={self ? true : false}>
+        <HStack space={3} reversed={self ? true : false} style={[style]}>
             <Avatar
                 size='50px'
                 _image={{

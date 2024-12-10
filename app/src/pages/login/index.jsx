@@ -1,4 +1,4 @@
-import { Input, Flex, Pressable, Text, VStack, Button, HStack, Box, Image, FormControl, ScrollView } from 'native-base';
+import { Input, Flex, Pressable, Text, VStack, Button, HStack, Box, Image, FormControl, ScrollView, KeyboardAvoidingView } from 'native-base';
 import React, { useContext, useState } from 'react';
 import { StyleSheet } from 'react-native';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';

@@ -110,7 +110,6 @@ const Chat = () => {
     }, [])
 
     const toChatItem = (userSession) => {
-        console.log('toChatItem')
         dispatch(selectSession(userSession))
         navigation.navigate('ChatItem')
     }

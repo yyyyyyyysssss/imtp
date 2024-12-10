@@ -1,5 +1,5 @@
-import { Avatar, FlatList, HStack, Input, Pressable, Text, View, VStack, Box } from 'native-base';
-import React, { useCallback, useState } from 'react';
+import { Avatar, FlatList, HStack, Input, Pressable, ScrollView, Text, View, VStack, KeyboardAvoidingView } from 'native-base';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Modal, StyleSheet } from 'react-native';
 import ItemHeader from '../../../components/ItemHeader';
 import { useDispatch, useSelector } from 'react-redux';
@@ -63,6 +63,19 @@ const initData = [
             size: 55602,
             sizeDesc: '54.3K'
         }
+    },
+    {
+        id: '4',
+        type: 1,
+        avatar: 'http://localhost:9000/y-chat-bucket/d4b0fb7c889d466183188f286ca03446.jpg',
+        name: '孙悟饭',
+        content: '好的吧',
+        deliveryMethod: 'SINGLE',
+        status: 'FAILED',
+        self: true,
+        contentMetadata: {
+
+        }
     }
 ]
 
@@ -70,9 +83,14 @@ const ChatItem = () => {
 
     console.log('ChatItem')
 
+    const flatListRef = useRef()
+
     const selectedUserSession = useSelector(state => state.chat.selectedUserSession)
     const dispatch = useDispatch()
 
+    useEffect(() => {
+        
+    },[])
 
     const moreOps = () => {
         showToast('更多操作')
@@ -81,31 +99,43 @@ const ChatItem = () => {
     const itemSeparator = useCallback(() => {
 
         return (
-            <View style={{ height: 30 }} />
+            <View style={{ height: 30, backgroundColor: 'red' }} />
         )
     }, [])
 
     const renderItem = ({ item, index }) => {
         return (
-            <Message message={item} />
+            <Message style={{ marginTop: 30 }} message={item} />
         )
     }
 
     return (
         <>
             <VStack flex={1} justifyContent="space-between">
-                <ItemHeader flex={0.7} title={selectedUserSession?.name} moreOps={moreOps} />
-                <HStack flex={8.5} style={styles.contentHstack}>
-                    <FlatList
-                        style={styles.messageList}
-                        data={initData}
-                        ItemSeparatorComponent={itemSeparator}
-                        renderItem={renderItem}
-                    />
-                </HStack>
-                {/* <HStack flex={0.8} style={styles.footerHstack} justifyContent='center'> */}
-                    <ChatItemFooter flex={0.8}/>
-                {/* </HStack> */}
+                <ItemHeader title={selectedUserSession?.name} moreOps={moreOps} />
+                <KeyboardAvoidingView
+                    flex={1}
+                    behavior={Platform.OS == "ios" ? "padding" : null}
+                    keyboardVerticalOffset={Platform.OS === "ios" ? 64 : 0}
+                >
+                    <HStack flex={9} style={styles.contentHstack}>
+                        <FlatList
+                            ref={flatListRef}
+                            style={styles.messageList}
+                            data={initData}
+                            // ItemSeparatorComponent={itemSeparator}
+                            renderItem={renderItem}
+                            // scrollEnabled={true}
+                            inverted={true}
+                            contentContainerStyle={{
+                                flexGrow: 1,
+                                flexDirection: 'column-reverse',
+
+                            }}
+                        />
+                    </HStack>
+                    <ChatItemFooter flex={1} />
+                </KeyboardAvoidingView>
             </VStack>
         </>
     )
@@ -119,7 +149,7 @@ const styles = StyleSheet.create({
 
     },
     messageList: {
-        padding: 10
+        padding: 10,
     },
     footerHstack: {
 
