@@ -44,27 +44,6 @@ const initData = [
         }
     },
     {
-        id: '3',
-        type: 4,
-        avatar: 'http://localhost:9000/y-chat-bucket/0e258bedd82e44a380f82817b48f3ca6.jpeg',
-        name: '比克大魔王',
-        content: 'http://localhost:9000/y-chat-bucket/a21f5d18bb074b16b0e5288264f7ec82.jpg',
-        deliveryMethod: 'GROUP',
-        status: 'PENDING',
-        self: true,
-        contentMetadata: {
-            name: '卡卡罗特.jpg',
-            width: 700,
-            height: 618,
-            mediaType: 'image/jpg',
-            thumbnailUrl: null,
-            duration: null,
-            durationDesc: null,
-            size: 55602,
-            sizeDesc: '54.3K'
-        }
-    },
-    {
         id: '4',
         type: 1,
         avatar: 'http://localhost:9000/y-chat-bucket/d4b0fb7c889d466183188f286ca03446.jpg',
@@ -134,7 +113,7 @@ const ChatItem = () => {
                             }}
                         />
                     </HStack>
-                    <ChatItemFooter flex={1} />
+                    <ChatItemFooter />
                 </KeyboardAvoidingView>
             </VStack>
         </>

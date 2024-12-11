@@ -92,8 +92,6 @@ const Chat = () => {
     const userSessions = useSelector(state => state.chat.userSessions, shallowEqual)
     const dispatch = useDispatch()
 
-    console.log('Chat')
-
     //查询用户会话
     useEffect(() => {
         api.get('/social/userSession/{userId}')

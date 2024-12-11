@@ -8,7 +8,7 @@ const ChatItemFooter = ({ flex }) => {
 
     return (
         <>
-            <Box flex={flex} style={{ overflow: 'hidden', paddingTop: 5}}>
+            <Box style={{ overflow: 'hidden', paddingTop: 5,height: 65}}>
                 <HStack
                     flex={1}
                     justifyContent='center'
@@ -29,7 +29,7 @@ const ChatItemFooter = ({ flex }) => {
                     </HStack>
                     <HStack flex={5.5} justifyContent='center' alignItems='center'>
                         <Input
-                            size='lg'
+                            size='md'
                             focusOutlineColor='none'
                             borderWidth={0}
                             backgroundColor='white'
