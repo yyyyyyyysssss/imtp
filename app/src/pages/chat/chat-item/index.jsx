@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { showToast } from '../../../components/Utils';
 import Message from '../../../components/Message';
 import ChatItemFooter from '../../../components/ChatItemFooter';
+import { addMessage } from '../../../redux/slices/chatSlice';
 
 
 const initData = [
@@ -58,40 +59,37 @@ const initData = [
     }
 ]
 
-const ChatItem = () => {
+const ChatItem = ({route }) => {
 
-    console.log('ChatItem')
+    const { sessionId } = route.params;
 
     const flatListRef = useRef()
 
-    const selectedUserSession = useSelector(state => state.chat.selectedUserSession)
+    const entities = useSelector(state => state.chat.entities)
+    const session = useSelector(state => state.chat.entities.sessions[sessionId])
+    const {messages} = session
     const dispatch = useDispatch()
 
     useEffect(() => {
-        
+        dispatch(addMessage({sessionId:sessionId,message: initData[0]}))
     },[])
 
     const moreOps = () => {
         showToast('更多操作')
     }
 
-    const itemSeparator = useCallback(() => {
-
-        return (
-            <View style={{ height: 30, backgroundColor: 'red' }} />
-        )
-    }, [])
-
     const renderItem = ({ item, index }) => {
+        console.log('message',item)
+        const message = entities.messages[item]
         return (
-            <Message style={{ marginTop: 30 }} message={item} />
+            <Message style={{ marginTop: 30 }} message={message} />
         )
     }
 
     return (
         <>
             <VStack flex={1} justifyContent="space-between">
-                <ItemHeader title={selectedUserSession?.name} moreOps={moreOps} />
+                <ItemHeader title={session.name} moreOps={moreOps} />
                 <KeyboardAvoidingView
                     flex={1}
                     behavior={Platform.OS == "ios" ? "padding" : null}
@@ -101,8 +99,7 @@ const ChatItem = () => {
                         <FlatList
                             ref={flatListRef}
                             style={styles.messageList}
-                            data={initData}
-                            // ItemSeparatorComponent={itemSeparator}
+                            data={messages}
                             renderItem={renderItem}
                             // scrollEnabled={true}
                             inverted={true}

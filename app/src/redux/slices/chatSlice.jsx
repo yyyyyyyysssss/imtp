@@ -3,12 +3,34 @@ import { createSlice } from '@reduxjs/toolkit'
 export const chatSlice = createSlice({
     name: 'chat',
     initialState: {
+        entities: {
+            sessions: {},
+            messages: {}
+        },
+        result: [],
         userSessions: [], //会话
         selectedUserSession: null, //当前选中的会话
         messages: {}, //会话关联的消息
         unreadCount: 0 //未读消息合计
     },
     reducers: {
+        loadSession: (state,action) => {
+            const { payload } = action
+            state.entities = payload.entities
+            state.result = payload.result
+        },
+        addMessage: (state,action) => {
+            const { payload } = action
+            const { sessionId, message } = payload
+            if(!state.entities.messages){
+                state.entities.messages = {}
+            }
+            state.entities.messages[message.id] = {...message}
+            if(!state.entities.sessions[sessionId].messages){
+                state.entities.sessions[sessionId].messages = []
+            }
+            state.entities.sessions[sessionId].messages.push(message.id)
+        },
         initSession: (state, action) => {
             console.log('initSession')
             state.userSessions = action.payload
@@ -39,6 +61,6 @@ export const chatSlice = createSlice({
     }
 })
 
-export const { initSession, addSession, updateSession, selectSession, removeSession,incrUnreadCount,decrUnreadCount } = chatSlice.actions
+export const { initSession,loadSession, addSession, updateSession, selectSession, removeSession,incrUnreadCount,decrUnreadCount,addMessage } = chatSlice.actions
 
 export default chatSlice.reducer

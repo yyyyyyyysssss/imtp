@@ -4,93 +4,24 @@ import { useNavigation, } from '@react-navigation/native';
 import { StyleSheet } from 'react-native';
 import api from '../../api/api';
 import { useDispatch, useSelector, shallowEqual } from 'react-redux';
-import { initSession, addSession, selectSession, removeSession, incrUnreadCount, decrUnreadCount } from '../../redux/slices/chatSlice';
+import { initSession, addSession,loadSession, selectSession, removeSession, incrUnreadCount, decrUnreadCount } from '../../redux/slices/chatSlice';
 import { formatChatDate } from '../../utils';
 import { SwipeListView } from 'react-native-swipe-list-view';
 import { showToast } from '../../components/Utils';
 import Search from '../../components/Search';
 import SwipeItemOperation from '../../components/SwipeItemOperation';
 import UserSessionItem from '../../components/UserSessionItem';
+import { normalize,schema } from 'normalizr';
 
-
-const initData = [
-    {
-        id: '1',
-        name: '张三',
-        avatar: 'http://localhost:9000/y-chat-bucket/0e258bedd82e44a380f82817b48f3ca6.jpeg',
-        lastMsgContent: '',
-        lastMsgTime: ''
-    },
-    {
-        id: '2',
-        name: '张三',
-        avatar: 'http://localhost:9000/y-chat-bucket/0e258bedd82e44a380f82817b48f3ca6.jpeg',
-        lastMsgContent: '',
-        lastMsgTime: ''
-    },
-    {
-        id: '3',
-        name: '张三',
-        avatar: 'http://localhost:9000/y-chat-bucket/0e258bedd82e44a380f82817b48f3ca6.jpeg',
-        lastMsgContent: '',
-        lastMsgTime: ''
-    },
-    {
-        id: '4',
-        name: '张三',
-        avatar: 'http://localhost:9000/y-chat-bucket/0e258bedd82e44a380f82817b48f3ca6.jpeg',
-        lastMsgContent: '',
-        lastMsgTime: ''
-    },
-    {
-        id: '5',
-        name: '张三',
-        avatar: 'http://localhost:9000/y-chat-bucket/0e258bedd82e44a380f82817b48f3ca6.jpeg',
-        lastMsgContent: '',
-        lastMsgTime: ''
-    },
-    {
-        id: '6',
-        name: '张三',
-        avatar: 'http://localhost:9000/y-chat-bucket/0e258bedd82e44a380f82817b48f3ca6.jpeg',
-        lastMsgContent: '',
-        lastMsgTime: ''
-    },
-    {
-        id: '7',
-        name: '张三',
-        avatar: 'http://localhost:9000/y-chat-bucket/0e258bedd82e44a380f82817b48f3ca6.jpeg',
-        lastMsgContent: '',
-        lastMsgTime: ''
-    },
-    {
-        id: '8',
-        name: '张三',
-        avatar: 'http://localhost:9000/y-chat-bucket/0e258bedd82e44a380f82817b48f3ca6.jpeg',
-        lastMsgContent: '',
-        lastMsgTime: 1725499854000
-    },
-    {
-        id: '9',
-        name: '李四',
-        avatar: 'http://localhost:9000/y-chat-bucket/0e258bedd82e44a380f82817b48f3ca6.jpeg',
-        lastMsgContent: '',
-        lastMsgTime: 1725499854000
-    },
-    {
-        id: '10',
-        name: '王二',
-        avatar: 'http://localhost:9000/y-chat-bucket/0e258bedd82e44a380f82817b48f3ca6.jpeg',
-        lastMsgContent: '',
-        lastMsgTime: 1725499854000
-    }
-]
 
 const Chat = () => {
     const navigation = useNavigation();
 
-    const userSessions = useSelector(state => state.chat.userSessions, shallowEqual)
+    // const userSessions = useSelector(state => state.chat.userSessions, shallowEqual)
     const dispatch = useDispatch()
+
+    const entities = useSelector(state => state.chat.entities)
+    const result = useSelector(state => state.chat.result)
 
     //查询用户会话
     useEffect(() => {
@@ -99,17 +30,26 @@ const Chat = () => {
                 (res) => {
                     const userSessionList = res.data
                     if (userSessionList) {
+                        const message = new schema.Entity('messages')
+                        const session = new schema.Entity('sessions',{
+                            messages: [message]
+                        })
+                        const normalizedData = normalize(userSessionList, [session]);
                         //初始化会话
-                        dispatch(initSession(userSessionList))
+                        // dispatch(initSession(userSessionList))
+                        //初始化加载会话
+                        dispatch(loadSession(normalizedData))
                     }
 
                 }
             )
     }, [])
 
-    const toChatItem = (userSession) => {
-        dispatch(selectSession(userSession))
-        navigation.navigate('ChatItem')
+    const toChatItem = (sessionId) => {
+        // dispatch(selectSession(userSession))
+        navigation.navigate('ChatItem',{
+            sessionId: sessionId,
+        })
     }
 
     const itemSeparator = useCallback(() => {
@@ -126,6 +66,7 @@ const Chat = () => {
     }, [])
 
     const renderItem = ({ item, index }) => {
+        const session = entities.sessions[item]
         return (
             <Pressable
                 onPress={() => toChatItem(item)}
@@ -134,12 +75,12 @@ const Chat = () => {
                     return (
                         <VStack style={{ backgroundColor: isPressed ? '#C8C6C5' : '#F5F5F5', padding: 10 }}>
                             <UserSessionItem
-                                avatar={item.avatar}
-                                name={item.name}
-                                lastMsgType={item.lastMsgType}
-                                lastMsgContent={item.lastMsgContent}
-                                lastMsgTime={item.lastMsgTime}
-                                unreadMessageCount={item.unreadMessageCount}
+                                avatar={session.avatar}
+                                name={session.name}
+                                lastMsgType={session.lastMsgType}
+                                lastMsgContent={session.lastMsgContent}
+                                lastMsgTime={session.lastMsgTime}
+                                unreadMessageCount={session.unreadMessageCount}
                             />
                         </VStack>
                     )
@@ -189,8 +130,8 @@ const Chat = () => {
                 <Search />
                 <SwipeListView
                     style={styles.userSessionList}
-                    keyExtractor={item => item.id}
-                    data={userSessions}
+                    keyExtractor={item => item}
+                    data={result}
                     renderItem={renderItem}
                     ItemSeparatorComponent={itemSeparator}
                     renderHiddenItem={renderHiddenItem}
