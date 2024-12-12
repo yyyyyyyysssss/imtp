@@ -231,6 +231,11 @@ resilience4j:
         base-config: default
 
 
+pagehelper:
+  helper-dialect: mysql
+  reasonable: true
+  support-methods-arguments: true
+
 http:
   config:
     # 单位：秒
