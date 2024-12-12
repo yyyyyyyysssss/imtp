@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.imtp.web.mapper.MessageMapper">
+
+    <resultMap id="resultMessageInfoMap" type="org.imtp.common.packet.body.MessageInfo">
+        <result property="id" column="id"/>
+        <result property="sessionId" column="session_id"/>
+        <result property="senderUserId" column="sender_user_id"/>
+        <result property="receiverUserId" column="receiver_user_id"/>
+        <result property="type" column="type"/>
+        <result property="content" column="content"/>
+        <result property="contentMetadata" typeHandler="com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler" column="content_metadata"/>
+        <result property="sendTime" typeHandler="org.imtp.web.mapper.DateToLongTypeHandler" column="send_time"/>
+        <result property="deliveryMethod" column="delivery_method"/>
+        <result property="avatar" column="avatar"/>
+    </resultMap>
+
+    <select id="findMessageBySessionId" parameterType="java.lang.String" resultMap="resultMessageInfoMap">
+        select t.*,
+               IFNULL(u.avatar,g.avatar) avatar
+        from im_msg t
+        LEFT JOIN im_user u on u.id = t.sender_user_id
+        LEFT JOIN im_group g on g.id = t.sender_user_id
+        <where>
+            t.session_id = #{sessionId}
+        </where>
+        order by t.id desc
+    </select>
+
+</mapper>

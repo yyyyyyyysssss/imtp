@@ -14,6 +14,7 @@ public class WebSocketAdapterMessage extends AbstractTextMessage{
     public WebSocketAdapterMessage(WebSocketMessage webSocketMessage){
         super(webSocketMessage.getContent(),
                 webSocketMessage.getContentMetadata(),
+                webSocketMessage.getSessionId(),
                 webSocketMessage.getSender(),
                 webSocketMessage.getReceiver(),
                 Command.find(webSocketMessage.getType().getValue().byteValue()),

@@ -68,7 +68,7 @@ const Message = React.memo(({ style,message }) => {
 
     return prevProps.message.status === nextProps.message.status &&
         prevProps.message.content === nextProps.message.content && 
-        prevProps.message.contentMetadata.thumbnailUrl === nextProps.message.contentMetadata.thumbnailUrl
+        prevProps.message.contentMetadata?.thumbnailUrl === nextProps.message.contentMetadata?.thumbnailUrl
 })
 
 const styles = StyleSheet.create({

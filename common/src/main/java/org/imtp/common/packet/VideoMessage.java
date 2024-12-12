@@ -18,12 +18,8 @@ public class VideoMessage extends AbstractTextMessage{
         super(byteBuf, header);
     }
 
-    public VideoMessage(String path, long sender, long receiver, Long ackId, boolean groupFlag) {
-        this(path,null, sender, receiver, ackId, groupFlag);
-    }
-
     public VideoMessage(String path,MessageMetadata messageMetadata, long sender, long receiver, Long ackId,boolean groupFlag) {
-        super(path,messageMetadata, sender, receiver, Command.VIDEO_MESSAGE, ackId, groupFlag);
+        super(path,messageMetadata,0, sender, receiver, Command.VIDEO_MESSAGE, ackId, groupFlag);
     }
 
     @Override

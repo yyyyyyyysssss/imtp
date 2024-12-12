@@ -27,6 +27,9 @@ public class Message {
     @TableId
     private Long id;
 
+    @TableField("session_id")
+    private Long sessionId;
+
     @TableField("sender_user_id")
     private Long senderUserId;
 

@@ -6,7 +6,10 @@ import { useDispatch, useSelector } from 'react-redux';
 import { showToast } from '../../../components/Utils';
 import Message from '../../../components/Message';
 import ChatItemFooter from '../../../components/ChatItemFooter';
-import { addMessage } from '../../../redux/slices/chatSlice';
+import { loadMessage,addMessage } from '../../../redux/slices/chatSlice';
+import { useFocusEffect } from '@react-navigation/native';
+import api from '../../../api/api';
+import Storage from '../../../storage/storage';
 
 
 const initData = [
@@ -59,27 +62,54 @@ const initData = [
     }
 ]
 
-const ChatItem = ({route }) => {
+const ChatItem = ({ route }) => {
 
     const { sessionId } = route.params;
 
     const flatListRef = useRef()
 
+    console.log('ChatItem')
+
     const entities = useSelector(state => state.chat.entities)
     const session = useSelector(state => state.chat.entities.sessions[sessionId])
-    const {messages} = session
+    const { messages } = session
     const dispatch = useDispatch()
 
     useEffect(() => {
-        dispatch(addMessage({sessionId:sessionId,message: initData[0]}))
-    },[])
+        //未初始化的数据进行初始化
+        if (session.messageInit === undefined || session.messageInit === false) {
+            console.log('messageInit')
+            api.get('/social/userMessage/{userId}',{
+                params: {
+                    sessionId: sessionId
+                }
+            })
+            .then(
+                (res) => {
+                    const messageList = res.data.list
+                    Storage.get('userInfo')
+                    .then(
+                        (userInfo) => {
+                            const newMessageList = messageList.map(item => {
+                                item.self = userInfo.id === item.senderUserId
+                                return item
+                            })
+                            dispatch(loadMessage({sessionId:sessionId,messages: newMessageList}))
+                        }
+                    )
+                }
+            )
+        }
+        return () => {
+            console.log('ChatItem unmount')
+        }
+    }, [])
 
     const moreOps = () => {
         showToast('更多操作')
     }
 
     const renderItem = ({ item, index }) => {
-        console.log('message',item)
         const message = entities.messages[item]
         return (
             <Message style={{ marginTop: 30 }} message={message} />

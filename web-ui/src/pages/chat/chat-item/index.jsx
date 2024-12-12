@@ -668,6 +668,7 @@ const ChatItem = (props) => {
         if (socketRef.current.readyState === WebSocket.OPEN) {
             socketRef.current.send(JSON.stringify({
                 ackId: msg.ackId,
+                sessionId: msg.sessionId,
                 type: msg.type,
                 sender: msg.sender,
                 receiver: msg.receiver,
@@ -693,6 +694,7 @@ const ChatItem = (props) => {
             id: uuidv4(),
             type: type,
             status: PENDING,
+            sessionId: userSessionItem.id,
             sender: userSessionItem.userId,
             receiver: userSessionItem.receiverUserId,
             deliveryMethod: userSessionItem.deliveryMethod,

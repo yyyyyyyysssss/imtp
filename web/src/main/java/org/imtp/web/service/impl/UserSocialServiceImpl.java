@@ -2,13 +2,12 @@ package org.imtp.web.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import jakarta.annotation.Resource;
 import org.imtp.common.enums.DeliveryMethod;
 import org.imtp.common.enums.MessageType;
-import org.imtp.common.packet.body.OfflineMessageInfo;
-import org.imtp.common.packet.body.UserFriendInfo;
-import org.imtp.common.packet.body.UserGroupInfo;
-import org.imtp.common.packet.body.UserSessionInfo;
+import org.imtp.common.packet.body.*;
 import org.imtp.common.packet.common.MessageDTO;
 import org.imtp.common.packet.common.OfflineMessageDTO;
 import org.imtp.web.config.idwork.IdGen;
@@ -18,7 +17,6 @@ import org.imtp.web.mapper.*;
 import org.imtp.web.service.OfflineMessageService;
 import org.imtp.web.service.UserSocialService;
 import org.springframework.stereotype.Service;
-import org.springframework.util.Assert;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -283,6 +281,7 @@ public class UserSocialServiceImpl implements UserSocialService {
     public Long message(MessageDTO messageDTO) {
         Message message = new Message();
         message.setId(IdGen.genId());
+        message.setSessionId(messageDTO.getSessionId());
         message.setSenderUserId(messageDTO.getSenderUserId());
         message.setReceiverUserId(messageDTO.getReceiverUserId());
         message.setType(messageDTO.getType());
@@ -295,6 +294,18 @@ public class UserSocialServiceImpl implements UserSocialService {
             return message.getId();
         }
         throw new RuntimeException("insert error");
+    }
+
+    public PageInfo<MessageInfo> message(String sessionId,Integer pageNum,Integer pageSize){
+        PageHelper.startPage(pageNum,pageSize);
+        QueryWrapper<Message> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("session_id",sessionId);
+        queryWrapper.orderByDesc("id");
+        List<MessageInfo> messageInfos = messageMapper.findMessageBySessionId(sessionId);
+        if (messageInfos == null || messageInfos.isEmpty()){
+            return PageInfo.of(new ArrayList<>());
+        }
+        return PageInfo.of(messageInfos);
     }
 
     @Override

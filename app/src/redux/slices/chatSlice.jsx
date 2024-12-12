@@ -19,6 +19,15 @@ export const chatSlice = createSlice({
             state.entities = payload.entities
             state.result = payload.result
         },
+        loadMessage: (state,action) => {
+            const { payload } = action
+            const { sessionId, messages } = payload
+            messages.forEach(message => {
+                chatSlice.reducer(state,chatSlice.actions.addMessage({sessionId: sessionId,message: message}))
+            });
+            const session = state.entities.sessions[sessionId]
+            state.entities.sessions[sessionId] = {...session,messageInit: true}
+        },
         addMessage: (state,action) => {
             const { payload } = action
             const { sessionId, message } = payload
@@ -61,6 +70,6 @@ export const chatSlice = createSlice({
     }
 })
 
-export const { initSession,loadSession, addSession, updateSession, selectSession, removeSession,incrUnreadCount,decrUnreadCount,addMessage } = chatSlice.actions
+export const { initSession,loadSession,loadMessage, addSession, updateSession, selectSession, removeSession,incrUnreadCount,decrUnreadCount,addMessage } = chatSlice.actions
 
 export default chatSlice.reducer

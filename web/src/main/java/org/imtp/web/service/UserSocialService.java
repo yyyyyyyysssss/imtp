@@ -1,14 +1,10 @@
 package org.imtp.web.service;
 
-import org.imtp.common.packet.body.OfflineMessageInfo;
-import org.imtp.common.packet.body.UserFriendInfo;
-import org.imtp.common.packet.body.UserGroupInfo;
-import org.imtp.common.packet.body.UserSessionInfo;
+import com.github.pagehelper.PageInfo;
+import org.imtp.common.packet.body.*;
 import org.imtp.common.packet.common.MessageDTO;
 import org.imtp.common.packet.common.OfflineMessageDTO;
 import org.imtp.web.domain.dto.UserSessionDTO;
-import org.imtp.web.domain.entity.Message;
-import org.imtp.web.domain.entity.OfflineMessage;
 
 import java.util.List;
 
@@ -28,6 +24,8 @@ public interface UserSocialService {
 
     //保存离线消息
     Long message(MessageDTO messageDTO);
+
+    PageInfo<MessageInfo> message(String sessionId,Integer pageNum,Integer pageSize);
 
     //保存离线消息
     Boolean offlineMessage(List<OfflineMessageDTO> offlineMessageList);
