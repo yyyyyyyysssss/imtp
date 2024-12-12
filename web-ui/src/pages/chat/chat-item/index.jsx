@@ -44,6 +44,10 @@ const ChatItem = (props) => {
         socketRef.current = socket;
     }, [socket]);
     const { userInfo } = useContext(HomeContext);
+    const userInfoRef = useRef();
+    useEffect(() => {
+        userInfoRef.current = userInfo;
+    }, [userInfo]);
     const { handleVideoPlay, handleSenderMessage, updateChatItem } = useContext(ChatPanelContext);
     const { userSessionItem } = props;
     //聊天内容
@@ -693,9 +697,9 @@ const ChatItem = (props) => {
             receiver: userSessionItem.receiverUserId,
             deliveryMethod: userSessionItem.deliveryMethod,
             self: true,
-            ackId: snowflake.nextId(),
+            ackId: snowflake.nextId().toString(),
             timestamp: new Date().getTime(),
-            avatar: userInfo?.avatar,
+            avatar: userInfoRef.current.avatar,
             name: userSessionItem.name,
             content: content
         }

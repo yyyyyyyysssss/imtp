@@ -95,7 +95,7 @@ const Chat = forwardRef((props, ref) => {
                 const { cmd, sender, receiver, reserved } = header;
                 const isGroup = getBit(reserved);
                 const realSender = (isGroup === 1) ? receiver : sender;
-                if (sender === 0) {
+                if (sender == 0) {
                     //消息响应
                     if(cmd === MSG_RES){
                         const msgResUserSessionItem = data.find(f => f.receiverUserId === receiver);
@@ -112,6 +112,7 @@ const Chat = forwardRef((props, ref) => {
                         userItem = findGroupByGroupId(receiver);
                         userItem.type = GROUP;
                     }else {
+                        console.log('findUserInfoByFriendId',sender)
                         userItem = findUserInfoByFriendId(sender);
                         userItem.type = SINGLE;
                     }

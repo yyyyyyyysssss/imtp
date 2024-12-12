@@ -3,6 +3,8 @@ package org.imtp.common.utils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.fasterxml.jackson.databind.type.CollectionType;
 import java.io.IOException;
 import java.util.List;
@@ -15,7 +17,15 @@ import java.util.List;
 public class JsonUtil {
 
 
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+    private static final ObjectMapper OBJECT_MAPPER;
+
+    static {
+        OBJECT_MAPPER = new ObjectMapper();
+        SimpleModule simpleModule = new SimpleModule();
+        simpleModule.addSerializer(Long.class, ToStringSerializer.instance);
+        simpleModule.addSerializer(long.class,ToStringSerializer.instance);
+        OBJECT_MAPPER.registerModule(simpleModule);
+    }
 
     public static String toJSONString(Object object){
         try {

@@ -78,6 +78,12 @@ public class UserSocialServiceImpl implements UserSocialService {
                 msgIds.add(userSession.getLastMsgId());
             }
         }
+        //好友
+        Map<Long, User> userIdMap = null;
+        if (!userIds.isEmpty()){
+            List<User> users = userMapper.selectBatchIds(userIds);
+            userIdMap = users.stream().collect(Collectors.toMap(User::getId, a -> a));
+        }
         //群组
         Map<Long, Group> groupMap = null;
         if (!groupIds.isEmpty()){
@@ -93,12 +99,6 @@ public class UserSocialServiceImpl implements UserSocialService {
                 userIds.add(message.getSenderUserId());
                 messageIdMap.put(message.getId(),message);
             }
-        }
-        //好友
-        Map<Long, User> userIdMap = null;
-        if (!userIds.isEmpty()){
-            List<User> users = userMapper.selectBatchIds(userIds);
-            userIdMap = users.stream().collect(Collectors.toMap(User::getId, a -> a));
         }
         //返回数据
         List<UserSessionInfo> userSessionInfos = new ArrayList<>();

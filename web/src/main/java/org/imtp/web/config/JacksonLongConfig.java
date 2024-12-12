@@ -16,6 +16,7 @@ public class JacksonLongConfig implements Jackson2ObjectMapperBuilderCustomizer 
     @Override
     public void customize(Jackson2ObjectMapperBuilder builder) {
         builder.serializerByType(Long.class, ToStringSerializer.instance);
+        builder.serializerByType(long.class, ToStringSerializer.instance);
     }
 
 }
