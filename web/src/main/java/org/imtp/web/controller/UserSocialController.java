@@ -33,7 +33,7 @@ public class UserSocialController {
 
 
     @GetMapping("/userInfo")
-    public Result<?> userInfo() throws AccessDeniedException {
+    public Result<User> userInfo() throws AccessDeniedException {
         User user = currentLoginUser();
         if (user == null) {
             throw new AccessDeniedException("Access Denied");
@@ -43,7 +43,7 @@ public class UserSocialController {
 
     @GetMapping("/userInfo/{userId}")
     @CircuitBreaker(name = "commonBreaker", fallbackMethod = "userSocialFallbackMethod")
-    public Result<?> userInfo(@PathVariable(name = "userId") String userId) throws AccessDeniedException {
+    public Result<User> userInfo(@PathVariable(name = "userId") String userId) throws AccessDeniedException {
         User user = currentLoginUser();
         checkUserId(user, userId);
         return ResultGenerator.ok(user);
@@ -51,22 +51,29 @@ public class UserSocialController {
 
     @GetMapping("/userSession/{userId}")
     @CircuitBreaker(name = "commonBreaker", fallbackMethod = "userSocialFallbackMethod")
-    public Result<?> userSession(@PathVariable(name = "userId") String userId) throws AccessDeniedException {
+    public Result<List<UserSessionInfo>> userSession(@PathVariable(name = "userId") String userId) throws AccessDeniedException {
         checkUserId(userId);
         List<UserSessionInfo> userSessionInfos = userSocialService.userSession(userId);
         return ResultGenerator.ok(userSessionInfos);
     }
 
-    @PostMapping("/userSession")
+    @PostMapping("/userSession/{userId}")
     @CircuitBreaker(name = "slowCallBreaker")
-    public Result<?> userSession(@RequestBody @Validated UserSessionDTO userSessionDTO) {
-        String id = userSocialService.userSession(userSessionDTO);
+    public Result<String> userSession(@PathVariable(name = "userId") String userId,@RequestBody @Validated UserSessionDTO userSessionDTO) {
+        String id = userSocialService.userSession(userId,userSessionDTO);
         return ResultGenerator.ok(id);
+    }
+
+    @DeleteMapping("/userSession/{userId}")
+    @CircuitBreaker(name = "slowCallBreaker")
+    public Result<Boolean> userSession(@PathVariable(name = "userId") String userId,Object object) {
+        Boolean deleted = userSocialService.userSession(userId,"");
+        return ResultGenerator.ok(deleted);
     }
 
     @GetMapping("/userFriend/{userId}")
     @CircuitBreaker(name = "commonBreaker", fallbackMethod = "userSocialFallbackMethod")
-    public Result<?> userFriend(@PathVariable(name = "userId") String userId) throws AccessDeniedException {
+    public Result<List<UserFriendInfo>> userFriend(@PathVariable(name = "userId") String userId) throws AccessDeniedException {
         checkUserId(userId);
         List<UserFriendInfo> userFriendInfos = userSocialService.userFriend(userId);
         return ResultGenerator.ok(userFriendInfos);
@@ -74,25 +81,25 @@ public class UserSocialController {
 
     @GetMapping("/userGroup/{userId}")
     @CircuitBreaker(name = "commonBreaker", fallbackMethod = "userSocialFallbackMethod")
-    public Result<?> userGroup(@PathVariable(name = "userId") String userId) throws AccessDeniedException {
+    public Result<List<UserGroupInfo>> userGroup(@PathVariable(name = "userId") String userId) throws AccessDeniedException {
         checkUserId(userId);
         List<UserGroupInfo> groupInfos = userSocialService.userGroup(userId);
         return ResultGenerator.ok(groupInfos);
     }
 
     @GetMapping("/userMessage/{userId}")
-    public Result<?> message(@PathVariable(name = "userId") String userId,
+    public Result<PageInfo<MessageInfo>> message(@PathVariable(name = "userId") String userId,
                              @RequestParam(name = "sessionId") String sessionId,
                              @RequestParam(name = "pageNum", required = false,defaultValue = "1") Integer pageNum,
                              @RequestParam(name = "pageSize", required = false,defaultValue = "20") Integer pageSize) {
         checkUserId(userId);
-        PageInfo<MessageInfo> messageInfoPageInfo = userSocialService.message(sessionId,pageNum,pageSize);
+        PageInfo<MessageInfo> messageInfoPageInfo = userSocialService.message(userId,sessionId,pageNum,pageSize);
         return ResultGenerator.ok(messageInfoPageInfo);
     }
 
     @GetMapping("/offlineMessage/{userId}")
     @CircuitBreaker(name = "commonBreaker", fallbackMethod = "userSocialFallbackMethod")
-    public Result<?> offlineMessage(@PathVariable(name = "userId") String userId) throws AccessDeniedException {
+    public Result<List<OfflineMessageInfo>> offlineMessage(@PathVariable(name = "userId") String userId) throws AccessDeniedException {
         checkUserId(userId);
         List<OfflineMessageInfo> offlineMessageInfos = userSocialService.offlineMessage(userId);
         return ResultGenerator.ok(offlineMessageInfos);

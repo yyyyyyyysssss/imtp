@@ -1,6 +1,5 @@
 package org.imtp.web.domain.entity;
 
-import com.baomidou.mybatisplus.annotation.EnumValue;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -10,15 +9,15 @@ import org.imtp.web.enums.MessageBoxType;
 /**
  * @Description
  * @Author ys
- * @Date 2024/12/13 13:08
+ * @Date 2024/12/13 13:11
  */
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@TableName("im_user_session")
-public class UserSession {
+@TableName("im_user_msg_box")
+public class UserMessageBox {
 
     @TableId
     private Long id;
@@ -29,11 +28,10 @@ public class UserSession {
     @TableField("session_id")
     private Long sessionId;
 
-    @TableField("message_Id")
-    private Long messageId;
+    @TableField("msg_id")
+    private Long msgId;
 
-    @TableField("box_Type")
-    @EnumValue
+    @TableField("box_type")
     private MessageBoxType boxType;
 
 }

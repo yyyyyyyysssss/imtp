@@ -15,14 +15,17 @@
         <result property="avatar" column="avatar"/>
     </resultMap>
 
-    <select id="findMessageBySessionId" parameterType="java.lang.String" resultMap="resultMessageInfoMap">
+    <select id="findMessageByIds" parameterType="java.util.List" resultMap="resultMessageInfoMap">
         select t.*,
                IFNULL(u.avatar,g.avatar) avatar
         from im_msg t
         LEFT JOIN im_user u on u.id = t.sender_user_id
         LEFT JOIN im_group g on g.id = t.sender_user_id
         <where>
-            t.session_id = #{sessionId}
+            t.id in
+            <foreach collection="msgIds" item="item" index="index" separator="," open="(" close=")">
+                #{item}
+            </foreach>
         </where>
         order by t.id desc
     </select>

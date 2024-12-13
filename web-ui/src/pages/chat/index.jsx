@@ -257,7 +257,7 @@ const Chat = forwardRef((props, ref) => {
             deliveryMethod: userItem.type
         }
         let userSessionItem;
-        await httpWrapper.post('/social/userSession', userSessionReq)
+        await httpWrapper.post('/social/userSession/{userId}', userSessionReq)
             .then(
                 (res) => {
                     userSessionItem = {

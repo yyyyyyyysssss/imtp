@@ -5,20 +5,22 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import jakarta.annotation.Resource;
-import org.imtp.common.enums.DeliveryMethod;
-import org.imtp.common.enums.MessageType;
 import org.imtp.common.packet.body.*;
 import org.imtp.common.packet.common.MessageDTO;
 import org.imtp.common.packet.common.OfflineMessageDTO;
 import org.imtp.web.config.idwork.IdGen;
 import org.imtp.web.domain.dto.UserSessionDTO;
 import org.imtp.web.domain.entity.*;
+import org.imtp.web.enums.MessageBoxType;
 import org.imtp.web.mapper.*;
 import org.imtp.web.service.OfflineMessageService;
 import org.imtp.web.service.UserSocialService;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -31,6 +33,9 @@ public class UserSocialServiceImpl implements UserSocialService {
 
     @Resource
     private UserMapper userMapper;
+
+    @Resource
+    private SessionMapper sessionMapper;
 
     @Resource
     private UserSessionMapper userSessionMapper;
@@ -48,6 +53,9 @@ public class UserSocialServiceImpl implements UserSocialService {
     private MessageMapper messageMapper;
 
     @Resource
+    private UserMessageBoxMapper userMessageBoxMapper;
+
+    @Resource
     private OfflineMessageMapper offlineMessageMapper;
 
     @Resource
@@ -55,105 +63,70 @@ public class UserSocialServiceImpl implements UserSocialService {
 
     @Override
     public List<UserSessionInfo> userSession(String userId) {
-        Wrapper<UserSession> userSessionQueryWrapper = new QueryWrapper<UserSession>()
-                .in("user_id", userId)
-                .orderByDesc("id");
-
-        List<UserSession> userSessions = userSessionMapper.selectList(userSessionQueryWrapper);
-        if (userSessions.isEmpty()){
+        List<Session> sessions = sessionMapper.findSessionByUserId(userId);
+        if (sessions.isEmpty()){
             return List.of();
         }
-        Set<Long> userIds = new HashSet<>();
-        Set<Long> msgIds = new HashSet<>();
-        Set<Long> groupIds = new HashSet<>();
-        for (UserSession userSession : userSessions){
-            if(userSession.getDeliveryMethod().equals(DeliveryMethod.SINGLE)){
-                userIds.add(userSession.getReceiverUserId());
-            }else {
-                groupIds.add(userSession.getReceiverUserId());
-            }
-            if(userSession.getLastMsgId() != null){
-                msgIds.add(userSession.getLastMsgId());
-            }
-        }
-        //好友
-        Map<Long, User> userIdMap = null;
-        if (!userIds.isEmpty()){
-            List<User> users = userMapper.selectBatchIds(userIds);
-            userIdMap = users.stream().collect(Collectors.toMap(User::getId, a -> a));
-        }
-        //群组
-        Map<Long, Group> groupMap = null;
-        if (!groupIds.isEmpty()){
-            List<Group> groups = groupMapper.selectBatchIds(groupIds);
-            groupMap = groups.stream().collect(Collectors.toMap(Group::getId, a -> a));
-        }
-        //最新消息
-        Map<Long, Message> messageIdMap = null;
-        if(!msgIds.isEmpty()){
-            List<Message> messages = messageMapper.selectBatchIds(msgIds);
-            messageIdMap = new HashMap<>();
-            for (Message message : messages){
-                userIds.add(message.getSenderUserId());
-                messageIdMap.put(message.getId(),message);
-            }
-        }
-        //返回数据
-        List<UserSessionInfo> userSessionInfos = new ArrayList<>();
-        UserSessionInfo userSessionInfo;
-        for (UserSession userSession : userSessions){
-            userSessionInfo = new UserSessionInfo();
-            userSessionInfo.setId(userSession.getId());
-            userSessionInfo.setUserId(userSession.getUserId());
-            userSessionInfo.setReceiverUserId(userSession.getReceiverUserId());
-            userSessionInfo.setDeliveryMethod(userSession.getDeliveryMethod());
-
-            if (userSession.getDeliveryMethod().equals(DeliveryMethod.SINGLE)){
-                User user = Optional.ofNullable(userIdMap).map(m -> m.get(userSession.getReceiverUserId())).orElse(null);
-                if(user != null){
-                    userSessionInfo.setName(user.getNickname());
-                    userSessionInfo.setAvatar(user.getAvatar());
-                }
-            }else {
-                Group group = Optional.ofNullable(groupMap).map(m -> m.get(userSession.getReceiverUserId())).orElse(null);
-                if (group != null){
-                    userSessionInfo.setName(group.getName());
-                    userSessionInfo.setAvatar(group.getAvatar());
-                }
-            }
-
-            Message message = Optional.ofNullable(messageIdMap).map(m -> m.get(userSession.getLastMsgId())).orElse(null);
-            if(message != null){
-                MessageType messageType = MessageType.findMessageTypeByValue(message.getType());
-                userSessionInfo.setLastMsgType(messageType);
-                userSessionInfo.setLastMsgContent(message.getContent());
-                userSessionInfo.setLastMsgTime(message.getSendTime().getTime());
-                userSessionInfo.setLastSendMsgUserId(message.getSenderUserId());
-                userSessionInfo.setLastMessageMetadata(message.getContentMetadata());
-                User user = Optional.ofNullable(userIdMap).map(m -> m.get(message.getSenderUserId())).orElse(null);
-                if(user != null){
-                    userSessionInfo.setLastUserAvatar(user.getAvatar());
-                    userSessionInfo.setLastUserName(user.getNickname());
-                }
-            }
-            userSessionInfos.add(userSessionInfo);
-        }
-
-        return userSessionInfos;
+        List<Long> sessionIds = sessions.stream().map(Session::getId).toList();
+        return userSessionMapper.findUserSessionBySessionIds(sessionIds);
     }
 
     @Override
-    public String userSession(UserSessionDTO userSessionDTO) {
-        UserSession userSession = UserSession
-                .builder()
-                .id(IdGen.genId())
-                .userId(Long.parseLong(userSessionDTO.getSenderUserId()))
-                .receiverUserId(Long.parseLong(userSessionDTO.getReceiverUserId()))
-                .lastMsgId(userSessionDTO.getLastMsgId() != null ? Long.parseLong(userSessionDTO.getLastMsgId()) : null)
-                .deliveryMethod(userSessionDTO.getDeliveryMethod())
-                .build();
-        userSessionMapper.insert(userSession);
-        return userSession.getId().toString();
+    public String userSession(String userId,UserSessionDTO userSessionDTO) {
+        userSessionDTO.setSenderUserId(userId);
+        QueryWrapper<Session> sessionQueryWrapper = new QueryWrapper<>();
+        sessionQueryWrapper.select("id");
+        sessionQueryWrapper
+                .nested(n -> n.eq("sender_user_id",userSessionDTO.getSenderUserId()).eq("receiver_user_id",userSessionDTO.getReceiverUserId()))
+                .or()
+                .nested(n -> n.eq("sender_user_id",userSessionDTO.getReceiverUserId()).eq("receiver_user_id",userSessionDTO.getSenderUserId()));
+        Session session = sessionMapper.selectOne(sessionQueryWrapper);
+        String sessionId;
+        if (session == null){
+            Session newSession = Session
+                    .builder()
+                    .id(IdGen.genId())
+                    .senderUserId(Long.parseLong(userSessionDTO.getSenderUserId()))
+                    .receiverUserId(Long.parseLong(userSessionDTO.getReceiverUserId()))
+                    .lastMsgId(userSessionDTO.getLastMsgId() != null ? Long.parseLong(userSessionDTO.getLastMsgId()) : null)
+                    .deliveryMethod(userSessionDTO.getDeliveryMethod())
+                    .build();
+            sessionMapper.insert(newSession);
+            sessionId = newSession.getId().toString();
+            UserSession userSession = UserSession
+                    .builder()
+                    .id(IdGen.genId())
+                    .userId(Long.valueOf(userSessionDTO.getSenderUserId()))
+                    .sessionId(newSession.getId())
+                    .build();
+            userSessionMapper.insert(userSession);
+        }else {
+            sessionId = session.getId().toString();
+            QueryWrapper<UserSession> userSessionQueryWrapper = new QueryWrapper<>();
+            userSessionQueryWrapper.select("id");
+            userSessionQueryWrapper.eq("user_id",userSessionDTO.getSenderUserId());
+            userSessionQueryWrapper.eq("session_id",session.getId());
+            UserSession userSession = userSessionMapper.selectOne(userSessionQueryWrapper);
+            if (userSession == null){
+                UserSession newUserSession = UserSession
+                        .builder()
+                        .id(IdGen.genId())
+                        .userId(Long.valueOf(userSessionDTO.getSenderUserId()))
+                        .sessionId(session.getId())
+                        .build();
+                userSessionMapper.insert(newUserSession);
+            }
+        }
+        return sessionId;
+    }
+
+    @Override
+    public Boolean userSession(String userId, String sessionId) {
+        QueryWrapper<UserSession> userSessionQueryWrapper = new QueryWrapper<>();
+        userSessionQueryWrapper.eq("user_id",userId);
+        userSessionQueryWrapper.eq("session_id",sessionId);
+        int delete = userSessionMapper.delete(userSessionQueryWrapper);
+        return delete > 0;
     }
 
     @Override
@@ -290,22 +263,52 @@ public class UserSocialServiceImpl implements UserSocialService {
         message.setSendTime(new Date());
         message.setDeliveryMethod(messageDTO.getDeliveryMethod());
         int insert = messageMapper.insert(message);
-        if (insert > 0){
-            return message.getId();
+        if (insert == 0){
+            throw new RuntimeException("insert error");
         }
-        throw new RuntimeException("insert error");
+        UserSession outboxUserSession = UserSession
+                .builder()
+                .id(IdGen.genId())
+                .userId(messageDTO.getSenderUserId())
+                .sessionId(message.getSessionId())
+                .messageId(message.getId())
+                .boxType(MessageBoxType.OUTBOX)
+                .build();
+        userSessionMapper.insert(outboxUserSession);
+        UserSession inboxUserSession = UserSession
+                .builder()
+                .id(IdGen.genId())
+                .userId(messageDTO.getReceiverUserId())
+                .sessionId(message.getSessionId())
+                .messageId(message.getId())
+                .boxType(MessageBoxType.INBOX)
+                .build();
+        userSessionMapper.insert(inboxUserSession);
+        return message.getId();
     }
 
-    public PageInfo<MessageInfo> message(String sessionId,Integer pageNum,Integer pageSize){
+    public PageInfo<MessageInfo> message(String userId,String sessionId,Integer pageNum,Integer pageSize){
         PageHelper.startPage(pageNum,pageSize);
-        QueryWrapper<Message> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("session_id",sessionId);
-        queryWrapper.orderByDesc("id");
-        List<MessageInfo> messageInfos = messageMapper.findMessageBySessionId(sessionId);
+        QueryWrapper<UserMessageBox> userMessageBoxQueryWrapper = new QueryWrapper<>();
+        userMessageBoxQueryWrapper.select("msg_id");
+        userMessageBoxQueryWrapper.eq("user_id",userId);
+        userMessageBoxQueryWrapper.eq("session_id",sessionId);
+        List<UserMessageBox> userMessageBoxes = userMessageBoxMapper.selectList(userMessageBoxQueryWrapper);
+        if (userMessageBoxes == null || userMessageBoxes.isEmpty()){
+            return PageInfo.of(new ArrayList<>());
+        }
+        PageInfo<UserMessageBox> userMessageBoxPageInfo = PageInfo.of(userMessageBoxes);
+        List<Long> msgIds = userMessageBoxes.stream().map(UserMessageBox::getMsgId).toList();
+        List<MessageInfo> messageInfos = messageMapper.findMessageByIds(msgIds);
         if (messageInfos == null || messageInfos.isEmpty()){
             return PageInfo.of(new ArrayList<>());
         }
-        return PageInfo.of(messageInfos);
+        PageInfo<MessageInfo> messageInfoPageInfo = new PageInfo<>();
+        messageInfoPageInfo.setList(messageInfos);
+        messageInfoPageInfo.setPageNum(pageNum);
+        messageInfoPageInfo.setPageSize(pageSize);
+        messageInfoPageInfo.setTotal(userMessageBoxPageInfo.getTotal());
+        return messageInfoPageInfo;
     }
 
     @Override

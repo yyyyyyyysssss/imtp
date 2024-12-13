@@ -100,9 +100,6 @@ const ChatItem = ({ route }) => {
                 }
             )
         }
-        return () => {
-            console.log('ChatItem unmount')
-        }
     }, [])
 
     const moreOps = () => {

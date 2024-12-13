@@ -5,35 +5,35 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
-import org.imtp.web.enums.MessageBoxType;
+import org.imtp.common.enums.DeliveryMethod;
 
 /**
  * @Description
  * @Author ys
- * @Date 2024/12/13 13:08
+ * @Date 2024/5/16 16:08
  */
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@TableName("im_user_session")
-public class UserSession {
+@TableName("im_session")
+public class Session {
 
     @TableId
     private Long id;
 
-    @TableField("user_id")
-    private Long userId;
+    @TableField("sender_user_id")
+    private Long senderUserId;
 
-    @TableField("session_id")
-    private Long sessionId;
+    @TableField("receiver_user_id")
+    private Long receiverUserId;
 
-    @TableField("message_Id")
-    private Long messageId;
+    @TableField("last_msg_id")
+    private Long lastMsgId;
 
-    @TableField("box_Type")
+    @TableField("delivery_method")
     @EnumValue
-    private MessageBoxType boxType;
+    private DeliveryMethod deliveryMethod;
 
 }

@@ -12,7 +12,9 @@ public interface UserSocialService {
 
     List<UserSessionInfo> userSession(String userId);
 
-    String userSession(UserSessionDTO userSessionDTO);
+    String userSession(String userId,UserSessionDTO userSessionDTO);
+
+    Boolean userSession(String userId,String sessionId);
 
     List<UserFriendInfo> userFriend(String userId);
 
@@ -25,7 +27,7 @@ public interface UserSocialService {
     //保存离线消息
     Long message(MessageDTO messageDTO);
 
-    PageInfo<MessageInfo> message(String sessionId,Integer pageNum,Integer pageSize);
+    PageInfo<MessageInfo> message(String userId,String sessionId,Integer pageNum,Integer pageSize);
 
     //保存离线消息
     Boolean offlineMessage(List<OfflineMessageDTO> offlineMessageList);

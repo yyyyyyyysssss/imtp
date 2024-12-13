@@ -11,6 +11,6 @@ import java.util.List;
 @Mapper
 public interface MessageMapper extends BaseMapper<Message> {
 
-    List<MessageInfo> findMessageBySessionId(@Param("sessionId") String sessionId);
+    List<MessageInfo> findMessageByIds(@Param("msgIds") List<Long> msgIds);
 
 }

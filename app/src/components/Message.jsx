@@ -4,6 +4,7 @@ import { StyleSheet } from 'react-native';
 import AntDesignIcon from 'react-native-vector-icons/AntDesign';
 import TextMessage from './TextMessage';
 import ImageMessage from './ImageMessage';
+import FileMessage from './FileMessage';
 
 
 const Message = React.memo(({ style,message }) => {
@@ -38,7 +39,7 @@ const Message = React.memo(({ style,message }) => {
             case 5:
                 return <></>
             case 6:
-                return <></>
+                return <FileMessage content={content} contentMetadata={contentMetadata} />
         }
     }, [])
 
