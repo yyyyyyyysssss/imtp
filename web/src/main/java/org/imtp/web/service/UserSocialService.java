@@ -10,26 +10,25 @@ import java.util.List;
 
 public interface UserSocialService {
 
-    List<UserSessionInfo> userSession(String userId);
+    List<UserSessionInfo> findSessionByUserId(String userId);
 
-    String userSession(String userId,UserSessionDTO userSessionDTO);
+    String createUserSessionByUserId(String userId,UserSessionDTO userSessionDTO);
 
-    Boolean userSession(String userId,String sessionId);
+    Boolean deleteUserSessionByUserIdAndSessionId(String userId,String sessionId);
 
-    List<UserFriendInfo> userFriend(String userId);
+    List<UserFriendInfo> findUserFriendByUserId(String userId);
 
-    List<UserGroupInfo> userGroup(String userId);
+    List<UserGroupInfo> findUserGroupByUserId(String userId);
 
-    List<OfflineMessageInfo> offlineMessage(String userId);
+    List<OfflineMessageInfo> findOfflineMessageByUserId(String userId);
 
-    List<String> userIds(String groupId);
+    List<String> findUserIdByGroupId(String groupId);
+
+    Long saveMessage(MessageDTO messageDTO);
+
+    PageInfo<MessageInfo> findMessages(String userId,String sessionId,Integer pageNum,Integer pageSize);
 
     //保存离线消息
-    Long message(MessageDTO messageDTO);
-
-    PageInfo<MessageInfo> message(String userId,String sessionId,Integer pageNum,Integer pageSize);
-
-    //保存离线消息
-    Boolean offlineMessage(List<OfflineMessageDTO> offlineMessageList);
+    Boolean saveOfflineMessage(List<OfflineMessageDTO> offlineMessageList);
 
 }

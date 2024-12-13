@@ -695,7 +695,7 @@ const ChatItem = (props) => {
             type: type,
             status: PENDING,
             sessionId: userSessionItem.id,
-            sender: userSessionItem.userId,
+            sender: userSessionItem.senderUserId,
             receiver: userSessionItem.receiverUserId,
             deliveryMethod: userSessionItem.deliveryMethod,
             self: true,

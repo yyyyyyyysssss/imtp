@@ -264,6 +264,7 @@ const Chat = forwardRef((props, ref) => {
                         id: res?.data,
                         userId: userId,
                         name: userItem.nickname === undefined ? userItem.groupName : userItem.nickname,
+                        senderUserId: userId,
                         receiverUserId: userItem.id,
                         avatar: userItem.avatar,
                         deliveryMethod: userItem.type,

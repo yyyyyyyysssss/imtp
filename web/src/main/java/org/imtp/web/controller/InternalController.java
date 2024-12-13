@@ -54,43 +54,43 @@ public class InternalController {
 
     @GetMapping("/userSession")
     public Result<?> userSession(@RequestParam(name = "userId") String userId){
-        List<UserSessionInfo> userSessionInfos = userSocialService.userSession(userId);
+        List<UserSessionInfo> userSessionInfos = userSocialService.findSessionByUserId(userId);
         return ResultGenerator.ok(userSessionInfos);
     }
 
     @GetMapping("/userFriend")
     public Result<?> userFriend(@RequestParam(name = "userId") String userId){
-        List<UserFriendInfo> userFriendInfos = userSocialService.userFriend(userId);
+        List<UserFriendInfo> userFriendInfos = userSocialService.findUserFriendByUserId(userId);
         return ResultGenerator.ok(userFriendInfos);
     }
 
     @GetMapping("/userGroup")
     public Result<?> userGroup(@RequestParam(name = "userId") String userId){
-        List<UserGroupInfo> groupInfos = userSocialService.userGroup(userId);
+        List<UserGroupInfo> groupInfos = userSocialService.findUserGroupByUserId(userId);
         return ResultGenerator.ok(groupInfos);
     }
 
     @GetMapping("/offlineMessage")
     public Result<?> offlineMessage(@RequestParam(name = "userId") String userId){
-        List<OfflineMessageInfo> offlineMessageInfos = userSocialService.offlineMessage(userId);
+        List<OfflineMessageInfo> offlineMessageInfos = userSocialService.findOfflineMessageByUserId(userId);
         return ResultGenerator.ok(offlineMessageInfos);
     }
 
     @GetMapping("/userIds")
     public Result<?> userIds(@RequestParam(name = "groupId") String groupId){
-        List<String> userIds = userSocialService.userIds(groupId);
+        List<String> userIds = userSocialService.findUserIdByGroupId(groupId);
         return ResultGenerator.ok(userIds);
     }
 
     @PostMapping("/message")
     public Result<?> message(@RequestBody MessageDTO messageDTO){
-        Long messageId = userSocialService.message(messageDTO);
+        Long messageId = userSocialService.saveMessage(messageDTO);
         return ResultGenerator.ok(messageId);
     }
 
     @PostMapping("/offlineMessage")
     public Result<?> offlineMessage(@RequestBody List<OfflineMessageDTO> offlineMessageList){
-        Boolean b = userSocialService.offlineMessage(offlineMessageList);
+        Boolean b = userSocialService.saveOfflineMessage(offlineMessageList);
         return ResultGenerator.ok(b);
     }
 

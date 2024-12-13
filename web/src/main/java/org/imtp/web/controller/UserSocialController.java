@@ -53,21 +53,21 @@ public class UserSocialController {
     @CircuitBreaker(name = "commonBreaker", fallbackMethod = "userSocialFallbackMethod")
     public Result<List<UserSessionInfo>> userSession(@PathVariable(name = "userId") String userId) throws AccessDeniedException {
         checkUserId(userId);
-        List<UserSessionInfo> userSessionInfos = userSocialService.userSession(userId);
+        List<UserSessionInfo> userSessionInfos = userSocialService.findSessionByUserId(userId);
         return ResultGenerator.ok(userSessionInfos);
     }
 
     @PostMapping("/userSession/{userId}")
     @CircuitBreaker(name = "slowCallBreaker")
     public Result<String> userSession(@PathVariable(name = "userId") String userId,@RequestBody @Validated UserSessionDTO userSessionDTO) {
-        String id = userSocialService.userSession(userId,userSessionDTO);
+        String id = userSocialService.createUserSessionByUserId(userId,userSessionDTO);
         return ResultGenerator.ok(id);
     }
 
     @DeleteMapping("/userSession/{userId}")
     @CircuitBreaker(name = "slowCallBreaker")
     public Result<Boolean> userSession(@PathVariable(name = "userId") String userId,Object object) {
-        Boolean deleted = userSocialService.userSession(userId,"");
+        Boolean deleted = userSocialService.deleteUserSessionByUserIdAndSessionId(userId,"");
         return ResultGenerator.ok(deleted);
     }
 
@@ -75,7 +75,7 @@ public class UserSocialController {
     @CircuitBreaker(name = "commonBreaker", fallbackMethod = "userSocialFallbackMethod")
     public Result<List<UserFriendInfo>> userFriend(@PathVariable(name = "userId") String userId) throws AccessDeniedException {
         checkUserId(userId);
-        List<UserFriendInfo> userFriendInfos = userSocialService.userFriend(userId);
+        List<UserFriendInfo> userFriendInfos = userSocialService.findUserFriendByUserId(userId);
         return ResultGenerator.ok(userFriendInfos);
     }
 
@@ -83,7 +83,7 @@ public class UserSocialController {
     @CircuitBreaker(name = "commonBreaker", fallbackMethod = "userSocialFallbackMethod")
     public Result<List<UserGroupInfo>> userGroup(@PathVariable(name = "userId") String userId) throws AccessDeniedException {
         checkUserId(userId);
-        List<UserGroupInfo> groupInfos = userSocialService.userGroup(userId);
+        List<UserGroupInfo> groupInfos = userSocialService.findUserGroupByUserId(userId);
         return ResultGenerator.ok(groupInfos);
     }
 
@@ -93,7 +93,7 @@ public class UserSocialController {
                              @RequestParam(name = "pageNum", required = false,defaultValue = "1") Integer pageNum,
                              @RequestParam(name = "pageSize", required = false,defaultValue = "20") Integer pageSize) {
         checkUserId(userId);
-        PageInfo<MessageInfo> messageInfoPageInfo = userSocialService.message(userId,sessionId,pageNum,pageSize);
+        PageInfo<MessageInfo> messageInfoPageInfo = userSocialService.findMessages(userId,sessionId,pageNum,pageSize);
         return ResultGenerator.ok(messageInfoPageInfo);
     }
 
@@ -101,7 +101,7 @@ public class UserSocialController {
     @CircuitBreaker(name = "commonBreaker", fallbackMethod = "userSocialFallbackMethod")
     public Result<List<OfflineMessageInfo>> offlineMessage(@PathVariable(name = "userId") String userId) throws AccessDeniedException {
         checkUserId(userId);
-        List<OfflineMessageInfo> offlineMessageInfos = userSocialService.offlineMessage(userId);
+        List<OfflineMessageInfo> offlineMessageInfos = userSocialService.findOfflineMessageByUserId(userId);
         return ResultGenerator.ok(offlineMessageInfos);
     }
 
