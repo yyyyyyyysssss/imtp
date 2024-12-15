@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Box, HStack, Text, VStack } from 'native-base';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Feather from 'react-native-vector-icons/Feather';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation,CommonActions  } from '@react-navigation/native';
 import { Pressable } from 'native-base';
 
 const ItemHeader = ({ title, moreOps, flex }) => {
@@ -12,6 +12,7 @@ const ItemHeader = ({ title, moreOps, flex }) => {
     const goBack = () => {
         navigation.goBack()
     }
+    
 
     const more = () => {
         moreOps()

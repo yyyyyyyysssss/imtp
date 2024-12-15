@@ -12,12 +12,14 @@
         <result property="contentMetadata" typeHandler="com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler" column="content_metadata"/>
         <result property="sendTime" typeHandler="org.imtp.web.mapper.DateToLongTypeHandler" column="send_time"/>
         <result property="deliveryMethod" column="delivery_method"/>
+        <result property="name" column="name"/>
         <result property="avatar" column="avatar"/>
     </resultMap>
 
     <select id="findMessageByIds" parameterType="java.util.List" resultMap="resultMessageInfoMap">
         select t.*,
-               IFNULL(u.avatar,g.avatar) avatar
+               IFNULL(u.avatar,g.avatar) avatar,
+               IFNULL(u.nickname,g.name) name
         from im_msg t
         LEFT JOIN im_user u on u.id = t.sender_user_id
         LEFT JOIN im_group g on g.id = t.sender_user_id

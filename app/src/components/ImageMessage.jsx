@@ -32,8 +32,9 @@ const ImageMessage = ({ content, contentMetadata }) => {
                 onPress={() => showOriginalImage(content)}
             >
                 <Image
+                    rounded={8}
                     size={200}
-                    shadow={5}
+                    shadow={3}
                     resizeMode='cover'
                     source={{
                         uri: content

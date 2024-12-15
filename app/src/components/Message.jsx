@@ -5,6 +5,7 @@ import AntDesignIcon from 'react-native-vector-icons/AntDesign';
 import TextMessage from './TextMessage';
 import ImageMessage from './ImageMessage';
 import FileMessage from './FileMessage';
+import VideoMessage from './VideoMessage';
 
 
 const Message = React.memo(({ style,message }) => {
@@ -29,15 +30,14 @@ const Message = React.memo(({ style,message }) => {
             messageStatusIcon = <></>
             break
     }
-
     const renderItem = useCallback((type, self, content, contentMetadata) => {
         switch (type) {
             case 1:
-                return <TextMessage content={content} contentMetadata={contentMetadata} direction={self ? 'LEFT' : 'RIGHT'} />
+                return <TextMessage content={content} contentMetadata={contentMetadata} direction={self ? 'RIGHT' : 'LEFT'} />
             case 4:
                 return <ImageMessage content={content} contentMetadata={contentMetadata} />
             case 5:
-                return <></>
+                return <VideoMessage content={content} contentMetadata={contentMetadata} />
             case 6:
                 return <FileMessage content={content} contentMetadata={contentMetadata} />
         }
@@ -52,7 +52,7 @@ const Message = React.memo(({ style,message }) => {
                 }}
                 source={{ uri: avatar }}
             />
-            <VStack flex={1} alignItems={self ? 'flex-end' : 'flex-start'}>
+            <VStack flex={1} justifyContent='center' alignItems={self ? 'flex-end' : 'flex-start'}  >
                 {!self && deliveryMethod === 'GROUP' && (
                     <HStack>
                         <Text style={styles.chatItemUserName}>{name}</Text>

@@ -5,8 +5,8 @@ import { Text, Box } from 'native-base';
 const TextMessage = ({ content, contentMetadata, direction }) => {
 
     return (
-        <Box style={direction === 'LEFT' ? styles.chatItemMessageBoxRight : styles.chatItemMessageBoxLeft}>
-            <Box style={self ? styles.chatItemMessageBoxRightArrow : styles.chatItemMessageBoxLeftArrow} />
+        <Box style={direction === 'LEFT' ? styles.chatItemMessageBoxLeft : styles.chatItemMessageBoxRight}>
+            <Box style={direction === 'LEFT' ? styles.chatItemMessageBoxLeftArrow : styles.chatItemMessageBoxRightArrow} />
             <Text
                 style={styles.chatItemMessageText}
                 isTruncated={false}

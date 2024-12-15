@@ -20,6 +20,7 @@ import api from './api/api';
 import { useSelector, useDispatch } from 'react-redux'
 import { restoreToken, signIn, signOut } from './redux/slices/authSlice';
 import Home from './pages/home';
+import VideoPlay from './components/VideoPlay';
 
 const HomeTab = createBottomTabNavigator({
   initialRouteName: 'Chat',
@@ -152,6 +153,12 @@ const RootStack = createNativeStackNavigator({
             headerRight: () => (
               <Feather name='more-horizontal' size={28} />
             )
+          }
+        },
+        VideoPlay: {
+          screen: VideoPlay,
+          options: {
+            headerShown: false,
           }
         }
       }

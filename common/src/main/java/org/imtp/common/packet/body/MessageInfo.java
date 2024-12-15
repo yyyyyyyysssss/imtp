@@ -32,6 +32,8 @@ public class MessageInfo {
 
     private DeliveryMethod deliveryMethod;
 
+    private String name;
+
     private String avatar;
 
 }

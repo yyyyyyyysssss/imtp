@@ -1,6 +1,6 @@
 import { Avatar, FlatList, HStack, Input, Pressable, ScrollView, Text, View, VStack, KeyboardAvoidingView } from 'native-base';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Modal, StyleSheet } from 'react-native';
+import { Modal, StyleSheet, TouchableWithoutFeedback } from 'react-native';
 import ItemHeader from '../../../components/ItemHeader';
 import { useDispatch, useSelector } from 'react-redux';
 import { showToast } from '../../../components/Utils';
@@ -68,14 +68,13 @@ const ChatItem = ({ route }) => {
 
     const flatListRef = useRef()
 
-    console.log('ChatItem')
-
     const entities = useSelector(state => state.chat.entities)
     const session = useSelector(state => state.chat.entities.sessions[sessionId])
     const { messages } = session
     const dispatch = useDispatch()
 
     useEffect(() => {
+        console.log('init chatItem')
         //未初始化的数据进行初始化
         if (session.messageInit === undefined || session.messageInit === false) {
             console.log('messageInit')
@@ -100,6 +99,10 @@ const ChatItem = ({ route }) => {
                 }
             )
         }
+
+        return () => {
+            console.log('unmount chatItem')
+        }
     }, [])
 
     const moreOps = () => {
@@ -113,8 +116,12 @@ const ChatItem = ({ route }) => {
         )
     }
 
+    const handleOutPress = () => {
+        console.log('handleOutPress')
+    }
+
     return (
-        <>
+        <TouchableWithoutFeedback onPress={handleOutPress} style={{ flex: 1 }}>
             <VStack flex={1} justifyContent="space-between">
                 <ItemHeader title={session.name} moreOps={moreOps} />
                 <KeyboardAvoidingView
@@ -140,7 +147,7 @@ const ChatItem = ({ route }) => {
                     <ChatItemFooter />
                 </KeyboardAvoidingView>
             </VStack>
-        </>
+        </TouchableWithoutFeedback>
     )
 }
 
