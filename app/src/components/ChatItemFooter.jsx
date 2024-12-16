@@ -1,13 +1,15 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Box, HStack, Text, VStack, Input, Pressable, KeyboardAvoidingView, Divider, Modal, Flex } from 'native-base';
+import { Box, HStack, Text, VStack, Input, Pressable, KeyboardAvoidingView, Divider, Flex, ScrollView } from 'native-base';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import Feather from 'react-native-vector-icons/Feather';
 import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { showToast } from './Utils';
-import { StyleSheet } from 'react-native';
-import EmojiPicker from 'rn-emoji-keyboard'
+import { StyleSheet, Modal, View } from 'react-native';
+import EmojiPicker, { tr } from 'rn-emoji-keyboard'
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
+import ImagePicker from 'react-native-image-crop-picker';
+import { MessageType } from '../enum';
 
 const ChatItemFooter = ({ flex }) => {
 
@@ -15,25 +17,56 @@ const ChatItemFooter = ({ flex }) => {
 
     const inputRef = useRef()
 
-    useEffect(() => {
-
-    }, [])
-
-    const handleOnSubmit = (event) => {
+    const handleSubmit = (event) => {
         const text = event.nativeEvent.text
-        showToast(text)
+        messageProvider({
+            type: 'text',
+            content: text
+        })
+        inputRef.current.clear()
     }
 
-    const handleEmoji = () => {
-
-    }
-
-    const handleEmojiSelected = (emoji) => {
-        console.log('emoji', emoji)
+    const messageProvider = (media) => {
+        const { content, uri, type, fileName, fileSize, width, height, duration } = media
+        let message = null
+        if(type.startsWith('image')){
+            message = {
+                type: MessageType.IMAGE_MESSAGE,
+                fileName: fileName,
+                content: uri,
+                fileType: type,
+                fileSize: fileSize,
+                width: width,
+                height: height
+            }
+            console.log('image: ',message)
+        }else if(type.startsWith('video')){
+            message = {
+                type: MessageType.VIDEO_MESSAGE,
+                fileName: fileName,
+                content: uri,
+                fileType: type,
+                fileSize: fileSize,
+                fileDuration: duration,
+                width: width,
+                height: height
+            }
+            console.log('video: ',message)
+        }else if(type.startsWith('text')){
+            message = {
+                type: MessageType.TEXT_MESSAGE,
+                content: content,
+            }
+            console.log('text: ',message)
+        }
     }
 
     const handleInputFocus = () => {
         setIsOpen(false)
+    }
+
+    const selectEmoji = () => {
+
     }
 
     const handleMoreOps = () => {
@@ -50,7 +83,8 @@ const ChatItemFooter = ({ flex }) => {
     const selectPhoto = () => {
         launchImageLibrary(
             {
-                mediaType: 'mixed'
+                mediaType: 'mixed',
+                selectionLimit: 10
             },
             res => {
                 if (res.didCancel) {
@@ -60,8 +94,7 @@ const ChatItemFooter = ({ flex }) => {
                 } else {
                     const assets = res.assets
                     assets.forEach(media => {
-                        const { uri, type, fileName, fileSize, width, height, duration, originalPath } = media
-                        console.log('mediaUrl:', uri, ' mediaType:', type, ' mediaName:', fileName, ' mediaSize:', fileSize, width, height, duration, originalPath)
+                        messageProvider(media)
                     })
                 }
             }
@@ -82,8 +115,7 @@ const ChatItemFooter = ({ flex }) => {
                 } else {
                     const assets = res.assets
                     assets.forEach(media => {
-                        const { uri, type, fileName, fileSize, width, height, duration, originalPath } = media
-                        console.log('mediaUrl:', uri, ' mediaType:', type, ' mediaName:', fileName, ' mediaSize:', fileSize, width, height, duration, originalPath)
+                        messageProvider(media)
                     })
                 }
             }
@@ -107,8 +139,7 @@ const ChatItemFooter = ({ flex }) => {
                 } else {
                     const assets = res.assets
                     assets.forEach(media => {
-                        const { uri, type, fileName, fileSize, width, height, duration, originalPath } = media
-                        console.log('mediaUrl:', uri, ' mediaType:', type, ' mediaName:', fileName, ' mediaSize:', fileSize, width, height, duration, originalPath)
+                        messageProvider(media)
                     })
                 }
             }
@@ -130,6 +161,7 @@ const ChatItemFooter = ({ flex }) => {
                 borderTopColor: 'blank',
                 borderTopWidth: 0.1
             }}>
+
                 <HStack
                     flex={1}
                     justifyContent='center'
@@ -148,7 +180,7 @@ const ChatItemFooter = ({ flex }) => {
                             focusOutlineColor='none'
                             borderWidth={0}
                             backgroundColor='white'
-                            onSubmitEditing={handleOnSubmit}
+                            onSubmitEditing={handleSubmit}
                             onFocus={handleInputFocus}
                             w={{
                                 base: "100%",
@@ -156,7 +188,7 @@ const ChatItemFooter = ({ flex }) => {
                         />
                     </HStack>
                     <HStack flex={2.5} justifyContent='center' alignContent='center' space={3}>
-                        <Pressable onPress={handleEmoji}>
+                        <Pressable onPress={selectEmoji}>
                             <SimpleLineIcons name="emotsmile" size={25} />
                         </Pressable>
                         <Pressable onPress={handleMoreOps}>
@@ -165,67 +197,79 @@ const ChatItemFooter = ({ flex }) => {
 
                     </HStack>
                 </HStack>
+
                 {/* <EmojiPicker onEmojiSelected={handleEmojiSelected} open={isOpen} onClose={() => setIsOpen(false)} /> */}
                 {isOpen && (
                     <Flex
-                        direction="row"
-                        wrap="wrap"
-                        justifyContent="center"
+                        direction="column"
+                        justifyContent='center'
+                        alignItems='center'
                         style={{
+                            width: '100%',
                             height: 235,
                             borderTopWidth: 1,
                             borderTopColor: '#D3D3D3',
-                            padding: 10
                         }}
-                        gap={6}
                     >
+                        <Flex
+                            direction="row"
+                            wrap="wrap"
+                            style={{
+                                width: '85%',
+                                height: '100%',
+                                padding: 10
+                            }}
+                            gap={6}
+                        >
 
-                        <VStack alignItems='center' space={2}>
-                            <Pressable onPress={selectPhoto}>
-                                <Box style={styles.chatOpsIcon}>
-                                    <MaterialIcon name="photo" size={40} />
-                                </Box>
-                            </Pressable>
-                            <Text>照片</Text>
-                        </VStack>
+                            <VStack alignItems='center' space={2}>
+                                <Pressable onPress={selectPhoto}>
+                                    <Box style={styles.chatOpsIcon}>
+                                        <MaterialIcon name="photo" size={40} />
+                                    </Box>
+                                </Pressable>
+                                <Text>照片</Text>
+                            </VStack>
 
-                        <VStack alignItems='center' space={2}>
-                            <Pressable onPress={takePicture}>
-                                <Box style={styles.chatOpsIcon}>
-                                    <MaterialIcon name="camera-alt" size={40} />
-                                </Box>
-                            </Pressable>
-                            <Text>拍照</Text>
-                        </VStack>
+                            <VStack alignItems='center' space={2}>
+                                <Pressable onPress={takePicture}>
+                                    <Box style={styles.chatOpsIcon}>
+                                        <MaterialIcon name="camera-alt" size={40} />
+                                    </Box>
+                                </Pressable>
+                                <Text>拍照</Text>
+                            </VStack>
 
-                        <VStack alignItems='center' space={2}>
-                            <Pressable onPress={cameraShoot}>
-                                <Box style={styles.chatOpsIcon}>
-                                    <MaterialIcon name="video-camera-back" size={40} />
-                                </Box>
-                            </Pressable>
-                            <Text>拍摄</Text>
-                        </VStack>
+                            <VStack alignItems='center' space={2}>
+                                <Pressable onPress={cameraShoot}>
+                                    <Box style={styles.chatOpsIcon}>
+                                        <MaterialIcon name="video-camera-back" size={40} />
+                                    </Box>
+                                </Pressable>
+                                <Text>拍摄</Text>
+                            </VStack>
 
-                        <VStack alignItems='center' space={2}>
-                            <Pressable>
-                                <Box style={styles.chatOpsIcon}>
-                                    <MaterialIcon name="phone" size={40} />
-                                </Box>
-                            </Pressable>
-                            <Text>语音通话</Text>
-                        </VStack>
+                            <VStack alignItems='center' space={2}>
+                                <Pressable>
+                                    <Box style={styles.chatOpsIcon}>
+                                        <MaterialIcon name="phone" size={40} />
+                                    </Box>
+                                </Pressable>
+                                <Text>语音通话</Text>
+                            </VStack>
 
-                        <VStack alignItems='center' justifyContent='flex-start' space={2}>
-                            <Pressable>
-                                <Box style={styles.chatOpsIcon}>
-                                    <MaterialIcon name="videocam" size={40} />
-                                </Box>
-                            </Pressable>
-                            <Text>视频通话</Text>
-                        </VStack>
+                            <VStack alignItems='center' justifyContent='flex-start' space={2}>
+                                <Pressable>
+                                    <Box style={styles.chatOpsIcon}>
+                                        <MaterialIcon name="videocam" size={40} />
+                                    </Box>
+                                </Pressable>
+                                <Text>视频通话</Text>
+                            </VStack>
 
+                        </Flex>
                     </Flex>
+
                 )}
             </VStack>
         </>

@@ -6,6 +6,7 @@ import TextMessage from './TextMessage';
 import ImageMessage from './ImageMessage';
 import FileMessage from './FileMessage';
 import VideoMessage from './VideoMessage';
+import { MessageType,MessageStatus } from '../enum';
 
 
 const Message = React.memo(({ style,message }) => {
@@ -14,16 +15,16 @@ const Message = React.memo(({ style,message }) => {
 
     let messageStatusIcon;
     switch (status) {
-        case 'PENDING':
+        case MessageStatus.PENDING:
             messageStatusIcon = <Spinner color='#70BFFF' />
             break
-        case 'SENT':
+        case MessageStatus.SENT:
             messageStatusIcon = <></>
             break
-        case 'DELIVERED':
+        case MessageStatus.DELIVERED:
             messageStatusIcon = <></>
             break
-        case 'FAILED':
+        case MessageStatus.FAILED:
             messageStatusIcon = <AntDesignIcon name="exclamationcircle" color="red" size={18} />
             break
         default:
@@ -32,13 +33,13 @@ const Message = React.memo(({ style,message }) => {
     }
     const renderItem = useCallback((type, self, content, contentMetadata) => {
         switch (type) {
-            case 1:
+            case MessageType.TEXT_MESSAGE:
                 return <TextMessage content={content} contentMetadata={contentMetadata} direction={self ? 'RIGHT' : 'LEFT'} />
-            case 4:
+            case MessageType.IMAGE_MESSAGE:
                 return <ImageMessage content={content} contentMetadata={contentMetadata} />
-            case 5:
+            case MessageType.VIDEO_MESSAGE:
                 return <VideoMessage content={content} contentMetadata={contentMetadata} />
-            case 6:
+            case MessageType.FILE_MESSAGE:
                 return <FileMessage content={content} contentMetadata={contentMetadata} />
         }
     }, [])

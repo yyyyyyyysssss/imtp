@@ -208,7 +208,7 @@ const App = () => {
           }
         )
       } else {
-        dispatch(restoreToken({ token: null }))
+        dispatch(restoreToken({ token: null,userInfo: null }))
       }
     }
     bootstrapAsync()
