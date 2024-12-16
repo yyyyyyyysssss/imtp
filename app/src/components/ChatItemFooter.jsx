@@ -11,7 +11,7 @@ import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import ImagePicker from 'react-native-image-crop-picker';
 import { MessageType } from '../enum';
 
-const ChatItemFooter = ({ flex }) => {
+const ChatItemFooter = ({ sendMessage }) => {
 
     const [isOpen, setIsOpen] = useState(false)
 
@@ -33,32 +33,32 @@ const ChatItemFooter = ({ flex }) => {
             message = {
                 type: MessageType.IMAGE_MESSAGE,
                 fileName: fileName,
-                content: uri,
+                filePath: uri,
                 fileType: type,
                 fileSize: fileSize,
                 width: width,
                 height: height
             }
-            console.log('image: ',message)
         }else if(type.startsWith('video')){
             message = {
                 type: MessageType.VIDEO_MESSAGE,
                 fileName: fileName,
-                content: uri,
+                filePath: uri,
                 fileType: type,
                 fileSize: fileSize,
                 fileDuration: duration,
                 width: width,
                 height: height
             }
-            console.log('video: ',message)
         }else if(type.startsWith('text')){
             message = {
                 type: MessageType.TEXT_MESSAGE,
                 content: content,
             }
-            console.log('text: ',message)
+        }else {
+            return
         }
+        sendMessage(message)
     }
 
     const handleInputFocus = () => {

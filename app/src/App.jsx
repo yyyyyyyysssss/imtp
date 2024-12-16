@@ -21,6 +21,7 @@ import { useSelector, useDispatch } from 'react-redux'
 import { restoreToken, signIn, signOut } from './redux/slices/authSlice';
 import Home from './pages/home';
 import VideoPlay from './components/VideoPlay';
+import { showToast } from './components/Utils';
 
 const HomeTab = createBottomTabNavigator({
   initialRouteName: 'Chat',
@@ -205,6 +206,9 @@ const App = () => {
               Storage.save('userInfo', userInfo)
               dispatch(restoreToken({ token: userToken, userInfo: userInfo }))
             }
+          },
+          (error) => {
+            showToast(error.message)
           }
         )
       } else {

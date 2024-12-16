@@ -6,10 +6,13 @@ import { useDispatch, useSelector } from 'react-redux';
 import { showToast } from '../../../components/Utils';
 import Message from '../../../components/Message';
 import ChatItemFooter from '../../../components/ChatItemFooter';
-import { loadMessage,addMessage } from '../../../redux/slices/chatSlice';
+import { loadMessage, addMessage } from '../../../redux/slices/chatSlice';
 import { useFocusEffect } from '@react-navigation/native';
 import api from '../../../api/api';
 import Storage from '../../../storage/storage';
+import Uplaod from '../../../components/Upload';
+import { MessageType } from '../../../enum';
+import { cs } from 'rn-emoji-keyboard';
 
 
 const initData = [
@@ -78,26 +81,26 @@ const ChatItem = ({ route }) => {
         //未初始化的数据进行初始化
         if (session.messageInit === undefined || session.messageInit === false) {
             console.log('messageInit')
-            api.get('/social/userMessage/{userId}',{
+            api.get('/social/userMessage/{userId}', {
                 params: {
                     sessionId: sessionId
                 }
             })
-            .then(
-                (res) => {
-                    const messageList = res.data.list
-                    Storage.get('userInfo')
-                    .then(
-                        (userInfo) => {
-                            const newMessageList = messageList.map(item => {
-                                item.self = userInfo.id === item.senderUserId
-                                return item
-                            })
-                            dispatch(loadMessage({sessionId:sessionId,messages: newMessageList}))
-                        }
-                    )
-                }
-            )
+                .then(
+                    (res) => {
+                        const messageList = res.data.list
+                        Storage.get('userInfo')
+                            .then(
+                                (userInfo) => {
+                                    const newMessageList = messageList.map(item => {
+                                        item.self = userInfo.id === item.senderUserId
+                                        return item
+                                    })
+                                    dispatch(loadMessage({ sessionId: sessionId, messages: newMessageList }))
+                                }
+                            )
+                    }
+                )
         }
 
         return () => {
@@ -118,6 +121,26 @@ const ChatItem = ({ route }) => {
 
     const handleOutPress = () => {
         console.log('handleOutPress')
+    }
+
+    const sendMessage = (message) => {
+        const { filePath, fileName,fileType, fileSize } = message
+        switch (message.type) {
+            case MessageType.TEXT_MESSAGE:
+                break
+            case MessageType.IMAGE_MESSAGE:
+                Uplaod.uploadChunks(filePath,fileName,fileType,fileSize)
+                break
+            case MessageType.VIDEO_MESSAGE:
+                Uplaod.uploadChunks(filePath,fileName,fileType,fileSize)
+                break
+            case MessageType.FILE_MESSAGE:
+                Uplaod.uploadChunks(filePath,fileName,fileType,fileSize)
+                break
+            default:
+                showToast("Unsupported message type")
+        }
+        // console.log('message: ', message)
     }
 
     return (
@@ -144,7 +167,9 @@ const ChatItem = ({ route }) => {
                             }}
                         />
                     </HStack>
-                    <ChatItemFooter />
+                    <ChatItemFooter
+                        sendMessage={sendMessage}
+                    />
                 </KeyboardAvoidingView>
             </VStack>
         </TouchableWithoutFeedback>
