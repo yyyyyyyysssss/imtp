@@ -22,6 +22,9 @@ import { restoreToken, signIn, signOut } from './redux/slices/authSlice';
 import Home from './pages/home';
 import VideoPlay from './components/VideoPlay';
 import { showToast } from './components/Utils';
+import { NativeModules } from 'react-native';
+
+const { NettyClientModule } = NativeModules
 
 const HomeTab = createBottomTabNavigator({
   initialRouteName: 'Chat',
@@ -189,6 +192,7 @@ const App = () => {
 
   useEffect(() => {
     const bootstrapAsync = async () => {
+      console.log('App init')
       let userToken = await Storage.get('userToken');
       if (userToken) {
         //验证token是否有效
@@ -201,10 +205,9 @@ const App = () => {
           (res) => {
             const { active, userInfo } = res.data
             if (!active) {
-              Storage.multiRemove(['userToken', 'userInfo'])
+              logoutHandler()
             } else {
-              Storage.save('userInfo', userInfo)
-              dispatch(restoreToken({ token: userToken, userInfo: userInfo }))
+              loginSuccessHandler(userToken, userInfo)
             }
           },
           (error) => {
@@ -212,7 +215,7 @@ const App = () => {
           }
         )
       } else {
-        dispatch(restoreToken({ token: null,userInfo: null }))
+        dispatch(restoreToken({ token: null, userInfo: null }))
       }
     }
     bootstrapAsync()
@@ -221,28 +224,33 @@ const App = () => {
   const authContext = useMemo(() => ({
     signIn: async (token) => {
       //登录之后获取用户信息
-      Storage.save('userToken', token)
-        .then(() => {
-          api.get('/social/userInfo')
-            .then(
-              (res) => {
-                const userInfo = res.data
-                Storage.save('userInfo', userInfo)
-                  .then(() => {
-                    dispatch(signIn({ token: token, userInfo: userInfo }))
-                  })
-
-              }
-            )
-        })
+      api.get('/social/userInfo')
+        .then(
+          (res) => {
+            const userInfo = res.data
+            loginSuccessHandler(token, userInfo)
+          }
+        )
     },
     signOut: async () => {
-      Storage.remove('userToken', 'userInfo')
-        .then(() => {
-          dispatch(signOut())
-        })
+      logoutHandler()
     }
   }))
+
+  const logoutHandler = async () => {
+    await Storage.multiRemove(['userToken', 'userInfo'])
+    NettyClientModule.destroy(userToken)
+    dispatch(signOut())
+  }
+
+  const loginSuccessHandler = async (userToken, userInfo) => {
+    await Storage.batchSave({
+      userInfo: userInfo,
+      userToken: userToken
+    })
+    NettyClientModule.init(userToken)
+    dispatch(restoreToken({ token: userToken, userInfo: userInfo }))
+  }
 
   //未确认用户是否已登录之前显示启动页
   if (isLoading) {

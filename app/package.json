@@ -38,7 +38,8 @@
     "react-native-video": "^6.8.2",
     "react-native-video-controls": "^2.8.1",
     "react-redux": "^9.1.2",
-    "rn-emoji-keyboard": "^1.7.0"
+    "rn-emoji-keyboard": "^1.7.0",
+    "rn-fetch-blob": "^0.12.0"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",

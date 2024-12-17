@@ -186,8 +186,8 @@ public class OAuth2AuthorizationServerConfig {
 
     @Bean
     public JWKSource<SecurityContext> jwkSource() throws Exception {
-        RSAPublicKey publicKey = (RSAPublicKey) RSAUtil.loadPublicKey();
-        RSAPrivateKey privateKey = (RSAPrivateKey) RSAUtil.loadPrivateKey();
+        RSAPublicKey publicKey = (RSAPublicKey) RSAUtil.loadLocalPublicKey();
+        RSAPrivateKey privateKey = (RSAPrivateKey) RSAUtil.loadLocalPrivateKey();
         RSAKey rsaKey = new RSAKey.Builder(publicKey)
                 .privateKey(privateKey)
                 .keyID("355cbc56f03da91b86306f3520186699")

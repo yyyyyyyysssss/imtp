@@ -58,7 +58,7 @@ public class FileController {
         return ResultGenerator.ok(temporaryUrl);
     }
 
-    //简单上传
+    //简单上传 只能上传最大不超过 20MB 的文件
     @PostMapping(value = "/upload/simple",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public Result<String> simpleUpload(@RequestPart("file") MultipartFile file){
         String accessUrl = fileService.simpleUpload(file);

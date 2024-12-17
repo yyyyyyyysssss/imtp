@@ -127,6 +127,7 @@ dependencies {
     implementation "org.imtp:common:$commonVersion"
     implementation project(':react-native-screens')
     implementation project(':react-native-safe-area-context')
+    implementation 'com.squareup.okhttp3:okhttp:4.12.0'
 
     if (hermesEnabled.toBoolean()) {
         implementation("com.facebook.react:hermes-android")

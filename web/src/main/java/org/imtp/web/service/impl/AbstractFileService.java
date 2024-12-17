@@ -46,6 +46,7 @@ public abstract class AbstractFileService implements FileService {
     private final String totalChunkField = "totalChunk";
     private final String uploadedChunkCountField = "uploadedChunkCount";
     private final String newFilenameField = "newFilenameField";
+    private final String accessUrlField = "accessUrlField";
 
     @Resource
     private RedisWrapper redisWrapper;
@@ -77,6 +78,7 @@ public abstract class AbstractFileService implements FileService {
         map.put(totalChunkField,fileInfoDTO.getTotalChunk());
         map.put(uploadedChunkCountField,0);
         map.put(newFilenameField,newFilename);
+        map.put(accessUrlField,null);
         redisWrapper.addHash(uploadPrefix + uploadId,map);
         return uploadId;
     }
@@ -90,7 +92,7 @@ public abstract class AbstractFileService implements FileService {
     public abstract Tuple2<String, String> mergePart(String uploadId, String filename, Integer totalChunk);
 
     @Override
-    @Transactional(noRollbackFor = Exception.class)
+    @Transactional(noRollbackFor = BusinessException.class)
     public boolean uploadChunk(FileChunkDTO fileChunkDTO) {
         String uploadId = fileChunkDTO.getUploadId();
         Long totalSize = fileChunkDTO.getTotalSize();
@@ -123,7 +125,7 @@ public abstract class AbstractFileService implements FileService {
                 updateWrapper.eq("upload_id",uploadId);
                 fileUploadMapper.update(null, updateWrapper);
 
-                redisWrapper.expire(uploadPrefix + uploadId, Duration.ofMinutes(5));
+                redisWrapper.addHash(uploadPrefix + uploadId,accessUrlField,accessUrl,Duration.ofMinutes(5));
             }
         } catch (Exception e) {
             Object uploadedChunkNum = redisWrapper.getHash(uploadPrefix + uploadId, uploadedChunkCountField);
@@ -187,6 +189,10 @@ public abstract class AbstractFileService implements FileService {
 
     @Override
     public String accessUrl(String uploadId) {
+        String accessUrl = (String)redisWrapper.getHash(uploadPrefix + uploadId, accessUrlField);
+        if (accessUrl != null && !accessUrl.isEmpty()){
+            return accessUrl;
+        }
         try (HintManager hintManager = HintManager.getInstance()){
             hintManager.setWriteRouteOnly();
             QueryWrapper<FileUpload> fileUploadQueryWrapper = new QueryWrapper<>();

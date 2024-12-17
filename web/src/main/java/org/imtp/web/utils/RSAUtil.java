@@ -28,8 +28,6 @@ public class RSAUtil {
 
     public static final String KEY_TYPE = "RSA";
 
-    private static final String PADDING_MODE="RSA/ECB/OAEPWithMD5AndMGF1Padding";
-
     /**
      * 最大加密长度 OAEP填充 减41个字节  其它填充减11个字节  向下兼容(比如某个填充需要减11个字节 则减41个字节也不会有问题)
      */
@@ -73,7 +71,7 @@ public class RSAUtil {
         return keyFactory.generatePrivate(keySpec);
     }
 
-    public static PrivateKey loadPrivateKey() throws Exception {
+    public static PrivateKey loadLocalPrivateKey() throws Exception {
         String localPrivateKeyStr = loadLocalPrivateKeyStr();
         return loadPrivateKey(localPrivateKeyStr);
     }
@@ -92,7 +90,7 @@ public class RSAUtil {
         return keyFactory.generatePublic(keySpec);
     }
 
-    public static PublicKey loadPublicKey() throws Exception {
+    public static PublicKey loadLocalPublicKey() throws Exception {
         String loadLocalPublicKeyStr = loadLocalPublicKeyStr();
         if (loadLocalPublicKeyStr == null){
             throw new IOException("本地公钥文件不存在");
@@ -102,13 +100,18 @@ public class RSAUtil {
 
 
     //加密
-    public static String encrypt(String context, String publicKey) throws Exception {
-        PublicKey pk = loadPublicKey(publicKey);
-        return encrypt(context, pk);
+    public static String encrypt(String context) throws Exception{
+        PublicKey publicKey = loadLocalPublicKey();
+        return encrypt(context,publicKey,PaddingMode.OAEP_SHA1);
     }
 
-    public static String encrypt(String context, PublicKey publicKey) throws Exception {
-        Cipher cipher = Cipher.getInstance(PADDING_MODE);
+    public static String encrypt(String context, String publicKey,PaddingMode paddingMode) throws Exception {
+        PublicKey pk = loadPublicKey(publicKey);
+        return encrypt(context, pk,paddingMode);
+    }
+
+    public static String encrypt(String context, PublicKey publicKey,PaddingMode paddingMode) throws Exception {
+        Cipher cipher = Cipher.getInstance(paddingMode.getCode());
         cipher.init(Cipher.ENCRYPT_MODE, publicKey);
         byte[] bytes = context.getBytes(StandardCharsets.UTF_8);
         byte[] crypt = crypt(bytes, cipher, MAX_ENCRYPT_BLOCK);
@@ -117,13 +120,18 @@ public class RSAUtil {
 
 
     //解密
-    public static String decrypt(String context, String privateKey) throws Exception {
-        PrivateKey pk = loadPrivateKey(privateKey);
-        return decrypt(context, pk);
+    public static String decrypt(String context) throws Exception{
+        PrivateKey privateKey = loadLocalPrivateKey();
+        return decrypt(context,privateKey,PaddingMode.OAEP_SHA1);
     }
 
-    public static String decrypt(String context, PrivateKey privateKey) throws Exception {
-        Cipher cipher = Cipher.getInstance(PADDING_MODE);
+    public static String decrypt(String context, String privateKey,PaddingMode paddingMode) throws Exception {
+        PrivateKey pk = loadPrivateKey(privateKey);
+        return decrypt(context, pk,paddingMode);
+    }
+
+    public static String decrypt(String context, PrivateKey privateKey,PaddingMode paddingMode) throws Exception {
+        Cipher cipher = Cipher.getInstance(paddingMode.getCode());
         cipher.init(Cipher.DECRYPT_MODE, privateKey);
         byte[] bytes = Base64.decodeBase64(context);
         byte[] crypt = crypt(bytes, cipher, MAX_DECRYPT_BLOCK);
@@ -155,36 +163,46 @@ public class RSAUtil {
     }
 
 
-    public static String sign(String context, String privateKey) throws Exception {
-        PrivateKey pk = loadPrivateKey(privateKey);
-        return sign(context, pk);
+    public static String sign(String context) throws Exception{
+        PrivateKey privateKey = loadLocalPrivateKey();
+        return sign(context,privateKey,SignAlgorithm.SHA256withRSA);
     }
 
-    public static String sign(String context, PrivateKey privateKey) throws Exception {
+    public static String sign(String context, String privateKey,SignAlgorithm signAlgorithm) throws Exception {
+        PrivateKey pk = loadPrivateKey(privateKey);
+        return sign(context, pk,signAlgorithm);
+    }
+
+    public static String sign(String context, PrivateKey privateKey,SignAlgorithm signAlgorithm) throws Exception {
         byte[] bytes = context.getBytes(charset);
         byte[] keyBytes = privateKey.getEncoded();
         PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(keyBytes);
         KeyFactory keyFactory = KeyFactory.getInstance(KEY_TYPE);
         PrivateKey key = keyFactory.generatePrivate(keySpec);
-        Signature signature = Signature.getInstance("MD5withRSA");
+        Signature signature = Signature.getInstance(signAlgorithm.getCode());
         signature.initSign(key);
         signature.update(bytes);
         return new String(Base64.encodeBase64(signature.sign()), charset);
     }
 
-    public static boolean verify(String context, String publicKey, String sign) throws Exception {
-        PublicKey pk = loadPublicKey(publicKey);
-        return verify(context, pk, sign);
+    public static boolean verify(String context,String sign) throws Exception{
+        PublicKey publicKey = loadLocalPublicKey();
+        return verify(context,publicKey,sign,SignAlgorithm.SHA256withRSA);
     }
 
-    public static boolean verify(String context, PublicKey publicKey, String sign) throws Exception {
+    public static boolean verify(String context, String publicKey, String sign,SignAlgorithm signAlgorithm) throws Exception {
+        PublicKey pk = loadPublicKey(publicKey);
+        return verify(context, pk, sign,signAlgorithm);
+    }
+
+    public static boolean verify(String context, PublicKey publicKey, String sign,SignAlgorithm signAlgorithm) throws Exception {
         byte[] srcBytes = context.getBytes(charset);
         byte[] signBytes = sign.getBytes(charset);
         byte[] keyBytes = publicKey.getEncoded();
         X509EncodedKeySpec keySpec = new X509EncodedKeySpec(keyBytes);
         KeyFactory keyFactory = KeyFactory.getInstance(KEY_TYPE);
         PublicKey key = keyFactory.generatePublic(keySpec);
-        Signature signature = Signature.getInstance("MD5withRSA");
+        Signature signature = Signature.getInstance(signAlgorithm.getCode());
         signature.initVerify(key);
         signature.update(srcBytes);
         return signature.verify(Base64.decodeBase64(signBytes));
@@ -241,6 +259,40 @@ public class RSAUtil {
         } catch (IOException e) {
             log.error("loadLocalPrivateKeyStr Error : ",e);
             throw new RuntimeException("load privateKey error :" + e.getMessage());
+        }
+    }
+
+
+    public static enum PaddingMode{
+        OAEP_MD5("RSA/ECB/OAEPWithMD5AndMGF1Padding"),
+        OAEP_SHA1("RSA/ECB/OAEPWithSHA1AndMGF1Padding"),
+        PKCS1_PADDING("RSA/ECB/PKCS1Padding"),
+        ;
+        private String code;
+
+        public String getCode() {
+            return code;
+        }
+
+        PaddingMode(String code){
+            this.code = code;
+        }
+    }
+
+
+    public static enum SignAlgorithm{
+        SHA1withRSA("SHA1withRSA"),
+        SHA256withRSA("SHA256withRSA"),
+        MD5withRSA("MD5withRSA")
+        ;
+        private String code;
+
+        public String getCode() {
+            return code;
+        }
+
+        SignAlgorithm(String code){
+            this.code = code;
         }
     }
 
