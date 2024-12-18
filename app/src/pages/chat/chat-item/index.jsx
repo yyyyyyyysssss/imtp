@@ -124,18 +124,42 @@ const ChatItem = ({ route }) => {
     }
 
     const sendMessage = (message) => {
-        const { filePath, fileName,fileType, fileSize } = message
+        const { filePath, fileName, fileType, fileSize } = message
         switch (message.type) {
             case MessageType.TEXT_MESSAGE:
                 break
             case MessageType.IMAGE_MESSAGE:
-                Uplaod.uploadChunks(filePath,fileName,fileType,fileSize)
+                Uplaod.uploadChunks(filePath, fileName, fileType, fileSize)
+                    .then(
+                        (res) => {
+
+                        },
+                        (error) => {
+
+                        }
+                    )
                 break
             case MessageType.VIDEO_MESSAGE:
-                Uplaod.uploadChunks(filePath,fileName,fileType,fileSize)
+                Uplaod.uploadChunks(filePath, fileName, fileType, fileSize)
+                    .then(
+                        (res) => {
+
+                        },
+                        (error) => {
+
+                        }
+                    )
                 break
             case MessageType.FILE_MESSAGE:
-                Uplaod.uploadChunks(filePath,fileName,fileType,fileSize)
+                Uplaod.uploadChunks(filePath, fileName, fileType, fileSize)
+                    .then(
+                        (res) => {
+
+                        },
+                        (error) => {
+
+                        }
+                    )
                 break
             default:
                 showToast("Unsupported message type")

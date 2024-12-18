@@ -1,9 +1,11 @@
 package org.imtp.app;
 
+import android.content.res.Resources;
 import android.util.Log;
 
-import java.io.File;
-import java.util.ResourceBundle;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -17,13 +19,21 @@ public class AppConfig {
     private String apiHost;
 
     private AppConfig(){
-        File file = new File("./app.properties");
-        ResourceBundle resourceBundle  = ResourceBundle.getBundle("app");
-        if (resourceBundle == null){
-            Log.e(TAG,"配置文件读取失败");
-            throw new RuntimeException();
+        Resources resources = MainApplication.getContext().getResources();
+        InputStream inputStream = resources.openRawResource(R.raw.app);
+        Properties properties = new Properties();
+        try {
+            properties.load(inputStream);
+        }catch (IOException e) {
+            Log.e(TAG,"load config error " + e);
+        } finally {
+            try {
+                inputStream.close();
+            } catch (IOException e) {
+                Log.e(TAG,"load config error " + e);
+            }
         }
-        this.apiHost = resourceBundle.getString("api.host");
+        this.apiHost = properties.getProperty("api.host");
         Log.i(TAG,"apiHost: " + apiHost);
     }
 

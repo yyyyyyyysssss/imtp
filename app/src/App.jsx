@@ -222,13 +222,17 @@ const App = () => {
   }, [])
 
   const authContext = useMemo(() => ({
-    signIn: async (token) => {
+    signIn: async (userToken) => {
       //登录之后获取用户信息
-      api.get('/social/userInfo')
+      api.get('/social/userInfo',{
+        headers: {
+          Authorization: `Bearer ${userToken.accessToken}`
+        }
+      })
         .then(
           (res) => {
             const userInfo = res.data
-            loginSuccessHandler(token, userInfo)
+            loginSuccessHandler(userToken, userInfo)
           }
         )
     },
@@ -239,8 +243,16 @@ const App = () => {
 
   const logoutHandler = async () => {
     await Storage.multiRemove(['userToken', 'userInfo'])
-    NettyClientModule.destroy(userToken)
     dispatch(signOut())
+    NettyClientModule.destroy()
+    .then(
+      (res) => {
+        console.log('NettyClientModule destroy', res ? 'succeed' : 'failed')
+      },
+      (error) => {
+        console.log('NettyClientModule destroy', 'failed',error.message)
+      }
+    )
   }
 
   const loginSuccessHandler = async (userToken, userInfo) => {
@@ -248,8 +260,16 @@ const App = () => {
       userInfo: userInfo,
       userToken: userToken
     })
-    NettyClientModule.init(userToken)
     dispatch(restoreToken({ token: userToken, userInfo: userInfo }))
+    NettyClientModule.init(JSON.stringify(userToken))
+    .then(
+      (res) => {
+        console.log('NettyClientModule init',res ? 'succeed' : 'failed')
+      },
+      (error) => {
+        console.log('NettyClientModule init', 'failed',error.message)
+      }
+    )
   }
 
   //未确认用户是否已登录之前显示启动页

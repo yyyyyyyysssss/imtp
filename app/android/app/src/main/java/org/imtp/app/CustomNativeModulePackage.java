@@ -8,7 +8,7 @@ import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.uimanager.ViewManager;
 
 import org.imtp.app.module.NettyClientModule;
-import org.imtp.app.module.UploadChunkModule;
+import org.imtp.app.module.UploadModule;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -22,7 +22,7 @@ public class CustomNativeModulePackage implements ReactPackage {
         //初始化netty客户端
         nativeModules.add(new NettyClientModule());
         //注册文件上传模块
-        nativeModules.add(new UploadChunkModule());
+        nativeModules.add(new UploadModule());
         return nativeModules;
     }
 

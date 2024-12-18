@@ -32,6 +32,7 @@ public class NettyClientModule extends ReactContextBaseJavaModule {
         promise.resolve(true);
     }
 
+    @ReactMethod
     public void destroy(Promise promise){
         Log.i(TAG,"NettyClient destroy");
         promise.resolve(true);

@@ -1,4 +1,4 @@
-package org.imtp.app.net;
+package org.imtp.app.config;
 
 import okhttp3.Interceptor;
 import okhttp3.Request;

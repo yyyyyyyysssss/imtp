@@ -1,4 +1,7 @@
-package org.imtp.desktop.component;
+package org.imtp.app.module;
+
+import android.annotation.SuppressLint;
+import android.util.Log;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import lombok.Getter;
@@ -7,12 +10,15 @@ import lombok.extern.slf4j.Slf4j;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
+
+import org.imtp.app.config.OKHttpClientHelper;
 import org.imtp.common.response.Result;
 
 import java.io.*;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -24,8 +30,9 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @Author ys
  * @Date 2024/9/26 19:53
  */
-@Slf4j
 public class ChunkedUploader {
+
+    private static final String TAG = "ChunkedUploader";
 
     private static final int CHUNK_SIZE = 1024 * 1024 * 5; // 5MB
 
@@ -49,30 +56,26 @@ public class ChunkedUploader {
         uploadExecutor = Executors.newFixedThreadPool(4,threadFactory);
     }
 
-    public static CompletableFuture<String> uploadFile(String path) {
-        return uploadFile(path, CHUNK_SIZE);
-    }
 
-    public static CompletableFuture<String> uploadFile(String path, int chunkSize) {
-        if (path.startsWith("file:")) {
-            path = path.substring(6);
+    public static CompletableFuture<String> uploadFile(FileInfo fileInfo) {
+        String filePath = fileInfo.getFilePath();
+        if (filePath.startsWith("file:")) {
+            filePath = filePath.substring(6);
         }
-        File file = new File(path);
+        File file = new File(filePath);
         try {
-            String fileType = mediaType(file);
-            return uploadFile(new FileInputStream(file),file.getName(),fileType,chunkSize);
+            String fileType = fileInfo.getFileType();
+            return uploadFile(new FileInputStream(file),file.getName(),fileType,CHUNK_SIZE);
         } catch (FileNotFoundException e) {
-            log.error("upload error: ",e);
-            return CompletableFuture.failedFuture(e);
+            Log.e(TAG,"upload error: ",e);
+            CompletableFuture<String> future = new CompletableFuture<>();
+            future.completeExceptionally(e);
+            return future;
         }
     }
 
-    public static CompletableFuture<String> uploadFile(InputStream inputStream,String fileName,String fileType){
 
-        return uploadFile(inputStream,fileName,fileType,CHUNK_SIZE);
-    }
-
-    public static CompletableFuture<String> uploadFile(InputStream inputStream,String fileName,String fileType, int chunkSize){
+    public static CompletableFuture<String> uploadFile(InputStream inputStream, String fileName, String fileType, int chunkSize){
         try {
             long length = inputStream.available();
             int totalChunk = (int) Math.ceil((double) length / chunkSize);
@@ -89,7 +92,7 @@ public class ChunkedUploader {
                 return uploadIdResult.getData();
                 //多任务上传分片
             },uploadExecutor).thenCompose(uploadId -> {
-                log.info("文件名称:{}, 文件总大小:{}, 总块数:{}", fileName, convertBytesToMB(length), totalChunk);
+                Log.i(TAG, "文件名称: "+ fileName+", 文件总大小:"+ convertBytesToMB(length)+", 总块数:"+totalChunk);
                 List<CompletableFuture<Void>> futures = new ArrayList<>(totalChunk);
                 try {
                     byte[] buffer;
@@ -111,13 +114,15 @@ public class ChunkedUploader {
                         futures.add(completableFuture);
                     }
                 } catch (IOException ioException) {
-                    log.error("UploadFile Exception ", ioException);
-                    return CompletableFuture.failedFuture(ioException);
+                    Log.e(TAG,"UploadFile Exception ", ioException);
+                    CompletableFuture<String> future = new CompletableFuture<>();
+                    future.completeExceptionally(ioException);
+                    return future;
                 }finally {
                     try {
                         inputStream.close();
                     } catch (IOException e) {
-                        throw new RuntimeException(e);
+                        Log.e(TAG,"UploadFile Exception ",e);
                     }
                 }
                 //等待分片任务完成后获取访问的url
@@ -129,13 +134,15 @@ public class ChunkedUploader {
                         });
             });
         }catch (Exception e){
-            log.error("upload error: ",e);
-            return CompletableFuture.failedFuture(e);
+            Log.e(TAG,"upload error: ",e);
+            CompletableFuture<String> future = new CompletableFuture<>();
+            future.completeExceptionally(e);
+            return future;
         }
     }
 
     private static void uploadChunk(byte[] chunkData, String uploadId, long totalSize, int totalChunk, int chunkSize, Integer chunkIndex) {
-        log.info("第{}块正在上传, 当前块大小:{}, 起始偏移量:{}, 结束偏移量:{}", chunkIndex + 1, convertBytesToMB(chunkData.length), chunkIndex * chunkSize, chunkIndex * chunkSize + chunkData.length);
+        Log.i(TAG, "第"+(chunkIndex + 1)+"块正在上传, 当前块大小:"+convertBytesToMB(chunkData.length)+", 起始偏移量:"+(chunkIndex * chunkSize)+", 结束偏移量:"+(chunkIndex * chunkSize + chunkData.length));
         RequestBody requestBody = RequestBody.create(chunkData, MediaType.parse("application/octet-stream"));
         MultipartBody multipartBody = new MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
@@ -152,20 +159,9 @@ public class ChunkedUploader {
 
 
     private static String convertBytesToMB(long size) {
-        return String.format("%.2f", (double) size / (1024 * 1024)) + "MB";
+        return String.format(Locale.US,"%.2f", (double) size / (1024 * 1024)) + "MB";
     }
 
-    private static String mediaType(File file) {
-        try {
-            return Files.probeContentType(file.toPath());
-        } catch (IOException e) {
-            log.error("probeContentType error ", e);
-            return "unknown";
-        }
-    }
-
-    @Getter
-    @Setter
     public static class FileInfoDTO {
         //文件名称
         private String filename;
@@ -180,6 +176,46 @@ public class ChunkedUploader {
 
         //每块的大小(最后一块文件大小小于等于该值)
         private Integer chunkSize;
+
+        public String getFilename() {
+            return filename;
+        }
+
+        public void setFilename(String filename) {
+            this.filename = filename;
+        }
+
+        public String getFileType() {
+            return fileType;
+        }
+
+        public void setFileType(String fileType) {
+            this.fileType = fileType;
+        }
+
+        public Long getTotalSize() {
+            return totalSize;
+        }
+
+        public void setTotalSize(Long totalSize) {
+            this.totalSize = totalSize;
+        }
+
+        public Integer getTotalChunk() {
+            return totalChunk;
+        }
+
+        public void setTotalChunk(Integer totalChunk) {
+            this.totalChunk = totalChunk;
+        }
+
+        public Integer getChunkSize() {
+            return chunkSize;
+        }
+
+        public void setChunkSize(Integer chunkSize) {
+            this.chunkSize = chunkSize;
+        }
     }
 
 }

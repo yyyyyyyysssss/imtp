@@ -3,6 +3,7 @@ package org.imtp.app;
 import static com.facebook.react.defaults.DefaultReactHost.getDefaultReactHost;
 
 import android.app.Application;
+import android.content.Context;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -18,11 +19,11 @@ import com.facebook.react.soloader.OpenSourceMergedSoMapping;
 import com.facebook.soloader.SoLoader;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 public class MainApplication extends Application implements ReactApplication {
 
+    private static Context context;
 
     private final ReactNativeHost reactNativeHost = new DefaultReactNativeHost(this) {
 
@@ -78,5 +79,10 @@ public class MainApplication extends Application implements ReactApplication {
             // If you opted-in for the New Architecture, we load the native entry point for this app.
             DefaultNewArchitectureEntryPoint.load();
         }
+        context = getApplicationContext();
+    }
+
+    public static Context getContext() {
+        return context;
     }
 }

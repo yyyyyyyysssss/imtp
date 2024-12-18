@@ -1,4 +1,4 @@
-package org.imtp.app.net;
+package org.imtp.app.config;
 
 import android.util.Log;
 
