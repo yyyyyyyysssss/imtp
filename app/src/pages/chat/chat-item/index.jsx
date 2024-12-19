@@ -7,63 +7,13 @@ import { showToast } from '../../../components/Utils';
 import Message from '../../../components/Message';
 import ChatItemFooter from '../../../components/ChatItemFooter';
 import { loadMessage, addMessage } from '../../../redux/slices/chatSlice';
-import { useFocusEffect } from '@react-navigation/native';
 import api from '../../../api/api';
 import Storage from '../../../storage/storage';
 import Uplaod from '../../../components/Upload';
-import { MessageType } from '../../../enum';
-import { cs } from 'rn-emoji-keyboard';
+import { MessageStatus, MessageType } from '../../../enum';
+import IdGen from '../../../utils/IdGen';
+import { formatFileSize } from '../../../utils/FormatUtil';
 
-
-const initData = [
-    {
-        id: '1',
-        type: 1,
-        avatar: 'http://localhost:9000/y-chat-bucket/d4b0fb7c889d466183188f286ca03446.jpg',
-        name: '卡卡罗特',
-        content: '在嘛？弗利萨要来毁灭地球了，快回来拯救地球',
-        deliveryMethod: 'SINGLE',
-        status: 'FAILED',
-        self: true,
-        contentMetadata: {
-
-        }
-    },
-    {
-        id: '2',
-        type: 4,
-        avatar: 'http://localhost:9000/y-chat-bucket/08ddb70d687f445892a294a684ec0ba3.jpg',
-        name: '贝吉塔',
-        content: 'http://localhost:9000/y-chat-bucket/08ddb70d687f445892a294a684ec0ba3.jpg',
-        deliveryMethod: 'GROUP',
-        status: 'PENDING',
-        self: false,
-        contentMetadata: {
-            name: '卡卡罗特.jpg',
-            width: 700,
-            height: 618,
-            mediaType: 'image/jpg',
-            thumbnailUrl: null,
-            duration: null,
-            durationDesc: null,
-            size: 55602,
-            sizeDesc: '54.3K'
-        }
-    },
-    {
-        id: '4',
-        type: 1,
-        avatar: 'http://localhost:9000/y-chat-bucket/d4b0fb7c889d466183188f286ca03446.jpg',
-        name: '孙悟饭',
-        content: '好的吧',
-        deliveryMethod: 'SINGLE',
-        status: 'FAILED',
-        self: true,
-        contentMetadata: {
-
-        }
-    }
-]
 
 const ChatItem = ({ route }) => {
 
@@ -71,7 +21,9 @@ const ChatItem = ({ route }) => {
 
     const flatListRef = useRef()
 
-    const entities = useSelector(state => state.chat.entities)
+    const userInfoRef = useRef()
+
+    const entitiesMessages = useSelector(state => state.chat.entities.messages)
     const session = useSelector(state => state.chat.entities.sessions[sessionId])
     const { messages } = session
     const dispatch = useDispatch()
@@ -103,32 +55,54 @@ const ChatItem = ({ route }) => {
                 )
         }
 
+        const fetchUserInfo = async () => {
+            const userInfo = await Storage.get('userInfo')
+            userInfoRef.current = userInfo
+        }
+
+        fetchUserInfo()
         return () => {
             console.log('unmount chatItem')
         }
     }, [])
+
+    //滚动到底部
+    useEffect(() => {
+        if (messages && messages.length > 0 && flatListRef.current) {
+            // flatListRef.current.scrollToEnd({ animated: true })
+        }
+    }, [messages])
 
     const moreOps = () => {
         showToast('更多操作')
     }
 
     const renderItem = ({ item, index }) => {
-        const message = entities.messages[item]
+        const message = entitiesMessages[item]
         return (
             <Message style={{ marginTop: 30 }} message={message} />
         )
     }
 
-    const handleOutPress = () => {
-        console.log('handleOutPress')
-    }
-
     const sendMessage = (message) => {
-        const { filePath, fileName, fileType, fileSize } = message
-        switch (message.type) {
+        const { content, type, width, height, duration, filePath, fileName, fileType, fileSize } = message
+        let msg;
+        switch (type) {
             case MessageType.TEXT_MESSAGE:
+                console.log('sendMessage')
+                msg = messageBase(content, type)
                 break
             case MessageType.IMAGE_MESSAGE:
+                msg = messageBase('', type)
+                msg.contentMetadata = {
+                    name: fileName,
+                    width: width,
+                    height: height,
+                    mediaType: fileType,
+                    size: fileSize,
+                    sizeDesc: formatFileSize(fileSize)
+                }
+                console.log('IMAGE_MESSAGE', msg)
                 Uplaod.uploadChunks(filePath, fileName, fileType, fileSize)
                     .then(
                         (res) => {
@@ -140,6 +114,20 @@ const ChatItem = ({ route }) => {
                     )
                 break
             case MessageType.VIDEO_MESSAGE:
+                msg = messageBase('', type)
+                const minutes = Math.floor(duration / 60);
+                const seconds = Math.floor(duration % 60);
+                msg.contentMetadata = {
+                    name: fileName,
+                    width: width,
+                    height: height,
+                    mediaType: fileType,
+                    size: fileSize,
+                    sizeDesc: formatFileSize(fileSize),
+                    duration: duration,
+                    durationDesc: `${minutes}:${seconds.toString().padStart(2, '0')}`
+                }
+                console.log('VIDEO_MESSAGE', msg)
                 Uplaod.uploadChunks(filePath, fileName, fileType, fileSize)
                     .then(
                         (res) => {
@@ -164,39 +152,57 @@ const ChatItem = ({ route }) => {
             default:
                 showToast("Unsupported message type")
         }
-        // console.log('message: ', message)
+        if(msg){
+            dispatch(addMessage({ sessionId: sessionId, message: msg }))
+        }
+    }
+
+    const messageBase = (content, type) => {
+        return {
+            id: IdGen.nextId(),
+            ackId: IdGen.nextId(),
+            type: type,
+            content: content,
+            status: MessageStatus.PENDING,
+            sessionId: sessionId,
+            senderUserId: session.senderUserId,
+            receiverUserId: session.receiverUserId,
+            deliveryMethod: session.deliveryMethod,
+            self: true,
+            timestamp: new Date().getTime(),
+            name: userInfoRef.current.nickname,
+            avatar: userInfoRef.current.avatar
+        }
     }
 
     return (
-        <TouchableWithoutFeedback onPress={handleOutPress} style={{ flex: 1 }}>
-            <VStack flex={1} justifyContent="space-between">
-                <ItemHeader title={session.name} moreOps={moreOps} />
-                <KeyboardAvoidingView
-                    flex={1}
-                    behavior={Platform.OS == "ios" ? "padding" : null}
-                    keyboardVerticalOffset={Platform.OS === "ios" ? 64 : 0}
-                >
-                    <HStack flex={9} style={styles.contentHstack}>
-                        <FlatList
-                            ref={flatListRef}
-                            style={styles.messageList}
-                            data={messages}
-                            renderItem={renderItem}
-                            // scrollEnabled={true}
-                            inverted={true}
-                            contentContainerStyle={{
-                                flexGrow: 1,
-                                flexDirection: 'column-reverse',
 
-                            }}
-                        />
-                    </HStack>
-                    <ChatItemFooter
-                        sendMessage={sendMessage}
+        <VStack flex={1} justifyContent="space-between">
+            <ItemHeader title={session.name} moreOps={moreOps} />
+            <KeyboardAvoidingView
+                flex={1}
+                behavior={Platform.OS == "ios" ? "padding" : null}
+                keyboardVerticalOffset={Platform.OS === "ios" ? 64 : 0}
+            >
+                <HStack flex={9} style={styles.contentHstack}>
+                    <FlatList
+                        ref={flatListRef}
+                        style={styles.messageList}
+                        data={messages}
+                        renderItem={renderItem}
+                        scrollEnabled={true}
+                        inverted={true}
+                        contentContainerStyle={{
+                            flexGrow: 1,
+                            flexDirection: 'column-reverse',
+                        }}
                     />
-                </KeyboardAvoidingView>
-            </VStack>
-        </TouchableWithoutFeedback>
+                </HStack>
+                <ChatItemFooter
+                    sendMessage={sendMessage}
+                />
+            </KeyboardAvoidingView>
+        </VStack>
     )
 }
 

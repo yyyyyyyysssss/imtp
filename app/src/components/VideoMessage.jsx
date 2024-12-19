@@ -1,12 +1,13 @@
 import React from 'react';
-import { Box, Image, Pressable, Text } from 'native-base';
+import { Box, Image, Pressable, Text, Spinner } from 'native-base';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { StyleSheet } from 'react-native';
 import Svg, { Defs, LinearGradient, Stop, Rect } from 'react-native-svg';
 import { useNavigation, } from '@react-navigation/native';
+import { MessageStatus } from '../enum';
 
 
-const VideoMessage = ({ content, contentMetadata }) => {
+const VideoMessage = ({ content, status, contentMetadata }) => {
 
     const navigation = useNavigation();
 
@@ -15,7 +16,7 @@ const VideoMessage = ({ content, contentMetadata }) => {
     const mediaHeight = 120 / width * height
 
     const playVideo = () => {
-        navigation.navigate('VideoPlay',{
+        navigation.navigate('VideoPlay', {
             url: content,
         })
     }
@@ -37,6 +38,7 @@ const VideoMessage = ({ content, contentMetadata }) => {
                         }}
                         alt=''
                     />
+                    {/* 底部渐变 */}
                     <Box
                         style={styles.videoGradientBox}
                         rounded={8}
@@ -51,12 +53,29 @@ const VideoMessage = ({ content, contentMetadata }) => {
                             <Rect width="100" height="100" fill="url(#grad1)" />
                         </Svg>
                     </Box>
-                    <Box style={styles.videoPlayIconBox}>
-                        <FontAwesome name="play-circle" size={50} color="gray" />
-                    </Box>
+                    {/* 播放图标 */}
+                    {status && status !== MessageStatus.PENDING && (
+                        <Box style={styles.videoPlayIconBox}>
+                            <FontAwesome name="play-circle" size={50} color="gray" />
+                        </Box>
+                    )}
+                    {/* 时长 */}
                     <Box style={styles.videoDurationDescBox}>
                         <Text style={styles.videoDurationDescText}>{durationDesc}</Text>
                     </Box>
+                    {/* 视频上传中 */}
+                    {status && status === MessageStatus.PENDING && (
+                        <Spinner
+                            style={{
+                                position: 'absolute',
+                                top: '50%',
+                                left: '50%',
+                                transform: 'translate(-50%, -50%)'
+                            }}
+                            size={50}
+                            color="gray.500"
+                        />
+                    )}
                 </Box>
             </Pressable>
         </>

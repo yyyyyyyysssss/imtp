@@ -1,7 +1,7 @@
 import React from 'react';
 import { Avatar, VStack, HStack, Text, Pressable } from 'native-base';
 import { StyleSheet } from 'react-native';
-import { formatChatDate } from '../utils';
+import { formatChatDate } from '../utils/FormatUtil';
 
 const UserSessionItem = React.memo(({ name, avatar, lastMsgType, lastMsgContent, lastMsgTime, unreadMessageCount }) => {
     

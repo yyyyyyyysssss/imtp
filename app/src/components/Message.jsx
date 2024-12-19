@@ -36,11 +36,11 @@ const Message = React.memo(({ style,message }) => {
             case MessageType.TEXT_MESSAGE:
                 return <TextMessage content={content} contentMetadata={contentMetadata} direction={self ? 'RIGHT' : 'LEFT'} />
             case MessageType.IMAGE_MESSAGE:
-                return <ImageMessage content={content} contentMetadata={contentMetadata} />
+                return <ImageMessage content={content} status={status} contentMetadata={contentMetadata} />
             case MessageType.VIDEO_MESSAGE:
-                return <VideoMessage content={content} contentMetadata={contentMetadata} />
+                return <VideoMessage content={content} status={status} contentMetadata={contentMetadata} />
             case MessageType.FILE_MESSAGE:
-                return <FileMessage content={content} contentMetadata={contentMetadata} />
+                return <FileMessage content={content} status={status} contentMetadata={contentMetadata} />
         }
     }, [])
 

@@ -5,7 +5,7 @@ import Feather from 'react-native-vector-icons/Feather';
 import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { showToast } from './Utils';
-import { StyleSheet, Modal, View } from 'react-native';
+import { StyleSheet, Modal, View, Keyboard } from 'react-native';
 import EmojiPicker, { tr } from 'rn-emoji-keyboard'
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import ImagePicker from 'react-native-image-crop-picker';
@@ -19,17 +19,16 @@ const ChatItemFooter = ({ sendMessage }) => {
 
     const handleSubmit = (event) => {
         const text = event.nativeEvent.text
-        messageProvider({
-            type: 'text',
-            content: text
-        })
-        inputRef.current.clear()
+        if (text) {
+            inputRef.current.clear()
+            messageProvider({ type: 'text', content: text })
+        }
     }
 
     const messageProvider = (media) => {
         const { content, uri, type, fileName, fileSize, width, height, duration } = media
         let message = null
-        if(type.startsWith('image')){
+        if (type.startsWith('image')) {
             message = {
                 type: MessageType.IMAGE_MESSAGE,
                 fileName: fileName,
@@ -39,23 +38,23 @@ const ChatItemFooter = ({ sendMessage }) => {
                 width: width,
                 height: height
             }
-        }else if(type.startsWith('video')){
+        } else if (type.startsWith('video')) {
             message = {
                 type: MessageType.VIDEO_MESSAGE,
                 fileName: fileName,
                 filePath: uri,
                 fileType: type,
                 fileSize: fileSize,
-                fileDuration: duration,
+                duration: duration,
                 width: width,
                 height: height
             }
-        }else if(type.startsWith('text')){
+        } else if (type.startsWith('text')) {
             message = {
                 type: MessageType.TEXT_MESSAGE,
                 content: content,
             }
-        }else {
+        } else {
             return
         }
         sendMessage(message)
@@ -180,6 +179,7 @@ const ChatItemFooter = ({ sendMessage }) => {
                             focusOutlineColor='none'
                             borderWidth={0}
                             backgroundColor='white'
+                            blurOnSubmit={false}
                             onSubmitEditing={handleSubmit}
                             onFocus={handleInputFocus}
                             w={{

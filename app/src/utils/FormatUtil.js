@@ -31,3 +31,16 @@ export const formatChatDate = (timestamp) => {
         }
     }
 }
+
+
+
+export const formatFileSize = (size) => {
+    if (size > 1048576) {
+        size = (size / (1024 * 1024)).toFixed(1) + "M"
+    } else if (size > 1024) {
+        size = (size / 1024).toFixed(1) + "K"
+    } else {
+        size = size + "B";
+    }
+    return size;
+}

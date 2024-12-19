@@ -5,7 +5,7 @@ import { StyleSheet } from 'react-native';
 import api from '../../api/api';
 import { useDispatch, useSelector, shallowEqual } from 'react-redux';
 import { initSession, addSession,loadSession, selectSession, removeSession, incrUnreadCount, decrUnreadCount } from '../../redux/slices/chatSlice';
-import { formatChatDate } from '../../utils';
+import { formatChatDate } from '../../utils/FormatUtil';
 import { SwipeListView } from 'react-native-swipe-list-view';
 import { showToast } from '../../components/Utils';
 import Search from '../../components/Search';
