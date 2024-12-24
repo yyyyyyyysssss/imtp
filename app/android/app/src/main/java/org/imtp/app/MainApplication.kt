@@ -1,88 +1,55 @@
-package org.imtp.app;
+package org.imtp.app
 
-import static com.facebook.react.defaults.DefaultReactHost.getDefaultReactHost;
+import android.annotation.SuppressLint
+import android.app.Application
+import android.content.Context
+import com.facebook.react.PackageList
+import com.facebook.react.ReactApplication
+import com.facebook.react.ReactHost
+import com.facebook.react.ReactNativeHost
+import com.facebook.react.ReactPackage
+import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint.load
+import com.facebook.react.defaults.DefaultReactHost.getDefaultReactHost
+import com.facebook.react.defaults.DefaultReactNativeHost
+import com.facebook.soloader.SoLoader
 
-import android.app.Application;
-import android.content.Context;
+class MainApplication : Application(), ReactApplication {
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-
-import com.facebook.react.PackageList;
-import com.facebook.react.ReactApplication;
-import com.facebook.react.ReactHost;
-import com.facebook.react.ReactNativeHost;
-import com.facebook.react.ReactPackage;
-import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint;
-import com.facebook.react.defaults.DefaultReactNativeHost;
-import com.facebook.react.soloader.OpenSourceMergedSoMapping;
-import com.facebook.soloader.SoLoader;
-
-import java.io.IOException;
-import java.util.List;
-
-public class MainApplication extends Application implements ReactApplication {
-
-    private static Context context;
-
-    private final ReactNativeHost reactNativeHost = new DefaultReactNativeHost(this) {
-
-        @Override
-        protected List<ReactPackage> getPackages() {
-            List<ReactPackage> packages = new PackageList(this).getPackages();
-            packages.add(new CustomNativeModulePackage());
-            return packages;
+    companion object {
+        @SuppressLint("StaticFieldLeak")
+        private lateinit var context: Context
+        @JvmStatic
+        fun getContext(): Context {
+            return context
         }
-
-        @Override
-        public boolean getUseDeveloperSupport() {
-            return BuildConfig.DEBUG;
-        }
-
-        @Override
-        protected String getJSMainModuleName() {
-            return "index";
-        }
-
-        @Override
-        protected Boolean isHermesEnabled() {
-            return BuildConfig.IS_HERMES_ENABLED;
-        }
-
-        @Override
-        protected boolean isNewArchEnabled() {
-            return BuildConfig.IS_NEW_ARCHITECTURE_ENABLED;
-        }
-    };
-
-    @Nullable
-    @Override
-    public ReactHost getReactHost() {
-        return getDefaultReactHost(getApplicationContext(), reactNativeHost);
     }
 
-    @NonNull
-    @Override
-    public ReactNativeHost getReactNativeHost() {
-        return reactNativeHost;
-    }
+  override val reactNativeHost: ReactNativeHost =
+      object : DefaultReactNativeHost(this) {
+        override fun getPackages(): List<ReactPackage> =
+            PackageList(this).packages.apply {
+              // Packages that cannot be autolinked yet can be added manually here, for example:
+               add(CustomNativeModulePackage())
+            }
 
-    @Override
-    public void onCreate() {
-        super.onCreate();
-        try {
-            SoLoader.init(this, OpenSourceMergedSoMapping.INSTANCE);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        if (BuildConfig.IS_NEW_ARCHITECTURE_ENABLED) {
-            // If you opted-in for the New Architecture, we load the native entry point for this app.
-            DefaultNewArchitectureEntryPoint.load();
-        }
-        context = getApplicationContext();
-    }
+        override fun getJSMainModuleName(): String = "index"
 
-    public static Context getContext() {
-        return context;
+        override fun getUseDeveloperSupport(): Boolean = BuildConfig.DEBUG
+
+        override val isNewArchEnabled: Boolean = BuildConfig.IS_NEW_ARCHITECTURE_ENABLED
+        override val isHermesEnabled: Boolean = BuildConfig.IS_HERMES_ENABLED
+      }
+
+  override val reactHost: ReactHost
+    get() = getDefaultReactHost(applicationContext, reactNativeHost)
+
+  override fun onCreate() {
+    super.onCreate()
+    SoLoader.init(this, false)
+    if (BuildConfig.IS_NEW_ARCHITECTURE_ENABLED) {
+      // If you opted-in for the New Architecture, we load the native entry point for this app.
+      load()
     }
+      context = applicationContext
+  }
 }

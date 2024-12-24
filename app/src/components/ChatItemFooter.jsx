@@ -6,9 +6,7 @@ import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { showToast } from './Utils';
 import { StyleSheet, Modal, View, Keyboard } from 'react-native';
-import EmojiPicker, { tr } from 'rn-emoji-keyboard'
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
-import ImagePicker from 'react-native-image-crop-picker';
 import { MessageType } from '../enum';
 
 const ChatItemFooter = ({ sendMessage }) => {

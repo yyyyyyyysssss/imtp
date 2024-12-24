@@ -10,7 +10,7 @@ import store from './src/redux/store';
 import { NativeBaseProvider } from 'native-base';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
-AppRegistry.registerComponent(appName, () => {
+AppRegistry.registerComponent(appName,  () => {
     return () => (
         <Provider store={store}>
             <NativeBaseProvider>

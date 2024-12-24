@@ -1,6 +1,5 @@
 import api from "../api/api";
 import { showToast } from "./Utils"
-import RNFS from 'react-native-fs'
 import { NativeModules } from 'react-native';
 
 
