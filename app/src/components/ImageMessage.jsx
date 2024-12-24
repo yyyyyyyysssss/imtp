@@ -34,7 +34,13 @@ const ImageMessage = ({ content, status, contentMetadata }) => {
             >
                 <Box
                     style={{
-                        position: 'relative'
+                        position: 'relative',
+                        top: 0, 
+                        left: 0, 
+                        right: 0, 
+                        bottom: 0, 
+                        justifyContent: 'center', 
+                        alignItems: 'center'
                     }}
                 >
                     <Image
@@ -51,9 +57,6 @@ const ImageMessage = ({ content, status, contentMetadata }) => {
                         <Spinner
                             style={{
                                 position: 'absolute',
-                                top: '50%',
-                                left: '50%',
-                                transform: 'translate(-50%, -50%)'
                             }}
                             size={50}
                             color="gray.500"
@@ -84,5 +87,9 @@ const ImageMessage = ({ content, status, contentMetadata }) => {
         </>
     )
 }
+
+const styles = StyleSheet.create({
+    
+})
 
 export default ImageMessage

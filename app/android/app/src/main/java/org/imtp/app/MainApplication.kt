@@ -1,6 +1,6 @@
 package org.imtp.app
 
-import android.annotation.SuppressLint
+
 import android.app.Application
 import android.content.Context
 import com.facebook.react.PackageList
@@ -12,6 +12,7 @@ import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint.load
 import com.facebook.react.defaults.DefaultReactHost.getDefaultReactHost
 import com.facebook.react.defaults.DefaultReactNativeHost
 import com.facebook.soloader.SoLoader
+import android.annotation.SuppressLint
 
 class MainApplication : Application(), ReactApplication {
 

@@ -34,7 +34,7 @@ const VideoMessage = ({ content, status, contentMetadata }) => {
                         shadow={3}
                         resizeMode='cover'
                         source={{
-                            uri: thumbnailUrl
+                            uri: 'http://localhost:9000/y-chat-bucket/702fa52222604d56a3191c5c73d6e1ce.jpg'
                         }}
                         alt=''
                     />
@@ -68,9 +68,6 @@ const VideoMessage = ({ content, status, contentMetadata }) => {
                         <Spinner
                             style={{
                                 position: 'absolute',
-                                top: '50%',
-                                left: '50%',
-                                transform: 'translate(-50%, -50%)'
                             }}
                             size={50}
                             color="gray.500"
@@ -86,28 +83,28 @@ const VideoMessage = ({ content, status, contentMetadata }) => {
 
 const styles = StyleSheet.create({
     videoBox: {
-        position: 'relative'
+        position: 'relative',
+        top: 0, 
+        left: 0, 
+        right: 0, 
+        bottom: 0, 
+        justifyContent: 'center', 
+        alignItems: 'center'
     },
     videoGradientBox: {
         position: 'absolute',
-        top: '90%',
-        left: '50%',
+        bottom: '0%',
         width: '100%',
         height: 50,
-        transform: 'translate(-50%, -50%)',
         overflow: 'hidden'
     },
     videoPlayIconBox: {
         position: 'absolute',
-        top: '50%',
-        left: '50%',
-        transform: 'translate(-50%, -50%)'
     },
     videoDurationDescBox: {
         position: 'absolute',
-        left: '85%',
-        bottom: -5,
-        transform: 'translate(-50%, -50%)',
+        left: 10,
+        bottom: 5,
     },
     videoDurationDescText: {
         color: 'white'

@@ -93,7 +93,7 @@ const ChatItem = ({ route }) => {
                 msg = messageBase(content, type)
                 break
             case MessageType.IMAGE_MESSAGE:
-                msg = messageBase('', type)
+                msg = messageBase(filePath, type)
                 msg.contentMetadata = {
                     name: fileName,
                     width: width,

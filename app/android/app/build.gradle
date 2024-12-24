@@ -139,4 +139,14 @@ dependencies {
     }
 }
 
+afterEvaluate {
+    tasks.named('generateDebugLintReportModel').configure {
+        dependsOn tasks.named('copyReactNativeVectorIconFonts')
+    }
+
+    tasks.named('lintAnalyzeDebug').configure {
+        dependsOn tasks.named('copyReactNativeVectorIconFonts')
+    }
+}
+
 apply from: file("../../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesAppBuildGradle(project)
