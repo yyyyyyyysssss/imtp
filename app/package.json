@@ -10,9 +10,6 @@
     "test": "jest"
   },
   "dependencies": {
-    "react": "18.2.0",
-    "react-dom": "18.0.0",
-    "react-native": "0.74.1",
     "@react-native-async-storage/async-storage": "^2.1.0",
     "@react-navigation/bottom-tabs": "^7.0.14",
     "@react-navigation/native": "^7.0.8",
@@ -21,8 +18,13 @@
     "axios": "^1.7.8",
     "native-base": "^3.4.28",
     "normalizr": "^3.6.2",
+    "react": "18.2.0",
+    "react-dom": "18.0.0",
     "react-hook-form": "^7.53.2",
+    "react-native": "0.74.1",
     "react-native-axios": "^0.17.1",
+    "react-native-create-thumbnail": "^2.0.1",
+    "react-native-document-picker": "^9.3.1",
     "react-native-image-picker": "^7.2.3",
     "react-native-image-zoom-viewer": "^3.0.1",
     "react-native-pager-view": "^6.5.1",

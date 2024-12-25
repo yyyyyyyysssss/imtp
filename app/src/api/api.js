@@ -44,7 +44,8 @@ api.interceptors.response.use(
                 return showToast("无权限访问");
             }
             if (error.response.status === 500) {
-                return showToast(error.message);
+                showToast(error.message)
+                return Promise.reject(error)
             }
         }
         return Promise.reject(error)

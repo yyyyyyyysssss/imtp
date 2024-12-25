@@ -65,7 +65,7 @@ public class ChunkedUploader {
         File file = new File(filePath);
         try {
             String fileType = fileInfo.getFileType();
-            return uploadFile(new FileInputStream(file),file.getName(),fileType,CHUNK_SIZE);
+            return uploadFile(new FileInputStream(file),fileInfo.getFilename(),fileType,CHUNK_SIZE);
         } catch (FileNotFoundException e) {
             Log.e(TAG,"upload error: ",e);
             CompletableFuture<String> future = new CompletableFuture<>();

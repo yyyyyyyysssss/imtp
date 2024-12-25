@@ -19,24 +19,24 @@ const Message = React.memo(({ style,message }) => {
             messageStatusIcon = <Spinner color='#70BFFF' />
             break
         case MessageStatus.SENT:
-            messageStatusIcon = <></>
+            messageStatusIcon = <Spinner color='#70BFFF' />
             break
         case MessageStatus.DELIVERED:
             messageStatusIcon = <></>
             break
         case MessageStatus.FAILED:
-            messageStatusIcon = <AntDesignIcon name="exclamationcircle" color="red" size={18} />
+            messageStatusIcon = <AntDesignIcon name="exclamationcircle" color="red" size={20} />
             break
         default:
             messageStatusIcon = <></>
             break
     }
-    const renderItem = useCallback((type, self, content, contentMetadata) => {
+    const renderItem = useCallback((type, self, status, content, contentMetadata) => {
         switch (type) {
             case MessageType.TEXT_MESSAGE:
                 return <TextMessage content={content} contentMetadata={contentMetadata} direction={self ? 'RIGHT' : 'LEFT'} />
             case MessageType.IMAGE_MESSAGE:
-                return <ImageMessage content={content} status={status} contentMetadata={contentMetadata} />
+                return <ImageMessage content={content} status={status} />
             case MessageType.VIDEO_MESSAGE:
                 return <VideoMessage content={content} status={status} contentMetadata={contentMetadata} />
             case MessageType.FILE_MESSAGE:
@@ -60,7 +60,7 @@ const Message = React.memo(({ style,message }) => {
                     </HStack>
                 )}
                 <HStack space={2} reversed={self ? true : false} alignItems='center'>
-                    {renderItem(type, self, content, contentMetadata)}
+                    {renderItem(type, self, status, content, contentMetadata)}
                     {messageStatusIcon}
                 </HStack>
             </VStack>

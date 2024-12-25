@@ -1,4 +1,4 @@
-import { Box, Image, Pressable, Spinner } from 'native-base';
+import { Box, Image, ImageBackground, Pressable, Spinner } from 'native-base';
 import React, { useState } from 'react';
 import { ImageContext } from '../context';
 import { Modal, StyleSheet } from 'react-native';
@@ -6,14 +6,16 @@ import ImageViewer from 'react-native-image-zoom-viewer';
 import { MessageStatus } from '../enum';
 
 
-const ImageMessage = ({ content, status, contentMetadata }) => {
-
+const ImageMessage = ({ content, status }) => {
     const [showImage, setShowImage] = useState({
         isVisible: false,
         imageUrl: null
     })
 
     const showOriginalImage = (url) => {
+        if(status && status === MessageStatus.PENDING){
+            return
+        }
         setShowImage({
             isVisible: true,
             imageUrl: url
@@ -35,11 +37,7 @@ const ImageMessage = ({ content, status, contentMetadata }) => {
                 <Box
                     style={{
                         position: 'relative',
-                        top: 0, 
-                        left: 0, 
-                        right: 0, 
-                        bottom: 0, 
-                        justifyContent: 'center', 
+                        justifyContent: 'center',
                         alignItems: 'center'
                     }}
                 >
@@ -51,13 +49,12 @@ const ImageMessage = ({ content, status, contentMetadata }) => {
                         source={{
                             uri: content
                         }}
+                        blurRadius={status && status === MessageStatus.PENDING ? 10 : 0}
                         alt=''
                     />
                     {status && status === MessageStatus.PENDING && (
                         <Spinner
-                            style={{
-                                position: 'absolute',
-                            }}
+                            style={styles.absolute}
                             size={50}
                             color="gray.500"
                         />
@@ -89,7 +86,13 @@ const ImageMessage = ({ content, status, contentMetadata }) => {
 }
 
 const styles = StyleSheet.create({
-    
+    absolute: {
+        position: "absolute",
+        top: 0,
+        left: 0,
+        bottom: 0,
+        right: 0
+    }
 })
 
 export default ImageMessage

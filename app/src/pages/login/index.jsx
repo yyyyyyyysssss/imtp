@@ -66,8 +66,10 @@ const Login = () => {
                 (error) => {
                     if (error.response && error.response.status === 401) {
                         showToast('用户名或密码错误')
-                        setLoading(false)
+                    }else {
+                        showToast(error.message)
                     }
+                    setLoading(false)
                 }
             )
     };

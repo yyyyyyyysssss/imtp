@@ -16,6 +16,9 @@ const VideoMessage = ({ content, status, contentMetadata }) => {
     const mediaHeight = 120 / width * height
 
     const playVideo = () => {
+        if (status && status === MessageStatus.PENDING) {
+            return
+        }
         navigation.navigate('VideoPlay', {
             url: content,
         })
@@ -26,18 +29,25 @@ const VideoMessage = ({ content, status, contentMetadata }) => {
             <Pressable
                 onPress={playVideo}
             >
-                <Box style={styles.videoBox}>
-                    <Image
-                        rounded={8}
-                        width={120}
-                        height={mediaHeight}
-                        shadow={3}
-                        resizeMode='cover'
-                        source={{
-                            uri: 'http://localhost:9000/y-chat-bucket/702fa52222604d56a3191c5c73d6e1ce.jpg'
-                        }}
-                        alt=''
-                    />
+                <Box
+                    style={styles.videoBox}
+                    width={120}
+                    height={mediaHeight}
+                >
+                    {thumbnailUrl && (
+                        <Image
+                            width={120}
+                            height={mediaHeight}
+                            shadow={3}
+                            resizeMode='cover'
+                            source={{
+                                uri: thumbnailUrl
+                            }}
+                            blurRadius={status && status === MessageStatus.PENDING ? 10 : 0}
+                            alt=''
+                        />
+                    )}
+
                     {/* 底部渐变 */}
                     <Box
                         style={styles.videoGradientBox}
@@ -84,12 +94,15 @@ const VideoMessage = ({ content, status, contentMetadata }) => {
 const styles = StyleSheet.create({
     videoBox: {
         position: 'relative',
-        top: 0, 
-        left: 0, 
-        right: 0, 
-        bottom: 0, 
-        justifyContent: 'center', 
-        alignItems: 'center'
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        borderRadius: 6,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'black',
+        overflow: 'hidden'
     },
     videoGradientBox: {
         position: 'absolute',

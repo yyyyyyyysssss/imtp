@@ -6,13 +6,14 @@ import { useDispatch, useSelector } from 'react-redux';
 import { showToast } from '../../../components/Utils';
 import Message from '../../../components/Message';
 import ChatItemFooter from '../../../components/ChatItemFooter';
-import { loadMessage, addMessage } from '../../../redux/slices/chatSlice';
+import { loadMessage, addMessage, updateMessage } from '../../../redux/slices/chatSlice';
 import api from '../../../api/api';
 import Storage from '../../../storage/storage';
 import Uplaod from '../../../components/Upload';
 import { MessageStatus, MessageType } from '../../../enum';
 import IdGen from '../../../utils/IdGen';
 import { formatFileSize } from '../../../utils/FormatUtil';
+import { createThumbnail } from "react-native-create-thumbnail";
 
 
 const ChatItem = ({ route }) => {
@@ -89,7 +90,6 @@ const ChatItem = ({ route }) => {
         let msg;
         switch (type) {
             case MessageType.TEXT_MESSAGE:
-                console.log('sendMessage')
                 msg = messageBase(content, type)
                 break
             case MessageType.IMAGE_MESSAGE:
@@ -102,14 +102,15 @@ const ChatItem = ({ route }) => {
                     size: fileSize,
                     sizeDesc: formatFileSize(fileSize)
                 }
-                console.log('IMAGE_MESSAGE', msg)
                 Uplaod.uploadChunks(filePath, fileName, fileType, fileSize)
                     .then(
                         (res) => {
-
+                            const newMsg = { ...msg, status: MessageStatus.SENT, content: res }
+                            dispatch(updateMessage({ message: newMsg }))
                         },
                         (error) => {
-
+                            const newMsg = { ...msg, status: MessageStatus.FAILED }
+                            dispatch(updateMessage({ message: newMsg }))
                         }
                     )
                 break
@@ -127,16 +128,47 @@ const ChatItem = ({ route }) => {
                     duration: duration,
                     durationDesc: `${minutes}:${seconds.toString().padStart(2, '0')}`
                 }
-                console.log('VIDEO_MESSAGE', msg)
-                Uplaod.uploadChunks(filePath, fileName, fileType, fileSize)
+                //获取视频封面
+                createThumbnail({
+                    url: filePath,
+                    timeStamp: 1000
+                })
                     .then(
-                        (res) => {
-
-                        },
-                        (error) => {
-
+                        response => {
+                            const path = response.path
+                            const mime = response.mime
+                            const thumbnaiFileName = path.substring(path.lastIndexOf('/') + 1) + '.' + mime.substring(mime.lastIndexOf('/') + 1)
+                            const size = response.size
+                            //上传海报
+                            Uplaod.uploadChunks(path, thumbnaiFileName, mime, size)
+                                .then(
+                                    (res) => {
+                                        const newMsg = { ...msg, contentMetadata: { ...msg.contentMetadata, thumbnailUrl: res } }
+                                        dispatch(updateMessage({ message: newMsg }))
+                                        //上传视频
+                                        Uplaod.uploadChunks(filePath, fileName, fileType, fileSize)
+                                            .then(
+                                                (res) => {
+                                                    const newMsg2 = { ...newMsg, status: MessageStatus.SENT, content: res }
+                                                    dispatch(updateMessage({ message: newMsg2 }))
+                                                },
+                                                (error) => {
+                                                    const newMsg2 = { ...newMsg, status: MessageStatus.FAILED }
+                                                    dispatch(updateMessage({ message: newMsg2 }))
+                                                }
+                                            )
+                                    },
+                                    (error) => {
+                                        const newMsg = { ...msg, status: MessageStatus.FAILED }
+                                        dispatch(updateMessage({ message: newMsg }))
+                                    }
+                                )
                         }
                     )
+                    .catch(err => {
+                        const newMsg = { ...msg, status: MessageStatus.FAILED }
+                        dispatch(updateMessage({ message: newMsg }))
+                    })
                 break
             case MessageType.FILE_MESSAGE:
                 Uplaod.uploadChunks(filePath, fileName, fileType, fileSize)
@@ -152,7 +184,7 @@ const ChatItem = ({ route }) => {
             default:
                 showToast("Unsupported message type")
         }
-        if(msg){
+        if (msg) {
             dispatch(addMessage({ sessionId: sessionId, message: msg }))
         }
     }

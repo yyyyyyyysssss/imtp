@@ -1,13 +1,11 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { Box, HStack, Text, VStack, Input, Pressable, KeyboardAvoidingView, Divider, Flex, ScrollView } from 'native-base';
+import React, { useRef, useState } from 'react';
+import { Box, HStack, Text, VStack, Input, Pressable, Flex } from 'native-base';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
-import Feather from 'react-native-vector-icons/Feather';
 import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import { showToast } from './Utils';
-import { StyleSheet, Modal, View, Keyboard } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import { MessageType } from '../enum';
+import DocumentPicker, { types } from 'react-native-document-picker'
 
 const ChatItemFooter = ({ sendMessage }) => {
 
@@ -143,6 +141,22 @@ const ChatItemFooter = ({ sendMessage }) => {
         )
     }
 
+    //语音通话
+    const voiceCall = () => {
+        DocumentPicker.pick({
+            mode: 'open',
+            type: types.allFiles
+        })
+            .then(
+                (res) => {
+                    console.log('picker', res)
+                }
+            )
+            .catch(err => {
+                console.log('error', err)
+            })
+    }
+
     return (
         <>
             <VStack style={{
@@ -248,7 +262,7 @@ const ChatItemFooter = ({ sendMessage }) => {
                             </VStack>
 
                             <VStack alignItems='center' space={2}>
-                                <Pressable>
+                                <Pressable onPress={voiceCall}>
                                     <Box style={styles.chatOpsIcon}>
                                         <MaterialIcon name="phone" size={40} />
                                     </Box>

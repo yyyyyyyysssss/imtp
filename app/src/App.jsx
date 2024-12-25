@@ -211,7 +211,7 @@ const App = () => {
             }
           },
           (error) => {
-            showToast(error.message)
+            dispatch(restoreToken({ token: null, userInfo: null }))
           }
         )
       } else {
