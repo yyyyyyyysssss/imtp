@@ -30,8 +30,8 @@ const styles = StyleSheet.create({
         shadowColor: "black",
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.8,
-        shadowRadius: 5,
-        elevation: 5,
+        shadowRadius: 1,
+        elevation: 1,
     },
     chatItemMessageBoxRight: {
         position: 'relative',
@@ -42,8 +42,8 @@ const styles = StyleSheet.create({
         shadowColor: "black",
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.8,
-        shadowRadius: 5,
-        elevation: 5,
+        shadowRadius: 1,
+        elevation: 1,
     },
     chatItemMessageBoxLeftArrow: {
         position: 'absolute',

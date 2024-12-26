@@ -43,34 +43,13 @@ class Uplaod {
         return chunks
     }
 
-    static async uploadId(filePath, fileName, fileType, fileSize) {
+    static async uploadChunks(filePath, fileName, fileType, fileSize,progressId) {
         const fileInfo = {
             filePath: filePath,
             filename: fileName,
             fileType: fileType,
-            fileSize: fileSize
-        }
-        return new Promise((resolve, reject) => {
-            UploadModule.uploadId(JSON.stringify(fileInfo))
-            .then(
-                (res) => {
-                    console.log('get uploadId success', res)
-                    resolve(res)
-                },
-                (error) => {
-                    console.log('get upload failed', error)
-                    reject(error)
-                }
-            )
-        })
-    }
-
-    static async uploadChunks(filePath, fileName, fileType, fileSize) {
-        const fileInfo = {
-            filePath: filePath,
-            filename: fileName,
-            fileType: fileType,
-            fileSize: fileSize
+            fileSize: fileSize,
+            progressId: progressId
         }
         return new Promise((resolve, reject) => {
             UploadModule.upload(JSON.stringify(fileInfo))
@@ -86,31 +65,6 @@ class Uplaod {
                 )
         })
     }
-
-    static async uploadChunksV2(uploadId,filePath, fileName, fileType, fileSize) {
-        const fileInfo = {
-            uploadId: uploadId,
-            filePath: filePath,
-            filename: fileName,
-            fileType: fileType,
-            fileSize: fileSize
-        }
-        return new Promise((resolve, reject) => {
-            UploadModule.upload(JSON.stringify(fileInfo))
-                .then(
-                    (res) => {
-                        console.log('upload completed', res)
-                        resolve(res)
-                    },
-                    (error) => {
-                        console.log('upload failed', error)
-                        reject(error)
-                    }
-                )
-        })
-    }
-
-
 }
 
 

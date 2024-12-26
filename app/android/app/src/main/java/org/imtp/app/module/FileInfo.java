@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class FileInfo {
 
-    private String uploadId;
+    private String progressId;
     private String filePath;
 
     private String filename;
@@ -16,12 +16,12 @@ public class FileInfo {
     private Long fileSize;
 
 
-    public String getUploadId() {
-        return uploadId;
+    public String getProgressId() {
+        return progressId;
     }
 
-    public void setUploadId(String uploadId) {
-        this.uploadId = uploadId;
+    public void setProgressId(String progressId) {
+        this.progressId = progressId;
     }
 
     public String getFilePath() {

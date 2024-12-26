@@ -58,6 +58,10 @@ public class ChunkedUploader {
         uploadExecutor = Executors.newFixedThreadPool(4,threadFactory);
     }
 
+    public static CompletableFuture<String> uploadFile(FileInfo fileInfo) {
+
+        return uploadFile(fileInfo,null);
+    }
     public static CompletableFuture<String> uploadFile(FileInfo fileInfo,ProgressListener progressListener) {
         String filePath = fileInfo.getFilePath();
         InputStream inputStream = null;
@@ -75,7 +79,7 @@ public class ChunkedUploader {
                 return future;
             }
             String fileType = fileInfo.getFileType();
-            return uploadFile(fileInfo.getUploadId(),inputStream,fileInfo.getFilename(),fileType,CHUNK_SIZE,progressListener);
+            return uploadFile(inputStream,fileInfo.getFilename(),fileType,CHUNK_SIZE,progressListener);
         } catch (FileNotFoundException e) {
             Log.e(TAG,"upload error: ",e);
             CompletableFuture<String> future = new CompletableFuture<>();
@@ -103,7 +107,7 @@ public class ChunkedUploader {
     }
 
 
-    public static CompletableFuture<String> uploadFile(String uploadId,InputStream inputStream, String fileName, String fileType, int chunkSize,ProgressListener progressListener){
+    public static CompletableFuture<String> uploadFile(InputStream inputStream, String fileName, String fileType, int chunkSize,ProgressListener progressListener){
         try {
             long length = inputStream.available();
             int totalChunk = (int) Math.ceil((double) length / chunkSize);
@@ -115,12 +119,9 @@ public class ChunkedUploader {
             fileInfoDTO.setChunkSize(chunkSize);
             //前置获取uploadId
             return CompletableFuture.supplyAsync(() -> {
-                if (uploadId == null || uploadId.isEmpty()){
-                    return uploadId(fileInfoDTO);
-                }
-                return uploadId;
+                return uploadId(fileInfoDTO);
                 //多任务上传分片
-            },uploadExecutor).thenCompose(id -> {
+            },uploadExecutor).thenCompose(uploadId -> {
                 Log.i(TAG, "文件名称: "+ fileName+", 文件总大小:"+ convertBytesToMB(length)+", 总块数:"+totalChunk);
                 List<CompletableFuture<Void>> futures = new ArrayList<>(totalChunk);
                 try {
@@ -138,7 +139,7 @@ public class ChunkedUploader {
                         byte[] finalBuffer = buffer;
                         final int finalI = i;
                         CompletableFuture<Void> completableFuture = CompletableFuture.runAsync(() -> {
-                            uploadChunk(finalBuffer, id, length, totalChunk, chunkSize, finalI,progressListener);
+                            uploadChunk(finalBuffer, uploadId, length, totalChunk, chunkSize, finalI,progressListener);
                         },uploadExecutor);
                         futures.add(completableFuture);
                     }
@@ -158,7 +159,7 @@ public class ChunkedUploader {
                 return CompletableFuture
                         .allOf(futures.toArray(new CompletableFuture[0]))
                         .thenApply(t -> {
-                            Result<String> result = okHttpClientHelper.doGet("/file/accessUrl?uploadId=" + id, new TypeReference<>() {});
+                            Result<String> result = okHttpClientHelper.doGet("/file/accessUrl?uploadId=" + uploadId, new TypeReference<>() {});
                             return result.getData();
                         });
             });

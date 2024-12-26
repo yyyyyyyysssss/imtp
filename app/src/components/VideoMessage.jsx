@@ -31,6 +31,7 @@ const VideoMessage = React.memo(({ content, status, contentMetadata }) => {
             >
                 <Box
                     style={styles.videoBox}
+                    backgroundColor={status && status === MessageStatus.PENDING ? 'black' : ''}
                     width={120}
                     height={mediaHeight}
                 >
@@ -64,7 +65,7 @@ const VideoMessage = React.memo(({ content, status, contentMetadata }) => {
                         </Svg>
                     </Box>
                     {/* 播放图标 */}
-                    {status && status !== MessageStatus.PENDING && (
+                    {((status && status !== MessageStatus.PENDING) || !status) && (
                         <Box style={styles.videoPlayIconBox}>
                             <FontAwesome name="play-circle" size={50} color="gray" />
                         </Box>
@@ -101,7 +102,6 @@ const styles = StyleSheet.create({
         borderRadius: 6,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: 'black',
         overflow: 'hidden'
     },
     videoGradientBox: {

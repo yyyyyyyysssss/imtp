@@ -1,23 +1,39 @@
-import React from 'react';
-import { HStack, Text, VStack } from 'native-base';
+import React, { useEffect } from 'react';
+import { Box, HStack, Text, VStack, Spinner } from 'native-base';
 import { StyleSheet } from 'react-native';
 import AntDesign from 'react-native-vector-icons/AntDesign';
+import { MessageStatus } from '../enum';
 
 
-const FileMessage = React.memo(({ content, contentMetadata }) => {
+const FileMessage = React.memo(({ content, status, contentMetadata }) => {
 
     const { name, sizeDesc } = contentMetadata
 
     return (
-        <HStack shadow={1} style={styles.rootHStack} space={2} justifyContent='center' alignItems='center'>
-            <VStack flex={8} style={styles.leftVstack} justifyContent='space-between'>
-                <Text numberOfLines={2} style={styles.leftVstackName}>{name}</Text>
-                <Text style={styles.leftVstackSize}>{sizeDesc}</Text>
-            </VStack>
-            <VStack flex={2} style={styles.rightVstack} justifyContent='center'>
-                <AntDesign name="file1" size={40} />
-            </VStack>
-        </HStack>
+        <Box
+            style={{
+                position: 'relative',
+                justifyContent: 'center',
+                alignItems: 'center'
+            }}
+        >
+            <HStack shadow={1} style={styles.rootHStack} space={2} justifyContent='center' alignItems='center'>
+                <VStack flex={8} style={styles.leftVstack} justifyContent='space-between'>
+                    <Text numberOfLines={2} style={styles.leftVstackName}>{name}</Text>
+                    <Text style={styles.leftVstackSize}>{sizeDesc}</Text>
+                </VStack>
+                <VStack flex={2} style={styles.rightVstack} justifyContent='center'>
+                    <AntDesign name="file1" size={40} />
+                </VStack>
+            </HStack>
+            {status && status === MessageStatus.PENDING && (
+                <Spinner
+                    style={styles.absolute}
+                    size={40}
+                    color="gray.500"
+                />
+            )}
+        </Box>
     )
 })
 
@@ -41,6 +57,13 @@ const styles = StyleSheet.create({
     leftVstackSize: {
         fontSize: 12,
         color: 'gray'
+    },
+    absolute: {
+        position: "absolute",
+        top: 0,
+        left: 0,
+        bottom: 0,
+        right: 0
     }
 })
 

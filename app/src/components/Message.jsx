@@ -1,20 +1,48 @@
 import { Avatar, HStack, Pressable, VStack, Text, Box, Spinner } from 'native-base';
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { StyleSheet } from 'react-native';
 import AntDesignIcon from 'react-native-vector-icons/AntDesign';
 import TextMessage from './TextMessage';
 import ImageMessage from './ImageMessage';
 import FileMessage from './FileMessage';
 import VideoMessage from './VideoMessage';
-import { MessageType,MessageStatus } from '../enum';
+import { MessageType, MessageStatus } from '../enum';
 import { useSelector } from 'react-redux';
+import { NativeModules, NativeEventEmitter } from 'react-native';
 
+const { UploadModule } = NativeModules
+const UploadModuleNativeEventEmitter = new NativeEventEmitter(UploadModule);
 
-const Message = React.memo(({ style,messageId }) => {
+const Message = React.memo(({ style, messageId }) => {
 
     const message = useSelector(state => state.chat.entities.messages[messageId])
 
-    const { type, name, avatar, deliveryMethod, self, status, content, contentMetadata } = message
+    const { type, name, avatar, deliveryMethod, self, status, content, contentMetadata, progressId } = message
+
+    useEffect(() => {
+        let progressEventEmitter;
+        const progressEvent = async () => {
+            if (progressId && status === MessageStatus.PENDING) {
+                const totalSize = contentMetadata.size
+                console.log('progressId',progressId)
+                //上传进度
+                progressEventEmitter = UploadModuleNativeEventEmitter.addListener(progressId, (uploadedSize) => {
+                    let progress = (uploadedSize / totalSize) * 100;
+                    console.log(`上传进度: ${progress.toFixed(2)}%`);
+                    if(progress == 100){
+                        progressEventEmitter.remove()
+                    }
+                })
+            }
+        }
+        progressEvent()
+        
+        return () => {
+            if(progressEventEmitter){
+                progressEventEmitter.remove()
+            }
+        }
+    }, [progressId,status])
 
     let messageStatusIcon;
     switch (status) {

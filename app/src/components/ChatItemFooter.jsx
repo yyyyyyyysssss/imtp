@@ -159,7 +159,6 @@ const ChatItemFooter = ({ sendMessage }) => {
                 (res) => {
                     res.forEach(file => {
                         const { name, uri, type, size } = file
-                        console.log('filePicker',uri)
                         const media = {
                             uri: uri,
                             type: type,

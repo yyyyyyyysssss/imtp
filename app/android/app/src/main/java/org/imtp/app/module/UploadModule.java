@@ -48,16 +48,18 @@ public class UploadModule extends ReactContextBaseJavaModule {
     public void upload(String fileInfoJson, Promise promise){
         FileInfo fileInfo = JsonUtil.parseObject(fileInfoJson,FileInfo.class);
         Long fileSize = fileInfo.getFileSize();
-        String uploadId = fileInfo.getUploadId();
-        AtomicLong count = new AtomicLong(0);
-        CompletableFuture<String> completableFuture = ChunkedUploader.uploadFile(fileInfo, new ProgressListener() {
-            @Override
-            public void onProgress(long bytesWritten) {
+        String progressId = fileInfo.getProgressId();
+        CompletableFuture<String> completableFuture;
+        if (progressId == null || progressId.isEmpty()){
+            completableFuture = ChunkedUploader.uploadFile(fileInfo);
+        }else {
+            AtomicLong count = new AtomicLong(0);
+            completableFuture = ChunkedUploader.uploadFile(fileInfo, bytesWritten -> {
                 long uploadedSize = count.addAndGet(bytesWritten);
-                uploadProgressEvent(uploadId,uploadedSize);
+                uploadProgressEvent(progressId,uploadedSize);
                 Log.i(TAG,"onProgress totalSize:" + fileSize + " uploadedSize:" + uploadedSize + " progress: " + (double)uploadedSize / fileSize * 100);
-            }
-        });
+            });
+        }
         completableFuture.whenComplete((r,e) -> {
             if (e != null) {
                 Log.e(TAG,"upload chunk failed: ", e);
@@ -67,6 +69,16 @@ public class UploadModule extends ReactContextBaseJavaModule {
             Log.i(TAG,"upload completed accessUrl: " + r);
             promise.resolve(r);
         });
+    }
+
+    @ReactMethod
+    public void addListener(String eventName) {
+
+    }
+
+    @ReactMethod
+    public void removeListeners(Integer count) {
+
     }
 
     //发送上传进度事件
