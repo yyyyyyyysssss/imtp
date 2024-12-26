@@ -7,7 +7,7 @@ import { useNavigation, } from '@react-navigation/native';
 import { MessageStatus } from '../enum';
 
 
-const VideoMessage = ({ content, status, contentMetadata }) => {
+const VideoMessage = React.memo(({ content, status, contentMetadata }) => {
 
     const navigation = useNavigation();
 
@@ -88,7 +88,7 @@ const VideoMessage = ({ content, status, contentMetadata }) => {
         </>
 
     )
-}
+})
 
 
 const styles = StyleSheet.create({

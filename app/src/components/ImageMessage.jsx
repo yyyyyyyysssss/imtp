@@ -6,7 +6,8 @@ import ImageViewer from 'react-native-image-zoom-viewer';
 import { MessageStatus } from '../enum';
 
 
-const ImageMessage = ({ content, status }) => {
+const ImageMessage = React.memo(({ content, status }) => {
+
     const [showImage, setShowImage] = useState({
         isVisible: false,
         imageUrl: null
@@ -83,7 +84,7 @@ const ImageMessage = ({ content, status }) => {
             </Pressable>
         </>
     )
-}
+})
 
 const styles = StyleSheet.create({
     absolute: {

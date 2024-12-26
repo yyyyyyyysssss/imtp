@@ -13,6 +13,8 @@ import com.facebook.react.defaults.DefaultReactHost.getDefaultReactHost
 import com.facebook.react.defaults.DefaultReactNativeHost
 import com.facebook.soloader.SoLoader
 import android.annotation.SuppressLint
+import com.reactlibrary.createthumbnail.CreateThumbnailPackage
+import com.rnfs.RNFSPackage
 
 class MainApplication : Application(), ReactApplication {
 

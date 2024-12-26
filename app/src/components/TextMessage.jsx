@@ -2,7 +2,7 @@ import React from 'react';
 import { StyleSheet } from 'react-native';
 import { Text, Box } from 'native-base';
 
-const TextMessage = ({ content, contentMetadata, direction }) => {
+const TextMessage = React.memo(({ content, direction }) => {
 
     return (
         <Box style={direction === 'LEFT' ? styles.chatItemMessageBoxLeft : styles.chatItemMessageBoxRight}>
@@ -17,7 +17,7 @@ const TextMessage = ({ content, contentMetadata, direction }) => {
             </Text>
         </Box>
     )
-}
+})
 
 
 const styles = StyleSheet.create({

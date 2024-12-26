@@ -22,7 +22,7 @@ public class CustomNativeModulePackage implements ReactPackage {
         //初始化netty客户端
         nativeModules.add(new NettyClientModule());
         //注册文件上传模块
-        nativeModules.add(new UploadModule());
+        nativeModules.add(new UploadModule(reactApplicationContext));
         return nativeModules;
     }
 

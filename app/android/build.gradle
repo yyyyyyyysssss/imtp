@@ -18,4 +18,9 @@ buildscript {
     }
 }
 
+//跳过Javadoc文档生成
+allprojects {
+    tasks.withType(Javadoc).all { enabled = false }
+}
+
 apply plugin: "com.facebook.react.rootproject"

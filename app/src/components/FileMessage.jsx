@@ -4,7 +4,7 @@ import { StyleSheet } from 'react-native';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 
 
-const FileMessage = ({ content, contentMetadata }) => {
+const FileMessage = React.memo(({ content, contentMetadata }) => {
 
     const { name, sizeDesc } = contentMetadata
 
@@ -19,7 +19,7 @@ const FileMessage = ({ content, contentMetadata }) => {
             </VStack>
         </HStack>
     )
-}
+})
 
 const styles = StyleSheet.create({
     rootHStack: {

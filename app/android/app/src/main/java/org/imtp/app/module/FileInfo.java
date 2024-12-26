@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class FileInfo {
 
+    private String uploadId;
     private String filePath;
 
     private String filename;
@@ -14,6 +15,14 @@ public class FileInfo {
 
     private Long fileSize;
 
+
+    public String getUploadId() {
+        return uploadId;
+    }
+
+    public void setUploadId(String uploadId) {
+        this.uploadId = uploadId;
+    }
 
     public String getFilePath() {
         return filePath;

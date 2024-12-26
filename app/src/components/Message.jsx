@@ -7,9 +7,12 @@ import ImageMessage from './ImageMessage';
 import FileMessage from './FileMessage';
 import VideoMessage from './VideoMessage';
 import { MessageType,MessageStatus } from '../enum';
+import { useSelector } from 'react-redux';
 
 
-const Message = React.memo(({ style,message }) => {
+const Message = React.memo(({ style,messageId }) => {
+
+    const message = useSelector(state => state.chat.entities.messages[messageId])
 
     const { type, name, avatar, deliveryMethod, self, status, content, contentMetadata } = message
 
@@ -34,7 +37,7 @@ const Message = React.memo(({ style,message }) => {
     const renderItem = useCallback((type, self, status, content, contentMetadata) => {
         switch (type) {
             case MessageType.TEXT_MESSAGE:
-                return <TextMessage content={content} contentMetadata={contentMetadata} direction={self ? 'RIGHT' : 'LEFT'} />
+                return <TextMessage content={content} direction={self ? 'RIGHT' : 'LEFT'} />
             case MessageType.IMAGE_MESSAGE:
                 return <ImageMessage content={content} status={status} />
             case MessageType.VIDEO_MESSAGE:
@@ -66,11 +69,6 @@ const Message = React.memo(({ style,message }) => {
             </VStack>
         </HStack>
     )
-}, (prevProps, nextProps) => {
-
-    return prevProps.message.status === nextProps.message.status &&
-        prevProps.message.content === nextProps.message.content && 
-        prevProps.message.contentMetadata?.thumbnailUrl === nextProps.message.contentMetadata?.thumbnailUrl
 })
 
 const styles = StyleSheet.create({

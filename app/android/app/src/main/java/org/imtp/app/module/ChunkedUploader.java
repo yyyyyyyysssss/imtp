@@ -1,6 +1,7 @@
 package org.imtp.app.module;
 
 import android.annotation.SuppressLint;
+import android.net.Uri;
 import android.util.Log;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -11,6 +12,7 @@ import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 
+import org.imtp.app.MainApplication;
 import org.imtp.app.config.OKHttpClientHelper;
 import org.imtp.common.response.Result;
 
@@ -56,16 +58,24 @@ public class ChunkedUploader {
         uploadExecutor = Executors.newFixedThreadPool(4,threadFactory);
     }
 
-
-    public static CompletableFuture<String> uploadFile(FileInfo fileInfo) {
+    public static CompletableFuture<String> uploadFile(FileInfo fileInfo,ProgressListener progressListener) {
         String filePath = fileInfo.getFilePath();
-        if (filePath.startsWith("file:")) {
-            filePath = filePath.substring(6);
-        }
-        File file = new File(filePath);
+        InputStream inputStream = null;
         try {
+            if (filePath.startsWith("file:")) {
+                filePath = filePath.substring(6);
+                File file = new File(filePath);
+                inputStream = new FileInputStream(file);
+            }else if (filePath.startsWith("content:")){
+                Uri uri = Uri.parse(filePath);
+                inputStream = MainApplication.getContext().getContentResolver().openInputStream(uri);
+            }else {
+                CompletableFuture<String> future = new CompletableFuture<>();
+                future.completeExceptionally(new UnsupportedOperationException("Unsupported file types"));
+                return future;
+            }
             String fileType = fileInfo.getFileType();
-            return uploadFile(new FileInputStream(file),fileInfo.getFilename(),fileType,CHUNK_SIZE);
+            return uploadFile(fileInfo.getUploadId(),inputStream,fileInfo.getFilename(),fileType,CHUNK_SIZE,progressListener);
         } catch (FileNotFoundException e) {
             Log.e(TAG,"upload error: ",e);
             CompletableFuture<String> future = new CompletableFuture<>();
@@ -75,7 +85,25 @@ public class ChunkedUploader {
     }
 
 
-    public static CompletableFuture<String> uploadFile(InputStream inputStream, String fileName, String fileType, int chunkSize){
+    public static CompletableFuture<String> uploadId(FileInfo fileInfo){
+        int totalChunk = (int) Math.ceil((double) fileInfo.getFileSize() / CHUNK_SIZE);
+        FileInfoDTO fileInfoDTO = new FileInfoDTO();
+        fileInfoDTO.setFilename(fileInfo.getFilename());
+        fileInfoDTO.setFileType(fileInfo.getFileType());
+        fileInfoDTO.setTotalSize(fileInfo.getFileSize());
+        fileInfoDTO.setTotalChunk(totalChunk);
+        fileInfoDTO.setChunkSize(CHUNK_SIZE);
+        return CompletableFuture.supplyAsync(() -> uploadId(fileInfoDTO),uploadExecutor);
+    }
+
+    private static String uploadId(FileInfoDTO fileInfoDTO){
+        Result<String> uploadIdResult = okHttpClientHelper.doPost("/file/uploadId",fileInfoDTO, new TypeReference<>() {
+        });
+        return uploadIdResult.getData();
+    }
+
+
+    public static CompletableFuture<String> uploadFile(String uploadId,InputStream inputStream, String fileName, String fileType, int chunkSize,ProgressListener progressListener){
         try {
             long length = inputStream.available();
             int totalChunk = (int) Math.ceil((double) length / chunkSize);
@@ -87,11 +115,12 @@ public class ChunkedUploader {
             fileInfoDTO.setChunkSize(chunkSize);
             //前置获取uploadId
             return CompletableFuture.supplyAsync(() -> {
-                Result<String> uploadIdResult = okHttpClientHelper.doPost("/file/uploadId",fileInfoDTO, new TypeReference<>() {
-                });
-                return uploadIdResult.getData();
+                if (uploadId == null || uploadId.isEmpty()){
+                    return uploadId(fileInfoDTO);
+                }
+                return uploadId;
                 //多任务上传分片
-            },uploadExecutor).thenCompose(uploadId -> {
+            },uploadExecutor).thenCompose(id -> {
                 Log.i(TAG, "文件名称: "+ fileName+", 文件总大小:"+ convertBytesToMB(length)+", 总块数:"+totalChunk);
                 List<CompletableFuture<Void>> futures = new ArrayList<>(totalChunk);
                 try {
@@ -109,7 +138,7 @@ public class ChunkedUploader {
                         byte[] finalBuffer = buffer;
                         final int finalI = i;
                         CompletableFuture<Void> completableFuture = CompletableFuture.runAsync(() -> {
-                            uploadChunk(finalBuffer, uploadId, length, totalChunk, chunkSize, finalI);
+                            uploadChunk(finalBuffer, id, length, totalChunk, chunkSize, finalI,progressListener);
                         },uploadExecutor);
                         futures.add(completableFuture);
                     }
@@ -129,7 +158,7 @@ public class ChunkedUploader {
                 return CompletableFuture
                         .allOf(futures.toArray(new CompletableFuture[0]))
                         .thenApply(t -> {
-                            Result<String> result = okHttpClientHelper.doGet("/file/accessUrl?uploadId=" + uploadId, new TypeReference<>() {});
+                            Result<String> result = okHttpClientHelper.doGet("/file/accessUrl?uploadId=" + id, new TypeReference<>() {});
                             return result.getData();
                         });
             });
@@ -141,7 +170,7 @@ public class ChunkedUploader {
         }
     }
 
-    private static void uploadChunk(byte[] chunkData, String uploadId, long totalSize, int totalChunk, int chunkSize, Integer chunkIndex) {
+    private static void uploadChunk(byte[] chunkData, String uploadId, long totalSize, int totalChunk, int chunkSize, Integer chunkIndex,ProgressListener progressListener) {
         Log.i(TAG, "第"+(chunkIndex + 1)+"块正在上传, 当前块大小:"+convertBytesToMB(chunkData.length)+", 起始偏移量:"+(chunkIndex * chunkSize)+", 结束偏移量:"+(chunkIndex * chunkSize + chunkData.length));
         RequestBody requestBody = RequestBody.create(chunkData, MediaType.parse("application/octet-stream"));
         MultipartBody multipartBody = new MultipartBody.Builder()
@@ -153,8 +182,10 @@ public class ChunkedUploader {
                 .addFormDataPart("chunkIndex", chunkIndex + "")
                 .addFormDataPart("file", "", requestBody)
                 .build();
-        okHttpClientHelper.doPost("/file/upload/chunk", multipartBody, new TypeReference<Void>() {
-        });
+        okHttpClientHelper.doPost("/file/upload/chunk", multipartBody, new TypeReference<Void>() {});
+        if (progressListener != null){
+            progressListener.onProgress(chunkData.length);
+        }
     }
 
 

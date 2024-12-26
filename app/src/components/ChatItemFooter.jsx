@@ -7,6 +7,8 @@ import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import { MessageType } from '../enum';
 import DocumentPicker, { types } from 'react-native-document-picker'
 
+var RNFS = require('react-native-fs');
+
 const ChatItemFooter = ({ sendMessage }) => {
 
     const [isOpen, setIsOpen] = useState(false)
@@ -50,8 +52,14 @@ const ChatItemFooter = ({ sendMessage }) => {
                 type: MessageType.TEXT_MESSAGE,
                 content: content,
             }
-        } else {
-            return
+        } else{
+            message = {
+                type: MessageType.FILE_MESSAGE,
+                fileName: fileName,
+                fileSize: fileSize,
+                filePath: uri,
+                fileType: type
+            }
         }
         sendMessage(message)
     }
@@ -141,15 +149,26 @@ const ChatItemFooter = ({ sendMessage }) => {
         )
     }
 
-    //语音通话
-    const voiceCall = () => {
+    //文件选择
+    const filePicker = () => {
         DocumentPicker.pick({
             mode: 'open',
             type: types.allFiles
         })
             .then(
                 (res) => {
-                    console.log('picker', res)
+                    res.forEach(file => {
+                        const { name, uri, type, size } = file
+                        console.log('filePicker',uri)
+                        const media = {
+                            uri: uri,
+                            type: type,
+                            fileName: name,
+                            fileSize: size
+                        }
+                        messageProvider(media)
+                    })
+                    
                 }
             )
             .catch(err => {
@@ -262,7 +281,7 @@ const ChatItemFooter = ({ sendMessage }) => {
                             </VStack>
 
                             <VStack alignItems='center' space={2}>
-                                <Pressable onPress={voiceCall}>
+                                <Pressable>
                                     <Box style={styles.chatOpsIcon}>
                                         <MaterialIcon name="phone" size={40} />
                                     </Box>
@@ -277,6 +296,15 @@ const ChatItemFooter = ({ sendMessage }) => {
                                     </Box>
                                 </Pressable>
                                 <Text>视频通话</Text>
+                            </VStack>
+
+                            <VStack alignItems='center' justifyContent='flex-start' space={2}>
+                                <Pressable onPress={filePicker}>
+                                    <Box style={styles.chatOpsIcon}>
+                                        <MaterialIcon name="folder-open" size={40} />
+                                    </Box>
+                                </Pressable>
+                                <Text>文件</Text>
                             </VStack>
 
                         </Flex>

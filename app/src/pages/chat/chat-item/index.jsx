@@ -14,6 +14,11 @@ import { MessageStatus, MessageType } from '../../../enum';
 import IdGen from '../../../utils/IdGen';
 import { formatFileSize } from '../../../utils/FormatUtil';
 import { createThumbnail } from "react-native-create-thumbnail";
+import { NativeModules,NativeEventEmitter } from 'react-native';
+
+
+const { UploadModule } = NativeModules
+const UploadModuleNativeEventEmitter = new NativeEventEmitter(UploadModule);
 
 
 const ChatItem = ({ route }) => {
@@ -24,7 +29,6 @@ const ChatItem = ({ route }) => {
 
     const userInfoRef = useRef()
 
-    const entitiesMessages = useSelector(state => state.chat.entities.messages)
     const session = useSelector(state => state.chat.entities.sessions[sessionId])
     const { messages } = session
     const dispatch = useDispatch()
@@ -79,9 +83,8 @@ const ChatItem = ({ route }) => {
     }
 
     const renderItem = ({ item, index }) => {
-        const message = entitiesMessages[item]
         return (
-            <Message style={{ marginTop: 30 }} message={message} />
+            <Message style={{ marginTop: 30 }} messageId={item} />
         )
     }
 
@@ -171,15 +174,49 @@ const ChatItem = ({ route }) => {
                     })
                 break
             case MessageType.FILE_MESSAGE:
-                Uplaod.uploadChunks(filePath, fileName, fileType, fileSize)
+                msg = messageBase(filePath, type)
+                msg.contentMetadata = {
+                    name: fileName,
+                    mediaType: fileType,
+                    size: fileSize,
+                    sizeDesc: formatFileSize(fileSize)
+                }
+                Uplaod.uploadId(filePath, fileName, fileType, fileSize)
                     .then(
                         (res) => {
-
+                            //上传进度
+                            UploadModuleNativeEventEmitter.addListener(res,(uploadedSize) => {
+                                let progress = (uploadedSize / fileSize) * 100;
+                                console.log(`上传进度: ${progress.toFixed(2)}%`);
+                            })
+                            Uplaod.uploadChunksV2(res,filePath, fileName, fileType, fileSize)
+                                .then(
+                                    (res) => {
+                                        const newMsg = { ...msg, status: MessageStatus.SENT, content: res }
+                                        dispatch(updateMessage({ message: newMsg }))
+                                    },
+                                    (error) => {
+                                        const newMsg = { ...msg, status: MessageStatus.FAILED }
+                                        dispatch(updateMessage({ message: newMsg }))
+                                    }
+                                )
                         },
                         (error) => {
-
+                            const newMsg = { ...msg, status: MessageStatus.FAILED }
+                            dispatch(updateMessage({ message: newMsg }))
                         }
                     )
+                // Uplaod.uploadChunks(filePath, fileName, fileType, fileSize)
+                //     .then(
+                //         (res) => {
+                //             const newMsg = { ...msg, status: MessageStatus.SENT, content: res }
+                //             dispatch(updateMessage({ message: newMsg }))
+                //         },
+                //         (error) => {
+                //             const newMsg = { ...msg, status: MessageStatus.FAILED }
+                //             dispatch(updateMessage({ message: newMsg }))
+                //         }
+                //     )
                 break
             default:
                 showToast("Unsupported message type")
