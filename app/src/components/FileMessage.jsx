@@ -28,7 +28,7 @@ const FileMessage = React.memo(({ content, status, contentMetadata, progress }) 
                 </VStack>
             </HStack>
 
-            {status && status === MessageStatus.PENDING && (
+            {/* {status && status === MessageStatus.PENDING && (
                 <>
                     <Box
                         style={{
@@ -50,7 +50,7 @@ const FileMessage = React.memo(({ content, status, contentMetadata, progress }) 
                     />
                 </>
 
-            )}
+            )} */}
         </Box>
     )
 })

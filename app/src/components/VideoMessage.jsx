@@ -74,16 +74,6 @@ const VideoMessage = React.memo(({ content, status, contentMetadata }) => {
                     <Box style={styles.videoDurationDescBox}>
                         <Text style={styles.videoDurationDescText}>{durationDesc}</Text>
                     </Box>
-                    {/* 视频上传中 */}
-                    {status && status === MessageStatus.PENDING && (
-                        <Spinner
-                            style={{
-                                position: 'absolute',
-                            }}
-                            size={50}
-                            color="gray.500"
-                        />
-                    )}
                 </Box>
             </Pressable>
         </>

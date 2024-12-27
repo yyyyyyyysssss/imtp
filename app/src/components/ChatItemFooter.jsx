@@ -52,7 +52,7 @@ const ChatItemFooter = ({ sendMessage }) => {
                 type: MessageType.TEXT_MESSAGE,
                 content: content,
             }
-        } else{
+        } else {
             message = {
                 type: MessageType.FILE_MESSAGE,
                 fileName: fileName,
@@ -151,12 +151,14 @@ const ChatItemFooter = ({ sendMessage }) => {
 
     //文件选择
     const filePicker = () => {
+        const s = performance.now()
         DocumentPicker.pick({
             mode: 'open',
             type: types.allFiles
         })
             .then(
                 (res) => {
+                    console.log('took', performance.now() - s)
                     res.forEach(file => {
                         const { name, uri, type, size } = file
                         const media = {
@@ -167,7 +169,7 @@ const ChatItemFooter = ({ sendMessage }) => {
                         }
                         messageProvider(media)
                     })
-                    
+
                 }
             )
             .catch(err => {

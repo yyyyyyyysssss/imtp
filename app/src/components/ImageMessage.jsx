@@ -53,13 +53,6 @@ const ImageMessage = React.memo(({ content, status }) => {
                         blurRadius={status && status === MessageStatus.PENDING ? 10 : 0}
                         alt=''
                     />
-                    {status && status === MessageStatus.PENDING && (
-                        <Spinner
-                            style={styles.absolute}
-                            size={50}
-                            color="gray.500"
-                        />
-                    )}
                 </Box>
             </Pressable>
             <Pressable

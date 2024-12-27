@@ -1,4 +1,4 @@
-import { Avatar, HStack, Pressable, VStack, Text, Box, Spinner } from 'native-base';
+import { Avatar, HStack, Pressable, VStack, Text, Box, Spinner, Flex } from 'native-base';
 import React, { useCallback, useEffect, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import AntDesignIcon from 'react-native-vector-icons/AntDesign';
@@ -9,6 +9,8 @@ import VideoMessage from './VideoMessage';
 import { MessageType, MessageStatus } from '../enum';
 import { useSelector } from 'react-redux';
 import { NativeModules, NativeEventEmitter } from 'react-native';
+import * as Progress from 'react-native-progress';
+import ProgressOverlayBox from './ProgressOverlayBox';
 
 const { UploadModule } = NativeModules
 const UploadModuleNativeEventEmitter = new NativeEventEmitter(UploadModule);
@@ -17,7 +19,7 @@ const Message = React.memo(({ style, messageId }) => {
 
     const message = useSelector(state => state.chat.entities.messages[messageId])
 
-    const [progress,setProgress] = useState(0.01)
+    const [progress, setProgress] = useState(0.01)
 
     const { type, name, avatar, deliveryMethod, self, status, content, contentMetadata, progressId } = message
 
@@ -31,20 +33,20 @@ const Message = React.memo(({ style, messageId }) => {
                     const progress = uploadedSize / totalSize
                     setProgress(progress)
                     console.log(`已上传: ${uploadedSize} 进度: ${(progress * 100).toFixed(2)}%`);
-                    if(progress == 100){
+                    if (progress == 100) {
                         progressEventEmitter.remove()
                     }
                 })
             }
         }
         progressEvent()
-        
+
         return () => {
-            if(progressEventEmitter){
+            if (progressEventEmitter) {
                 progressEventEmitter.remove()
             }
         }
-    }, [progressId,status])
+    }, [progressId, status])
 
     let messageStatusIcon;
     switch (status) {
@@ -64,16 +66,39 @@ const Message = React.memo(({ style, messageId }) => {
             messageStatusIcon = <></>
             break
     }
-    const renderItem = useCallback((type, self, status, content, contentMetadata,progress) => {
+    const renderItem = useCallback((type, self, status, content, contentMetadata, progress) => {
         switch (type) {
             case MessageType.TEXT_MESSAGE:
                 return <TextMessage content={content} direction={self ? 'RIGHT' : 'LEFT'} />
             case MessageType.IMAGE_MESSAGE:
-                return <ImageMessage content={content} status={status} />
+                return (
+                    <ProgressOverlayBox
+                        enabled={status && status === MessageStatus.PENDING}
+                        progress={progress}
+                    >
+                        <ImageMessage content={content} status={status} />
+                    </ProgressOverlayBox>
+                )
+
             case MessageType.VIDEO_MESSAGE:
-                return <VideoMessage content={content} status={status} contentMetadata={contentMetadata} />
+                return (
+                    <ProgressOverlayBox
+                        enabled={status && status === MessageStatus.PENDING}
+                        progress={progress}
+                    >
+                        <VideoMessage content={content} status={status} contentMetadata={contentMetadata} />
+                    </ProgressOverlayBox>
+                )
+
             case MessageType.FILE_MESSAGE:
-                return <FileMessage content={content} status={status} contentMetadata={contentMetadata} progress={progress} />
+                return (
+                    <ProgressOverlayBox
+                        enabled={status && status === MessageStatus.PENDING}
+                        progress={progress}
+                    >
+                        <FileMessage content={content} status={status} contentMetadata={contentMetadata} />
+                    </ProgressOverlayBox>
+                )
         }
     }, [])
 
@@ -93,7 +118,7 @@ const Message = React.memo(({ style, messageId }) => {
                     </HStack>
                 )}
                 <HStack space={2} reversed={self ? true : false} alignItems='center'>
-                    {renderItem(type, self, status, content, contentMetadata,progress)}
+                    {renderItem(type, self, status, content, contentMetadata, progress)}
                     {messageStatusIcon}
                 </HStack>
             </VStack>
