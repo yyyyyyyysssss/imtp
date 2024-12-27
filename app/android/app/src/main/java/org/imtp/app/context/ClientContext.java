@@ -20,4 +20,6 @@ public interface ClientContext {
     void resetChannel(Channel channel);
 
     TokenInfo tokenInfo();
+
+    void resetTokenInfo(TokenInfo tokenInfo);
 }

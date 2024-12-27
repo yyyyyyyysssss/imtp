@@ -23,10 +23,16 @@ export const chatSlice = createSlice({
             const { payload } = action
             const { sessionId, messages } = payload
             messages.forEach(message => {
-                chatSlice.reducer(state,chatSlice.actions.addMessage({sessionId: sessionId,message: message}))
+                if(!state.entities.messages){
+                    state.entities.messages = {}
+                }
+                state.entities.messages[message.id] = {...message}
+                if(!state.entities.sessions[sessionId].messages){
+                    state.entities.sessions[sessionId].messages = []
+                }
+                state.entities.sessions[sessionId].messages.push(message.id)
             });
-            const session = state.entities.sessions[sessionId]
-            state.entities.sessions[sessionId] = {...session,messageInit: true}
+            state.entities.sessions[sessionId].messageInit = true
         },
         addMessage: (state,action) => {
             const { payload } = action

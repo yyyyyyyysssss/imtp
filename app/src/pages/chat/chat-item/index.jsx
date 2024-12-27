@@ -1,6 +1,6 @@
 import { Avatar, FlatList, HStack, Input, Pressable, ScrollView, Text, View, VStack, KeyboardAvoidingView } from 'native-base';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Modal, StyleSheet, TouchableWithoutFeedback } from 'react-native';
+import { InteractionManager, Modal, StyleSheet, TouchableWithoutFeedback } from 'react-native';
 import ItemHeader from '../../../components/ItemHeader';
 import { useDispatch, useSelector } from 'react-redux';
 import { showToast } from '../../../components/Utils';
@@ -24,15 +24,15 @@ const ChatItem = ({ route }) => {
 
     const userInfoRef = useRef()
 
+    const [messageIds,setMessageIds] = useState([])
+
     const session = useSelector(state => state.chat.entities.sessions[sessionId])
-    const { messages } = session
+    const {messages} = session
+
     const dispatch = useDispatch()
 
     useEffect(() => {
-        console.log('init chatItem')
-        //未初始化的数据进行初始化
-        if (session.messageInit === undefined || session.messageInit === false) {
-            console.log('messageInit')
+        const fetchData = async () => {
             api.get('/social/userMessage/{userId}', {
                 params: {
                     sessionId: sessionId
@@ -54,23 +54,30 @@ const ChatItem = ({ route }) => {
                     }
                 )
         }
+        //未初始化的数据进行初始化
+        InteractionManager.runAfterInteractions(() => {
+            if (session.messageInit === undefined || session.messageInit === false) {
+                console.log('messageInit')
+                fetchData()
+            }
 
-        const fetchUserInfo = async () => {
-            const userInfo = await Storage.get('userInfo')
-            userInfoRef.current = userInfo
-        }
+            const fetchUserInfo = async () => {
+                const userInfo = await Storage.get('userInfo')
+                userInfoRef.current = userInfo
+            }
 
-        fetchUserInfo()
+            fetchUserInfo()
+        })
         return () => {
-            console.log('unmount chatItem')
+            
         }
     }, [])
 
-    //滚动到底部
+    //加载消息
     useEffect(() => {
-        if (messages && messages.length > 0 && flatListRef.current) {
-            // flatListRef.current.scrollToEnd({ animated: true })
-        }
+        InteractionManager.runAfterInteractions(() => {
+            setMessageIds(messages)
+        })
     }, [messages])
 
     const moreOps = () => {
@@ -101,7 +108,7 @@ const ChatItem = ({ route }) => {
                     size: fileSize,
                     sizeDesc: formatFileSize(fileSize)
                 }
-                Uplaod.uploadChunks(filePath, fileName, fileType, fileSize,msg.progressId)
+                Uplaod.uploadChunks(filePath, fileName, fileType, fileSize, msg.progressId)
                     .then(
                         (res) => {
                             const newMsg = { ...msg, status: MessageStatus.SENT, content: res }
@@ -146,7 +153,7 @@ const ChatItem = ({ route }) => {
                                         const newMsg = { ...msg, contentMetadata: { ...msg.contentMetadata, thumbnailUrl: res } }
                                         dispatch(updateMessage({ message: newMsg }))
                                         //上传视频
-                                        Uplaod.uploadChunks(filePath, fileName, fileType, fileSize,msg.progressId)
+                                        Uplaod.uploadChunks(filePath, fileName, fileType, fileSize, msg.progressId)
                                             .then(
                                                 (res) => {
                                                     const newMsg2 = { ...newMsg, status: MessageStatus.SENT, content: res }
@@ -230,7 +237,7 @@ const ChatItem = ({ route }) => {
                     <FlatList
                         ref={flatListRef}
                         style={styles.messageList}
-                        data={messages}
+                        data={messageIds}
                         renderItem={renderItem}
                         scrollEnabled={true}
                         inverted={true}

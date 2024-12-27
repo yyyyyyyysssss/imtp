@@ -35,4 +35,9 @@ public abstract class AbstractClientChannelContext implements ClientContext{
     public TokenInfo tokenInfo() {
         return this.tokenInfo;
     }
+
+    @Override
+    public void resetTokenInfo(TokenInfo tokenInfo) {
+        this.tokenInfo = tokenInfo;
+    }
 }

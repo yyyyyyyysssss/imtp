@@ -3,9 +3,10 @@ import { Box, HStack, Text, VStack, Spinner } from 'native-base';
 import { StyleSheet } from 'react-native';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import { MessageStatus } from '../enum';
+import * as Progress from 'react-native-progress';
 
 
-const FileMessage = React.memo(({ content, status, contentMetadata }) => {
+const FileMessage = React.memo(({ content, status, contentMetadata, progress }) => {
 
     const { name, sizeDesc } = contentMetadata
 
@@ -26,12 +27,29 @@ const FileMessage = React.memo(({ content, status, contentMetadata }) => {
                     <AntDesign name="file1" size={40} />
                 </VStack>
             </HStack>
+
             {status && status === MessageStatus.PENDING && (
-                <Spinner
-                    style={styles.absolute}
-                    size={40}
-                    color="gray.500"
-                />
+                <>
+                    <Box
+                        style={{
+                            position: 'absolute',
+                            height: '100%',
+                            width: '100%',
+                            borderRadius: 6,
+                            backgroundColor: 'rgba(0, 0, 0, 0.3)'
+                        }}
+                    />
+                    <Progress.Pie
+                        style={{
+                            position: 'absolute'
+                        }}
+                        progress={progress}
+                        color='white'
+                        borderWidth={0}
+                        size={40}
+                    />
+                </>
+
             )}
         </Box>
     )
@@ -60,10 +78,6 @@ const styles = StyleSheet.create({
     },
     absolute: {
         position: "absolute",
-        top: 0,
-        left: 0,
-        bottom: 0,
-        right: 0
     }
 })
 

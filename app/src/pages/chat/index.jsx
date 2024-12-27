@@ -1,53 +1,59 @@
 import { Button, Center, FlatList, Avatar, Input, Pressable, VStack, HStack, Box, Text, Flex, Divider, Icon, ScrollView } from 'native-base';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useNavigation, } from '@react-navigation/native';
-import { StyleSheet } from 'react-native';
+import { InteractionManager, StyleSheet } from 'react-native';
 import api from '../../api/api';
 import { useDispatch, useSelector, shallowEqual } from 'react-redux';
-import { initSession, addSession,loadSession, selectSession, removeSession, incrUnreadCount, decrUnreadCount } from '../../redux/slices/chatSlice';
+import { initSession, addSession, loadSession, selectSession, removeSession, incrUnreadCount, decrUnreadCount } from '../../redux/slices/chatSlice';
 import { formatChatDate } from '../../utils/FormatUtil';
 import { SwipeListView } from 'react-native-swipe-list-view';
 import { showToast } from '../../components/Utils';
 import Search from '../../components/Search';
 import SwipeItemOperation from '../../components/SwipeItemOperation';
 import UserSessionItem from '../../components/UserSessionItem';
-import { normalize,schema } from 'normalizr';
+import { normalize, schema } from 'normalizr';
 
 
 const Chat = () => {
     const navigation = useNavigation();
-
-    // const userSessions = useSelector(state => state.chat.userSessions, shallowEqual)
     const dispatch = useDispatch()
 
     const entities = useSelector(state => state.chat.entities)
     const result = useSelector(state => state.chat.result)
 
-    //查询用户会话
-    useEffect(() => {
-        api.get('/social/userSession/{userId}')
-            .then(
-                (res) => {
-                    const userSessionList = res.data
-                    if (userSessionList) {
-                        const message = new schema.Entity('messages')
-                        const session = new schema.Entity('sessions',{
-                            messages: [message]
-                        })
-                        const normalizedData = normalize(userSessionList, [session]);
-                        //初始化会话
-                        // dispatch(initSession(userSessionList))
-                        //初始化加载会话
-                        dispatch(loadSession(normalizedData))
-                    }
+    const [sessionIds,setSessionIds] = useState([])
 
-                }
-            )
+    //初始查询用户会话
+    useEffect(() => {
+        const fetchData = async () => {
+            api.get('/social/userSession/{userId}')
+                .then(
+                    (res) => {
+                        const userSessionList = res.data
+                        if (userSessionList) {
+                            const message = new schema.Entity('messages')
+                            const session = new schema.Entity('sessions', {
+                                messages: [message]
+                            })
+                            const normalizedData = normalize(userSessionList, [session]);
+                            //初始化加载会话
+                            dispatch(loadSession(normalizedData))
+                        }
+
+                    }
+                )
+        }
+        fetchData()
     }, [])
 
+    useEffect(() => {
+        InteractionManager.runAfterInteractions(() => {
+            setSessionIds(result)
+        })
+    },[result])
+
     const toChatItem = (sessionId) => {
-        // dispatch(selectSession(userSession))
-        navigation.navigate('ChatItem',{
+        navigation.navigate('ChatItem', {
             sessionId: sessionId,
         })
     }
@@ -131,7 +137,7 @@ const Chat = () => {
                 <SwipeListView
                     style={styles.userSessionList}
                     keyExtractor={item => item}
-                    data={result}
+                    data={sessionIds}
                     renderItem={renderItem}
                     ItemSeparatorComponent={itemSeparator}
                     renderHiddenItem={renderHiddenItem}

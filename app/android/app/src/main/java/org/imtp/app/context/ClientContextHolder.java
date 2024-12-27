@@ -30,6 +30,8 @@ public class ClientContextHolder {
             }finally {
                 lock.unlock();
             }
+        }else {
+            clientContext.resetTokenInfo(tokenInfo);
         }
         return clientContext;
     }

@@ -21,6 +21,7 @@ export const authSlice = createSlice({
         signOut: (state, action) => {
             state.userToken = null
             state.userInfo = null
+            state.isLoading = false
         }
     }
 })

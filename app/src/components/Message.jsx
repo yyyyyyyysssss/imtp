@@ -1,6 +1,6 @@
 import { Avatar, HStack, Pressable, VStack, Text, Box, Spinner } from 'native-base';
-import React, { useCallback, useEffect } from 'react';
-import { StyleSheet } from 'react-native';
+import React, { useCallback, useEffect, useState } from 'react';
+import { StyleSheet, View } from 'react-native';
 import AntDesignIcon from 'react-native-vector-icons/AntDesign';
 import TextMessage from './TextMessage';
 import ImageMessage from './ImageMessage';
@@ -17,6 +17,8 @@ const Message = React.memo(({ style, messageId }) => {
 
     const message = useSelector(state => state.chat.entities.messages[messageId])
 
+    const [progress,setProgress] = useState(0.01)
+
     const { type, name, avatar, deliveryMethod, self, status, content, contentMetadata, progressId } = message
 
     useEffect(() => {
@@ -24,11 +26,11 @@ const Message = React.memo(({ style, messageId }) => {
         const progressEvent = async () => {
             if (progressId && status === MessageStatus.PENDING) {
                 const totalSize = contentMetadata.size
-                console.log('progressId',progressId)
                 //上传进度
                 progressEventEmitter = UploadModuleNativeEventEmitter.addListener(progressId, (uploadedSize) => {
-                    let progress = (uploadedSize / totalSize) * 100;
-                    console.log(`上传进度: ${progress.toFixed(2)}%`);
+                    const progress = uploadedSize / totalSize
+                    setProgress(progress)
+                    console.log(`已上传: ${uploadedSize} 进度: ${(progress * 100).toFixed(2)}%`);
                     if(progress == 100){
                         progressEventEmitter.remove()
                     }
@@ -62,7 +64,7 @@ const Message = React.memo(({ style, messageId }) => {
             messageStatusIcon = <></>
             break
     }
-    const renderItem = useCallback((type, self, status, content, contentMetadata) => {
+    const renderItem = useCallback((type, self, status, content, contentMetadata,progress) => {
         switch (type) {
             case MessageType.TEXT_MESSAGE:
                 return <TextMessage content={content} direction={self ? 'RIGHT' : 'LEFT'} />
@@ -71,7 +73,7 @@ const Message = React.memo(({ style, messageId }) => {
             case MessageType.VIDEO_MESSAGE:
                 return <VideoMessage content={content} status={status} contentMetadata={contentMetadata} />
             case MessageType.FILE_MESSAGE:
-                return <FileMessage content={content} status={status} contentMetadata={contentMetadata} />
+                return <FileMessage content={content} status={status} contentMetadata={contentMetadata} progress={progress} />
         }
     }, [])
 
@@ -91,7 +93,7 @@ const Message = React.memo(({ style, messageId }) => {
                     </HStack>
                 )}
                 <HStack space={2} reversed={self ? true : false} alignItems='center'>
-                    {renderItem(type, self, status, content, contentMetadata)}
+                    {renderItem(type, self, status, content, contentMetadata,progress)}
                     {messageStatusIcon}
                 </HStack>
             </VStack>
