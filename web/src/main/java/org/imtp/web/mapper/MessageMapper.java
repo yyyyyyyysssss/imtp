@@ -13,4 +13,6 @@ public interface MessageMapper extends BaseMapper<Message> {
 
     List<MessageInfo> findMessageByIds(@Param("msgIds") List<Long> msgIds);
 
+    List<MessageInfo> findLatestMessageBySessionIds(@Param("sessionIds") List<Long> sessionIds);
+
 }

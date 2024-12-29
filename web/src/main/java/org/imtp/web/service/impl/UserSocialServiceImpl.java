@@ -6,6 +6,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import jakarta.annotation.Resource;
 import org.imtp.common.enums.DeliveryMethod;
+import org.imtp.common.enums.MessageType;
 import org.imtp.common.packet.body.*;
 import org.imtp.common.packet.common.MessageDTO;
 import org.imtp.common.packet.common.OfflineMessageDTO;
@@ -70,7 +71,22 @@ public class UserSocialServiceImpl implements UserSocialService {
             return List.of();
         }
         List<Long> sessionIds = sessions.stream().map(Session::getId).toList();
-        return userSessionMapper.findUserSessionBySessionIds(sessionIds,userId);
+        List<UserSessionInfo> userSessionInfos = userSessionMapper.findUserSessionBySessionIds(sessionIds, userId);
+
+        List<MessageInfo> latestMessageInfos = messageMapper.findLatestMessageBySessionIds(sessionIds);
+        if (latestMessageInfos != null && !latestMessageInfos.isEmpty()){
+            Map<Long, MessageInfo> latestMessageInfoMap = latestMessageInfos.stream().collect(Collectors.toMap(MessageInfo::getSessionId, a -> a));
+            userSessionInfos = userSessionInfos.stream().peek(p -> {
+                MessageInfo messageInfo = latestMessageInfoMap.get(p.getId());
+                if (messageInfo != null){
+                    p.setLastMsgType(MessageType.findMessageTypeByValue(messageInfo.getType()));
+                    p.setLastMsgContent(messageInfo.getContent());
+                    p.setLastMsgTime(messageInfo.getSendTime());
+                    p.setLastUserName(messageInfo.getName());
+                }
+            }).toList();
+        }
+        return userSessionInfos;
     }
 
     @Override

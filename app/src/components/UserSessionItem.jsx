@@ -2,9 +2,34 @@ import React from 'react';
 import { Avatar, VStack, HStack, Text, Pressable } from 'native-base';
 import { StyleSheet } from 'react-native';
 import { formatChatDate } from '../utils/FormatUtil';
+import { useSelector } from 'react-redux';
+import { DeliveryMethod, MessageType } from '../enum';
 
-const UserSessionItem = React.memo(({ name, avatar, lastMsgType, lastMsgContent, lastMsgTime, unreadMessageCount }) => {
-    
+const UserSessionItem = React.memo(({ sessionId }) => {
+
+    const session = useSelector(state => state.chat.entities.sessions[sessionId])
+
+    const { name, avatar, lastMsgType,lastUserName, lastMsgContent, lastMsgTime, deliveryMethod, unreadMessageCount } = session
+
+    let messageContent;
+    switch (lastMsgType) {
+        case MessageType.TEXT_MESSAGE:
+            messageContent = lastMsgContent
+            break
+        case MessageType.IMAGE_MESSAGE:
+            messageContent = '[图片]'
+            break
+        case MessageType.VIDEO_MESSAGE:
+            messageContent = '[视频]'
+            break
+        case MessageType.FILE_MESSAGE:
+            messageContent = '[文件]'
+            break
+    }
+    if(deliveryMethod === DeliveryMethod.GROUP){
+        messageContent = lastUserName + ': ' + messageContent
+    }
+
     return (
         <HStack space={5}>
             <HStack flex={1}>
@@ -24,7 +49,13 @@ const UserSessionItem = React.memo(({ name, avatar, lastMsgType, lastMsgContent,
             <HStack flex={6}>
                 <VStack flex={1} justifyContent='space-between'>
                     <Text style={styles.userSessionName}>{name}</Text>
-                    <Text style={styles.userSessionLastMsg}>{lastMsgContent}</Text>
+                    <Text
+                        style={styles.userSessionLastMsg}
+                        numberOfLines={1}
+                        ellipsizeMode='tail'
+                    >
+                        {messageContent}
+                    </Text>
                 </VStack>
                 <VStack flex={1} alignItems='flex-end'>
                     <Text style={styles.userSessionLastTime}>{formatChatDate(lastMsgTime)}</Text>
@@ -43,11 +74,11 @@ const styles = StyleSheet.create({
     },
     userSessionLastMsg: {
         color: 'gray',
-        fontSize: 13
+        fontSize: 15
     },
     userSessionLastTime: {
         color: 'gray',
-        fontSize: 13
+        fontSize: 14
     }
 })
 

@@ -1,12 +1,12 @@
 import { Avatar, FlatList, HStack, Input, Pressable, ScrollView, Text, View, VStack, KeyboardAvoidingView } from 'native-base';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { InteractionManager, Modal, StyleSheet, TouchableWithoutFeedback } from 'react-native';
-import ItemHeader from '../../../components/ItemHeader';
+import ChatItemHeader from '../../../components/ChatItemHeader';
 import { useDispatch, useSelector } from 'react-redux';
 import { showToast } from '../../../components/Utils';
 import Message from '../../../components/Message';
 import ChatItemFooter from '../../../components/ChatItemFooter';
-import { loadMessage, addMessage, updateMessage } from '../../../redux/slices/chatSlice';
+import { loadMessage, addMessage, updateMessage, selectSession } from '../../../redux/slices/chatSlice';
 import api from '../../../api/api';
 import Storage from '../../../storage/storage';
 import Uplaod from '../../../components/Upload';
@@ -67,6 +67,8 @@ const ChatItem = ({ route }) => {
             }
 
             fetchUserInfo()
+            //选择会话
+            dispatch(selectSession({ sessionId: sessionId}))
         })
         return () => {
             
@@ -227,7 +229,7 @@ const ChatItem = ({ route }) => {
     return (
 
         <VStack flex={1} justifyContent="space-between">
-            <ItemHeader title={session.name} moreOps={moreOps} />
+            <ChatItemHeader title={session.name} moreOps={moreOps} />
             <KeyboardAvoidingView
                 flex={1}
                 behavior={Platform.OS == "ios" ? "padding" : null}
@@ -237,13 +239,13 @@ const ChatItem = ({ route }) => {
                     <FlatList
                         ref={flatListRef}
                         style={styles.messageList}
-                        data={messageIds}
+                        data={messageIds ? [...messageIds].reverse() : []}
                         renderItem={renderItem}
                         scrollEnabled={true}
                         inverted={true}
                         contentContainerStyle={{
                             flexGrow: 1,
-                            flexDirection: 'column-reverse',
+                            justifyContent: 'flex-end'
                         }}
                     />
                 </HStack>
@@ -263,7 +265,7 @@ const styles = StyleSheet.create({
 
     },
     messageList: {
-        padding: 10,
+        padding: 10
     },
     footerHstack: {
 

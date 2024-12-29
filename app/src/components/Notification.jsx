@@ -1,12 +1,15 @@
 import { Box, Text } from 'native-base';
 import React, { useEffect, } from 'react';
+import { useSelector } from 'react-redux';
 
-const Notification = React.memo(({ children, size = 20, count }) => {
+const Notification = React.memo(({ children, size = 20 }) => {
+
+    const unreadCount = useSelector(state => state.chat.unreadCount)
 
     return (
         <Box position='relative'>
             {children}
-            {count > 0 && (
+            {unreadCount > 0 && (
                 <Box
                     position='absolute'
                     style={{
@@ -27,7 +30,7 @@ const Notification = React.memo(({ children, size = 20, count }) => {
                             lineHeight: size,
                         }}
                     >
-                        {count > 99 ? '99+' : count}
+                        {unreadCount > 99 ? '99+' : unreadCount}
                     </Text>
                 </Box>
             )}

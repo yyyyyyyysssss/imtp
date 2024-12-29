@@ -12,3 +12,8 @@ export const MessageStatus = Object.freeze({
     DELIVERED: 'DELIVERED',
     FAILED: 'FAILED'
 })
+
+export const DeliveryMethod = Object.freeze({
+    SINGLE: 'SINGLE',
+    GROUP: 'GROUP'
+})

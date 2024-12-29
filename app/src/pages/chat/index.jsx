@@ -4,7 +4,7 @@ import { useNavigation, } from '@react-navigation/native';
 import { InteractionManager, StyleSheet } from 'react-native';
 import api from '../../api/api';
 import { useDispatch, useSelector, shallowEqual } from 'react-redux';
-import { initSession, addSession, loadSession, selectSession, removeSession, incrUnreadCount, decrUnreadCount } from '../../redux/slices/chatSlice';
+import { loadSession, removeSession, incrUnreadCount, decrUnreadCount } from '../../redux/slices/chatSlice';
 import { formatChatDate } from '../../utils/FormatUtil';
 import { SwipeListView } from 'react-native-swipe-list-view';
 import { showToast } from '../../components/Utils';
@@ -18,7 +18,6 @@ const Chat = () => {
     const navigation = useNavigation();
     const dispatch = useDispatch()
 
-    const entities = useSelector(state => state.chat.entities)
     const result = useSelector(state => state.chat.result)
 
     const [sessionIds,setSessionIds] = useState([])
@@ -72,7 +71,6 @@ const Chat = () => {
     }, [])
 
     const renderItem = ({ item, index }) => {
-        const session = entities.sessions[item]
         return (
             <Pressable
                 onPress={() => toChatItem(item)}
@@ -80,14 +78,7 @@ const Chat = () => {
                 {({ isHovered, isFocused, isPressed }) => {
                     return (
                         <VStack style={{ backgroundColor: isPressed ? '#C8C6C5' : '#F5F5F5', padding: 10 }}>
-                            <UserSessionItem
-                                avatar={session.avatar}
-                                name={session.name}
-                                lastMsgType={session.lastMsgType}
-                                lastMsgContent={session.lastMsgContent}
-                                lastMsgTime={session.lastMsgTime}
-                                unreadMessageCount={session.unreadMessageCount}
-                            />
+                            <UserSessionItem sessionId={item}/>
                         </VStack>
                     )
                 }}
@@ -104,7 +95,7 @@ const Chat = () => {
                     cursor="pointer"
                     bg="red.500"
                     justifyContent="center"
-                    onPress={() => deleteUserSession(rowMap, data.item.id)}
+                    onPress={() => deleteUserSession(rowMap, data.item)}
                     _pressed={{
                         opacity: 0.5
                     }}>
@@ -127,7 +118,7 @@ const Chat = () => {
     }
 
     const deleteUserSession = (rowMap, id) => {
-        dispatch(removeSession(id))
+        dispatch(removeSession({sessionId: id}))
     };
 
     return (

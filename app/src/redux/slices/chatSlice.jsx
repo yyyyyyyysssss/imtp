@@ -14,73 +14,81 @@ export const chatSlice = createSlice({
         unreadCount: 0 //未读消息合计
     },
     reducers: {
-        loadSession: (state,action) => {
+        loadSession: (state, action) => {
             const { payload } = action
             state.entities = payload.entities
             state.result = payload.result
         },
-        loadMessage: (state,action) => {
+        addSession: (state, action) => {
+            
+        },
+        selectSession: (state, action) => {
+            const { payload } = action
+            const { sessionId } = payload
+            //会话未读消息
+            const unreadMessageCount = state.entities.sessions[sessionId].unreadMessageCount || 0
+            state.entities.sessions[sessionId].unreadMessageCount = 0
+            //未读消息总计
+            const unreadCount = state.unreadCount || 0
+            state.unreadCount = unreadCount - unreadMessageCount
+        },
+        removeSession: (state, action) => {
+            const { payload } = action
+            const { sessionId } = payload
+            state.result = [...state.result.filter(item => item !== sessionId)]
+        },
+        loadMessage: (state, action) => {
             const { payload } = action
             const { sessionId, messages } = payload
             messages.forEach(message => {
-                if(!state.entities.messages){
+                if (!state.entities.messages) {
                     state.entities.messages = {}
                 }
-                state.entities.messages[message.id] = {...message}
-                if(!state.entities.sessions[sessionId].messages){
+                state.entities.messages[message.id] = { ...message }
+                if (!state.entities.sessions[sessionId].messages) {
                     state.entities.sessions[sessionId].messages = []
                 }
                 state.entities.sessions[sessionId].messages.push(message.id)
             });
             state.entities.sessions[sessionId].messageInit = true
         },
-        addMessage: (state,action) => {
+        addMessage: (state, action) => {
             const { payload } = action
             const { sessionId, message } = payload
-            if(!state.entities.messages){
-                state.entities.messages = {}
-            }
-            state.entities.messages[message.id] = {...message}
-            if(!state.entities.sessions[sessionId].messages){
-                state.entities.sessions[sessionId].messages = []
-            }
+            //添加消息
+            state.entities.messages = state.entities.messages || {}
+            state.entities.messages[message.id] = { ...message }
+            //添加会话关联的消息id
+            state.entities.sessions[sessionId].messages = state.entities.sessions[sessionId].messages || []
             state.entities.sessions[sessionId].messages.push(message.id)
+            //更新会话最新消息
+            state.entities.sessions[sessionId].lastMsgType = message.type
+            state.entities.sessions[sessionId].lastMsgContent = message.content
+            state.entities.sessions[sessionId].lastMsgTime = message.timestamp
+            state.entities.sessions[sessionId].lastUserName = message.name
+            //将会话移动到最前
+            state.result = [sessionId,...state.result.filter(item => item !== sessionId)]
+            //未读消息
+            if(!message.self && sessionId !== message.sessionId){
+                //会话未读消息
+                state.entities.sessions[sessionId].unreadMessageCount = state.entities.sessions[sessionId].unreadMessageCount || 0
+                state.entities.sessions[sessionId].unreadMessageCount = state.entities.sessions[sessionId].unreadMessageCount + 1
+                //未读消息总计
+                state.unreadCount = state.unreadCount || 0
+                state.unreadCount = state.unreadCount + 1
+            }
         },
-        updateMessage: (state,action) => {
+        updateMessage: (state, action) => {
             const { payload } = action
             const { message } = payload
-            state.entities.messages[message.id] = {...message}
+            state.entities.messages[message.id] = { ...message }
         },
-        initSession: (state, action) => {
-            console.log('initSession')
-            state.userSessions = action.payload
-            state.unreadCount = action.payload.reduce((acc,session) => acc + session.unreadMessageCount,0)
-        },
-        addSession: (state, action) => {
-            console.log('addSession')
-            state.userSessions.push(action.payload)
-        },
-        updateSession: (state, action) => {
+        deleteMessage: (state, action) => {
 
-        },
-        selectSession: (state, action) => {
-            state.selectedUserSession = action.payload
-        },
-        removeSession: (state, action) => {
-            console.log('removeSession')
-            state.userSessions = state.userSessions.filter(s => s.id != action.payload)
-        },
-        incrUnreadCount: (state, action) => {
-            state.unreadCount += action.payload
-        },
-        decrUnreadCount: (state, action) => {
-            state.unreadCount -= action.payload
         }
-
-
     }
 })
 
-export const { initSession,loadSession,loadMessage, addSession, updateSession, selectSession, removeSession,incrUnreadCount,decrUnreadCount,addMessage,updateMessage } = chatSlice.actions
+export const { loadSession, addSession, selectSession, removeSession, loadMessage, addMessage, updateMessage, deleteMessage } = chatSlice.actions
 
 export default chatSlice.reducer

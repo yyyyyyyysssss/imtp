@@ -7,13 +7,10 @@ import Friend from '../friend';
 import Group from '../group';
 import Me from '../me';
 import Notification from '../../components/Notification';
-import { useDispatch, useSelector } from 'react-redux';
 
 const Tab = createBottomTabNavigator();
 
 const Home = () => {
-
-    const unreadCount = useSelector(state => state.chat.unreadCount)
 
     console.log('Home')
 
@@ -35,7 +32,7 @@ const Home = () => {
                         backgroundColor: '#F5F5F5'
                     },
                     tabBarIcon: ({ focused, color, size }) => (
-                        <Notification size={22} count={unreadCount}>
+                        <Notification size={22}>
                             {
                                 focused ?
                                     <Image alt='' color={color} size={size} source={require('../../assets/img/chat-icon-50-selected.png')} />
