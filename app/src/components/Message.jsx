@@ -9,7 +9,6 @@ import VideoMessage from './VideoMessage';
 import { MessageType, MessageStatus } from '../enum';
 import { useSelector } from 'react-redux';
 import { NativeModules, NativeEventEmitter } from 'react-native';
-import * as Progress from 'react-native-progress';
 import ProgressOverlayBox from './ProgressOverlayBox';
 
 const { UploadModule } = NativeModules

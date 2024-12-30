@@ -18,10 +18,6 @@
 
     <select id="findUserSessionBySessionIds" parameterType="java.util.List" resultMap="resultUserSessionInfoMap">
         SELECT t.*,
-               m.type           as last_msg_type,
-               m.content        as last_msg_content,
-               m.send_time      as last_msg_time,
-               m.sender_user_id as last_send_msg_user_id,
                CASE t.delivery_method
                    WHEN 'SINGLE' THEN
                        IFNULL(u1.nickname, u2.nickname)
@@ -39,7 +35,6 @@
                  left join im_user u2 on u2.id = t.receiver_user_id and u2.id != #{userId}
                  left join im_group g1 on g1.id = t.sender_user_id
                  left join im_group g2 on g2.id = t.receiver_user_id
-                 left join im_msg m on m.id = t.last_msg_id
         <where>
             t.id in
             <foreach collection="sessionIds" item="item" index="index" separator="," open="(" close=")">

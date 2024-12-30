@@ -26,7 +26,7 @@ const UserSessionItem = React.memo(({ sessionId }) => {
             messageContent = '[文件]'
             break
     }
-    if(deliveryMethod === DeliveryMethod.GROUP){
+    if(messageContent && deliveryMethod === DeliveryMethod.GROUP){
         messageContent = lastUserName + ': ' + messageContent
     }
 

@@ -29,9 +29,6 @@ public class Session {
     @TableField("receiver_user_id")
     private Long receiverUserId;
 
-    @TableField("last_msg_id")
-    private Long lastMsgId;
-
     @TableField("delivery_method")
     @EnumValue
     private DeliveryMethod deliveryMethod;

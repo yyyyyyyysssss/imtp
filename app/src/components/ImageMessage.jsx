@@ -1,9 +1,10 @@
-import { Box, Image, ImageBackground, Pressable, Spinner } from 'native-base';
+import { Box, Image, ImageBackground, NativeBaseProvider, Pressable, Spinner, Toast } from 'native-base';
 import React, { useState } from 'react';
 import { ImageContext } from '../context';
 import { Modal, StyleSheet } from 'react-native';
 import ImageViewer from 'react-native-image-zoom-viewer';
 import { MessageStatus } from '../enum';
+import { savePicture } from '../utils/CameraRollUtil';
 
 
 const ImageMessage = React.memo(({ content, status }) => {
@@ -14,7 +15,7 @@ const ImageMessage = React.memo(({ content, status }) => {
     })
 
     const showOriginalImage = (url) => {
-        if(status && status === MessageStatus.PENDING){
+        if (status && status === MessageStatus.PENDING) {
             return
         }
         setShowImage({
@@ -28,6 +29,10 @@ const ImageMessage = React.memo(({ content, status }) => {
             isVisible: false,
             imageUrl: null
         })
+    }
+
+    const saveToCamera = (url) => {
+        savePicture(url, 'photo')
     }
 
     return (
@@ -63,16 +68,23 @@ const ImageMessage = React.memo(({ content, status }) => {
                     transparent={true}
                     onRequestClose={closeModal}
                 >
-                    <ImageViewer
-                        onClick={closeModal}
-                        onSwipeDown={closeModal} // 下滑关闭 Modal
-                        enableSwipeDown={true}
-                        imageUrls={[
-                            {
-                                url: showImage.imageUrl
-                            }
-                        ]}
-                    />
+                    <NativeBaseProvider>
+                        <ImageViewer
+                            onClick={closeModal}
+                            onSwipeDown={closeModal} // 下滑关闭 Modal
+                            enableSwipeDown={true}
+                            onSave={saveToCamera}
+                            imageUrls={[
+                                {
+                                    url: showImage.imageUrl
+                                }
+                            ]}
+                            menuContext={{
+                                saveToLocal: '保存到相册',
+                                cancel: "取消"
+                            }}
+                        />
+                    </NativeBaseProvider>
                 </Modal>
             </Pressable>
         </>

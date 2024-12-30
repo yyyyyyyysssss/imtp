@@ -23,6 +23,4 @@ public class UserSessionDTO {
     @NotNull(message = "not null")
     private DeliveryMethod deliveryMethod;
 
-    private String lastMsgId;
-
 }

@@ -113,7 +113,6 @@ public class UserSocialServiceImpl implements UserSocialService {
                     .id(IdGen.genId())
                     .senderUserId(Long.parseLong(userSessionDTO.getSenderUserId()))
                     .receiverUserId(Long.parseLong(userSessionDTO.getReceiverUserId()))
-                    .lastMsgId(userSessionDTO.getLastMsgId() != null ? Long.parseLong(userSessionDTO.getLastMsgId()) : null)
                     .deliveryMethod(userSessionDTO.getDeliveryMethod())
                     .build();
             sessionMapper.insert(newSession);
