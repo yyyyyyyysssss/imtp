@@ -29,8 +29,11 @@ public class UserFriend {
     @TableField("friend_id")
     private Long friendId;
 
-    @TableField("state")
-    private boolean state;
+    @TableField("note")
+    private String note;
+
+    @TableField("note_pinyin")
+    private String notePinyin;
 
     @TableField("create_time")
     private Date createTime;

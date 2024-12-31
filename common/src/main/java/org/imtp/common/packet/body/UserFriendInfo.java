@@ -24,6 +24,8 @@ public class UserFriendInfo {
 
     private String note;
 
+    private String notePinyin;
+
     private String tagline;
 
     private Gender gender;

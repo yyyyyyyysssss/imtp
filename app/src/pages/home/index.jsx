@@ -15,12 +15,15 @@ const Home = () => {
     console.log('Home')
 
     return (
-        <Tab.Navigator initialRouteName='Chat'>
+        <Tab.Navigator 
+            initialRouteName='Chat'
+        >
             <Tab.Screen
                 name='Chat'
                 component={Chat}
                 options={{
                     title: '聊天',
+                    lazy: false,
                     headerTitleAlign: 'center',
                     headerTitleStyle: {
                         fontWeight: 'bold'
@@ -48,6 +51,7 @@ const Home = () => {
                 name='Friend'
                 component={Friend}
                 options={{
+                    lazy: false,
                     title: '好友',
                     headerTitleAlign: 'center',
                     headerTitleStyle: {
@@ -75,6 +79,7 @@ const Home = () => {
                 component={Group}
                 options={{
                     title: '群组',
+                    lazy: false,
                     headerTitleAlign: 'center',
                     headerTitleStyle: {
                         fontWeight: 'bold'
@@ -101,6 +106,7 @@ const Home = () => {
                 component={Me}
                 options={{
                     title: '我',
+                    lazy: false,
                     headerShown: false,
                     tabBarIcon: ({ focused, color, size }) => (
                         focused ?

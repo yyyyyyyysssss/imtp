@@ -56,8 +56,8 @@ public class User implements UserDetails, CredentialsContainer {
     @TableField("nickname")
     private String nickname;
 
-    @TableField("note")
-    private String note;
+    @TableField("nickname_pinyin")
+    private String nicknamePinyin;
 
     @TableField("tagline")
     private String tagline;
@@ -89,7 +89,7 @@ public class User implements UserDetails, CredentialsContainer {
                 ", username='" + username + '\'' +
                 ", password='" + password + '\'' +
                 ", nickname='" + nickname + '\'' +
-                ", note='" + note + '\'' +
+                ", nicknamePinyin='" + nicknamePinyin + '\'' +
                 ", tagline='" + tagline + '\'' +
                 ", gender=" + gender +
                 ", avatar='" + avatar + '\'' +
@@ -139,7 +139,7 @@ public class User implements UserDetails, CredentialsContainer {
             String username = JsonNodeUtil.findStringValue(root, "username");
             String password = JsonNodeUtil.findStringValue(root, "password");
             String nickname = JsonNodeUtil.findStringValue(root, "nickname");
-            String note = JsonNodeUtil.findStringValue(root, "note");
+            String nicknamePinyin = JsonNodeUtil.findStringValue(root, "nicknamePinyin");
             String tagline = JsonNodeUtil.findStringValue(root, "tagline");
             String gender = JsonNodeUtil.findStringValue(root, "gender");
             String avatar = JsonNodeUtil.findStringValue(root, "avatar");
@@ -151,7 +151,7 @@ public class User implements UserDetails, CredentialsContainer {
             user.setUsername(username);
             user.setPassword(password);
             user.setNickname(nickname);
-            user.setNote(note);
+            user.setNicknamePinyin(nicknamePinyin);
             user.setTagline(tagline);
             user.setGender(gender != null ? Gender.valueOf(gender) : null);
             user.setAvatar(avatar);

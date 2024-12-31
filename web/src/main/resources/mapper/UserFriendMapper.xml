@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.imtp.web.mapper.UserFriendMapper">
+
+
+    <resultMap id="resultUserFriendInfoMap" type="org.imtp.common.packet.body.UserFriendInfo">
+        <result property="id" column="id"/>
+        <result property="nickname" column="nickname"/>
+        <result property="note" column="note"/>
+        <result property="notePinyin" column="note_pinyin"/>
+        <result property="avatar" column="avatar"/>
+        <result property="tagline" column="tagline"/>
+        <result property="gender" column="gender"/>
+        <result property="region" column="region"/>
+    </resultMap>
+
+    <select id="findUserFriendByUserId" resultMap="resultUserFriendInfoMap">
+        SELECT
+        u.id,
+        u.nickname,
+        IFNULL(t.note,u.nickname) as note,
+        IFNULL(t.note_pinyin,u.nickname_pinyin) as note_pinyin,
+        u.avatar as avatar,
+        u.tagline,
+        u.gender,
+        u.region
+        FROM im_user_friend t
+        left join im_user u on u.id = t.friend_id
+        where t.user_id = #{userId}
+    </select>
+
+</mapper>

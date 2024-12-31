@@ -59,7 +59,7 @@ const Chat = () => {
 
     const itemSeparator = useCallback(() => {
         return (
-            <HStack space={7} alignItems='flex-end' justifyContent='center' style={styles.userSessionListItemSeparator} >
+            <HStack space={5} alignItems='flex-end' justifyContent='center' style={styles.userSessionListItemSeparator} >
                 <HStack flex={1}>
 
                 </HStack>
@@ -132,6 +132,9 @@ const Chat = () => {
                     renderItem={renderItem}
                     ItemSeparatorComponent={itemSeparator}
                     renderHiddenItem={renderHiddenItem}
+                    ListFooterComponent={(
+                        <Divider style={styles.userSessionListItemSeparatorDivider} />
+                    )}
                     rightOpenValue={-120}
                     disableRightSwipe={true}
                     onRowDidOpen={onRowDidOpen}
@@ -154,10 +157,10 @@ const styles = StyleSheet.create({
     },
     userSessionList: {
         width: '100%',
-        height: '100%',
+        height: '100%'
     },
     userSessionListItemSeparator: {
-
+        paddingLeft: 10
     },
     userSessionListItemSeparatorDivider: {
         height: 1,

@@ -155,32 +155,7 @@ public class UserSocialServiceImpl implements UserSocialService {
 
     @Override
     public List<UserFriendInfo> findUserFriendByUserId(String userId) {
-        Wrapper<UserFriend> userFriendQueryWrapper = new QueryWrapper<UserFriend>().eq("user_id", userId);
-        List<UserFriend> userFriends = userFriendMapper.selectList(userFriendQueryWrapper);
-        if (userFriends.isEmpty()){
-            return List.of();
-        }
-        List<Long> friendIds = userFriends.stream().map(UserFriend::getFriendId).collect(Collectors.toList());
-        friendIds.add(Long.parseLong(userId));
-        Wrapper<User> userQueryWrapper = new QueryWrapper<User>()
-                .select("id","nickname","username", "gender","avatar","note","tagline","region")
-                .in("id", friendIds);
-        List<User> users = userMapper.selectList(userQueryWrapper);
-        List<UserFriendInfo> userFriendInfos = new ArrayList<>();
-        for (User user : users){
-            UserFriendInfo userFriendInfo = UserFriendInfo.builder()
-                    .id(user.getId())
-                    .nickname(user.getNickname())
-                    .note(user.getNote())
-                    .tagline(user.getTagline())
-                    .account(user.getUsername())
-                    .gender(user.getGender())
-                    .avatar(user.getAvatar())
-                    .region(user.getRegion())
-                    .build();
-            userFriendInfos.add(userFriendInfo);
-        }
-        return userFriendInfos;
+        return userFriendMapper.findUserFriendByUserId(userId);
     }
 
     @Override
