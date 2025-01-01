@@ -1,4 +1,4 @@
-import { Avatar, FlatList, HStack, Input, Pressable, ScrollView, Text, View, VStack, KeyboardAvoidingView } from 'native-base';
+import { Avatar, FlatList, HStack, Input, Pressable, ScrollView, Text, View, VStack, KeyboardAvoidingView, Box } from 'native-base';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { InteractionManager, Modal, StyleSheet, TouchableWithoutFeedback } from 'react-native';
 import ChatItemHeader from '../../../components/ChatItemHeader';
@@ -24,10 +24,10 @@ const ChatItem = ({ route }) => {
 
     const userInfoRef = useRef()
 
-    const [messageIds,setMessageIds] = useState([])
+    const [messageIds, setMessageIds] = useState([])
 
     const session = useSelector(state => state.chat.entities.sessions[sessionId])
-    const {messages} = session
+    const { messages } = session
 
     const dispatch = useDispatch()
 
@@ -54,13 +54,7 @@ const ChatItem = ({ route }) => {
                     }
                 )
         }
-        //未初始化的数据进行初始化
-        InteractionManager.runAfterInteractions(() => {
-            if (session.messageInit === undefined || session.messageInit === false) {
-                console.log('messageInit')
-                fetchData()
-            }
-
+        const init = async () => {
             const fetchUserInfo = async () => {
                 const userInfo = await Storage.get('userInfo')
                 userInfoRef.current = userInfo
@@ -68,17 +62,28 @@ const ChatItem = ({ route }) => {
 
             fetchUserInfo()
             //选择会话
-            dispatch(selectSession({ sessionId: sessionId}))
+            dispatch(selectSession({ sessionId: sessionId }))
+        }
+        //未初始化的数据进行初始化
+        InteractionManager.runAfterInteractions(() => {
+            setTimeout(() => {
+                if (session.messageInit === undefined || session.messageInit === false) {
+                    fetchData()
+                }
+                init()
+            }, 100);
         })
         return () => {
-            
+
         }
     }, [])
 
     //加载消息
     useEffect(() => {
         InteractionManager.runAfterInteractions(() => {
-            setMessageIds(messages)
+            setTimeout(() => {
+                setMessageIds(messages)
+            }, 100)
         })
     }, [messages])
 

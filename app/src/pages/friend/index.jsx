@@ -1,10 +1,11 @@
-import { Button, Center, Input, Pressable, VStack, Divider, Box, Text, HStack, Avatar } from 'native-base';
+import { Button, Pressable, Input, Image, VStack, Divider, Box, Text, HStack, Avatar } from 'native-base';
 import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigation, } from '@react-navigation/native';
 import { StyleSheet } from 'react-native';
 import Search from '../../components/Search';
 import { AlphabetList } from "react-native-section-alphabet-list";
 import api from '../../api/api';
+import UserFriendItem, { UserFriendItemFooter, UserFriendItemSeparator } from '../../components/UserFriendItem';
 
 const alphabet = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
 
@@ -23,9 +24,9 @@ const Friend = () => {
                             for (let userFriend of userFriends) {
                                 userFriend.key = userFriend.id
                                 let notePinyin;
-                                if((notePinyin = userFriend.notePinyin) && notePinyin.charAt(0) !== -1){
+                                if ((notePinyin = userFriend.notePinyin) && alphabet.indexOf(notePinyin.charAt(0)) !== -1) {
                                     userFriend.value = notePinyin
-                                }else {
+                                } else {
                                     userFriend.value = '#'
                                 }
                             }
@@ -38,21 +39,22 @@ const Friend = () => {
         fetchData()
     }, [])
 
-    const toFriendItem = () => {
-        navigation.navigate('FriendItem')
+    const toFriendItem = (item) => {
+        navigation.navigate('FriendItem', {
+            friend: item
+        })
+    }
+
+    const toGroupItem = (item) => {
+        navigation.navigate('Group', {
+            friend: item
+        })
     }
 
 
     const itemSeparator = useCallback(() => {
         return (
-            <HStack flex={1} space={5} alignItems='flex-end' justifyContent='center' style={styles.customItem}>
-                <VStack flex={1}>
-
-                </VStack>
-                <VStack flex={6}>
-                    <Divider style={styles.userFriendListItemSeparatorDivider} />
-                </VStack>
-            </HStack>
+            <UserFriendItemSeparator/>
         )
     }, [])
 
@@ -65,26 +67,47 @@ const Friend = () => {
         )
     }
 
+    const renderItemHeader = () => {
+
+        return (
+            <Pressable
+                onPress={() => toGroupItem({})}
+            >
+                {({ isHovered, isFocused, isPressed }) => {
+                    return (
+                        <HStack space={5} style={{ backgroundColor: isPressed ? '#C8C6C5' : '#F5F5F5', padding: 10, paddingRight: 0 }}>
+                            <Box style={styles.renderItemHeaderBox}>
+                                <Image alt='' size={35} source={require('../../assets/img/friend-icon-50-white.png')} />
+                            </Box>
+                            <VStack justifyContent='center'>
+                                <Text style={styles.customItemVStackText}>
+                                    群聊
+                                </Text>
+                            </VStack>
+                        </HStack>
+                    )
+                }}
+            </Pressable>
+
+        )
+    }
+
     const renderItem = (item) => {
 
         return (
-            <HStack flex={1} space={5} alignItems='center' style={styles.customItem}>
-                <VStack flex={1} justifyContent='center'>
-                    <Avatar
-                        size="60px"
-                        _image={{
-                            borderRadius: 8
-                        }}
-                        source={{ uri: item.avatar }}
-                    />
-                </VStack>
-
-                <VStack flex={6} justifyContent='center' style={styles.customItemVStack}>
-                    <Text style={styles.customItemVStackText}>
-                        {item.note}
-                    </Text>
-                </VStack>
-            </HStack>
+            <Pressable
+                onPress={() => toFriendItem(item)}
+            >
+                {({ isHovered, isFocused, isPressed }) => {
+                    return (
+                        <UserFriendItem
+                            avatar = {item.avatar}
+                            name = {item.note}
+                            isPressed = {isPressed}
+                        />
+                    )
+                }}
+            </Pressable>
         )
     }
 
@@ -112,9 +135,8 @@ const Friend = () => {
                     renderCustomItem={renderItem}
                     ItemSeparatorComponent={itemSeparator}
                     renderCustomSectionHeader={renderSectionHeader}
-                    ListFooterComponent={(
-                        <Divider style={styles.userFriendListItemSeparatorDivider} />
-                    )}
+                    renderCustomListHeader={renderItemHeader}
+                    ListFooterComponent={(UserFriendItemFooter)}
                 />
             </VStack>
         </>
@@ -157,6 +179,11 @@ const styles = StyleSheet.create({
     },
     sectionHeader: {
         paddingLeft: 10,
+    },
+    renderItemHeaderBox: {
+        backgroundColor: '#70BFFF',
+        padding: 10,
+        borderRadius: 8
     }
 })
 

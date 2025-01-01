@@ -150,6 +150,15 @@ const RootStack = createNativeStackNavigator({
             )
           }
         },
+        Group: {
+          screen: Group,
+          options: {
+            title: '',
+            headerRight: () => (
+              <Feather name='more-horizontal' size={28} />
+            )
+          }
+        },
         GroupItem: {
           screen: GroupItem,
           options: {

@@ -74,7 +74,7 @@ const Home = () => {
                     )
                 }}
             />
-            <Tab.Screen
+            {/* <Tab.Screen
                 name='Group'
                 component={Group}
                 options={{
@@ -100,7 +100,7 @@ const Home = () => {
                         <Image alt='' size={7} mr={4} source={require('../../assets/img/add-group-icon-50.png')} />
                     )
                 }}
-            />
+            /> */}
             <Tab.Screen
                 name='Me'
                 component={Me}
