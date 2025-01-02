@@ -13,58 +13,63 @@ const FriendItem = ({ route }) => {
     return (
         <>
             <Center style={styles.rootContainer}>
-                <VStack width='100%'>
-                    <HStack width='100%' style={styles.friendBase} space={5} alignItems='center'>
-                        <Avatar
-                            size={75}
-                            _image={{
-                                borderRadius: 8
-                            }}
-                            source={{ uri: friendItem.avatar }}
-                        />
-                        <VStack height='100%' justifyContent='flex-start'>
-                            <HStack space={2}>
-                                <Text style={{
-                                    fontSize: 18,
-                                    fontWeight: 'bold'
-                                }}>
-                                    {friendItem.note}
-                                </Text>
-                                <Image alt='' size={5} source={friendItem.gender === 'MALE' ? genderMaleImg : genderFemaleImg} />
-                            </HStack>
-                            {friendItem.note !== friendItem.nickname && (
+                <VStack space={2} width='100%'>
+                    <VStack style={styles.rootContainerTop}>
+                        <HStack width='100%' style={styles.friendBase} space={5} alignItems='center'>
+                            <Avatar
+                                size={75}
+                                _image={{
+                                    borderRadius: 8
+                                }}
+                                source={{ uri: friendItem.avatar }}
+                            />
+                            <VStack height='100%' justifyContent='flex-start'>
                                 <HStack space={2}>
-                                    <Text style={styles.friendItemText}>昵称:</Text>
-                                    <Text style={styles.friendItemText}>{friendItem.nickname}</Text>
+                                    <Text style={{
+                                        fontSize: 18,
+                                        fontWeight: 'bold'
+                                    }}>
+                                        {friendItem.note}
+                                    </Text>
+                                    <Image alt='' size={5} source={friendItem.gender === 'MALE' ? genderMaleImg : genderFemaleImg} />
                                 </HStack>
-                            )}
-                            <HStack space={2}>
-                                <Text style={styles.friendItemText}>账号:</Text>
-                                <Text style={styles.friendItemText}>{friendItem.account}</Text>
-                            </HStack>
-                            {friendItem.region && (
+                                {friendItem.note !== friendItem.nickname && (
+                                    <HStack space={2}>
+                                        <Text style={styles.friendItemText}>昵称:</Text>
+                                        <Text style={styles.friendItemText}>{friendItem.nickname}</Text>
+                                    </HStack>
+                                )}
                                 <HStack space={2}>
-                                    <Text style={styles.friendItemText}>地区:</Text>
-                                    <Text style={styles.friendItemText}>{friendItem.region}</Text>
+                                    <Text style={styles.friendItemText}>账号:</Text>
+                                    <Text style={styles.friendItemText}>{friendItem.account}</Text>
                                 </HStack>
-                            )}
-                        </VStack>
-                    </HStack>
-                    <Divider style={styles.divider} />
-                    <HStack width='100%' style={{ padding: 15,paddingRight: 5 }} space={1} alignItems='center' justifyContent='space-between'>
-                        <Text style={{ fontSize: 18 }}>备注</Text>
-                        <MaterialIcons name="keyboard-arrow-right" color="gray" size={30} />
-                    </HStack>
-                    <Divider style={styles.divider} />
-                    <HStack width='100%' style={{ padding: 15 }} space={1} justifyContent='center' alignItems='center'>
-                        <Ionicons name='chatbubble-outline' size={28} color="#9AA5BE" />
-                        <Text style={{ color: '#9AA5BE',fontSize: 15 }}>发消息</Text>
-                    </HStack>
-                    <Divider style={styles.divider} />
-                    <HStack width='100%' style={{ padding: 15 }} space={1} justifyContent='center' alignItems='center'>
-                        <Ionicons name='videocam-outline' size={28} color="#9AA5BE" />
-                        <Text style={{ color: '#9AA5BE',fontSize: 15 }}>音视频通话</Text>
-                    </HStack>
+                                {friendItem.region && (
+                                    <HStack space={2}>
+                                        <Text style={styles.friendItemText}>地区:</Text>
+                                        <Text style={styles.friendItemText}>{friendItem.region}</Text>
+                                    </HStack>
+                                )}
+                            </VStack>
+                        </HStack>
+                        <Divider style={styles.divider} />
+                        <HStack width='100%' style={{ padding: 15, paddingLeft: 0, paddingRight: 5 }} space={1} alignItems='center' justifyContent='space-between'>
+                            <Text style={{ fontSize: 18 }}>备注</Text>
+                            <MaterialIcons name="keyboard-arrow-right" color="gray" size={30} />
+                        </HStack>
+                    </VStack>
+
+                    <VStack style={styles.rootContainerBottom}>
+                        <HStack width='100%' style={{ padding: 15 }} space={1} justifyContent='center' alignItems='center'>
+                            <Ionicons name='chatbubble-outline' size={28} color="#9AA5BE" />
+                            <Text style={{ color: '#9AA5BE', fontSize: 15 }}>发消息</Text>
+                        </HStack>
+                        <Divider style={styles.divider} />
+                        <HStack width='100%' style={{ padding: 15 }} space={1} justifyContent='center' alignItems='center'>
+                            <Ionicons name='videocam-outline' size={28} color="#9AA5BE" />
+                            <Text style={{ color: '#9AA5BE', fontSize: 15 }}>音视频通话</Text>
+                        </HStack>
+                    </VStack>
+
                 </VStack>
             </Center>
         </>
@@ -73,10 +78,16 @@ const FriendItem = ({ route }) => {
 
 const styles = StyleSheet.create({
     rootContainer: {
+
+    },
+    rootContainerTop:{
+        backgroundColor: 'white',
+        paddingLeft: 15
+    },
+    rootContainerBottom: {
         backgroundColor: 'white',
     },
     friendBase: {
-        paddingLeft: 15,
         paddingTop: 30,
         paddingBottom: 30
     },
