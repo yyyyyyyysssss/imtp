@@ -72,7 +72,7 @@ const Group = () => {
                     data={userGroups}
                     renderItem={renderItem}
                     ItemSeparatorComponent={itemSeparator}
-                    ListFooterComponent={(UserFriendItemFooter)}
+                    ListFooterComponent={<UserFriendItemFooter/>}
                 />
             </VStack>
         </>

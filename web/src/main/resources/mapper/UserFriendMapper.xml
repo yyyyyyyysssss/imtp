@@ -6,6 +6,7 @@
     <resultMap id="resultUserFriendInfoMap" type="org.imtp.common.packet.body.UserFriendInfo">
         <result property="id" column="id"/>
         <result property="nickname" column="nickname"/>
+        <result property="account" column="username"/>
         <result property="note" column="note"/>
         <result property="notePinyin" column="note_pinyin"/>
         <result property="avatar" column="avatar"/>
@@ -17,6 +18,7 @@
     <select id="findUserFriendByUserId" resultMap="resultUserFriendInfoMap">
         SELECT
         u.id,
+        u.username,
         u.nickname,
         IFNULL(t.note,u.nickname) as note,
         IFNULL(t.note_pinyin,u.nickname_pinyin) as note_pinyin,

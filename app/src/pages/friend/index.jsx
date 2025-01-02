@@ -41,7 +41,7 @@ const Friend = () => {
 
     const toFriendItem = (item) => {
         navigation.navigate('FriendItem', {
-            friend: item
+            friendItem: item
         })
     }
 
@@ -136,7 +136,7 @@ const Friend = () => {
                     ItemSeparatorComponent={itemSeparator}
                     renderCustomSectionHeader={renderSectionHeader}
                     renderCustomListHeader={renderItemHeader}
-                    ListFooterComponent={(UserFriendItemFooter)}
+                    ListFooterComponent={<UserFriendItemFooter/>}
                 />
             </VStack>
         </>
@@ -171,11 +171,7 @@ const styles = StyleSheet.create({
     },
     userFriendListItemSeparatorDivider: {
         height: 1,
-        backgroundColor: '#D3D3D3',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.1,
-        shadowRadius: 2,
+        backgroundColor: '#D3D3D3'
     },
     sectionHeader: {
         paddingLeft: 10,
