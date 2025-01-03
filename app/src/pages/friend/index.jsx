@@ -60,8 +60,9 @@ const Friend = () => {
 
     const renderSectionHeader = (section) => {
         return (
-            <VStack height={10} justifyContent='space-between' style={styles.sectionHeader}>
+            <VStack justifyContent='space-between' style={styles.sectionHeader}>
                 <Divider style={styles.userFriendListItemSeparatorDivider} />
+                <Box height={4}/>
                 <Text>{section.title}</Text>
             </VStack>
         )
@@ -125,12 +126,12 @@ const Friend = () => {
                         fontSize: 12,
                     }}
                     indexLetterContainerStyle={{
-                        margin: 4
+                        margin: 4,
                     }}
                     indexContainerStyle={{
                         marginRight: 6,
                         marginTop: '-60%',
-                        zIndex: 1000,
+                        zIndex: 1000
                     }}
                     renderCustomItem={renderItem}
                     ItemSeparatorComponent={itemSeparator}
@@ -156,7 +157,7 @@ const styles = StyleSheet.create({
     },
     alphabetList: {
         width: '100%',
-        height: '100%'
+        height: '100%',
     },
     customItem: {
         padding: 10,
@@ -175,6 +176,7 @@ const styles = StyleSheet.create({
     },
     sectionHeader: {
         paddingLeft: 10,
+        // backgroundColor: 'red'
     },
     renderItemHeaderBox: {
         backgroundColor: '#70BFFF',
