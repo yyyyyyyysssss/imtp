@@ -31,7 +31,7 @@ public class ClientContextHolder {
                 lock.unlock();
             }
         }else {
-            clientContext.resetTokenInfo(tokenInfo);
+            clientContext.reset(channel,tokenInfo);
         }
         return clientContext;
     }

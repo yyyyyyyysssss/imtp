@@ -1,9 +1,8 @@
 package org.imtp.app.context;
 
-import io.netty.channel.Channel;
-
-import org.imtp.app.NettyClient;
 import org.imtp.common.packet.body.TokenInfo;
+
+import io.netty.channel.Channel;
 
 /**
  * @Description
@@ -27,17 +26,16 @@ public abstract class AbstractClientChannelContext implements ClientContext{
     }
 
     @Override
-    public void resetChannel(Channel channel) {
-        this.channel = channel;
-    }
-
-    @Override
     public TokenInfo tokenInfo() {
         return this.tokenInfo;
     }
 
+
     @Override
-    public void resetTokenInfo(TokenInfo tokenInfo) {
+    public void reset(Channel channel, TokenInfo tokenInfo) {
+        this.channel = channel;
         this.tokenInfo = tokenInfo;
     }
+
+
 }

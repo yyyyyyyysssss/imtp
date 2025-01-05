@@ -175,8 +175,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#D3D3D3'
     },
     sectionHeader: {
-        paddingLeft: 10,
-        // backgroundColor: 'red'
+        paddingLeft: 10
     },
     renderItemHeaderBox: {
         backgroundColor: '#70BFFF',

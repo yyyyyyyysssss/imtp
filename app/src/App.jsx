@@ -24,7 +24,7 @@ import VideoPlay from './components/VideoPlay';
 import { showToast } from './components/Utils';
 import { NativeModules } from 'react-native';
 
-const { NettyClientModule } = NativeModules
+const { MessageModule } = NativeModules
 
 const HomeTab = createBottomTabNavigator({
   initialRouteName: 'Chat',
@@ -253,13 +253,13 @@ const App = () => {
   const logoutHandler = async () => {
     await Storage.multiRemove(['userToken', 'userInfo'])
     dispatch(signOut())
-    NettyClientModule.destroy()
+    MessageModule.destroy()
     .then(
       (res) => {
-        console.log('NettyClientModule destroy', res ? 'succeed' : 'failed')
+        console.log('MessageModule destroy', res ? 'succeed' : 'failed')
       },
       (error) => {
-        console.log('NettyClientModule destroy', 'failed',error.message)
+        console.log('MessageModule destroy', 'failed',error.message)
       }
     )
   }
@@ -270,13 +270,13 @@ const App = () => {
       userToken: userToken
     })
     dispatch(restoreToken({ token: userToken, userInfo: userInfo }))
-    NettyClientModule.init(JSON.stringify(userToken))
+    MessageModule.init(JSON.stringify(userToken))
     .then(
       (res) => {
-        console.log('NettyClientModule init',res ? 'succeed' : 'failed')
+        console.log('MessageModule init succeed')
       },
       (error) => {
-        console.log('NettyClientModule init', 'failed',error.message)
+        console.log('MessageModule init error:',error.message)
       }
     )
   }

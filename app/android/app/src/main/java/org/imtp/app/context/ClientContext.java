@@ -1,6 +1,7 @@
 package org.imtp.app.context;
 
 import org.imtp.app.NettyClient;
+import org.imtp.app.model.MessageModel;
 import org.imtp.common.packet.body.TokenInfo;
 
 import io.netty.channel.Channel;
@@ -17,9 +18,8 @@ public interface ClientContext {
 
     Channel channel();
 
-    void resetChannel(Channel channel);
-
     TokenInfo tokenInfo();
 
-    void resetTokenInfo(TokenInfo tokenInfo);
+    void reset(Channel channel,TokenInfo tokenInfo);
+
 }

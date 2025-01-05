@@ -7,7 +7,7 @@ import com.facebook.react.bridge.NativeModule;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.uimanager.ViewManager;
 
-import org.imtp.app.module.NettyClientModule;
+import org.imtp.app.module.MessageModule;
 import org.imtp.app.module.UploadModule;
 
 import java.util.ArrayList;
@@ -20,7 +20,7 @@ public class CustomNativeModulePackage implements ReactPackage {
     public List<NativeModule> createNativeModules(@NonNull ReactApplicationContext reactApplicationContext) {
         List<NativeModule> nativeModules = new ArrayList<>();
         //初始化netty客户端
-        nativeModules.add(new NettyClientModule());
+        nativeModules.add(new MessageModule(reactApplicationContext));
         //注册文件上传模块
         nativeModules.add(new UploadModule(reactApplicationContext));
         return nativeModules;

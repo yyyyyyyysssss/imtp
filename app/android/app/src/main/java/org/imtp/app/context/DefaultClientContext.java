@@ -1,6 +1,7 @@
 package org.imtp.app.context;
 
 import org.imtp.app.NettyClient;
+import org.imtp.app.model.MessageModel;
 import org.imtp.common.packet.body.TokenInfo;
 
 import io.netty.channel.Channel;

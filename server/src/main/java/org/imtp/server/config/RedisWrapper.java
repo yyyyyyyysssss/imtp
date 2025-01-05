@@ -1,6 +1,7 @@
 package org.imtp.server.config;
 
 import jakarta.annotation.Resource;
+import org.imtp.server.mq.ForwardMessage;
 import org.imtp.server.mq.Topic;
 import org.springframework.data.redis.connection.stream.ObjectRecord;
 import org.springframework.data.redis.connection.stream.RecordId;
@@ -35,8 +36,8 @@ public class RedisWrapper {
         return redisTemplate.convertAndSend(topic,message);
     }
 
-    public RecordId addStreamRecord(Object object){
-        ObjectRecord<String, Object> objectObjectRecord = StreamRecords.newRecord().in(Topic.MESSAGE_FORWARD).ofObject(object);
+    public RecordId addStreamRecord(ForwardMessage forwardMessage){
+        ObjectRecord<String, ForwardMessage> objectObjectRecord = StreamRecords.newRecord().in(Topic.MESSAGE_FORWARD).ofObject(forwardMessage);
         return redisTemplate.opsForStream().add(objectObjectRecord);
     }
 
