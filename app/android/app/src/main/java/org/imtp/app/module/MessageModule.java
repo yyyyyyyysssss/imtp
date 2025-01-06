@@ -26,15 +26,14 @@ public class MessageModule extends ReactContextBaseJavaModule implements Observe
 
     private static final String TAG = "MessageModule";
 
-    private NettyClient nettyClient;
+    private static NettyClient nettyClient;
 
-    private final MessageModel messageModel;
+    private static final MessageModel messageModel = new MessageModel();
 
     private final ReactApplicationContext reactApplicationContext;
 
     public MessageModule(ReactApplicationContext reactApplicationContext){
         this.reactApplicationContext = reactApplicationContext;
-        messageModel = new MessageModel();
         messageModel.registerObserver(this);
     }
 
@@ -47,9 +46,13 @@ public class MessageModule extends ReactContextBaseJavaModule implements Observe
 
     @ReactMethod
     public void init(String tokenInfoJson, Promise promise){
+        if (nettyClient != null){
+            promise.resolve(true);
+            return;
+        }
         TokenInfo tokenInfo = JsonUtil.parseObject(tokenInfoJson, TokenInfo.class);
-        this.nettyClient = new NettyClient(tokenInfo,this.messageModel);
-        this.nettyClient.addListener(new ConnectListener() {
+        nettyClient = new NettyClient(tokenInfo, messageModel);
+        nettyClient.addListener(new ConnectListener() {
             @Override
             public void connected() {
                 messageModel.sendMessage(new AuthenticationRequest(tokenInfo.getAccessToken()));
@@ -62,13 +65,16 @@ public class MessageModule extends ReactContextBaseJavaModule implements Observe
             }
         });
         //启动客户端
-        new Thread(this.nettyClient).start();
+        new Thread(nettyClient).start();
     }
 
     @ReactMethod
     public void destroy(Promise promise){
         Log.i(TAG,"MessageModule destroy");
-        this.nettyClient.stop();
+        if (nettyClient != null){
+            nettyClient.stop();
+            nettyClient = null;
+        }
         promise.resolve(true);
     }
 
@@ -89,7 +95,7 @@ public class MessageModule extends ReactContextBaseJavaModule implements Observe
             return;
         }
         ReactNativeMessage reactNativeMessage = JsonUtil.parseObject(messageJson, ReactNativeMessage.class);
-        this.messageModel.sendMessage(new ReactNativeAdapterMessage(reactNativeMessage), new MessageListenerListener() {
+        messageModel.sendMessage(new ReactNativeAdapterMessage(reactNativeMessage), new MessageListenerListener() {
             @Override
             public void succeed() {
                 promise.resolve(true);

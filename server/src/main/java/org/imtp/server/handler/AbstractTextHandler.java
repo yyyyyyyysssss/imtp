@@ -70,21 +70,13 @@ public abstract class AbstractTextHandler<T extends AbstractTextMessage>  extend
             }
         }
 
-        //离线用户消息落库
+        //消息落库
         ctx.channel().eventLoop().execute(() -> {
             MessageDTO messageDTO = new MessageDTO(msg);
             messageDTO.setContent(msg.getMessage());
             Result<Long> result = webApi.message(messageDTO);
             if (result.isSucceed()){
-                Long messageId = result.getData();
-                if (!offlineReceivers.isEmpty()){
-                    List<OfflineMessageDTO> offlineMessages = new ArrayList<>();
-                    for (String receiver : offlineReceivers){
-                        OfflineMessageDTO offlineMessage = new OfflineMessageDTO(messageId,Long.parseLong(receiver));
-                        offlineMessages.add(offlineMessage);
-                    }
-                    webApi.offlineMessage(offlineMessages);
-                }
+                log.debug("save message succeed : {}",result.getMessage());
             }else {
                 log.warn("save message error : {}",result.getMessage());
             }

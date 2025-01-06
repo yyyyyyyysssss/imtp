@@ -1,7 +1,7 @@
 import { Button, Center, FlatList, Avatar, Input, Pressable, VStack, HStack, Box, Text, Flex, Divider, Icon, ScrollView } from 'native-base';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useNavigation, } from '@react-navigation/native';
-import { InteractionManager, StyleSheet } from 'react-native';
+import { InteractionManager, StyleSheet,NativeModules,NativeEventEmitter } from 'react-native';
 import api from '../../api/api';
 import { useDispatch, useSelector, shallowEqual } from 'react-redux';
 import { loadSession, removeSession, incrUnreadCount, decrUnreadCount } from '../../redux/slices/chatSlice';
@@ -12,6 +12,9 @@ import Search from '../../components/Search';
 import SwipeItemOperation from '../../components/SwipeItemOperation';
 import UserSessionItem from '../../components/UserSessionItem';
 import { normalize, schema } from 'normalizr';
+
+const { MessageModule } = NativeModules
+const MessageModuleNativeEventEmitter = new NativeEventEmitter(MessageModule);
 
 
 const Chat = () => {
@@ -43,6 +46,15 @@ const Chat = () => {
                 )
         }
         fetchData()
+
+        //接收消息监听
+        const receiveMessageEventEmitter = MessageModuleNativeEventEmitter.addListener('RECEIVE_MESSAGE',(message) => {
+            console.log('RECEIVE_MESSAGE',message)
+        })
+
+        return () => {
+            receiveMessageEventEmitter.remove()
+        }
     }, [])
 
     useEffect(() => {

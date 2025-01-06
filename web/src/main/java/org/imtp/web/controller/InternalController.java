@@ -84,8 +84,8 @@ public class InternalController {
 
     @PostMapping("/message")
     public Result<?> message(@RequestBody MessageDTO messageDTO){
-        Long messageId = userSocialService.saveMessage(messageDTO);
-        return ResultGenerator.ok(messageId);
+//        Long messageId = userSocialService.saveMessage(messageDTO);
+        return ResultGenerator.ok();
     }
 
     @PostMapping("/offlineMessage")

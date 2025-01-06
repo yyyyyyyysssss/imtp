@@ -14,7 +14,9 @@ import { MessageStatus, MessageType } from '../../../enum';
 import IdGen from '../../../utils/IdGen';
 import { formatFileSize } from '../../../utils/FormatUtil';
 import { createThumbnail } from "react-native-create-thumbnail";
+import { NativeModules } from 'react-native';
 
+const { MessageModule } = NativeModules
 
 const ChatItem = ({ route }) => {
 
@@ -103,6 +105,15 @@ const ChatItem = ({ route }) => {
         switch (type) {
             case MessageType.TEXT_MESSAGE:
                 msg = messageBase(content, type)
+                MessageModule.sendMessage(JSON.stringify(msg))
+                    .then(
+                        (res) => {
+                            console.log('send succeed')
+                        },
+                        (error) => {
+                            console.log('send failed')
+                        }
+                    )
                 break
             case MessageType.IMAGE_MESSAGE:
                 msg = messageBase(filePath, type)
@@ -221,8 +232,8 @@ const ChatItem = ({ route }) => {
             content: content,
             status: MessageStatus.PENDING,
             sessionId: sessionId,
-            senderUserId: session.senderUserId,
-            receiverUserId: session.receiverUserId,
+            sender: session.senderUserId,
+            receiver: session.receiverUserId,
             deliveryMethod: session.deliveryMethod,
             self: true,
             timestamp: new Date().getTime(),
