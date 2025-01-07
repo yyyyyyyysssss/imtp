@@ -34,6 +34,8 @@ public class MessageModule extends ReactContextBaseJavaModule implements Observe
 
     public MessageModule(ReactApplicationContext reactApplicationContext){
         this.reactApplicationContext = reactApplicationContext;
+        messageModel.removeObserver(MessageModule.class);
+        messageModel.registerObserver(this);
     }
 
     @NonNull
@@ -49,7 +51,6 @@ public class MessageModule extends ReactContextBaseJavaModule implements Observe
             promise.resolve(true);
             return;
         }
-        messageModel.registerObserver(this);
         TokenInfo tokenInfo = JsonUtil.parseObject(tokenInfoJson, TokenInfo.class);
         nettyClient = new NettyClient(tokenInfo, messageModel);
         nettyClient.addListener(new ConnectListener() {
@@ -74,7 +75,6 @@ public class MessageModule extends ReactContextBaseJavaModule implements Observe
         if (nettyClient != null){
             nettyClient.stop();
             nettyClient = null;
-            messageModel.removeObserver(this);
         }
         promise.resolve(true);
     }

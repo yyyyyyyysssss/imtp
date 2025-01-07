@@ -48,6 +48,7 @@ public class NettyClient implements Runnable {
         this.appConfig = AppConfig.getInstance();
         this.eventLoopGroup = new NioEventLoopGroup();
         this.bootstrap = new Bootstrap();
+        NettyClient that = this;
         this.bootstrap.group(eventLoopGroup)
                 .channel(NioSocketChannel.class)
                 .option(ChannelOption.TCP_NODELAY, true)
@@ -57,7 +58,7 @@ public class NettyClient implements Runnable {
                         ChannelPipeline pipeline = ch.pipeline();
                         pipeline.addLast(new IMTPDecoder());
                         pipeline.addLast(new IMTPEncoder());
-                        pipeline.addLast(new AuthenticationHandler(messageModel));
+                        pipeline.addLast(new AuthenticationHandler(that,messageModel));
                     }
                 });
     }
@@ -70,28 +71,27 @@ public class NettyClient implements Runnable {
         try {
             ChannelFuture connect = this.bootstrap.connect("10.0.2.2", 2921);
             connect.addListener((ChannelFutureListener) future -> {
-                if (future.isDone()) {
-                    if (future.isSuccess()) {
-                        Log.i(TAG, "server connection success");
-                        //初始化上下文对象
-                        ClientContextHolder.createClientContext(future.channel(), tokenInfo);
+                if (future.isSuccess()) {
+                    Log.i(TAG, "server connection success");
+                    //初始化上下文对象
+                    ClientContextHolder.createClientContext(future.channel(), tokenInfo);
+                    if (this.connectListener != null) {
+                        this.connectListener.connected();
+                    }
+                } else {
+                    if (future.cause() != null) {
+                        Throwable throwable = future.cause();
+                        Log.w(TAG, "server connection exception: " + throwable.getMessage());
                         if (this.connectListener != null) {
-                            this.connectListener.connected();
-                        }
-                    } else {
-                        if (future.cause() != null){
-                            Throwable throwable = future.cause();
-                            Log.w(TAG, "server connection exception: " + throwable.getMessage());
-                            if (this.connectListener != null) {
-                                this.connectListener.exception(future.cause());
-                            }
-                            this.eventLoopGroup.schedule(() -> {
-                                Log.w(TAG, "server reconnecting...");
-                                connect();
-                            },2L, TimeUnit.SECONDS);
+                            this.connectListener.exception(future.cause());
                         }
                     }
+                    future.channel().eventLoop().schedule(() -> {
+                        Log.w(TAG, "server reconnecting...");
+                        connect();
+                    }, 2L, TimeUnit.SECONDS);
                 }
+
             });
             connect.channel().closeFuture().sync();
         } catch (Exception e) {

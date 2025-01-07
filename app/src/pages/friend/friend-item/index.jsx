@@ -1,14 +1,37 @@
-import { Avatar, Center, Divider, HStack, Image, Text, VStack } from 'native-base';
+import { Avatar, Center, Divider, HStack, Image, Pressable, Text, VStack } from 'native-base';
 import React, { useState } from 'react';
 import { StyleSheet } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import genderFemaleImg from './../../../assets/img/gender_female.png'
 import genderMaleImg from './../../../assets/img/gender_male.png'
+import { useSelector } from 'react-redux';
+import { useNavigation, } from '@react-navigation/native';
 
 const FriendItem = ({ route }) => {
 
     const { friendItem } = route.params;
+
+    const navigation = useNavigation();
+
+    const sessions = useSelector(state => state.chat.entities.sessions)
+
+
+    const toSend = () => {
+        const friendId = friendItem.id
+        let sessionId;
+        Object.values(sessions).map(session => {
+            const { receiverUserId } = session
+            if (friendId === receiverUserId) {
+                sessionId = session.id
+            }
+        })
+        if (sessionId) {
+            navigation.navigate('ChatItem', {
+                sessionId: sessionId,
+            })
+        }
+    }
 
     return (
         <>
@@ -59,15 +82,19 @@ const FriendItem = ({ route }) => {
                     </VStack>
 
                     <VStack style={styles.rootContainerBottom}>
-                        <HStack width='100%' style={{ padding: 15 }} space={1} justifyContent='center' alignItems='center'>
-                            <Ionicons name='chatbubble-outline' size={28} color="#9AA5BE" />
-                            <Text style={{ color: '#9AA5BE', fontSize: 15 }}>发消息</Text>
-                        </HStack>
+                        <Pressable onPress={toSend}>
+                            <HStack width='100%' style={{ padding: 15 }} space={1} justifyContent='center' alignItems='center'>
+                                <Ionicons name='chatbubble-outline' size={28} color="#9AA5BE" />
+                                <Text style={{ color: '#9AA5BE', fontSize: 15 }}>发消息</Text>
+                            </HStack>
+                        </Pressable>
                         <Divider style={styles.divider} />
-                        <HStack width='100%' style={{ padding: 15 }} space={1} justifyContent='center' alignItems='center'>
-                            <Ionicons name='videocam-outline' size={28} color="#9AA5BE" />
-                            <Text style={{ color: '#9AA5BE', fontSize: 15 }}>音视频通话</Text>
-                        </HStack>
+                        <Pressable>
+                            <HStack width='100%' style={{ padding: 15 }} space={1} justifyContent='center' alignItems='center'>
+                                <Ionicons name='videocam-outline' size={28} color="#9AA5BE" />
+                                <Text style={{ color: '#9AA5BE', fontSize: 15 }}>音视频通话</Text>
+                            </HStack>
+                        </Pressable>
                     </VStack>
 
                 </VStack>
@@ -80,7 +107,7 @@ const styles = StyleSheet.create({
     rootContainer: {
 
     },
-    rootContainerTop:{
+    rootContainerTop: {
         backgroundColor: 'white',
         paddingLeft: 15
     },

@@ -2,8 +2,8 @@ package org.imtp.app.handler;
 
 import android.util.Log;
 
+import org.imtp.app.NettyClient;
 import org.imtp.app.model.MessageModel;
-import org.imtp.app.model.Model;
 import org.imtp.common.enums.Command;
 import org.imtp.common.packet.CommandPacket;
 import org.imtp.common.packet.FileMessage;
@@ -13,6 +13,7 @@ import org.imtp.common.packet.TextMessage;
 import org.imtp.common.packet.VideoMessage;
 import org.imtp.common.packet.base.Header;
 import org.imtp.common.packet.base.Packet;
+
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandler;
@@ -25,8 +26,8 @@ public class CommandHandler extends AbstractModelHandler<Packet> {
 
     private static final String TAG = "CommandHandler";
 
-    public CommandHandler(MessageModel model){
-        super(model);
+    public CommandHandler(NettyClient nettyClient, MessageModel model){
+        super(nettyClient,model);
     }
 
     @Override
@@ -55,4 +56,11 @@ public class CommandHandler extends AbstractModelHandler<Packet> {
                 Log.e(TAG,"Unsupported Operation");
         }
     }
+
+    @Override
+    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        Log.w(TAG,"channelInactive");
+        this.nettyClient.connect();
+    }
+
 }

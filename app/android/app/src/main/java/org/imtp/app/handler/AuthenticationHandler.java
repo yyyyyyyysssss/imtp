@@ -2,6 +2,7 @@ package org.imtp.app.handler;
 
 import android.util.Log;
 
+import org.imtp.app.NettyClient;
 import org.imtp.app.context.ClientContextHolder;
 import org.imtp.app.model.MessageModel;
 import org.imtp.app.model.Model;
@@ -28,8 +29,8 @@ public class AuthenticationHandler extends AbstractModelHandler<Packet> {
 
     private static final String TAG = "AuthenticationHandler";
 
-    public AuthenticationHandler(MessageModel model) {
-        super(model);
+    public AuthenticationHandler(NettyClient nettyClient, MessageModel model) {
+        super(nettyClient,model);
     }
 
     @Override
@@ -41,7 +42,7 @@ public class AuthenticationHandler extends AbstractModelHandler<Packet> {
             AuthenticationResponse authenticationResponse = new AuthenticationResponse(byteBuf,header);
             if (authenticationResponse.isAuthenticated()){
                 Log.i(TAG,"Authentication Succeed");
-                channelHandlerContext.pipeline().addLast(new CommandHandler(this.model)).remove(this);
+                channelHandlerContext.pipeline().addLast(new CommandHandler(this.nettyClient,this.model)).remove(this);
             }else {
                 Log.e(TAG,"Authentication Failed");
             }
