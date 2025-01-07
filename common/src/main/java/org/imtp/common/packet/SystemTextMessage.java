@@ -48,5 +48,6 @@ public abstract class SystemTextMessage extends Packet {
 
     public abstract void encodeBodyAsByteBuf0(ByteBuf byteBuf);
 
+    @JsonIgnore
     public abstract int getBodyLength0();
 }

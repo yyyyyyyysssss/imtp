@@ -4,7 +4,7 @@ import { useNavigation, } from '@react-navigation/native';
 import { InteractionManager, StyleSheet,NativeModules,NativeEventEmitter } from 'react-native';
 import api from '../../api/api';
 import { useDispatch, useSelector, shallowEqual } from 'react-redux';
-import { loadSession, removeSession, incrUnreadCount, decrUnreadCount } from '../../redux/slices/chatSlice';
+import { loadSession, removeSession, updateMessageStatus } from '../../redux/slices/chatSlice';
 import { formatChatDate } from '../../utils/FormatUtil';
 import { SwipeListView } from 'react-native-swipe-list-view';
 import { showToast } from '../../components/Utils';
@@ -12,6 +12,7 @@ import Search from '../../components/Search';
 import SwipeItemOperation from '../../components/SwipeItemOperation';
 import UserSessionItem from '../../components/UserSessionItem';
 import { normalize, schema } from 'normalizr';
+import { MessageType } from '../../enum';
 
 const { MessageModule } = NativeModules
 const MessageModuleNativeEventEmitter = new NativeEventEmitter(MessageModule);
@@ -49,7 +50,16 @@ const Chat = () => {
 
         //接收消息监听
         const receiveMessageEventEmitter = MessageModuleNativeEventEmitter.addListener('RECEIVE_MESSAGE',(message) => {
-            console.log('RECEIVE_MESSAGE',message)
+            const msg = JSON.parse(message)
+            const { header } = msg
+            const {cmd} = header
+            switch(cmd){
+                case MessageType.COMMON_RESPONSE:
+                    const {ackId,state} = msg
+                    dispatch(updateMessageStatus({ id: ackId,status: state }))
+                    break
+            }
+            console.log('RECEIVE_MESSAGE',msg)
         })
 
         return () => {

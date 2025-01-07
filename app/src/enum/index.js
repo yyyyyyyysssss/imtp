@@ -1,4 +1,5 @@
 export const MessageType = Object.freeze({
+    COMMON_RESPONSE: -1,
     TEXT_MESSAGE: 1,
     IMAGE_MESSAGE: 4,
     VIDEO_MESSAGE: 5,

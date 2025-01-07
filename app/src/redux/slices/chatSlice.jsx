@@ -27,6 +27,9 @@ export const chatSlice = createSlice({
             const { sessionId } = payload
             //会话未读消息
             const unreadMessageCount = state.entities.sessions[sessionId].unreadMessageCount || 0
+            if(unreadMessageCount === 0){
+                return
+            }
             state.entities.sessions[sessionId].unreadMessageCount = 0
             //未读消息总计
             const unreadCount = state.unreadCount || 0
@@ -83,12 +86,18 @@ export const chatSlice = createSlice({
             const { message } = payload
             state.entities.messages[message.id] = { ...message }
         },
+        updateMessageStatus: (state, action) => {
+            const { payload } = action
+            const { id,newStatus } = payload
+            const message = state.entities.messages[id]
+            state.entities.messages[id] = { ...message, status: newStatus }
+        },
         deleteMessage: (state, action) => {
 
         }
     }
 })
 
-export const { loadSession, addSession, selectSession, removeSession, loadMessage, addMessage, updateMessage, deleteMessage } = chatSlice.actions
+export const { loadSession, addSession, selectSession, removeSession, loadMessage, addMessage, updateMessage,updateMessageStatus, deleteMessage } = chatSlice.actions
 
 export default chatSlice.reducer

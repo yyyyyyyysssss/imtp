@@ -32,7 +32,6 @@ const ChatItem = ({ route }) => {
     const { messages } = session
 
     const dispatch = useDispatch()
-
     useEffect(() => {
         const fetchData = async () => {
             api.get('/social/userMessage/{userId}', {
@@ -105,15 +104,10 @@ const ChatItem = ({ route }) => {
         switch (type) {
             case MessageType.TEXT_MESSAGE:
                 msg = messageBase(content, type)
-                MessageModule.sendMessage(JSON.stringify(msg))
-                    .then(
-                        (res) => {
-                            console.log('send succeed')
-                        },
-                        (error) => {
-                            console.log('send failed')
-                        }
-                    )
+                //添加消息
+                dispatch(addMessage({ sessionId: sessionId, message: msg }))
+                //向服务器发送消息
+                realSendMessage(msg)
                 break
             case MessageType.IMAGE_MESSAGE:
                 msg = messageBase(filePath, type)
@@ -126,11 +120,15 @@ const ChatItem = ({ route }) => {
                     size: fileSize,
                     sizeDesc: formatFileSize(fileSize)
                 }
+                //添加消息
+                dispatch(addMessage({ sessionId: sessionId, message: msg }))
                 Uplaod.uploadChunks(filePath, fileName, fileType, fileSize, msg.progressId)
                     .then(
                         (res) => {
                             const newMsg = { ...msg, status: MessageStatus.SENT, content: res }
                             dispatch(updateMessage({ message: newMsg }))
+                            //向服务器发送消息
+                            realSendMessage(newMsg)
                         },
                         (error) => {
                             const newMsg = { ...msg, status: MessageStatus.FAILED }
@@ -153,6 +151,8 @@ const ChatItem = ({ route }) => {
                     duration: duration,
                     durationDesc: `${minutes}:${seconds.toString().padStart(2, '0')}`
                 }
+                //添加消息
+                dispatch(addMessage({ sessionId: sessionId, message: msg }))
                 //获取视频封面
                 createThumbnail({
                     url: filePath,
@@ -176,6 +176,8 @@ const ChatItem = ({ route }) => {
                                                 (res) => {
                                                     const newMsg2 = { ...newMsg, status: MessageStatus.SENT, content: res }
                                                     dispatch(updateMessage({ message: newMsg2 }))
+                                                    //向服务器发送消息
+                                                    realSendMessage(newMsg2)
                                                 },
                                                 (error) => {
                                                     const newMsg2 = { ...newMsg, status: MessageStatus.FAILED }
@@ -204,11 +206,15 @@ const ChatItem = ({ route }) => {
                     size: fileSize,
                     sizeDesc: formatFileSize(fileSize)
                 }
+                //添加消息
+                dispatch(addMessage({ sessionId: sessionId, message: msg }))
                 Uplaod.uploadChunks(filePath, fileName, fileType, fileSize, msg.progressId)
                     .then(
                         (res) => {
                             const newMsg = { ...msg, status: MessageStatus.SENT, content: res }
                             dispatch(updateMessage({ message: newMsg }))
+                            //向服务器发送消息
+                            realSendMessage(newMsg)
                         },
                         (error) => {
                             const newMsg = { ...msg, status: MessageStatus.FAILED }
@@ -219,15 +225,25 @@ const ChatItem = ({ route }) => {
             default:
                 showToast("Unsupported message type")
         }
-        if (msg) {
-            dispatch(addMessage({ sessionId: sessionId, message: msg }))
-        }
+    }
+
+    const realSendMessage = (msg) => {
+        MessageModule.sendMessage(JSON.stringify(msg))
+            .then(
+                (res) => {
+                    console.log('send succeed')
+                },
+                (error) => {
+                    console.log('send failed',error)
+                }
+            )
     }
 
     const messageBase = (content, type) => {
+        const id = IdGen.nextId()
         return {
-            id: IdGen.nextId(),
-            ackId: IdGen.nextId(),
+            id: id,
+            ackId: id,
             type: type,
             content: content,
             status: MessageStatus.PENDING,
