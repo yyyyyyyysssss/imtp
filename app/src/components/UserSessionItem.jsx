@@ -9,7 +9,7 @@ const UserSessionItem = React.memo(({ sessionId }) => {
 
     const session = useSelector(state => state.chat.entities.sessions[sessionId])
 
-    const { name, avatar, lastMsgType,lastUserName, lastMsgContent, lastMsgTime, deliveryMethod, unreadMessageCount } = session
+    const { name, avatar, lastMsgType,lastUserName, lastMsgContent, lastMsgTime, deliveryMethod, unreadMessageCount } = session || {}
 
     let messageContent;
     switch (lastMsgType) {

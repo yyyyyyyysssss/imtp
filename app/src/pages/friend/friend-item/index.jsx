@@ -5,13 +5,12 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import genderFemaleImg from './../../../assets/img/gender_female.png'
 import genderMaleImg from './../../../assets/img/gender_male.png'
-import { useSelector,useDispatch } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { addSession } from '../../../redux/slices/chatSlice';
 import { useNavigation, } from '@react-navigation/native';
 import api from '../../../api/api';
 import { DeliveryMethod } from '../../../enum';
 import { UserInfoContext } from '../../../context';
-import reduxStore from '../../../redux/store';
 
 const FriendItem = ({ route }) => {
 
@@ -19,26 +18,17 @@ const FriendItem = ({ route }) => {
 
     const navigation = useNavigation();
 
-    const sessionIds = useSelector(state => state.chat.result)
+    const sessions = useSelector(state => state.chat.entities.sessions)
 
     const dispatch = useDispatch()
 
     const userInfo = useContext(UserInfoContext)
 
-    const sessionsRef = useRef({})
-    useEffect(() => {
-        const state = reduxStore.getState()
-        for (let sessionId of sessionIds) {
-            const session = state.chat.entities.sessions[sessionId]
-            sessionsRef.current[session.receiverUserId] = session
-        }
-    }, [sessionIds])
-
 
     const toSend = async () => {
         const friendId = friendItem.id
-        const session = sessionsRef.current[friendId]
         let sessionId;
+        const session = Object.values(sessions).find(s => s.receiverUserId === friendId);
         if (session) {
             sessionId = session.id
         } else {
@@ -56,7 +46,7 @@ const FriendItem = ({ route }) => {
                 avatar: friendItem.avatar,
                 deliveryMethod: DeliveryMethod.SINGLE
             }
-            dispatch(addSession({session: userSessionItem}))
+            dispatch(addSession({ session: userSessionItem }))
         }
         navigation.navigate('ChatItem', {
             sessionId: sessionId,

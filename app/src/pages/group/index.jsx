@@ -11,7 +11,10 @@ const Group = () => {
 
     const navigation = useNavigation();
 
+    const sessions = useSelector(state => state.chat.entities.sessions)
+
     const userGroups = useSelector(state => state.chat.userGroups)
+
     const dispatch = useDispatch()
 
     useEffect(() => {
@@ -27,7 +30,7 @@ const Group = () => {
                     }
                 )
         }
-        if(!userGroups.length){
+        if (!userGroups.length) {
             fetchData()
         }
     }, [])

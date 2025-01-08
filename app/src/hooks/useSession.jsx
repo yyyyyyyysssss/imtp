@@ -1,18 +1,17 @@
-import { useRef } from "react"
+import { useMemo, useRef, useState } from "react"
 import { useSelector } from "react-redux"
 
 
 
-const useSession = () => {
-    const sessionIds = useSelector(state => state.chat.result)
+const useSession = (receiverUserId) => {
 
-    const sessionsRef = useRef({})
-    useEffect(() => {
-        const state = reduxStore.getState()
-        for (let sessionId of sessionIds) {
-            const session = state.chat.entities.sessions[sessionId]
-            sessionsRef.current[session.receiverUserId] = session
-        }
-    }, [sessionIds])
+    const sessions = useSelector(state => state.chat.entities.sessions)
 
+    const session = useMemo(() => {
+        return Object.values(sessions).find(s => s.receiverUserId === receiverUserId);
+    },[receiverUserId,sessions])
+
+    return session;
 }
+
+export default useSession

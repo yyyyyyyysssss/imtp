@@ -41,6 +41,7 @@ export const chatSlice = createSlice({
         removeSession: (state, action) => {
             const { payload } = action
             const { sessionId } = payload
+            delete state.entities.sessions[sessionId]
             state.result = [...state.result.filter(item => item !== sessionId)]
         },
         loadMessage: (state, action) => {
