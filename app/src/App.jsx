@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Image, VStack } from 'native-base';
 import { createStaticNavigation } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -14,7 +14,7 @@ import GroupItem from './pages/group/group-item';
 import Me from './pages/me';
 import Feather from 'react-native-vector-icons/Feather';
 import ChatTools from './components/ChatTools';
-import { AuthContext, SignInContext, useIsSignedIn, useIsSignedOut } from './context';
+import { AuthContext, SignInContext, useIsSignedIn, useIsSignedOut, UserInfoContext } from './context';
 import Storage from './storage/storage';
 import api from './api/api';
 import { useSelector, useDispatch } from 'react-redux'
@@ -199,6 +199,8 @@ const App = () => {
   const { userToken, isLoading } = useSelector(state => state.auth)
   const dispatch = useDispatch()
 
+  const [userInfo, setUserInfo] = useState();
+
   useEffect(() => {
     const bootstrapAsync = async () => {
       console.log('App init')
@@ -233,7 +235,7 @@ const App = () => {
   const authContext = useMemo(() => ({
     signIn: async (userToken) => {
       //登录之后获取用户信息
-      api.get('/social/userInfo',{
+      api.get('/social/userInfo', {
         headers: {
           Authorization: `Bearer ${userToken.accessToken}`
         }
@@ -254,14 +256,14 @@ const App = () => {
     await Storage.multiRemove(['userToken', 'userInfo'])
     dispatch(signOut())
     MessageModule.destroy()
-    .then(
-      (res) => {
-        console.log('MessageModule destroy', res ? 'succeed' : 'failed')
-      },
-      (error) => {
-        console.log('MessageModule destroy', 'failed',error.message)
-      }
-    )
+      .then(
+        (res) => {
+          console.log('MessageModule destroy', res ? 'succeed' : 'failed')
+        },
+        (error) => {
+          console.log('MessageModule destroy', 'failed', error.message)
+        }
+      )
   }
 
   const loginSuccessHandler = async (userToken, userInfo) => {
@@ -269,16 +271,17 @@ const App = () => {
       userInfo: userInfo,
       userToken: userToken
     })
+    setUserInfo(userInfo)
     dispatch(restoreToken({ token: userToken, userInfo: userInfo }))
     MessageModule.init(JSON.stringify(userToken))
-    .then(
-      (res) => {
-        console.log('MessageModule init succeed')
-      },
-      (error) => {
-        console.log('MessageModule init error:',error.message)
-      }
-    )
+      .then(
+        (res) => {
+          console.log('MessageModule init succeed')
+        },
+        (error) => {
+          console.log('MessageModule init error:', error.message)
+        }
+      )
   }
 
   //未确认用户是否已登录之前显示启动页
@@ -293,7 +296,9 @@ const App = () => {
   return (
     <AuthContext.Provider value={authContext}>
       <SignInContext.Provider value={isSignedIn}>
-        <Navigation />
+        <UserInfoContext.Provider value={userInfo}>
+          <Navigation />
+        </UserInfoContext.Provider>
       </SignInContext.Provider>
     </AuthContext.Provider>
   )

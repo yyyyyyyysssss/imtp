@@ -15,7 +15,7 @@ import org.imtp.common.enums.DeliveryMethod;
 @Setter
 public class UserSessionDTO {
 
-    private String senderUserId;
+    private String userId;
 
     @NotBlank(message = "not null")
     private String receiverUserId;

@@ -23,8 +23,8 @@ public class Session {
     @TableId
     private Long id;
 
-    @TableField("sender_user_id")
-    private Long senderUserId;
+    @TableField("user_id")
+    private Long userId;
 
     @TableField("receiver_user_id")
     private Long receiverUserId;

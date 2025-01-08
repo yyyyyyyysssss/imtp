@@ -8,9 +8,8 @@ export const chatSlice = createSlice({
             messages: {}
         },
         result: [],
-        userSessions: [], //会话
-        selectedUserSession: null, //当前选中的会话
-        messages: {}, //会话关联的消息
+        userFriends: [],
+        userGroups: [],
         unreadCount: 0 //未读消息合计
     },
     reducers: {
@@ -20,14 +19,18 @@ export const chatSlice = createSlice({
             state.result = payload.result
         },
         addSession: (state, action) => {
-            
+            const { payload } = action
+            const { session } = payload
+            const sessionId = session.id
+            state.entities.sessions[sessionId] = session
+            state.result.unshift(sessionId)
         },
         selectSession: (state, action) => {
             const { payload } = action
             const { sessionId } = payload
             //会话未读消息
             const unreadMessageCount = state.entities.sessions[sessionId].unreadMessageCount || 0
-            if(unreadMessageCount === 0){
+            if (unreadMessageCount === 0) {
                 return
             }
             state.entities.sessions[sessionId].unreadMessageCount = 0
@@ -70,9 +73,9 @@ export const chatSlice = createSlice({
             state.entities.sessions[sessionId].lastMsgTime = message.timestamp
             state.entities.sessions[sessionId].lastUserName = message.name
             //将会话移动到最前
-            state.result = [sessionId,...state.result.filter(item => item !== sessionId)]
+            state.result = [sessionId, ...state.result.filter(item => item !== sessionId)]
             //未读消息
-            if(!message.self && sessionId !== message.sessionId){
+            if (!message.self && sessionId !== message.sessionId) {
                 //会话未读消息
                 state.entities.sessions[sessionId].unreadMessageCount = state.entities.sessions[sessionId].unreadMessageCount || 0
                 state.entities.sessions[sessionId].unreadMessageCount = state.entities.sessions[sessionId].unreadMessageCount + 1
@@ -88,16 +91,24 @@ export const chatSlice = createSlice({
         },
         updateMessageStatus: (state, action) => {
             const { payload } = action
-            const { id,newStatus } = payload
+            const { id, newStatus } = payload
             const message = state.entities.messages[id]
             state.entities.messages[id] = { ...message, status: newStatus }
         },
         deleteMessage: (state, action) => {
 
+        },
+        loadUserFriend: (state, action) => {
+            const { payload } = action
+            state.userFriends = payload
+        },
+        loadUserGroup: (state, action) => {
+            const { payload } = action
+            state.userGroups = payload
         }
     }
 })
 
-export const { loadSession, addSession, selectSession, removeSession, loadMessage, addMessage, updateMessage,updateMessageStatus, deleteMessage } = chatSlice.actions
+export const { loadSession, addSession, selectSession, removeSession, loadMessage, addMessage, updateMessage, updateMessageStatus, deleteMessage, loadUserFriend, loadUserGroup } = chatSlice.actions
 
 export default chatSlice.reducer

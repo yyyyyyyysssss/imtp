@@ -252,7 +252,7 @@ const Chat = forwardRef((props, ref) => {
     const createUserSession = async (userItem) => {
         const userId = userInfo.id;
         const userSessionReq = {
-            senderUserId: userId,
+            userId: userId,
             receiverUserId: userItem.id,
             deliveryMethod: userItem.type
         }

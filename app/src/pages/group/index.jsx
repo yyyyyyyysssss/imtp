@@ -1,45 +1,46 @@
-import { Avatar, Button, Center, FlatList, HStack, Input, Pressable, Text, VStack } from 'native-base';
-import React, { useEffect, useState,useCallback } from 'react';
+import { FlatList, Pressable, VStack } from 'native-base';
+import React, { useEffect, useCallback } from 'react';
 import { useNavigation, } from '@react-navigation/native';
-import AntDesignIcon from 'react-native-vector-icons/AntDesign';
 import { StyleSheet } from 'react-native';
-import Search from '../../components/Search';
 import api from '../../api/api';
 import UserFriendItem, { UserFriendItemFooter, UserFriendItemSeparator } from '../../components/UserFriendItem';
+import { useDispatch, useSelector } from 'react-redux';
+import { loadUserGroup } from '../../redux/slices/chatSlice';
 
 const Group = () => {
 
+    const navigation = useNavigation();
 
-
-    const [userGroups, setUserGroups] = useState([])
+    const userGroups = useSelector(state => state.chat.userGroups)
+    const dispatch = useDispatch()
 
     useEffect(() => {
         const fetchData = async () => {
             api.get('/social/userGroup/{userId}')
                 .then(
                     (res) => {
-                        const userGroups = res.data
-                        if (userGroups) {
-                            setUserGroups(userGroups)
+                        const userGroupList = res.data
+                        if (userGroupList) {
+                            dispatch(loadUserGroup(userGroupList))
                         }
 
                     }
                 )
         }
-        fetchData()
+        if(!userGroups.length){
+            fetchData()
+        }
     }, [])
 
-    const navigation = useNavigation();
-
     const toChatItem = (item) => {
-        console.log('item',item)
+        console.log('item', item)
     }
 
     const itemSeparator = useCallback(() => {
-            return (
-                <UserFriendItemSeparator/>
-            )
-        }, [])
+        return (
+            <UserFriendItemSeparator />
+        )
+    }, [])
 
     const renderItem = ({ item, index }) => {
 
@@ -50,9 +51,9 @@ const Group = () => {
                 {({ isHovered, isFocused, isPressed }) => {
                     return (
                         <UserFriendItem
-                            avatar = {item.avatar}
-                            name = {item.groupName}
-                            isPressed = {isPressed}
+                            avatar={item.avatar}
+                            name={item.groupName}
+                            isPressed={isPressed}
                         />
                     )
                 }}
@@ -72,7 +73,7 @@ const Group = () => {
                     data={userGroups}
                     renderItem={renderItem}
                     ItemSeparatorComponent={itemSeparator}
-                    ListFooterComponent={<UserFriendItemFooter/>}
+                    ListFooterComponent={<UserFriendItemFooter />}
                 />
             </VStack>
         </>

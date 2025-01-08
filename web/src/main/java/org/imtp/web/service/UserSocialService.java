@@ -12,9 +12,9 @@ public interface UserSocialService {
 
     List<UserSessionInfo> findSessionByUserId(String userId);
 
-    String createUserSessionByUserId(String userId,UserSessionDTO userSessionDTO);
+    Long createUserSessionByUserId(String userId,UserSessionDTO userSessionDTO);
 
-    Boolean deleteUserSessionByUserIdAndSessionId(String userId,String sessionId);
+    Boolean deleteSessionById(String userId);
 
     List<UserFriendInfo> findUserFriendByUserId(String userId);
 

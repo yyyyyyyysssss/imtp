@@ -1,12 +1,17 @@
 import { Avatar, Center, Divider, HStack, Image, Pressable, Text, VStack } from 'native-base';
-import React, { useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import { StyleSheet } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import genderFemaleImg from './../../../assets/img/gender_female.png'
 import genderMaleImg from './../../../assets/img/gender_male.png'
-import { useSelector } from 'react-redux';
+import { useSelector,useDispatch } from 'react-redux';
+import { addSession } from '../../../redux/slices/chatSlice';
 import { useNavigation, } from '@react-navigation/native';
+import api from '../../../api/api';
+import { DeliveryMethod } from '../../../enum';
+import { UserInfoContext } from '../../../context';
+import reduxStore from '../../../redux/store';
 
 const FriendItem = ({ route }) => {
 
@@ -14,23 +19,48 @@ const FriendItem = ({ route }) => {
 
     const navigation = useNavigation();
 
-    const sessions = useSelector(state => state.chat.entities.sessions)
+    const sessionIds = useSelector(state => state.chat.result)
 
+    const dispatch = useDispatch()
 
-    const toSend = () => {
-        const friendId = friendItem.id
-        let sessionId;
-        Object.values(sessions).map(session => {
-            const { receiverUserId } = session
-            if (friendId === receiverUserId) {
-                sessionId = session.id
-            }
-        })
-        if (sessionId) {
-            navigation.navigate('ChatItem', {
-                sessionId: sessionId,
-            })
+    const userInfo = useContext(UserInfoContext)
+
+    const sessionsRef = useRef({})
+    useEffect(() => {
+        const state = reduxStore.getState()
+        for (let sessionId of sessionIds) {
+            const session = state.chat.entities.sessions[sessionId]
+            sessionsRef.current[session.receiverUserId] = session
         }
+    }, [sessionIds])
+
+
+    const toSend = async () => {
+        const friendId = friendItem.id
+        const session = sessionsRef.current[friendId]
+        let sessionId;
+        if (session) {
+            sessionId = session.id
+        } else {
+            const createUserSessionReq = {
+                receiverUserId: friendId,
+                deliveryMethod: DeliveryMethod.SINGLE
+            }
+            const res = await api.post('/social/userSession/{userId}', createUserSessionReq)
+            sessionId = res.data
+            const userSessionItem = {
+                id: sessionId,
+                userId: userInfo.id,
+                name: friendItem.note,
+                receiverUserId: friendId,
+                avatar: friendItem.avatar,
+                deliveryMethod: DeliveryMethod.SINGLE
+            }
+            dispatch(addSession({session: userSessionItem}))
+        }
+        navigation.navigate('ChatItem', {
+            sessionId: sessionId,
+        })
     }
 
     return (

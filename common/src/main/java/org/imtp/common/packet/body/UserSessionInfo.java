@@ -17,7 +17,7 @@ public class UserSessionInfo {
 
     private Long id;
 
-    private Long senderUserId;
+    private Long userId;
 
     private String name;
 

@@ -11,6 +11,6 @@ import java.util.List;
 @Mapper
 public interface UserSessionMapper extends BaseMapper<UserSession> {
 
-    List<UserSessionInfo> findUserSessionBySessionIds(@Param("sessionIds") List<Long> sessionIds,@Param("userId") String userId);
+    List<UserSessionInfo> findSessionByUserId(@Param("userId") String userId);
 
 }

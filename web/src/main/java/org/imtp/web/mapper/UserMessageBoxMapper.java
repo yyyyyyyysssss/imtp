@@ -2,7 +2,10 @@ package org.imtp.web.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.imtp.web.domain.entity.UserMessageBox;
+
+import java.util.List;
 
 /**
  * @Description
@@ -11,4 +14,7 @@ import org.imtp.web.domain.entity.UserMessageBox;
  */
 @Mapper
 public interface UserMessageBoxMapper extends BaseMapper<UserMessageBox> {
+
+    List<UserMessageBox> findLatestMessageIdsBySessionIds(@Param("sessionIds") List<Long> sessionIds);
+
 }

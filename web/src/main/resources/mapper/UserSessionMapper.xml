@@ -7,7 +7,7 @@
         <result property="id" column="id"/>
         <result property="name" column="name"/>
         <result property="avatar" column="avatar"/>
-        <result property="senderUserId" column="sender_user_id"/>
+        <result property="userId" column="user_id"/>
         <result property="receiverUserId" column="receiver_user_id"/>
         <result property="deliveryMethod" column="delivery_method"/>
         <result property="lastMsgType" typeHandler="org.imtp.web.mapper.MessageTypeHandler" column="last_msg_type"/>
@@ -16,31 +16,16 @@
         <result property="lastSendMsgUserId" column="last_send_msg_user_id"/>
     </resultMap>
 
-    <select id="findUserSessionBySessionIds" parameterType="java.util.List" resultMap="resultUserSessionInfoMap">
-        SELECT t.*,
-               CASE t.delivery_method
-                   WHEN 'SINGLE' THEN
-                       IFNULL(u1.nickname, u2.nickname)
-                   ELSE
-                       IFNULL(g1.name, g2.name)
-                   END          as name,
-               CASE t.delivery_method
-                   WHEN 'SINGLE' THEN
-                       IFNULL(u1.avatar, u2.avatar)
-                   ELSE
-                       IFNULL(g1.avatar, g2.avatar)
-                   END          as avatar
-        FROM im_session t
-                 left join im_user u1 on u1.id = t.sender_user_id and u1.id != #{userId}
-                 left join im_user u2 on u2.id = t.receiver_user_id and u2.id != #{userId}
-                 left join im_group g1 on g1.id = t.sender_user_id
-                 left join im_group g2 on g2.id = t.receiver_user_id
-        <where>
-            t.id in
-            <foreach collection="sessionIds" item="item" index="index" separator="," open="(" close=")">
-                #{item}
-            </foreach>
-        </where>
+    <select id="findSessionByUserId" parameterType="java.util.List" resultMap="resultUserSessionInfoMap">
+        SELECT
+        t.*,
+        IFNULL( u.nickname, g.NAME ) AS NAME,
+        IFNULL( u.avatar, g.avatar ) avatar
+        FROM
+        im_session t
+        LEFT JOIN im_user u ON u.id = t.receiver_user_id
+        LEFT JOIN im_group g ON g.id = t.receiver_user_id
+        WHERE t.user_id = #{userId} order by t.id desc
     </select>
 
 </mapper>

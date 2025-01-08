@@ -1,5 +1,5 @@
 import { Avatar, FlatList, HStack, Input, Pressable, ScrollView, Text, View, VStack, KeyboardAvoidingView, Box } from 'native-base';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { InteractionManager, Modal, StyleSheet, TouchableWithoutFeedback } from 'react-native';
 import ChatItemHeader from '../../../components/ChatItemHeader';
 import { useDispatch, useSelector } from 'react-redux';
@@ -15,6 +15,7 @@ import IdGen from '../../../utils/IdGen';
 import { formatFileSize } from '../../../utils/FormatUtil';
 import { createThumbnail } from "react-native-create-thumbnail";
 import { NativeModules } from 'react-native';
+import { UserInfoContext } from '../../../context';
 
 const { MessageModule } = NativeModules
 
@@ -22,9 +23,7 @@ const ChatItem = ({ route }) => {
 
     const { sessionId } = route.params;
 
-    const flatListRef = useRef()
-
-    const userInfoRef = useRef()
+    const userInfo = useContext(UserInfoContext)
 
     const [messageIds, setMessageIds] = useState([])
 
@@ -42,26 +41,15 @@ const ChatItem = ({ route }) => {
                 .then(
                     (res) => {
                         const messageList = res.data.list
-                        Storage.get('userInfo')
-                            .then(
-                                (userInfo) => {
-                                    const newMessageList = messageList.map(item => {
-                                        item.self = userInfo.id === item.senderUserId
-                                        return item
-                                    })
-                                    dispatch(loadMessage({ sessionId: sessionId, messages: newMessageList }))
-                                }
-                            )
+                        const newMessageList = messageList.map(item => {
+                            item.self = userInfo.id === item.senderUserId
+                            return item
+                        })
+                        dispatch(loadMessage({ sessionId: sessionId, messages: newMessageList }))
                     }
                 )
         }
         const init = async () => {
-            const fetchUserInfo = async () => {
-                const userInfo = await Storage.get('userInfo')
-                userInfoRef.current = userInfo
-            }
-
-            fetchUserInfo()
             //选择会话
             dispatch(selectSession({ sessionId: sessionId }))
         }
@@ -248,13 +236,13 @@ const ChatItem = ({ route }) => {
             content: content,
             status: MessageStatus.PENDING,
             sessionId: sessionId,
-            sender: session.senderUserId,
+            sender: session.userId,
             receiver: session.receiverUserId,
             deliveryMethod: session.deliveryMethod,
             self: true,
             timestamp: new Date().getTime(),
-            name: userInfoRef.current.nickname,
-            avatar: userInfoRef.current.avatar
+            name: userInfo.nickname,
+            avatar: userInfo.avatar
         }
     }
 
@@ -269,7 +257,6 @@ const ChatItem = ({ route }) => {
             >
                 <HStack flex={9} style={styles.contentHstack}>
                     <FlatList
-                        ref={flatListRef}
                         style={styles.messageList}
                         data={messageIds ? [...messageIds].reverse() : []}
                         renderItem={renderItem}

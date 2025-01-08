@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.imtp.common.packet.body.*;
 import org.imtp.common.response.Result;
 import org.imtp.common.response.ResultGenerator;
+import org.imtp.web.domain.dto.DeleteSessionDTO;
 import org.imtp.web.domain.dto.UserSessionDTO;
 import org.imtp.web.domain.entity.User;
 import org.imtp.web.service.UserSocialService;
@@ -59,16 +60,18 @@ public class UserSocialController {
 
     @PostMapping("/userSession/{userId}")
     @CircuitBreaker(name = "slowCallBreaker")
-    public Result<String> userSession(@PathVariable(name = "userId") String userId,@RequestBody @Validated UserSessionDTO userSessionDTO) {
-        String id = userSocialService.createUserSessionByUserId(userId,userSessionDTO);
+    public Result<Long> userSession(@PathVariable(name = "userId") String userId,@RequestBody @Validated UserSessionDTO userSessionDTO) {
+        checkUserId(userId);
+        Long id = userSocialService.createUserSessionByUserId(userId,userSessionDTO);
         return ResultGenerator.ok(id);
     }
 
     @DeleteMapping("/userSession/{userId}")
     @CircuitBreaker(name = "slowCallBreaker")
-    public Result<Boolean> userSession(@PathVariable(name = "userId") String userId,Object object) {
-        Boolean deleted = userSocialService.deleteUserSessionByUserIdAndSessionId(userId,"");
-        return ResultGenerator.ok(deleted);
+    public Result<Boolean> userSession(@PathVariable(name = "userId") String userId, @RequestBody @Validated DeleteSessionDTO deleteSessionDTO) {
+        checkUserId(userId);
+        Boolean deleted = userSocialService.deleteSessionById(deleteSessionDTO.getId());
+        return deleted ? ResultGenerator.ok() : ResultGenerator.failed();
     }
 
     @GetMapping("/userFriend/{userId}")

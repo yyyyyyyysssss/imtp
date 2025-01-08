@@ -74,33 +74,6 @@ const Home = () => {
                     )
                 }}
             />
-            {/* <Tab.Screen
-                name='Group'
-                component={Group}
-                options={{
-                    title: '群组',
-                    lazy: false,
-                    headerTitleAlign: 'center',
-                    headerTitleStyle: {
-                        fontWeight: 'bold'
-                    },
-                    headerStyle: {
-                        borderBottomWidth: 0,
-                        elevation: 0,
-                        shadowOpacity: 0,
-                        backgroundColor: '#F5F5F5'
-                    },
-                    tabBarIcon: ({ focused, color, size }) => (
-                        focused ?
-                            <Image alt='' color={color} size={size} source={require('../../assets/img/group-icon-50-selected.png')} />
-                            :
-                            <Image alt='' color={color} size={size} source={require('../../assets/img/group-icon-50.png')} />
-                    ),
-                    headerRight: () => (
-                        <Image alt='' size={7} mr={4} source={require('../../assets/img/add-group-icon-50.png')} />
-                    )
-                }}
-            /> */}
             <Tab.Screen
                 name='Me'
                 component={Me}

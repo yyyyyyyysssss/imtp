@@ -6,6 +6,8 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
 import org.imtp.web.enums.MessageBoxType;
 
+import java.util.Date;
+
 /**
  * @Description
  * @Author ys
@@ -33,5 +35,8 @@ public class UserMessageBox {
 
     @TableField("box_type")
     private MessageBoxType boxType;
+
+    @TableField("time")
+    private Date time;
 
 }

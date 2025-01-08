@@ -1,7 +1,7 @@
 import { Button, Center, FlatList, Avatar, Input, Pressable, VStack, HStack, Box, Text, Flex, Divider, Icon, ScrollView } from 'native-base';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useNavigation, } from '@react-navigation/native';
-import { InteractionManager, StyleSheet,NativeModules,NativeEventEmitter } from 'react-native';
+import { InteractionManager, StyleSheet, NativeModules, NativeEventEmitter } from 'react-native';
 import api from '../../api/api';
 import { useDispatch, useSelector, shallowEqual } from 'react-redux';
 import { loadSession, removeSession, updateMessageStatus } from '../../redux/slices/chatSlice';
@@ -24,7 +24,7 @@ const Chat = () => {
 
     const result = useSelector(state => state.chat.result)
 
-    const [sessionIds,setSessionIds] = useState([])
+    const [sessionIds, setSessionIds] = useState([])
 
     //初始查询用户会话
     useEffect(() => {
@@ -49,17 +49,17 @@ const Chat = () => {
         fetchData()
 
         //接收消息监听
-        const receiveMessageEventEmitter = MessageModuleNativeEventEmitter.addListener('RECEIVE_MESSAGE',(message) => {
+        const receiveMessageEventEmitter = MessageModuleNativeEventEmitter.addListener('RECEIVE_MESSAGE', (message) => {
             const msg = JSON.parse(message)
             const { header } = msg
-            const {cmd} = header
-            switch(cmd){
+            const { cmd } = header
+            switch (cmd) {
                 case MessageType.COMMON_RESPONSE:
-                    const {ackId,state} = msg
-                    dispatch(updateMessageStatus({ id: ackId,status: state }))
+                    const { ackId, state } = msg
+                    dispatch(updateMessageStatus({ id: ackId, status: state }))
                     break
             }
-            console.log('RECEIVE_MESSAGE',msg)
+            console.log('RECEIVE_MESSAGE', msg)
         })
 
         return () => {
@@ -71,7 +71,7 @@ const Chat = () => {
         InteractionManager.runAfterInteractions(() => {
             setSessionIds(result)
         })
-    },[result])
+    }, [result])
 
     const toChatItem = (sessionId) => {
         navigation.navigate('ChatItem', {
@@ -100,7 +100,7 @@ const Chat = () => {
                 {({ isHovered, isFocused, isPressed }) => {
                     return (
                         <VStack style={{ backgroundColor: isPressed ? '#C8C6C5' : '#F5F5F5', padding: 10 }}>
-                            <UserSessionItem sessionId={item}/>
+                            <UserSessionItem sessionId={item} />
                         </VStack>
                     )
                 }}
@@ -140,7 +140,14 @@ const Chat = () => {
     }
 
     const deleteUserSession = (rowMap, id) => {
-        dispatch(removeSession({sessionId: id}))
+        dispatch(removeSession({ sessionId: id }))
+        const deleteUserSessionReq = {
+            id: id
+        }
+        api.delete('/social/userSession/{userId}', {
+            data: deleteUserSessionReq
+        })
+            .catch(error => console.log('deleteUserSession: ',error))
     };
 
     return (

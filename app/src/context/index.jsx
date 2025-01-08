@@ -18,3 +18,6 @@ export const useIsSignedOut = () => {
 
 
 export const ImageContext  = createContext();
+
+
+export const UserInfoContext  = createContext();

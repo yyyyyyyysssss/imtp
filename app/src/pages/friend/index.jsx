@@ -1,4 +1,4 @@
-import { Button, Pressable, Input, Image, VStack, Divider, Box, Text, HStack, Avatar } from 'native-base';
+import { Pressable, Image, VStack, Divider, Box, Text, HStack } from 'native-base';
 import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigation, } from '@react-navigation/native';
 import { StyleSheet } from 'react-native';
@@ -6,22 +6,26 @@ import Search from '../../components/Search';
 import { AlphabetList } from "react-native-section-alphabet-list";
 import api from '../../api/api';
 import UserFriendItem, { UserFriendItemFooter, UserFriendItemSeparator } from '../../components/UserFriendItem';
+import { useDispatch, useSelector } from 'react-redux';
+import { loadUserFriend } from '../../redux/slices/chatSlice';
 
 const alphabet = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
 
 const Friend = () => {
     const navigation = useNavigation();
 
-    const [userFriends, setUserFriends] = useState([])
+    const userFriends = useSelector(state => state.chat.userFriends)
+
+    const dispatch = useDispatch()
 
     useEffect(() => {
         const fetchData = async () => {
             api.get('/social/userFriend/{userId}')
                 .then(
                     (res) => {
-                        const userFriends = res.data
-                        if (userFriends) {
-                            for (let userFriend of userFriends) {
+                        const userFriendList = res.data
+                        if (userFriendList) {
+                            for (let userFriend of userFriendList) {
                                 userFriend.key = userFriend.id
                                 let notePinyin;
                                 if ((notePinyin = userFriend.notePinyin) && alphabet.indexOf(notePinyin.charAt(0)) !== -1) {
@@ -30,13 +34,15 @@ const Friend = () => {
                                     userFriend.value = '#'
                                 }
                             }
-                            setUserFriends(userFriends)
+                            dispatch(loadUserFriend(userFriendList))
                         }
 
                     }
                 )
         }
-        fetchData()
+        if(!userFriends.length){
+            fetchData()
+        }
     }, [])
 
     const toFriendItem = (item) => {
