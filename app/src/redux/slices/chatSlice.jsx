@@ -8,6 +8,7 @@ export const chatSlice = createSlice({
             messages: {}
         },
         result: [],
+        selectedSessionId: null,
         userFriends: [],
         userGroups: [],
         unreadCount: 0 //未读消息合计
@@ -28,6 +29,10 @@ export const chatSlice = createSlice({
         selectSession: (state, action) => {
             const { payload } = action
             const { sessionId } = payload
+            state.selectedSessionId = sessionId
+            if(sessionId === null){
+                return
+            }
             //会话未读消息
             const unreadMessageCount = state.entities.sessions[sessionId].unreadMessageCount || 0
             if (unreadMessageCount === 0) {
@@ -76,7 +81,7 @@ export const chatSlice = createSlice({
             //将会话移动到最前
             state.result = [sessionId, ...state.result.filter(item => item !== sessionId)]
             //未读消息
-            if (!message.self && sessionId !== message.sessionId) {
+            if (!message.self && sessionId !== state.selectedSessionId) {
                 //会话未读消息
                 state.entities.sessions[sessionId].unreadMessageCount = state.entities.sessions[sessionId].unreadMessageCount || 0
                 state.entities.sessions[sessionId].unreadMessageCount = state.entities.sessions[sessionId].unreadMessageCount + 1

@@ -1,9 +1,9 @@
 import { Pressable, VStack, HStack, Text, Divider } from 'native-base';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigation, } from '@react-navigation/native';
 import { InteractionManager, StyleSheet, NativeModules, NativeEventEmitter } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
-import { loadSession, removeSession, updateMessageStatus } from '../../redux/slices/chatSlice';
+import { loadSession, removeSession, updateMessageStatus, addMessage,selectSession } from '../../redux/slices/chatSlice';
 import { SwipeListView } from 'react-native-swipe-list-view';
 import { showToast } from '../../components/Utils';
 import Search from '../../components/Search';
@@ -12,6 +12,7 @@ import { normalize, schema } from 'normalizr';
 import { MessageType } from '../../enum';
 import { fetchUserSessions, deleteUserSessionById } from '../../api/ApiService';
 import { getBitAtPosition } from '../../utils/BitUtil';
+import IdGen from '../../utils/IdGen';
 
 const { MessageModule } = NativeModules
 const MessageModuleNativeEventEmitter = new NativeEventEmitter(MessageModule);
@@ -24,7 +25,9 @@ const Chat = (props) => {
 
     const result = useSelector(state => state.chat.result)
 
-    const [sessionIds, setSessionIds] = useState([])
+    const sessions = useSelector(state => state.chat.entities.sessions)
+
+    const sessionMapRef = useRef(new Map())
 
     const { findFriendByFriendId, findGroupByGroupId, findFriendByGroupIdAndFriendId } = props
 
@@ -38,6 +41,7 @@ const Chat = (props) => {
                     messages: [message]
                 })
                 const normalizedData = normalize(userSessionList, [session]);
+                // console.log('fetchData',normalizedData)
                 //初始化加载会话
                 dispatch(loadSession(normalizedData))
             }
@@ -49,7 +53,7 @@ const Chat = (props) => {
         //接收消息监听
         const receiveMessageEventEmitter = MessageModuleNativeEventEmitter.addListener('RECEIVE_MESSAGE', (message) => {
             const msg = JSON.parse(message)
-            const { header } = msg
+            const { header, timestamp } = msg
             const { cmd, sender, receiver, reserved } = header
             //消息响应
             if (cmd === MessageType.COMMON_RESPONSE) {
@@ -58,8 +62,46 @@ const Chat = (props) => {
                 return
             }
             const groupBit = getBitAtPosition(reserved, 0)
-            const groupFlag = groupBit === 1
-            
+            const isGroup = groupBit === 1
+            const realSender = isGroup ? receiver : sender;
+            const session = sessionMapRef.current.get(realSender)
+            let content;
+            switch (cmd) {
+                case MessageType.TEXT_MESSAGE:
+                    content = msg.text;
+                    break;
+                case MessageType.IMAGE_MESSAGE:
+                    content = msg.url;
+                    break;
+                case MessageType.VIDEO_MESSAGE:
+                    content = msg.url;
+                    break;
+                case MessageType.FILE_MESSAGE:
+                    content = msg.url;
+                    break;
+                default:
+                    console.log('unsupported message type:', cmd)
+                    return
+            }
+            if (session) {
+                const message = {
+                    id: IdGen.nextId(),
+                    type: cmd,
+                    content: content,
+                    sessionId: session.id,
+                    sender: session.userId,
+                    receiver: session.receiverUserId,
+                    deliveryMethod: session.deliveryMethod,
+                    self: false,
+                    timestamp: timestamp,
+                    name: session.name,
+                    avatar: session.avatar
+                }
+                //添加消息
+                dispatch(addMessage({ sessionId: session.id, message: message }))
+            } else {
+
+            }
             switch (cmd) {
 
             }
@@ -72,12 +114,14 @@ const Chat = (props) => {
     }, [])
 
     useEffect(() => {
-        InteractionManager.runAfterInteractions(() => {
-            setSessionIds(result)
-        })
+        for (const session of Object.values(sessions)) {
+            sessionMapRef.current.set(session.receiverUserId, session)
+        }
     }, [result])
 
     const toChatItem = (sessionId) => {
+        // 当前选择会话
+        dispatch(selectSession({ sessionId: sessionId }))
         navigation.navigate('ChatItem', {
             sessionId: sessionId,
         })
@@ -97,6 +141,7 @@ const Chat = (props) => {
     }, [])
 
     const renderItem = ({ item, index }) => {
+
         return (
             <Pressable
                 onPress={() => toChatItem(item)}
@@ -155,7 +200,7 @@ const Chat = (props) => {
                 <SwipeListView
                     style={styles.userSessionList}
                     keyExtractor={item => item}
-                    data={sessionIds}
+                    data={result}
                     renderItem={renderItem}
                     ItemSeparatorComponent={itemSeparator}
                     renderHiddenItem={renderHiddenItem}

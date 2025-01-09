@@ -15,10 +15,13 @@ import { createThumbnail } from "react-native-create-thumbnail";
 import { NativeModules } from 'react-native';
 import { UserInfoContext } from '../../../context';
 import { fetchMessageByUserSessionId } from '../../../api/ApiService';
+import { useNavigation, } from '@react-navigation/native';
 
 const { MessageModule } = NativeModules
 
 const ChatItem = ({ route }) => {
+
+    const navigation = useNavigation();
 
     const { sessionId } = route.params;
 
@@ -40,21 +43,16 @@ const ChatItem = ({ route }) => {
             })
             dispatch(loadMessage({ sessionId: sessionId, messages: newMessageList }))
         }
-        const init = async () => {
-            //选择会话
-            dispatch(selectSession({ sessionId: sessionId }))
-        }
         //未初始化的数据进行初始化
         InteractionManager.runAfterInteractions(() => {
             setTimeout(() => {
                 if (session.messageInit === undefined || session.messageInit === false) {
                     fetchData()
                 }
-                init()
             }, 100);
         })
         return () => {
-
+            
         }
     }, [])
 
@@ -66,6 +64,12 @@ const ChatItem = ({ route }) => {
             }, 100)
         })
     }, [messages])
+
+    useEffect(() => {
+        navigation.addListener('beforeRemove',(e) => {
+            dispatch(selectSession({ sessionId: null }))
+        })
+    },[navigation])
 
     const moreOps = () => {
         showToast('更多操作')
