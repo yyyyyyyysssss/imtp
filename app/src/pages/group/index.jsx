@@ -1,11 +1,13 @@
 import { FlatList, Pressable, VStack } from 'native-base';
-import React, { useEffect, useCallback } from 'react';
+import React, { useEffect, useCallback, useContext } from 'react';
 import { useNavigation, } from '@react-navigation/native';
 import { StyleSheet } from 'react-native';
-import api from '../../api/api';
 import UserFriendItem, { UserFriendItemFooter, UserFriendItemSeparator } from '../../components/UserFriendItem';
 import { useDispatch, useSelector } from 'react-redux';
-import { loadUserGroup } from '../../redux/slices/chatSlice';
+import { loadUserGroup, addSession } from '../../redux/slices/chatSlice';
+import { UserInfoContext } from '../../context';
+import { DeliveryMethod } from '../../enum';
+import { createUserSession, fetchUserGroups } from '../../api/ApiService';
 
 const Group = () => {
 
@@ -17,26 +19,33 @@ const Group = () => {
 
     const dispatch = useDispatch()
 
-    useEffect(() => {
-        const fetchData = async () => {
-            api.get('/social/userGroup/{userId}')
-                .then(
-                    (res) => {
-                        const userGroupList = res.data
-                        if (userGroupList) {
-                            dispatch(loadUserGroup(userGroupList))
-                        }
+    const userInfo = useContext(UserInfoContext)
 
-                    }
-                )
+    const toChatItem = async (item) => {
+        const groupId = item.id
+        let sessionId;
+        const session = Object.values(sessions).find(s => s.receiverUserId === groupId);
+        if (session) {
+            sessionId = session.id
+        } else {
+            const createUserSessionReq = {
+                receiverUserId: groupId,
+                deliveryMethod: DeliveryMethod.GROUP
+            }
+            sessionId  = await createUserSession(createUserSessionReq)
+            const userSessionItem = {
+                id: sessionId,
+                userId: userInfo.id,
+                name: item.groupName,
+                receiverUserId: groupId,
+                avatar: item.avatar,
+                deliveryMethod: DeliveryMethod.GROUP
+            }
+            dispatch(addSession({ session: userSessionItem }))
         }
-        if (!userGroups.length) {
-            fetchData()
-        }
-    }, [])
-
-    const toChatItem = (item) => {
-        console.log('item', item)
+        navigation.navigate('ChatItem', {
+            sessionId: sessionId,
+        })
     }
 
     const itemSeparator = useCallback(() => {
@@ -49,7 +58,7 @@ const Group = () => {
 
         return (
             <Pressable
-                onPress={() => toChatItem(item.id)}
+                onPress={() => toChatItem(item)}
             >
                 {({ isHovered, isFocused, isPressed }) => {
                     return (

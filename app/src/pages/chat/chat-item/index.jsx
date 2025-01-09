@@ -7,8 +7,6 @@ import { showToast } from '../../../components/Utils';
 import Message from '../../../components/Message';
 import ChatItemFooter from '../../../components/ChatItemFooter';
 import { loadMessage, addMessage, updateMessage, selectSession } from '../../../redux/slices/chatSlice';
-import api from '../../../api/api';
-import Storage from '../../../storage/storage';
 import Uplaod from '../../../components/Upload';
 import { MessageStatus, MessageType } from '../../../enum';
 import IdGen from '../../../utils/IdGen';
@@ -16,6 +14,7 @@ import { formatFileSize } from '../../../utils/FormatUtil';
 import { createThumbnail } from "react-native-create-thumbnail";
 import { NativeModules } from 'react-native';
 import { UserInfoContext } from '../../../context';
+import { fetchMessageByUserSessionId } from '../../../api/ApiService';
 
 const { MessageModule } = NativeModules
 
@@ -33,21 +32,13 @@ const ChatItem = ({ route }) => {
     const dispatch = useDispatch()
     useEffect(() => {
         const fetchData = async () => {
-            api.get('/social/userMessage/{userId}', {
-                params: {
-                    sessionId: sessionId
-                }
+            const data = await fetchMessageByUserSessionId(sessionId)
+            const messageList = data.list
+            const newMessageList = messageList.map(item => {
+                item.self = userInfo.id === item.senderUserId
+                return item
             })
-                .then(
-                    (res) => {
-                        const messageList = res.data.list
-                        const newMessageList = messageList.map(item => {
-                            item.self = userInfo.id === item.senderUserId
-                            return item
-                        })
-                        dispatch(loadMessage({ sessionId: sessionId, messages: newMessageList }))
-                    }
-                )
+            dispatch(loadMessage({ sessionId: sessionId, messages: newMessageList }))
         }
         const init = async () => {
             //选择会话
@@ -222,7 +213,7 @@ const ChatItem = ({ route }) => {
                     console.log('send succeed')
                 },
                 (error) => {
-                    console.log('send failed',error)
+                    console.log('send failed', error)
                 }
             )
     }

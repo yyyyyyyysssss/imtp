@@ -1,18 +1,17 @@
 import { Text, Button } from 'native-base';
 import React, { useContext, useState } from 'react';
 import { AuthContext } from '../../context';
-import Storage from '../../storage/storage';
-import api from '../../api/api';
 import { showToast } from '../../components/Utils';
+import { logout } from '../../api/ApiService';
 
 const Me = () => {
 
     const { signOut } = useContext(AuthContext)
 
-    const logout = () => {
-        api.post('/logout', null)
+    const quit = () => {
+        logout()
             .then(
-                (res) => {
+                (data) => {
                     signOut()
                 },
                 (error) => {
@@ -23,7 +22,7 @@ const Me = () => {
 
     return (
         <>
-            <Button onPress={logout}>退出登录</Button>
+            <Button onPress={quit}>退出登录</Button>
         </>
     )
 }

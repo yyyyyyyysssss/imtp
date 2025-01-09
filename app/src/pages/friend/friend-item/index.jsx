@@ -8,9 +8,9 @@ import genderMaleImg from './../../../assets/img/gender_male.png'
 import { useSelector, useDispatch } from 'react-redux';
 import { addSession } from '../../../redux/slices/chatSlice';
 import { useNavigation, } from '@react-navigation/native';
-import api from '../../../api/api';
 import { DeliveryMethod } from '../../../enum';
 import { UserInfoContext } from '../../../context';
+import { createUserSession } from '../../../api/ApiService';
 
 const FriendItem = ({ route }) => {
 
@@ -36,8 +36,7 @@ const FriendItem = ({ route }) => {
                 receiverUserId: friendId,
                 deliveryMethod: DeliveryMethod.SINGLE
             }
-            const res = await api.post('/social/userSession/{userId}', createUserSessionReq)
-            sessionId = res.data
+            sessionId = await createUserSession(createUserSessionReq)
             const userSessionItem = {
                 id: sessionId,
                 userId: userInfo.id,

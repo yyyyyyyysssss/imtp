@@ -1,10 +1,9 @@
-import { VStack, Image, Badge, Text, Avatar, Box } from 'native-base';
-import React, { useState } from 'react';
+import { Image } from 'native-base';
+import React, { useRef, useState } from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import ChatTools from '../../components/ChatTools';
 import Chat from '../chat';
 import Friend from '../friend';
-import Group from '../group';
 import Me from '../me';
 import Notification from '../../components/Notification';
 
@@ -14,13 +13,36 @@ const Home = () => {
 
     console.log('Home')
 
+    const userFriendRef = useRef()
+
+    const findFriendByFriendId = (friendId) => {
+
+        return userFriendRef.current.findFriendByFriendId(friendId)
+    }
+
+    const findGroupByGroupId = (groupId) => {
+
+        return userFriendRef.current.findGroupByGroupId(groupId)
+    }
+
+    const findFriendByGroupIdAndFriendId = (groupId, friendId) => {
+
+        return userFriendRef.current.findFriendByGroupIdAndFriendId(groupId, friendId)
+    }
+
     return (
-        <Tab.Navigator 
+        <Tab.Navigator
             initialRouteName='Chat'
         >
             <Tab.Screen
                 name='Chat'
-                component={Chat}
+                children={() => (
+                    <Chat
+                        findFriendByFriendId={findFriendByFriendId}
+                        findGroupByGroupId={findGroupByGroupId}
+                        findFriendByGroupIdAndFriendId={findFriendByGroupIdAndFriendId}
+                    />
+                )}
                 options={{
                     title: '聊天',
                     lazy: false,
@@ -49,7 +71,9 @@ const Home = () => {
             />
             <Tab.Screen
                 name='Friend'
-                component={Friend}
+                children={() => (
+                    <Friend ref={userFriendRef} />
+                )}
                 options={{
                     lazy: false,
                     title: '好友',
@@ -76,7 +100,9 @@ const Home = () => {
             />
             <Tab.Screen
                 name='Me'
-                component={Me}
+                children={() => (
+                    <Me />
+                )}
                 options={{
                     title: '我',
                     lazy: false,

@@ -5,10 +5,9 @@ import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import AntDesignIcon from 'react-native-vector-icons/AntDesign';
 import { GoogleIcon, MicrosoftIcon } from '../../components/CustomIcon';
 import { useForm, Controller } from 'react-hook-form';
-import api from '../../api/api';
 import { showToast } from '../../components/Utils';
-import Storage from '../../storage/storage';
 import { AuthContext } from '../../context';
+import { login } from '../../api/ApiService';
 
 const Login = () => {
 
@@ -57,16 +56,16 @@ const Login = () => {
             clientType: 'APP'
         }
         setLoading(true)
-        api.post('/login', loginRequest)
+        login(loginRequest)
             .then(
-                async (res) => {
-                    const userToken = res.data
+                async (data) => {
+                    const userToken = data
                     await signIn(userToken)
                 },
                 (error) => {
                     if (error.response && error.response.status === 401) {
                         showToast('用户名或密码错误')
-                    }else {
+                    } else {
                         showToast(error.message)
                     }
                     setLoading(false)

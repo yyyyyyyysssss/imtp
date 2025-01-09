@@ -9,14 +9,10 @@ export const authSlice = createSlice({
         isLoading: true,
     },
     reducers: {
-        restoreToken: (state, action) => {
-            state.userToken = action.payload.token
-            state.userInfo = action.payload.userInfo
-            state.isLoading = false
-        },
         signIn: (state, action) => {
             state.userToken = action.payload.token
             state.userInfo = action.payload.userInfo
+            state.isLoading = false
         },
         signOut: (state, action) => {
             state.userToken = null
@@ -26,6 +22,6 @@ export const authSlice = createSlice({
     }
 })
 
-export const { restoreToken, signIn, signOut } = authSlice.actions
+export const { signIn, signOut } = authSlice.actions
 
 export default authSlice.reducer

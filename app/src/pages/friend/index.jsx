@@ -1,49 +1,101 @@
 import { Pressable, Image, VStack, Divider, Box, Text, HStack } from 'native-base';
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useRef, forwardRef, useImperativeHandle } from 'react';
 import { useNavigation, } from '@react-navigation/native';
 import { StyleSheet } from 'react-native';
 import Search from '../../components/Search';
 import { AlphabetList } from "react-native-section-alphabet-list";
-import api from '../../api/api';
 import UserFriendItem, { UserFriendItemFooter, UserFriendItemSeparator } from '../../components/UserFriendItem';
 import { useDispatch, useSelector } from 'react-redux';
-import { loadUserFriend } from '../../redux/slices/chatSlice';
+import { loadUserFriend, loadUserGroup } from '../../redux/slices/chatSlice';
+import { fetchUserFriends, fetchUserGroups } from '../../api/ApiService';
 
 const alphabet = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
 
-const Friend = () => {
+const Friend = forwardRef((props, ref) => {
     const navigation = useNavigation();
 
     const userFriends = useSelector(state => state.chat.userFriends)
+    const userGroups = useSelector(state => state.chat.userGroups)
+
+    const dataMapRef = useRef(new Map())
 
     const dispatch = useDispatch()
 
-    useEffect(() => {
-        const fetchData = async () => {
-            api.get('/social/userFriend/{userId}')
-                .then(
-                    (res) => {
-                        const userFriendList = res.data
-                        if (userFriendList) {
-                            for (let userFriend of userFriendList) {
-                                userFriend.key = userFriend.id
-                                let notePinyin;
-                                if ((notePinyin = userFriend.notePinyin) && alphabet.indexOf(notePinyin.charAt(0)) !== -1) {
-                                    userFriend.value = notePinyin
-                                } else {
-                                    userFriend.value = '#'
-                                }
-                            }
-                            dispatch(loadUserFriend(userFriendList))
-                        }
+    const fetchUserFriendData = async () => {
+        if (userFriends && userFriends.length) {
+            return userFriends
+        }
+        try {
+            const userFriendList = await fetchUserFriends() || []
+            for (let userFriend of userFriendList) {
+                userFriend.key = userFriend.id
+                let notePinyin;
+                if ((notePinyin = userFriend.notePinyin) && alphabet.indexOf(notePinyin.charAt(0)) !== -1) {
+                    userFriend.value = notePinyin
+                } else {
+                    userFriend.value = '#'
+                }
+            }
+            dispatch(loadUserFriend(userFriendList))
+            return userFriendList
+        } catch (error) {
+            console.error('Error fetching user friends:', error);
+            return []
+        }
+    }
 
-                    }
-                )
+    const fetchUserGroupData = async () => {
+        if (userGroups && userGroups.length) {
+            return userGroups
         }
-        if(!userFriends.length){
-            fetchData()
+        try {
+            const userGroupList = await fetchUserGroups() || []
+            dispatch(loadUserGroup(userGroupList))
+            return userGroupList
+        } catch (error) {
+            console.error('Error fetching user groups:', error);
+            return []
         }
+    }
+
+    useEffect(() => {
+        fetchUserFriendData()
+        fetchUserGroupData()
     }, [])
+
+    useEffect(() => {
+        userFriends.forEach(item => dataMapRef.current.set(item.id, item))
+    }, [userFriends])
+
+    useEffect(() => {
+        for (let userGroup of userGroups) {
+            const groupId = userGroup.id
+            dataMapRef.current.set(groupId, userGroup)
+            const { groupUserInfos } = userGroup
+            groupUserInfos.forEach(item => dataMapRef.current.set(groupId + '-' + item.id, item))
+        }
+    }, [userGroups])
+
+    useImperativeHandle(ref, () => ({
+        findFriendByFriendId: findFriendByFriendId,
+        findGroupByGroupId: findGroupByGroupId,
+        findFriendByGroupIdAndFriendId: findFriendByGroupIdAndFriendId
+    }))
+
+    const findFriendByFriendId = (friendId) => {
+
+        return dataMapRef.current.get(friendId)
+    }
+
+    const findGroupByGroupId = (groupId) => {
+
+        return dataMapRef.current.get(groupId)
+    }
+
+    const findFriendByGroupIdAndFriendId = (groupId, friendId) => {
+        const key = groupId + '-' + friendId
+        return dataMapRef.current.get(key)
+    }
 
     const toFriendItem = (item) => {
         navigation.navigate('FriendItem', {
@@ -51,16 +103,14 @@ const Friend = () => {
         })
     }
 
-    const toGroupItem = (item) => {
-        navigation.navigate('Group', {
-            friend: item
-        })
+    const toGroupItem = () => {
+        navigation.navigate('Group')
     }
 
 
     const itemSeparator = useCallback(() => {
         return (
-            <UserFriendItemSeparator/>
+            <UserFriendItemSeparator />
         )
     }, [])
 
@@ -68,7 +118,7 @@ const Friend = () => {
         return (
             <VStack justifyContent='space-between' style={styles.sectionHeader}>
                 <Divider style={styles.userFriendListItemSeparatorDivider} />
-                <Box height={4}/>
+                <Box height={4} />
                 <Text>{section.title}</Text>
             </VStack>
         )
@@ -78,7 +128,7 @@ const Friend = () => {
 
         return (
             <Pressable
-                onPress={() => toGroupItem({})}
+                onPress={() => toGroupItem()}
             >
                 {({ isHovered, isFocused, isPressed }) => {
                     return (
@@ -108,9 +158,9 @@ const Friend = () => {
                 {({ isHovered, isFocused, isPressed }) => {
                     return (
                         <UserFriendItem
-                            avatar = {item.avatar}
-                            name = {item.note}
-                            isPressed = {isPressed}
+                            avatar={item.avatar}
+                            name={item.note}
+                            isPressed={isPressed}
                         />
                     )
                 }}
@@ -143,12 +193,12 @@ const Friend = () => {
                     ItemSeparatorComponent={itemSeparator}
                     renderCustomSectionHeader={renderSectionHeader}
                     renderCustomListHeader={renderItemHeader}
-                    ListFooterComponent={<UserFriendItemFooter/>}
+                    ListFooterComponent={<UserFriendItemFooter />}
                 />
             </VStack>
         </>
     )
-}
+})
 
 
 

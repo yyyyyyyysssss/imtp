@@ -1,24 +1,24 @@
-import { Button, Center, FlatList, Avatar, Input, Pressable, VStack, HStack, Box, Text, Flex, Divider, Icon, ScrollView } from 'native-base';
+import { Pressable, VStack, HStack, Text, Divider } from 'native-base';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useNavigation, } from '@react-navigation/native';
 import { InteractionManager, StyleSheet, NativeModules, NativeEventEmitter } from 'react-native';
-import api from '../../api/api';
-import { useDispatch, useSelector, shallowEqual } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { loadSession, removeSession, updateMessageStatus } from '../../redux/slices/chatSlice';
-import { formatChatDate } from '../../utils/FormatUtil';
 import { SwipeListView } from 'react-native-swipe-list-view';
 import { showToast } from '../../components/Utils';
 import Search from '../../components/Search';
-import SwipeItemOperation from '../../components/SwipeItemOperation';
 import UserSessionItem from '../../components/UserSessionItem';
 import { normalize, schema } from 'normalizr';
 import { MessageType } from '../../enum';
+import { fetchUserSessions, deleteUserSessionById } from '../../api/ApiService';
+import { getBitAtPosition } from '../../utils/BitUtil';
 
 const { MessageModule } = NativeModules
 const MessageModuleNativeEventEmitter = new NativeEventEmitter(MessageModule);
 
 
-const Chat = () => {
+const Chat = (props) => {
+
     const navigation = useNavigation();
     const dispatch = useDispatch()
 
@@ -26,38 +26,42 @@ const Chat = () => {
 
     const [sessionIds, setSessionIds] = useState([])
 
+    const { findFriendByFriendId, findGroupByGroupId, findFriendByGroupIdAndFriendId } = props
+
     //初始查询用户会话
     useEffect(() => {
         const fetchData = async () => {
-            api.get('/social/userSession/{userId}')
-                .then(
-                    (res) => {
-                        const userSessionList = res.data
-                        if (userSessionList) {
-                            const message = new schema.Entity('messages')
-                            const session = new schema.Entity('sessions', {
-                                messages: [message]
-                            })
-                            const normalizedData = normalize(userSessionList, [session]);
-                            //初始化加载会话
-                            dispatch(loadSession(normalizedData))
-                        }
-
-                    }
-                )
+            const userSessionList = await fetchUserSessions() || []
+            if (userSessionList) {
+                const message = new schema.Entity('messages')
+                const session = new schema.Entity('sessions', {
+                    messages: [message]
+                })
+                const normalizedData = normalize(userSessionList, [session]);
+                //初始化加载会话
+                dispatch(loadSession(normalizedData))
+            }
         }
-        fetchData()
+        if (!result || !result.length) {
+            fetchData()
+        }
 
         //接收消息监听
         const receiveMessageEventEmitter = MessageModuleNativeEventEmitter.addListener('RECEIVE_MESSAGE', (message) => {
             const msg = JSON.parse(message)
             const { header } = msg
-            const { cmd } = header
+            const { cmd, sender, receiver, reserved } = header
+            //消息响应
+            if (cmd === MessageType.COMMON_RESPONSE) {
+                const { ackId, state } = msg
+                dispatch(updateMessageStatus({ id: ackId, status: state }))
+                return
+            }
+            const groupBit = getBitAtPosition(reserved, 0)
+            const groupFlag = groupBit === 1
+            
             switch (cmd) {
-                case MessageType.COMMON_RESPONSE:
-                    const { ackId, state } = msg
-                    dispatch(updateMessageStatus({ id: ackId, status: state }))
-                    break
+
             }
             console.log('RECEIVE_MESSAGE', msg)
         })
@@ -117,7 +121,7 @@ const Chat = () => {
                     cursor="pointer"
                     bg="red.500"
                     justifyContent="center"
-                    onPress={() => deleteUserSession(rowMap, data.item)}
+                    onPress={() => removeUserSession(rowMap, data.item)}
                     _pressed={{
                         opacity: 0.5
                     }}>
@@ -139,15 +143,9 @@ const Chat = () => {
         // console.log('onRowClose',rowKey)
     }
 
-    const deleteUserSession = (rowMap, id) => {
+    const removeUserSession = (rowMap, id) => {
         dispatch(removeSession({ sessionId: id }))
-        const deleteUserSessionReq = {
-            id: id
-        }
-        api.delete('/social/userSession/{userId}', {
-            data: deleteUserSessionReq
-        })
-            .catch(error => console.log('deleteUserSession: ',error))
+        deleteUserSessionById(id)
     };
 
     return (

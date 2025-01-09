@@ -1,8 +1,9 @@
 import { VStack, Text, HStack, Avatar, Divider } from 'native-base';
+import React from 'react';
 import { StyleSheet } from 'react-native';
 
-const UserFriendItem = ({ avatar, name, isPressed = false }) => {
-
+const UserFriendItem = React.memo(({ avatar, name, isPressed = false }) => {
+    
     return (
         <HStack flex={1} space={5} alignItems='center' style={{ backgroundColor: isPressed ? '#C8C6C5' : '#F5F5F5', padding: 10, paddingRight: 0 }}>
             <VStack flex={1} justifyContent='center'>
@@ -21,7 +22,7 @@ const UserFriendItem = ({ avatar, name, isPressed = false }) => {
             </VStack>
         </HStack>
     )
-}
+})
 
 const styles = StyleSheet.create({
     customItemVStack: {
