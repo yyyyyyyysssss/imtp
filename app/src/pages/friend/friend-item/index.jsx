@@ -32,11 +32,7 @@ const FriendItem = ({ route }) => {
         if (session) {
             sessionId = session.id
         } else {
-            const createUserSessionReq = {
-                receiverUserId: friendId,
-                deliveryMethod: DeliveryMethod.SINGLE
-            }
-            sessionId = await createUserSession(createUserSessionReq)
+            sessionId = await createUserSession(friendId,DeliveryMethod.SINGLE)
             const userSessionItem = {
                 id: sessionId,
                 userId: userInfo.id,

@@ -1,8 +1,7 @@
 package org.imtp.common.packet.body;
 
 import lombok.*;
-
-import java.util.List;
+import org.imtp.common.enums.Gender;
 
 /**
  * @Description
@@ -15,25 +14,26 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class UserGroupInfo {
+public class GroupUserInfo {
 
     private Long id;
 
-    private String groupName;
+    private Long groupId;
+
+    private String nickname;
 
     private String note;
 
     private String avatar;
 
-    private List<GroupUserInfo> groupUserInfos;
-
     @Override
     public String toString() {
-        return "UserGroupInfo{" +
-                "id=" + id +
-                ", groupName='" + groupName + '\'' +
+        return "GroupUserInfo{" +
+                "groupId=" + groupId +
+                ", id=" + id +
+                ", nickname='" + nickname + '\'' +
+                ", note='" + note + '\'' +
                 ", avatar='" + avatar + '\'' +
-                ", groupUserInfos=" + groupUserInfos +
                 '}';
     }
 }

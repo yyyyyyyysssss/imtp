@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import jakarta.annotation.Resource;
+import org.apache.shardingsphere.infra.hint.HintManager;
 import org.imtp.common.enums.DeliveryMethod;
 import org.imtp.common.enums.MessageType;
 import org.imtp.common.packet.body.*;
@@ -19,6 +20,7 @@ import org.imtp.web.mapper.*;
 import org.imtp.web.service.OfflineMessageService;
 import org.imtp.web.service.UserMessageBoxService;
 import org.imtp.web.service.UserSocialService;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -115,9 +117,21 @@ public class UserSocialServiceImpl implements UserSocialService {
                 .receiverUserId(Long.valueOf(receiverUserId))
                 .deliveryMethod(userSessionDTO.getDeliveryMethod())
                 .build();
-        int insert = sessionMapper.insert(insertSession);
-        if (insert <= 0){
-            throw new BusinessException("create user session fail: [" + userId + "]");
+        try {
+            int insert = sessionMapper.insert(insertSession);
+            if (insert <= 0){
+                throw new BusinessException("create user session fail: [" + userId + "]");
+            }
+        }catch (DuplicateKeyException duplicateKeyException){
+            try (HintManager hintManager = HintManager.getInstance()){
+                hintManager.setWriteRouteOnly();
+                session = sessionMapper.selectOne(sessionQueryWrapper);
+                if (session != null){
+                    return session.getId();
+                }else {
+                    throw duplicateKeyException;
+                }
+            }
         }
         return insertSession.getId();
     }
@@ -135,44 +149,29 @@ public class UserSocialServiceImpl implements UserSocialService {
 
     @Override
     public List<UserGroupInfo> findUserGroupByUserId(String userId) {
-        Wrapper<GroupUser> groupUserQueryWrapper = new QueryWrapper<GroupUser>()
-                .eq("user_id", userId);
-        List<GroupUser> groupUsers = groupUserMapper.selectList(groupUserQueryWrapper);
-        if(groupUsers.isEmpty()){
+        List<Group> groups = groupMapper.findGroupByUserId(userId);
+        if (groups.isEmpty()){
             return List.of();
         }
-        List<Long> groupIds = groupUsers.stream().map(GroupUser::getGroupId).toList();
-        Wrapper<Group> groupQueryWrapper = new QueryWrapper<Group>()
-                .eq("state",true)
-                .in("id", groupIds);
-        List<Group> groups = groupMapper.selectList(groupQueryWrapper);
-        List<Long> ids = groups.stream().map(Group::getId).toList();
-        QueryWrapper<GroupUser> queryWrapper = new QueryWrapper<GroupUser>()
-                .select("user_id","group_id")
-                .in("group_id", ids);
-        List<GroupUser> gus = groupUserMapper.selectList(queryWrapper);
-        List<Long> userIds = gus.stream().map(GroupUser::getUserId).distinct().toList();
-        Wrapper<User> userQueryWrapper = new QueryWrapper<User>()
-                .select("id","nickname","avatar").in("id", userIds);
-        List<User> users = userMapper.selectList(userQueryWrapper);
-
-
-        Map<Long, List<GroupUser>> groupUserMap = gus.stream().collect(Collectors.groupingBy(GroupUser::getGroupId));
-        Map<Long, User> userMap = users.stream().collect(Collectors.toMap(User::getId, a -> a));
-
+        List<Long> groupIds = groups.stream().map(Group::getId).toList();
+        List<GroupUserInfo> groupUserInfos = groupMapper.findGroupUserInfoByGroupIdsAndUserId(groupIds, Long.valueOf(userId));
+        if (groupUserInfos.isEmpty()){
+            throw new BusinessException("userId[" + userId +  "] find group exception");
+        }
+        Map<Long, List<GroupUserInfo>> groupIdMap = groupUserInfos.stream().collect(Collectors.groupingBy(GroupUserInfo::getGroupId));
         List<UserGroupInfo> userGroupInfos = new ArrayList<>();
         for (Group group : groups){
             Long id = group.getId();
-            UserGroupInfo groupInfo = UserGroupInfo.builder().id(id).groupName(group.getName()).avatar(group.getAvatar()).build();
-            List<GroupUser> guList = groupUserMap.get(id);
-            List<UserFriendInfo> groupUserInfos = new ArrayList<>();
-            for (GroupUser groupUser : guList){
-                User user = userMap.get(groupUser.getUserId());
-                UserFriendInfo userFriendInfo = UserFriendInfo.builder().id(user.getId()).nickname(user.getNickname()).account(user.getUsername()).gender(user.getGender()).avatar(user.getAvatar()).build();
-                groupUserInfos.add(userFriendInfo);
-            }
-            groupInfo.setGroupUserInfos(groupUserInfos);
-            userGroupInfos.add(groupInfo);
+            List<GroupUserInfo> groupUserInfoList = groupIdMap.get(id);
+            UserGroupInfo userGroupInfo = UserGroupInfo
+                    .builder()
+                    .id(id)
+                    .groupName(group.getName())
+                    .note(group.getName())
+                    .avatar(group.getAvatar())
+                    .groupUserInfos(groupUserInfoList)
+                    .build();
+            userGroupInfos.add(userGroupInfo);
         }
         return userGroupInfos;
     }

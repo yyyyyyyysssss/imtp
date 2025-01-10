@@ -27,30 +27,6 @@ const FileMessage = React.memo(({ content, status, contentMetadata, progress }) 
                     <AntDesign name="file1" size={40} />
                 </VStack>
             </HStack>
-
-            {/* {status && status === MessageStatus.PENDING && (
-                <>
-                    <Box
-                        style={{
-                            position: 'absolute',
-                            height: '100%',
-                            width: '100%',
-                            borderRadius: 6,
-                            backgroundColor: 'rgba(0, 0, 0, 0.3)'
-                        }}
-                    />
-                    <Progress.Pie
-                        style={{
-                            position: 'absolute'
-                        }}
-                        progress={progress}
-                        color='white'
-                        borderWidth={0}
-                        size={40}
-                    />
-                </>
-
-            )} */}
         </Box>
     )
 })

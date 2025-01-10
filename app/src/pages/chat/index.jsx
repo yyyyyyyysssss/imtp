@@ -1,18 +1,19 @@
 import { Pressable, VStack, HStack, Text, Divider } from 'native-base';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { useNavigation, } from '@react-navigation/native';
 import { InteractionManager, StyleSheet, NativeModules, NativeEventEmitter } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
-import { loadSession, removeSession, updateMessageStatus, addMessage,selectSession } from '../../redux/slices/chatSlice';
+import { loadSession, removeSession, updateMessageStatus, addMessage, selectSession, addSession } from '../../redux/slices/chatSlice';
 import { SwipeListView } from 'react-native-swipe-list-view';
 import { showToast } from '../../components/Utils';
 import Search from '../../components/Search';
 import UserSessionItem from '../../components/UserSessionItem';
 import { normalize, schema } from 'normalizr';
-import { MessageType } from '../../enum';
-import { fetchUserSessions, deleteUserSessionById } from '../../api/ApiService';
+import { DeliveryMethod, MessageType } from '../../enum';
+import { fetchUserSessions, deleteUserSessionById, createUserSession } from '../../api/ApiService';
 import { getBitAtPosition } from '../../utils/BitUtil';
 import IdGen from '../../utils/IdGen';
+import { UserInfoContext } from '../../context';
 
 const { MessageModule } = NativeModules
 const MessageModuleNativeEventEmitter = new NativeEventEmitter(MessageModule);
@@ -26,6 +27,8 @@ const Chat = (props) => {
     const result = useSelector(state => state.chat.result)
 
     const sessions = useSelector(state => state.chat.entities.sessions)
+
+    const userInfo = useContext(UserInfoContext)
 
     const sessionMapRef = useRef(new Map())
 
@@ -52,60 +55,7 @@ const Chat = (props) => {
 
         //接收消息监听
         const receiveMessageEventEmitter = MessageModuleNativeEventEmitter.addListener('RECEIVE_MESSAGE', (message) => {
-            const msg = JSON.parse(message)
-            const { header, timestamp } = msg
-            const { cmd, sender, receiver, reserved } = header
-            //消息响应
-            if (cmd === MessageType.COMMON_RESPONSE) {
-                const { ackId, state } = msg
-                dispatch(updateMessageStatus({ id: ackId, status: state }))
-                return
-            }
-            const groupBit = getBitAtPosition(reserved, 0)
-            const isGroup = groupBit === 1
-            const realSender = isGroup ? receiver : sender;
-            const session = sessionMapRef.current.get(realSender)
-            let content;
-            switch (cmd) {
-                case MessageType.TEXT_MESSAGE:
-                    content = msg.text;
-                    break;
-                case MessageType.IMAGE_MESSAGE:
-                    content = msg.url;
-                    break;
-                case MessageType.VIDEO_MESSAGE:
-                    content = msg.url;
-                    break;
-                case MessageType.FILE_MESSAGE:
-                    content = msg.url;
-                    break;
-                default:
-                    console.log('unsupported message type:', cmd)
-                    return
-            }
-            if (session) {
-                const message = {
-                    id: IdGen.nextId(),
-                    type: cmd,
-                    content: content,
-                    sessionId: session.id,
-                    sender: session.userId,
-                    receiver: session.receiverUserId,
-                    deliveryMethod: session.deliveryMethod,
-                    self: false,
-                    timestamp: timestamp,
-                    name: session.name,
-                    avatar: session.avatar
-                }
-                //添加消息
-                dispatch(addMessage({ sessionId: session.id, message: message }))
-            } else {
-
-            }
-            switch (cmd) {
-
-            }
-            console.log('RECEIVE_MESSAGE', msg)
+            receiveMessageHandler(message)
         })
 
         return () => {
@@ -114,14 +64,102 @@ const Chat = (props) => {
     }, [])
 
     useEffect(() => {
+        sessionMapRef.current = new Map()
         for (const session of Object.values(sessions)) {
             sessionMapRef.current.set(session.receiverUserId, session)
         }
     }, [result])
 
+    const receiveMessageHandler = async (message) => {
+        const msg = JSON.parse(message)
+        const { header } = msg
+        const { cmd, sender, receiver, reserved } = header
+        //消息响应
+        if (cmd === MessageType.COMMON_RESPONSE) {
+            const { ackId, state } = msg
+            dispatch(updateMessageStatus({ id: ackId, status: state }))
+            return
+        }
+        const { contentMetadata, timestamp } = msg
+        const groupBit = getBitAtPosition(reserved, 0)
+        const isGroup = groupBit === 1
+        const deliveryMethod = isGroup ? DeliveryMethod.GROUP : DeliveryMethod.SINGLE
+        const realSender = isGroup ? receiver : sender;
+        let content;
+        switch (cmd) {
+            case MessageType.TEXT_MESSAGE:
+                content = msg.text;
+                break;
+            case MessageType.IMAGE_MESSAGE:
+                content = msg.url;
+                break;
+            case MessageType.VIDEO_MESSAGE:
+                content = msg.url;
+                break;
+            case MessageType.FILE_MESSAGE:
+                content = msg.url;
+                break;
+            default:
+                console.log('unsupported message type:', cmd)
+                return
+        }
+        // 会话是否存在 不存在则先新增会话
+        let session = sessionMapRef.current.get(realSender)
+        const friendInfo = findFriendInfo(sender, realSender, deliveryMethod)
+        if (session) {
+            session = {
+                ...session,
+                lastMsgType: cmd,
+                lastMsgContent: content,
+                lastMsgTime: timestamp,
+                lastUserName: friendInfo.note
+            }
+        } else {
+            const groupInfo = deliveryMethod === DeliveryMethod.GROUP ? findGroupByGroupId(realSender) : friendInfo
+            const sessionId = await createUserSession(realSender, deliveryMethod)
+            session = {
+                id: sessionId,
+                userId: userInfo.id,
+                name: groupInfo.note,
+                avatar: groupInfo.avatar,
+                receiverUserId: realSender,
+                deliveryMethod: deliveryMethod,
+                lastMsgType: cmd,
+                lastMsgContent: content,
+                lastMsgTime: timestamp,
+                lastUserName: friendInfo.note
+            }
+            dispatch(addSession({ session: session }))
+        }
+        //添加消息
+        const receiveMessage = messageBase(content, contentMetadata, cmd, timestamp, friendInfo, session)
+        dispatch(addMessage({ sessionId: session.id, message: receiveMessage }))
+    }
+
+    const findFriendInfo = (friendId, groupId, deliveryMethod) => {
+
+        return deliveryMethod === DeliveryMethod.SINGLE ? findFriendByFriendId(friendId) : findFriendByGroupIdAndFriendId(groupId, friendId)
+    }
+
+    const messageBase = (content, contentMetadata, type, timestamp, friendInfo, session) => {
+
+        return {
+            id: IdGen.nextId(),
+            content: content,
+            type: type,
+            timestamp: timestamp,
+            contentMetadata: contentMetadata,
+            self: false,
+            sessionId: session.id,
+            sender: session.userId,
+            receiver: session.receiverUserId,
+            deliveryMethod: session.deliveryMethod,
+            name: friendInfo.note,
+            avatar: friendInfo.avatar
+        }
+    }
+
     const toChatItem = (sessionId) => {
-        // 当前选择会话
-        dispatch(selectSession({ sessionId: sessionId }))
         navigation.navigate('ChatItem', {
             sessionId: sessionId,
         })

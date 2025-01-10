@@ -17,7 +17,8 @@ const Friend = forwardRef((props, ref) => {
     const userFriends = useSelector(state => state.chat.userFriends)
     const userGroups = useSelector(state => state.chat.userGroups)
 
-    const dataMapRef = useRef(new Map())
+    const userFriendMapRef = useRef(new Map())
+    const userGroupMapRef = useRef(new Map())
 
     const dispatch = useDispatch()
 
@@ -64,15 +65,17 @@ const Friend = forwardRef((props, ref) => {
     }, [])
 
     useEffect(() => {
-        userFriends.forEach(item => dataMapRef.current.set(item.id, item))
+        userFriendMapRef.current = new Map()
+        userFriends.forEach(item => userFriendMapRef.current.set(item.id, item))
     }, [userFriends])
 
     useEffect(() => {
+        userGroupMapRef.current = new Map()
         for (let userGroup of userGroups) {
             const groupId = userGroup.id
-            dataMapRef.current.set(groupId, userGroup)
+            userGroupMapRef.current.set(groupId, {id: groupId,note: userGroup.note,avatar: userGroup.avatar})
             const { groupUserInfos } = userGroup
-            groupUserInfos.forEach(item => dataMapRef.current.set(groupId + '-' + item.id, item))
+            groupUserInfos.forEach(item => userGroupMapRef.current.set(groupId + '-' + item.id, item))
         }
     }, [userGroups])
 
@@ -84,17 +87,17 @@ const Friend = forwardRef((props, ref) => {
 
     const findFriendByFriendId = (friendId) => {
 
-        return dataMapRef.current.get(friendId)
+        return userFriendMapRef.current.get(friendId)
     }
 
     const findGroupByGroupId = (groupId) => {
 
-        return dataMapRef.current.get(groupId)
+        return userGroupMapRef.current.get(groupId)
     }
 
     const findFriendByGroupIdAndFriendId = (groupId, friendId) => {
         const key = groupId + '-' + friendId
-        return dataMapRef.current.get(key)
+        return userGroupMapRef.current.get(key)
     }
 
     const toFriendItem = (item) => {

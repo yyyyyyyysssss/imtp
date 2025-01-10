@@ -60,10 +60,13 @@ export const fetchUserSessions = () => {
 }
 
 // 创建用户会话
-export const createUserSession = (req) => {
-
+export const createUserSession = (receiverUserId, deliveryMethod) => {
+    const createUserSessionReq = {
+        receiverUserId: receiverUserId,
+        deliveryMethod: deliveryMethod
+    }
     return new Promise((resolve, reject) => {
-        api.post('/social/userSession/{userId}', req)
+        api.post('/social/userSession/{userId}', createUserSessionReq)
             .then(res => resolve(res.data))
             .catch(error => reject(error))
     })

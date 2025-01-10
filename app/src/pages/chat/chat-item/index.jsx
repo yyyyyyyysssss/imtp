@@ -46,13 +46,15 @@ const ChatItem = ({ route }) => {
         //未初始化的数据进行初始化
         InteractionManager.runAfterInteractions(() => {
             setTimeout(() => {
+                // 当前选择会话
+                dispatch(selectSession({ sessionId: sessionId }))
                 if (session.messageInit === undefined || session.messageInit === false) {
                     fetchData()
                 }
             }, 100);
         })
         return () => {
-            
+
         }
     }, [])
 
@@ -65,11 +67,12 @@ const ChatItem = ({ route }) => {
         })
     }, [messages])
 
+    // 监听路由退出前事件
     useEffect(() => {
-        navigation.addListener('beforeRemove',(e) => {
+        navigation.addListener('beforeRemove', (e) => {
             dispatch(selectSession({ sessionId: null }))
         })
-    },[navigation])
+    }, [navigation])
 
     const moreOps = () => {
         showToast('更多操作')

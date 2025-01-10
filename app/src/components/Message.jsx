@@ -20,7 +20,7 @@ const Message = React.memo(({ style, messageId }) => {
 
     const [progress, setProgress] = useState(0.01)
 
-    const { type, name, avatar, deliveryMethod, self, status, content, contentMetadata, progressId } = message
+    const { type, name, avatar, deliveryMethod, self, status, content, contentMetadata, progressId } = message || {}
 
     useEffect(() => {
         let progressEventEmitter;

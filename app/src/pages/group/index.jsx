@@ -28,11 +28,7 @@ const Group = () => {
         if (session) {
             sessionId = session.id
         } else {
-            const createUserSessionReq = {
-                receiverUserId: groupId,
-                deliveryMethod: DeliveryMethod.GROUP
-            }
-            sessionId  = await createUserSession(createUserSessionReq)
+            sessionId = await createUserSession(groupId, DeliveryMethod.GROUP)
             const userSessionItem = {
                 id: sessionId,
                 userId: userInfo.id,
@@ -64,7 +60,7 @@ const Group = () => {
                     return (
                         <UserFriendItem
                             avatar={item.avatar}
-                            name={item.groupName}
+                            name={item.note}
                             isPressed={isPressed}
                         />
                     )

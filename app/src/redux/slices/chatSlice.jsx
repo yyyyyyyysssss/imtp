@@ -46,12 +46,18 @@ export const chatSlice = createSlice({
         removeSession: (state, action) => {
             const { payload } = action
             const { sessionId } = payload
+            // 清除该会话的未读消息
+            const unreadMessageCount = state.entities.sessions[sessionId].unreadMessageCount || 0
+            // 消息总计
+            const unreadCount = state.unreadCount || 0
+            state.unreadCount = unreadCount - unreadMessageCount
             delete state.entities.sessions[sessionId]
             state.result = [...state.result.filter(item => item !== sessionId)]
         },
         loadMessage: (state, action) => {
             const { payload } = action
             const { sessionId, messages } = payload
+            const messageInit = state.entities.sessions[sessionId].messageInit
             messages.forEach(message => {
                 if (!state.entities.messages) {
                     state.entities.messages = {}
@@ -60,7 +66,12 @@ export const chatSlice = createSlice({
                 if (!state.entities.sessions[sessionId].messages) {
                     state.entities.sessions[sessionId].messages = []
                 }
-                state.entities.sessions[sessionId].messages.push(message.id)
+                if(messageInit === undefined || messageInit === false){
+                    state.entities.sessions[sessionId].messages.push(message.id)
+                }else {
+                    state.entities.sessions[sessionId].messages.unshift(message.id)
+                }
+                
             });
             state.entities.sessions[sessionId].messageInit = true
         },

@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Box, HStack, Text, VStack, Input, Pressable, Flex } from 'native-base';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons';
@@ -12,6 +12,10 @@ var RNFS = require('react-native-fs');
 const ChatItemFooter = ({ sendMessage }) => {
 
     const [isOpen, setIsOpen] = useState(false)
+
+    const [isVoice, setIsVoice] = useState(null)
+
+    const [inputMemo, setInputMemo] = useState("")
 
     const inputRef = useRef()
 
@@ -71,6 +75,27 @@ const ChatItemFooter = ({ sendMessage }) => {
     const selectEmoji = () => {
 
     }
+
+    useEffect(() => {
+        if (isVoice === null) {
+            return
+        }
+        if (isVoice) {
+            inputRef.current.blur()
+        } else {
+            inputRef.current.focus()
+        }
+    }, [isVoice])
+
+    const handleOnPressVoice = () => {
+        if (isVoice) {
+            setIsVoice(false)
+        } else {
+            setIsVoice(true)
+        }
+
+    }
+
 
     const handleMoreOps = () => {
         if (isOpen) {
@@ -202,11 +227,20 @@ const ChatItemFooter = ({ sendMessage }) => {
                     }}
                 >
                     <HStack flex={1} justifyContent='center'>
-                        <MaterialIcon name="keyboard-voice" size={30} />
+                        <Pressable
+                            onPress={() => handleOnPressVoice()}
+                        >
+                            <MaterialIcon name={isVoice === true ? 'keyboard' : 'keyboard-voice'} size={30} />
+                        </Pressable>
                     </HStack>
                     <HStack flex={5.5} justifyContent='center' alignItems='center'>
                         <Input
                             ref={inputRef}
+                            readOnly={isVoice === true ? true : false}
+                            style={isVoice === true ? styles.holdToSpeak : {}}
+                            defaultValue={isVoice === false ? inputMemo : ''}
+                            placeholder={isVoice === true ? '按住 说话' : ''}
+                            placeholderTextColor={isVoice === true ? 'black' : ''}
                             size='md'
                             focusOutlineColor='none'
                             borderWidth={0}
@@ -214,6 +248,7 @@ const ChatItemFooter = ({ sendMessage }) => {
                             blurOnSubmit={false}
                             onSubmitEditing={handleSubmit}
                             onFocus={handleInputFocus}
+                            onChangeText={(text) => setInputMemo(text)}
                             w={{
                                 base: "100%",
                             }}
@@ -322,6 +357,11 @@ const styles = StyleSheet.create({
         padding: 12,
         backgroundColor: 'white',
         borderRadius: 10
+    },
+    holdToSpeak: {
+        fontSize: 20,
+        textAlign: 'center',
+        fontWeight: 'bold'
     }
 })
 
