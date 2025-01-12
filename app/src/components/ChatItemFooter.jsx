@@ -1,11 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Box, HStack, Text, VStack, Input, Pressable, Flex } from 'native-base';
+import { Box, HStack, Text, VStack, Input, Pressable, Flex, View } from 'native-base';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons';
-import { StyleSheet } from 'react-native';
+import { Modal, StyleSheet } from 'react-native';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import { MessageType } from '../enum';
 import DocumentPicker, { types } from 'react-native-document-picker'
+import { tr } from 'rn-emoji-keyboard';
+import RecordVoice from './RecordVoice';
 
 var RNFS = require('react-native-fs');
 
@@ -16,6 +18,8 @@ const ChatItemFooter = ({ sendMessage }) => {
     const [isVoice, setIsVoice] = useState(null)
 
     const [inputMemo, setInputMemo] = useState("")
+
+    const [overlayVisible, setOverlayVisible] = useState(false);
 
     const inputRef = useRef()
 
@@ -96,6 +100,15 @@ const ChatItemFooter = ({ sendMessage }) => {
 
     }
 
+    const handleViocePressIn = () => {
+        console.log('按下')
+        setOverlayVisible(true)
+    }
+
+    const handleViocePressOut = () => {
+        console.log('松开')
+        setOverlayVisible(false)
+    }
 
     const handleMoreOps = () => {
         if (isOpen) {
@@ -217,7 +230,6 @@ const ChatItemFooter = ({ sendMessage }) => {
                 borderTopColor: 'blank',
                 borderTopWidth: 0.1
             }}>
-
                 <HStack
                     flex={1}
                     justifyContent='center'
@@ -234,25 +246,47 @@ const ChatItemFooter = ({ sendMessage }) => {
                         </Pressable>
                     </HStack>
                     <HStack flex={5.5} justifyContent='center' alignItems='center'>
-                        <Input
-                            ref={inputRef}
-                            readOnly={isVoice === true ? true : false}
-                            style={isVoice === true ? styles.holdToSpeak : {}}
-                            defaultValue={isVoice === false ? inputMemo : ''}
-                            placeholder={isVoice === true ? '按住 说话' : ''}
-                            placeholderTextColor={isVoice === true ? 'black' : ''}
-                            size='md'
-                            focusOutlineColor='none'
-                            borderWidth={0}
-                            backgroundColor='white'
-                            blurOnSubmit={false}
-                            onSubmitEditing={handleSubmit}
-                            onFocus={handleInputFocus}
-                            onChangeText={(text) => setInputMemo(text)}
-                            w={{
-                                base: "100%",
-                            }}
-                        />
+                        {isVoice === true ?
+                            (
+                                <Pressable
+                                    flex={1}
+                                    onPressIn={handleViocePressIn}
+                                    onTouchEnd={handleViocePressOut}
+                                >
+                                    <Input
+                                        ref={inputRef}
+                                        isReadOnly
+                                        style={styles.holdToSpeak}
+                                        placeholder='按住 说话'
+                                        placeholderTextColor='black'
+                                        size='md'
+                                        focusOutlineColor='none'
+                                        borderWidth={0}
+                                        backgroundColor='white'
+                                        w={{
+                                            base: "100%",
+                                        }}
+                                    />
+                                </Pressable>
+                            ) : (
+                                <Input
+                                    ref={inputRef}
+                                    defaultValue={isVoice === false ? inputMemo : ''}
+                                    size='md'
+                                    focusOutlineColor='none'
+                                    borderWidth={0}
+                                    backgroundColor='white'
+                                    blurOnSubmit={false}
+                                    onSubmitEditing={handleSubmit}
+                                    onFocus={handleInputFocus}
+                                    onChangeText={(text) => setInputMemo(text)}
+                                    w={{
+                                        base: "100%",
+                                    }}
+                                />
+                            )
+                        }
+
                     </HStack>
                     <HStack flex={2.5} justifyContent='center' alignContent='center' space={3}>
                         <Pressable onPress={selectEmoji}>
@@ -264,8 +298,6 @@ const ChatItemFooter = ({ sendMessage }) => {
 
                     </HStack>
                 </HStack>
-
-                {/* <EmojiPicker onEmojiSelected={handleEmojiSelected} open={isOpen} onClose={() => setIsOpen(false)} /> */}
                 {isOpen && (
                     <Flex
                         direction="column"
@@ -348,6 +380,9 @@ const ChatItemFooter = ({ sendMessage }) => {
 
                 )}
             </VStack>
+            <RecordVoice
+                overlayVisible={overlayVisible}
+            />
         </>
     )
 }
