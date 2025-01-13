@@ -382,6 +382,7 @@ const ChatItemFooter = ({ sendMessage }) => {
             </VStack>
             <RecordVoice
                 overlayVisible={overlayVisible}
+                setOverlayVisible={setOverlayVisible}
             />
         </>
     )
