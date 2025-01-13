@@ -15,7 +15,7 @@ for (let i = 0; i < NUM_BARS; i++) {
     bars.push(new Animated.Value(initValue));
 }
 
-const RecordVoice = ({ overlayVisible, setOverlayVisible }) => {
+const RecordVoice = ({ overlayVisible, setOverlayVisible, messageProvider }) => {
 
     const recorderRef = useRef()
 
@@ -74,12 +74,12 @@ const RecordVoice = ({ overlayVisible, setOverlayVisible }) => {
         if (recorderRef.current) {
             recorderRef.current.destroy()
         }
-        recorderRef.current = new Recorder('adrec.mp4', {
+        recorderRef.current = new Recorder('record.aac', {
             bitrate: 256000, //越高 音频质量越好
             channels: 2, //双声道
             sampleRate: 44100, //采样率
             quality: 'high', //录音质量
-            // format: 'aac'
+            format: 'aac'
         }).prepare((err, fsPath) => {
             if (err) {
                 console.log('reload recorder error', err)
@@ -88,7 +88,7 @@ const RecordVoice = ({ overlayVisible, setOverlayVisible }) => {
             }
         })
         //开始录制
-        recorderRef.current.record((err) => {
+        recorderRef.current.toggleRecord((err) => {
             if (err) {
                 console.log('start recorder error', err)
             } else {
@@ -124,26 +124,16 @@ const RecordVoice = ({ overlayVisible, setOverlayVisible }) => {
                         const result = await RNFS.stat(filePath)
                         const duration = player.duration;
                         console.log(`filePath: ${filePath} fileSize: ${result.size} duration: ${(duration / 1000).toFixed(2)}s`);
-                        RNFS.readFile(filePath, 'base64')
-                            .then(
-                                (content) => {
-                                    console.log('content', content)
-                                }
-                            )
                         player.destroy()
+                        const media = {
+                            uri: filePath,
+                            type: 'audio/x-hx-aac-adts',
+                            fileName: 'record.aac',
+                            fileSize: result.size,
+                            duration: duration
+                        }
+                        messageProvider(media)
                     })
-                // RNFS.stat(filePath)
-                //     .then(
-                //         (result) => {
-                //             console.log(`filePath: ${filePath} totalSize: ${result.size}`)
-                //         }
-                //     )
-                // RNFS.readFile(filePath, 'base64')
-                //     .then(
-                //         (content) => {
-                //             console.log('content',content)
-                //         }
-                //     )
                 if (intervalRef.current) {
                     clearInterval(intervalRef.current)
                 }

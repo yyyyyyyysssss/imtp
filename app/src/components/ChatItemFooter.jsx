@@ -60,7 +60,16 @@ const ChatItemFooter = ({ sendMessage }) => {
                 type: MessageType.TEXT_MESSAGE,
                 content: content,
             }
-        } else {
+        } else if (type.startsWith('audio')) {
+            message = {
+                type: MessageType.VOICE_MESSAGE,
+                fileName: fileName,
+                filePath: uri,
+                fileType: type,
+                fileSize: fileSize,
+                duration: duration,
+            }
+        }else {
             message = {
                 type: MessageType.FILE_MESSAGE,
                 fileName: fileName,
@@ -383,6 +392,7 @@ const ChatItemFooter = ({ sendMessage }) => {
             <RecordVoice
                 overlayVisible={overlayVisible}
                 setOverlayVisible={setOverlayVisible}
+                messageProvider={messageProvider}
             />
         </>
     )

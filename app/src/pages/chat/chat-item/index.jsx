@@ -183,6 +183,18 @@ const ChatItem = ({ route }) => {
                         dispatch(updateMessage({ message: newMsg }))
                     })
                 break
+            case MessageType.VOICE_MESSAGE:
+                msg = messageBase(filePath, type)
+                Uplaod.uploadChunks(filePath, fileName, fileType, fileSize, msg.progressId)
+                    .then(
+                        (res) => {
+                            console.log('VOICE_MESSAGE',res)
+                        },
+                        (error) => {
+                            console.log('VOICE_MESSAGE',error)
+                        }
+                    )
+                break
             case MessageType.FILE_MESSAGE:
                 msg = messageBase(filePath, type)
                 msg.progressId = IdGen.nextId()

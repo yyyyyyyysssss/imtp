@@ -38,6 +38,8 @@ public class ChunkedUploader {
 
     private static final int CHUNK_SIZE = 1024 * 1024 * 5; // 5MB
 
+    private static final int SIMPLE_UPLOAD_THRESHOLD_SIZE = 1024 * 1024 * 10; // 10MB
+
     private static final OKHttpClientHelper okHttpClientHelper;
 
     private static final ExecutorService uploadExecutor;
@@ -74,9 +76,7 @@ public class ChunkedUploader {
                 Uri uri = Uri.parse(filePath);
                 inputStream = MainApplication.getContext().getContentResolver().openInputStream(uri);
             }else {
-                CompletableFuture<String> future = new CompletableFuture<>();
-                future.completeExceptionally(new UnsupportedOperationException("Unsupported file types"));
-                return future;
+                inputStream = new FileInputStream(new File(filePath));
             }
             String fileType = fileInfo.getFileType();
             return uploadFile(inputStream,fileInfo.getFilename(),fileType,CHUNK_SIZE,progressListener);
@@ -186,6 +186,19 @@ public class ChunkedUploader {
         okHttpClientHelper.doPost("/file/upload/chunk", multipartBody, new TypeReference<Void>() {});
         if (progressListener != null){
             progressListener.onProgress(chunkData.length);
+        }
+    }
+
+    private static void simpleUpload(byte[] bytes, String fileName, String fileType,ProgressListener progressListener){
+        Log.i(TAG, "simpleUpload 文件名称: "+fileName+" 文件大小:"+convertBytesToMB(bytes.length) + " 文件类型: " + fileType);
+        RequestBody requestBody = RequestBody.create(bytes, MediaType.parse(fileType));
+        MultipartBody multipartBody = new MultipartBody.Builder()
+                .setType(MultipartBody.FORM)
+                .addFormDataPart("file",fileName,requestBody)
+                .build();
+        okHttpClientHelper.doPost("/file/upload/simple", multipartBody, new TypeReference<Void>() {});
+        if (progressListener != null){
+            progressListener.onProgress(bytes.length);
         }
     }
 
