@@ -202,6 +202,7 @@ const ChatItem = ({ route }) => {
                             dispatch(updateMessage({ message: newMsg }))
                         },
                         (error) => {
+                            console.log('error',error)
                             const newMsg = { ...msg, status: MessageStatus.FAILED }
                             dispatch(updateMessage({ message: newMsg }))
                         }

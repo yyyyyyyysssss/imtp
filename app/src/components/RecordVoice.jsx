@@ -103,15 +103,13 @@ const RecordVoice = ({ overlayVisible, setOverlayVisible, messageProvider }) => 
                             console.log('音频加载失败：', err);
                             return
                         }
-                        const result = await RNFS.stat(filePath)
                         const duration = player.duration;
-                        console.log(`filePath: ${filePath} fileSize: ${result.size} duration: ${(duration / 1000).toFixed(2)}s`);
+                        console.log(`filePath: ${filePath} duration: ${(duration / 1000).toFixed(2)}s`);
                         player.destroy()
                         const media = {
                             uri: filePath,
                             type: 'audio/x-hx-aac-adts',
                             fileName: 'record.aac',
-                            fileSize: result.size,
                             duration: duration
                         }
                         messageProvider(media)
