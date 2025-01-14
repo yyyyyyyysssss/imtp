@@ -9,7 +9,7 @@ const UserSessionItem = React.memo(({ sessionId }) => {
 
     const session = useSelector(state => state.chat.entities.sessions[sessionId])
 
-    const { name, avatar, lastMsgType,lastUserName, lastMsgContent, lastMsgTime, deliveryMethod, unreadMessageCount } = session || {}
+    const { name, avatar, lastMsgType, lastUserName, lastMsgContent, lastMsgTime, deliveryMethod, unreadMessageCount } = session || {}
 
     let messageContent;
     switch (lastMsgType) {
@@ -25,8 +25,11 @@ const UserSessionItem = React.memo(({ sessionId }) => {
         case MessageType.FILE_MESSAGE:
             messageContent = '[文件]'
             break
+        case MessageType.VOICE_MESSAGE:
+            messageContent = '[语音]'
+            break
     }
-    if(messageContent && deliveryMethod === DeliveryMethod.GROUP){
+    if (messageContent && deliveryMethod === DeliveryMethod.GROUP) {
         messageContent = lastUserName + ': ' + messageContent
     }
 

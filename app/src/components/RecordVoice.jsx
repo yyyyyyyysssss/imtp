@@ -1,9 +1,10 @@
 import { Box, HStack } from "native-base"
 import { useEffect, useRef, useState } from "react"
-import { Animated, Modal, PermissionsAndroid, StyleSheet } from "react-native"
+import { Animated, Modal, StyleSheet } from "react-native"
 import { Recorder, Player } from '@react-native-community/audio-toolkit';
 import RNFS from 'react-native-fs';
 import { randomInt } from "../utils/RandomUtil";
+import IdGen from "../utils/IdGen";
 
 
 const NUM_BARS = 20;  // 音浪条形数量
@@ -21,9 +22,9 @@ const RecordVoice = ({ overlayVisible, setOverlayVisible, messageProvider }) => 
 
     const recorderFilePathRef = useRef()
 
-    const intervalRef = useRef()
-
     const timeoutRef = useRef()
+
+    const animatedLoopRef = useRef()
 
     useEffect(() => {
 
@@ -32,19 +33,16 @@ const RecordVoice = ({ overlayVisible, setOverlayVisible, messageProvider }) => 
             if (timeoutRef.current) {
                 clearTimeout(timeoutRef.current)
             }
-            if (intervalRef.current) {
-                clearInterval(intervalRef.current)
+            if(animatedLoopRef.current){
+                animatedLoopRef.current.stop()
             }
         }
-    })
+    },[])
 
     useEffect(() => {
         const start = async () => {
-            const checked = await checkRecorderPermission()
-            if (checked) {
-                startRecorder()
-                startAnimation()
-            }
+            startRecorder()
+            startAnimation()
         }
         const stop = () => {
             stopRecorder()
@@ -57,24 +55,14 @@ const RecordVoice = ({ overlayVisible, setOverlayVisible, messageProvider }) => 
         }
     }, [overlayVisible])
 
-    const checkRecorderPermission = async () => {
-        if (Platform.OS !== 'android') {
-            return Promise.resolve(true);
-        }
-        let result;
-        try {
-            result = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.RECORD_AUDIO, { title: 'Microphone Permission', message: 'Enter the Gunbook needs access to your microphone so you can search with voice.' });
-        } catch (error) {
-            console.error('failed getting permission, result:', result);
-        }
-        return (result === true || result === PermissionsAndroid.RESULTS.GRANTED);
-    }
+
 
     const startRecorder = () => {
         if (recorderRef.current) {
             recorderRef.current.destroy()
         }
-        recorderRef.current = new Recorder('record.aac', {
+        const name = IdGen.nextId() + '.aac'
+        recorderRef.current = new Recorder(name, {
             bitrate: 256000, //越高 音频质量越好
             channels: 2, //双声道
             sampleRate: 44100, //采样率
@@ -104,15 +92,9 @@ const RecordVoice = ({ overlayVisible, setOverlayVisible, messageProvider }) => 
     }
 
     const stopRecorder = () => {
-        if (timeoutRef.current) {
-            clearTimeout(timeoutRef.current)
-        }
         recorderRef.current?.stop((err) => {
             if (err) {
                 console.log('stop recorder error', err)
-                if (intervalRef.current) {
-                    clearInterval(intervalRef.current)
-                }
             } else {
                 const filePath = recorderFilePathRef.current
                 const player = new Player(filePath)
@@ -134,11 +116,9 @@ const RecordVoice = ({ overlayVisible, setOverlayVisible, messageProvider }) => 
                         }
                         messageProvider(media)
                     })
-                if (intervalRef.current) {
-                    clearInterval(intervalRef.current)
-                }
                 console.log('recording completed', filePath)
             }
+            recorderRef.current.destroy()
         })
     }
 
@@ -174,23 +154,24 @@ const RecordVoice = ({ overlayVisible, setOverlayVisible, messageProvider }) => 
     const startAnimation = () => {
         const firstHalf = bars.slice(0, 10).reverse()
         const secondHalf = bars.slice(10)
-        const run = (init = false) => {
+        const animatedParallel = (init = false) => {
             const x1 = randomInt(0, 10)
             const x2 = randomInt(0, 10)
             const x3 = randomInt(0, 10)
             const x4 = randomInt(0, 10)
+            const animatedSequence = []
             firstHalf.forEach((bar, index) => {
                 let animation;
                 if (init) {
-                    animation = animationInstance(bar, index, 15, 100, 200)
+                    animation = animationInstance(bar, index, 50)
                 } else if (x1 === index || x2 === index) {
-                    animation = animationInstance(bar, index, 30, 50, 100)
+                    animation = animationInstance(bar, index, 30)
                 } else if (x3 === index || x4 === index) {
-                    animation = animationInstance(bar, index, 40, 50, 100)
+                    animation = animationInstance(bar, index, 40)
                 } else {
-                    animation = animationInstance(bar, index, 15, 100, 200)
+                    animation = animationInstance(bar, index, 20)
                 }
-                animation.start()
+                animatedSequence.push(animation)
             })
             const y1 = randomInt(0, 10)
             const y2 = randomInt(0, 10)
@@ -199,24 +180,24 @@ const RecordVoice = ({ overlayVisible, setOverlayVisible, messageProvider }) => 
             secondHalf.forEach((bar, index) => {
                 let animation;
                 if (init) {
-                    animation = animationInstance(bar, index, 15, 100, 200)
+                    animation = animationInstance(bar, index, 50)
                 } else if (y1 === index || y2 === index) {
-                    animation = animationInstance(bar, index, 30, 50, 100)
+                    animation = animationInstance(bar, index, 30)
                 } else if (y3 === index || y4 === index) {
-                    animation = animationInstance(bar, index, 40, 50, 100)
+                    animation = animationInstance(bar, index, 40)
                 } else {
-                    animation = animationInstance(bar, index, 15, 100, 200)
+                    animation = animationInstance(bar, index, 20)
                 }
-                animation.start()
+                animatedSequence.push(animation)
             })
+
+            return Animated.parallel(animatedSequence, { stopTogether: false })
         }
-        run(true)
-        intervalRef.current = setInterval(() => {
-            run(false)
-        }, 500)
+        const parallelAnimated = animatedParallel()
+        animatedLoopRef.current = Animated.loop(parallelAnimated).start()
     }
 
-    const animationInstance = (bar, index, value = 15, delay = 100, duration = 200) => {
+    const animationInstance = (bar, index, value = 15, delay = 50, duration = 50) => {
         const originalValue = new Animated.Value(initValue)
         const toAnimatedValue = new Animated.Value(value)
         return Animated.sequence([
@@ -235,6 +216,9 @@ const RecordVoice = ({ overlayVisible, setOverlayVisible, messageProvider }) => 
     }
 
     const stopAnimation = () => {
+        if(animatedLoopRef.current){
+            animatedLoopRef.current.stop()
+        }
         const toValue = new Animated.Value(initValue)
         bars.forEach(bar => {
             Animated.timing(bar, {

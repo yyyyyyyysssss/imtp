@@ -43,7 +43,7 @@ class Uplaod {
         return chunks
     }
 
-    static async uploadChunks(filePath, fileName, fileType, fileSize,progressId) {
+    static async uploadChunks(filePath, fileName, fileType, fileSize,progressId = null) {
         const fileInfo = {
             filePath: filePath,
             filename: fileName,
@@ -55,11 +55,9 @@ class Uplaod {
             UploadModule.upload(JSON.stringify(fileInfo))
                 .then(
                     (res) => {
-                        console.log('upload completed', res)
                         resolve(res)
                     },
                     (error) => {
-                        console.log('upload failed', error)
                         reject(error)
                     }
                 )

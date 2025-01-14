@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Box, HStack, Text, VStack, Input, Pressable, Flex, View } from 'native-base';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons';
-import { Modal, StyleSheet } from 'react-native';
+import { PermissionsAndroid, StyleSheet } from 'react-native';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import { MessageType } from '../enum';
 import DocumentPicker, { types } from 'react-native-document-picker'
@@ -19,7 +19,7 @@ const ChatItemFooter = ({ sendMessage }) => {
 
     const [inputMemo, setInputMemo] = useState("")
 
-    const [overlayVisible, setOverlayVisible] = useState(false);
+    const [overlayVisible, setOverlayVisible] = useState(false)
 
     const inputRef = useRef()
 
@@ -109,9 +109,28 @@ const ChatItemFooter = ({ sendMessage }) => {
 
     }
 
-    const handleViocePressIn = () => {
+    const checkAndRequestRecorderPermission = async () => {
+        if (Platform.OS !== 'android') {
+            return Promise.resolve(true);
+        }
+        let result;
+        try {
+            result = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.RECORD_AUDIO, { title: 'Microphone Permission', message: 'Enter the Gunbook needs access to your microphone so you can search with voice.' });
+        } catch (error) {
+            console.error('failed getting permission, result:', result);
+        }
+        return (result === true || result === PermissionsAndroid.RESULTS.GRANTED);
+    }
+
+    const handleViocePressIn = async () => {
         console.log('按下')
-        setOverlayVisible(true)
+        const permissionChecked = await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.RECORD_AUDIO)
+        if(permissionChecked){
+            setOverlayVisible(true)
+        }else {
+            await checkAndRequestRecorderPermission()
+        }
+        
     }
 
     const handleViocePressOut = () => {

@@ -76,7 +76,7 @@ public class ChunkedUploader {
                 Uri uri = Uri.parse(filePath);
                 inputStream = MainApplication.getContext().getContentResolver().openInputStream(uri);
             }else {
-                inputStream = new FileInputStream(new File(filePath));
+                inputStream = new FileInputStream(filePath);
             }
             String fileType = fileInfo.getFileType();
             return uploadFile(inputStream,fileInfo.getFilename(),fileType,CHUNK_SIZE,progressListener);

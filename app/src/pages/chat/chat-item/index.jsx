@@ -185,13 +185,25 @@ const ChatItem = ({ route }) => {
                 break
             case MessageType.VOICE_MESSAGE:
                 msg = messageBase(filePath, type)
-                Uplaod.uploadChunks(filePath, fileName, fileType, fileSize, msg.progressId)
+                msg.contentMetadata = {
+                    name: fileName,
+                    mediaType: fileType,
+                    size: fileSize,
+                    sizeDesc: formatFileSize(fileSize),
+                    duration: duration
+                }
+                //添加消息
+                dispatch(addMessage({ sessionId: sessionId, message: msg }))
+                Uplaod.uploadChunks(filePath, fileName, fileType, fileSize)
                     .then(
                         (res) => {
                             console.log('VOICE_MESSAGE',res)
+                            const newMsg = { ...msg, status: MessageStatus.SENT, content: res }
+                            dispatch(updateMessage({ message: newMsg }))
                         },
                         (error) => {
-                            console.log('VOICE_MESSAGE',error)
+                            const newMsg = { ...msg, status: MessageStatus.FAILED }
+                            dispatch(updateMessage({ message: newMsg }))
                         }
                     )
                 break

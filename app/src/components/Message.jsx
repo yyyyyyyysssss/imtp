@@ -10,6 +10,7 @@ import { MessageType, MessageStatus } from '../enum';
 import { useSelector } from 'react-redux';
 import { NativeModules, NativeEventEmitter } from 'react-native';
 import ProgressOverlayBox from './ProgressOverlayBox';
+import VoiceMessage from './VoiceMessage';
 
 const { UploadModule } = NativeModules
 const UploadModuleNativeEventEmitter = new NativeEventEmitter(UploadModule);
@@ -88,14 +89,15 @@ const Message = React.memo(({ style, messageId }) => {
                         <VideoMessage content={content} status={status} contentMetadata={contentMetadata} />
                     </ProgressOverlayBox>
                 )
-
+            case MessageType.VOICE_MESSAGE:
+                return <VoiceMessage content={content} status={status} duration={contentMetadata.duration} direction={self ? 'RIGHT' : 'LEFT'} />
             case MessageType.FILE_MESSAGE:
                 return (
                     <ProgressOverlayBox
                         enabled={status && status === MessageStatus.PENDING}
                         progress={progress}
                     >
-                        <FileMessage content={content} status={status} contentMetadata={contentMetadata} />
+                        <FileMessage filename={contentMetadata.name} fileSize={contentMetadata.sizeDesc} />
                     </ProgressOverlayBox>
                 )
         }

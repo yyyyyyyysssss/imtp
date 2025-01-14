@@ -6,9 +6,7 @@ import { MessageStatus } from '../enum';
 import * as Progress from 'react-native-progress';
 
 
-const FileMessage = React.memo(({ content, status, contentMetadata, progress }) => {
-
-    const { name, sizeDesc } = contentMetadata
+const FileMessage = React.memo(({ filename, fileSize }) => {
 
     return (
         <Box
@@ -20,8 +18,8 @@ const FileMessage = React.memo(({ content, status, contentMetadata, progress }) 
         >
             <HStack shadow={1} style={styles.rootHStack} space={2} justifyContent='center' alignItems='center'>
                 <VStack flex={8} style={styles.leftVstack} justifyContent='space-between'>
-                    <Text numberOfLines={2} style={styles.leftVstackName}>{name}</Text>
-                    <Text style={styles.leftVstackSize}>{sizeDesc}</Text>
+                    <Text numberOfLines={2} style={styles.leftVstackName}>{filename}</Text>
+                    <Text style={styles.leftVstackSize}>{fileSize}</Text>
                 </VStack>
                 <VStack flex={2} style={styles.rightVstack} justifyContent='center'>
                     <AntDesign name="file1" size={40} />
