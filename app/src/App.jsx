@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { createStaticNavigation } from '@react-navigation/native';
+import { createStaticNavigation, useNavigation } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Splash from './pages/Splash';
 import Login from './pages/login';
@@ -17,6 +17,7 @@ import VideoPlay from './components/VideoPlay';
 import { showToast } from './components/Utils';
 import { NativeModules } from 'react-native';
 import { fetchUserInfo, tokenValid } from './api/ApiService';
+import { navigationRef } from './RootNavigation';
 
 const { MessageModule } = NativeModules
 
@@ -73,6 +74,12 @@ const RootStack = createNativeStackNavigator({
           options: {
             headerShown: false,
           }
+        },
+        AuthLogin: {
+          screen: Login,
+          options: {
+            headerShown: false
+          }
         }
       }
     },
@@ -86,7 +93,7 @@ const RootStack = createNativeStackNavigator({
           options: {
             headerShown: false
           }
-        },
+        }
       }
     }
   }
@@ -151,6 +158,7 @@ const App = () => {
           console.log('MessageModule destroy', 'failed', error.message)
         }
       )
+
   }
 
   const loginSuccessHandler = async (userToken, userInfo) => {
@@ -184,7 +192,7 @@ const App = () => {
     <AuthContext.Provider value={authContext}>
       <SignInContext.Provider value={isSignedIn}>
         <UserInfoContext.Provider value={userInfo}>
-          <Navigation />
+          <Navigation ref={navigationRef} />
         </UserInfoContext.Provider>
       </SignInContext.Provider>
     </AuthContext.Provider>

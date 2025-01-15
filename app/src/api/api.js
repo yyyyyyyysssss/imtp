@@ -2,6 +2,7 @@ import axios from "axios";
 import { showToast } from "../components/Utils";
 import Storage from "../storage/storage";
 import global from "../../global";
+import { navigate } from "../RootNavigation";
 
 
 const api = axios.create({
@@ -38,7 +39,7 @@ api.interceptors.response.use(
     (error) => {
         if (error.response) {
             if (error.response.status === 401 && error.response.config.url != '/login' && error.response.config.url != '/logout') {
-                return showToast('身份认证失败')
+                // navigate('AuthLogin')
             }
             if (error.response.status === 403) {
                 return showToast("无权限访问");

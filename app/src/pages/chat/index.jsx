@@ -21,7 +21,7 @@ const MessageModuleNativeEventEmitter = new NativeEventEmitter(MessageModule);
 
 const Chat = (props) => {
 
-    const navigation = useNavigation();
+    const navigation = useNavigation()
     const dispatch = useDispatch()
 
     const result = useSelector(state => state.chat.result)
