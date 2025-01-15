@@ -56,11 +56,4 @@ public class CommandHandler extends AbstractModelHandler<Packet> {
                 Log.e(TAG,"Unsupported Operation");
         }
     }
-
-    @Override
-    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        Log.w(TAG,"channelInactive");
-        this.nettyClient.connect();
-    }
-
 }

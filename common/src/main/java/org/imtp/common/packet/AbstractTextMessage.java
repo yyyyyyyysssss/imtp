@@ -118,6 +118,10 @@ public abstract class AbstractTextMessage extends Packet {
         return text;
     }
 
+    public String getContent() {
+        return text;
+    }
+
     @JsonIgnore
     public AbstractTextMessage additionTimestamp(){
         this.timestamp = System.currentTimeMillis();

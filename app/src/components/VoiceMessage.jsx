@@ -1,13 +1,38 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Box, HStack, Text } from 'native-base';
+import { Box, HStack, Image, Text } from 'native-base';
 import { Platform, Pressable, StyleSheet, TouchableOpacity } from 'react-native';
 import { VoiceStaticIcon } from './CustomIcon';
 import { MessageStatus } from '../enum';
 import { Player } from '@react-native-community/audio-toolkit';
+import FastImage from 'react-native-fast-image'
 
 const minWidth = 0.25
 
 const VoiceMessage = React.memo(({ content, status, duration, direction }) => {
+
+    const [playing, setPlaying] = useState(false)
+
+    const playRef = useRef()
+
+    useEffect(() => {
+        return () => {
+            playRef.current?.destroy()
+        }
+    }, [])
+
+    useEffect(() => {
+        if (playRef.current) {
+            playRef.current.destroy()
+        }
+        playRef.current = new Player(content, {
+            autoDestroy: false,
+            continuesToPlayInBackground: false,
+            mixWithOthers: false
+        })
+        if (Platform.OS === 'android') {
+            playRef.current.speed = 0.0
+        }
+    }, [content])
 
     const durationDesc = useMemo(() => {
 
@@ -20,37 +45,21 @@ const VoiceMessage = React.memo(({ content, status, duration, direction }) => {
         return s > 1 ? '100%' : `${s * 100}%`
     }, [duration])
 
-
-    const playRef = useRef()
-
-    useEffect(() => {
-        return () => {
-            playRef.current?.destroy()
-        }
-    }, [])
-
-    useEffect(() => {
-        playRef.current = new Player(content, {
-            autoDestroy: false
-        })
-        if (Platform.OS === 'android') {
-            playRef.current.speed = 0.0
-        }
-    }, [content])
-
-    const [inPlay, setInPlay] = useState(false)
-
-
-
     const playVoice = () => {
-        console.log('playVoice', content)
-        if(playRef.current.isPlaying){
+        if (playRef.current.isPlaying) {
             playRef.current.stop()
+            setPlaying(false)
             return
         }
         playRef.current.play((err) => {
             if (err) {
                 console.log('play', err)
+            }
+            if (playRef.current.isPlaying) {
+                setPlaying(true)
+                playRef.current.on('ended',() => {
+                    setPlaying(false)
+                }) 
             }
         })
     }
@@ -61,7 +70,27 @@ const VoiceMessage = React.memo(({ content, status, duration, direction }) => {
             <Pressable onPress={playVoice} hitSlop={7}>
                 <HStack opacity={status && status === MessageStatus.PENDING ? 0 : 1} reversed={direction === 'LEFT' ? true : false} justifyContent={direction === 'LEFT' ? 'flex-start' : 'flex-end'} alignItems='center'>
                     <Text style={styles.durationText}>{durationDesc}</Text>
-                    <VoiceStaticIcon style={{ transform: direction === 'LEFT' ? [{ rotate: '90deg' }] : [{ rotate: '-90deg' }] }} size={35} />
+
+                    {
+                        playing ?
+                            (
+                                <FastImage
+                                    style={{ width: 28, height: 28, transform: direction === 'LEFT' ? [{ rotate: '90deg' }] : [{ rotate: '-90deg' }] }}
+                                    source={require('../assets/gif/voice-play.gif')}
+                                    resizeMode={FastImage.resizeMode.contain}
+                                />
+                            )
+                            :
+                            (
+                                <Image
+                                    style={{ transform: direction === 'LEFT' ? [{ rotate: '90deg' }] : [{ rotate: '-90deg' }] }}
+                                    alt=''
+                                    size={28}
+                                    source={require('../assets/gif/voice-play.gif')}
+                                />
+                            )
+                    }
+
                 </HStack>
             </Pressable>
         </Box>

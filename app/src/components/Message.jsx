@@ -125,7 +125,7 @@ const Message = React.memo(({ style, messageId }) => {
             </VStack>
         </HStack>
     )
-})
+},(prevProps,nextProps) => prevProps.messageId === nextProps.messageId)
 
 const styles = StyleSheet.create({
     chatItemUserName: {

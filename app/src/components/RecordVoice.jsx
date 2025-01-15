@@ -1,5 +1,5 @@
 import { Box, HStack } from "native-base"
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useLayoutEffect, useRef, useState } from "react"
 import { Animated, Modal, StyleSheet } from "react-native"
 import { Recorder, Player } from '@react-native-community/audio-toolkit';
 import RNFS from 'react-native-fs';
@@ -24,20 +24,77 @@ const RecordVoice = ({ overlayVisible, setOverlayVisible, messageProvider }) => 
 
     const timeoutRef = useRef()
 
+    const animatedParallelRef = useRef()
     const animatedLoopRef = useRef()
 
     useEffect(() => {
+        const animationInstance = (bar, index, value = 15, delay = 50, duration = 50) => {
+            const originalValue = new Animated.Value(initValue)
+            const toAnimatedValue = new Animated.Value(value)
+            return Animated.sequence([
+                Animated.delay(index * delay),
+                Animated.timing(bar, {
+                    toValue: toAnimatedValue,
+                    duration: duration,
+                    useNativeDriver: true
+                }),
+                Animated.timing(bar, {
+                    toValue: originalValue,
+                    duration: duration,
+                    useNativeDriver: true
+                }),
+            ])
+        }
+        const animatedParallel = (init = false) => {
+            const x1 = randomInt(0, 10)
+            const x2 = randomInt(0, 10)
+            const x3 = randomInt(0, 10)
+            const x4 = randomInt(0, 10)
+            const animatedSequence = []
+            const firstHalf = bars.slice(0, 10).reverse()
+            firstHalf.forEach((bar, index) => {
+                let animation;
+                if (init) {
+                    animation = animationInstance(bar, index, 50)
+                } else if (x1 === index || x2 === index) {
+                    animation = animationInstance(bar, index, 30)
+                } else if (x3 === index || x4 === index) {
+                    animation = animationInstance(bar, index, 40)
+                } else {
+                    animation = animationInstance(bar, index, 20)
+                }
+                animatedSequence.push(animation)
+            })
+            const y1 = randomInt(0, 10)
+            const y2 = randomInt(0, 10)
+            const y3 = randomInt(0, 10)
+            const y4 = randomInt(0, 10)
+            const secondHalf = bars.slice(10)
+            secondHalf.forEach((bar, index) => {
+                let animation;
+                if (init) {
+                    animation = animationInstance(bar, index, 50)
+                } else if (y1 === index || y2 === index) {
+                    animation = animationInstance(bar, index, 30)
+                } else if (y3 === index || y4 === index) {
+                    animation = animationInstance(bar, index, 40)
+                } else {
+                    animation = animationInstance(bar, index, 20)
+                }
+                animatedSequence.push(animation)
+            })
 
+            return Animated.parallel(animatedSequence, { stopTogether: false })
+        }
+        animatedParallelRef.current = animatedParallel()
         return () => {
             recorderRef.current?.destroy()
+            animatedParallelRef.current?.stop()
             if (timeoutRef.current) {
                 clearTimeout(timeoutRef.current)
             }
-            if(animatedLoopRef.current){
-                animatedLoopRef.current.stop()
-            }
         }
-    },[])
+    }, [])
 
     useEffect(() => {
         const start = async () => {
@@ -76,7 +133,7 @@ const RecordVoice = ({ overlayVisible, setOverlayVisible, messageProvider }) => 
             }
         })
         //开始录制
-        recorderRef.current.toggleRecord((err) => {
+        recorderRef.current.record((err) => {
             if (err) {
                 console.log('start recorder error', err)
             } else {
@@ -100,16 +157,16 @@ const RecordVoice = ({ overlayVisible, setOverlayVisible, messageProvider }) => 
                 const player = new Player(filePath)
                     .prepare(async (err) => {
                         if (err) {
-                            console.log('音频加载失败：', err);
+                            console.log('player prepare error', err);
                             return
                         }
                         const duration = player.duration;
-                        console.log(`filePath: ${filePath} duration: ${(duration / 1000).toFixed(2)}s`);
                         player.destroy()
+                        const fileName = filePath.substring(filePath.lastIndexOf('/') + 1)
                         const media = {
                             uri: filePath,
                             type: 'audio/x-hx-aac-adts',
-                            fileName: 'record.aac',
+                            fileName: fileName,
                             duration: duration
                         }
                         messageProvider(media)
@@ -150,71 +207,15 @@ const RecordVoice = ({ overlayVisible, setOverlayVisible, messageProvider }) => 
     }
 
     const startAnimation = () => {
-        const firstHalf = bars.slice(0, 10).reverse()
-        const secondHalf = bars.slice(10)
-        const animatedParallel = (init = false) => {
-            const x1 = randomInt(0, 10)
-            const x2 = randomInt(0, 10)
-            const x3 = randomInt(0, 10)
-            const x4 = randomInt(0, 10)
-            const animatedSequence = []
-            firstHalf.forEach((bar, index) => {
-                let animation;
-                if (init) {
-                    animation = animationInstance(bar, index, 50)
-                } else if (x1 === index || x2 === index) {
-                    animation = animationInstance(bar, index, 30)
-                } else if (x3 === index || x4 === index) {
-                    animation = animationInstance(bar, index, 40)
-                } else {
-                    animation = animationInstance(bar, index, 20)
-                }
-                animatedSequence.push(animation)
-            })
-            const y1 = randomInt(0, 10)
-            const y2 = randomInt(0, 10)
-            const y3 = randomInt(0, 10)
-            const y4 = randomInt(0, 10)
-            secondHalf.forEach((bar, index) => {
-                let animation;
-                if (init) {
-                    animation = animationInstance(bar, index, 50)
-                } else if (y1 === index || y2 === index) {
-                    animation = animationInstance(bar, index, 30)
-                } else if (y3 === index || y4 === index) {
-                    animation = animationInstance(bar, index, 40)
-                } else {
-                    animation = animationInstance(bar, index, 20)
-                }
-                animatedSequence.push(animation)
-            })
-
-            return Animated.parallel(animatedSequence, { stopTogether: false })
+        if(animatedLoopRef.current){
+            animatedLoopRef.current.stop()
         }
-        const parallelAnimated = animatedParallel()
-        animatedLoopRef.current = Animated.loop(parallelAnimated).start()
-    }
-
-    const animationInstance = (bar, index, value = 15, delay = 50, duration = 50) => {
-        const originalValue = new Animated.Value(initValue)
-        const toAnimatedValue = new Animated.Value(value)
-        return Animated.sequence([
-            Animated.delay(index * delay),
-            Animated.timing(bar, {
-                toValue: toAnimatedValue,
-                duration: duration,
-                useNativeDriver: true
-            }),
-            Animated.timing(bar, {
-                toValue: originalValue,
-                duration: duration,
-                useNativeDriver: true
-            }),
-        ])
+        animatedLoopRef.current = Animated.loop(animatedParallelRef.current)
+        animatedLoopRef.current.start()
     }
 
     const stopAnimation = () => {
-        if(animatedLoopRef.current){
+        if (animatedLoopRef.current) {
             animatedLoopRef.current.stop()
         }
         const toValue = new Animated.Value(initValue)

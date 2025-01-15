@@ -6,12 +6,9 @@ import { PermissionsAndroid, StyleSheet } from 'react-native';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import { MessageType } from '../enum';
 import DocumentPicker, { types } from 'react-native-document-picker'
-import { tr } from 'rn-emoji-keyboard';
 import RecordVoice from './RecordVoice';
 
-var RNFS = require('react-native-fs');
-
-const ChatItemFooter = ({ sendMessage }) => {
+const ChatItemFooter = React.memo(({ sendMessage }) => {
 
     const [isOpen, setIsOpen] = useState(false)
 
@@ -123,7 +120,6 @@ const ChatItemFooter = ({ sendMessage }) => {
     }
 
     const handleViocePressIn = async () => {
-        console.log('按下')
         const permissionChecked = await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.RECORD_AUDIO)
         if(permissionChecked){
             setOverlayVisible(true)
@@ -134,7 +130,6 @@ const ChatItemFooter = ({ sendMessage }) => {
     }
 
     const handleViocePressOut = () => {
-        console.log('松开')
         setOverlayVisible(false)
     }
 
@@ -415,7 +410,7 @@ const ChatItemFooter = ({ sendMessage }) => {
             />
         </>
     )
-}
+})
 
 const styles = StyleSheet.create({
     chatOpsIcon: {

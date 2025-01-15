@@ -5,8 +5,9 @@ import Feather from 'react-native-vector-icons/Feather';
 import { useNavigation } from '@react-navigation/native';
 import { Pressable } from 'native-base';
 import { useSelector } from 'react-redux';
+import { showToast } from './Utils';
 
-const ItemHeader = ({ title, moreOps, flex }) => {
+const ItemHeader = React.memo(({ title }) => {
 
     const unreadCount = useSelector(state => state.chat.unreadCount)
 
@@ -18,7 +19,7 @@ const ItemHeader = ({ title, moreOps, flex }) => {
 
 
     const more = () => {
-        moreOps()
+        showToast('更多操作')
     }
 
     return (
@@ -109,8 +110,6 @@ const ItemHeader = ({ title, moreOps, flex }) => {
             </Box>
         </>
     )
-}
-
-
+})
 
 export default ItemHeader;

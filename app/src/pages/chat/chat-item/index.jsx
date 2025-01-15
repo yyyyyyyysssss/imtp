@@ -74,17 +74,13 @@ const ChatItem = ({ route }) => {
         })
     }, [navigation])
 
-    const moreOps = () => {
-        showToast('更多操作')
-    }
-
     const renderItem = ({ item, index }) => {
         return (
             <Message style={{ marginTop: 30 }} messageId={item} />
         )
     }
 
-    const sendMessage = (message) => {
+    const sendMessage = useCallback((message) => {
         const { content, type, width, height, duration, filePath, fileName, fileType, fileSize } = message
         let msg;
         switch (type) {
@@ -197,9 +193,10 @@ const ChatItem = ({ route }) => {
                 Uplaod.uploadChunks(filePath, fileName, fileType, fileSize)
                     .then(
                         (res) => {
-                            console.log('VOICE_MESSAGE',res)
                             const newMsg = { ...msg, status: MessageStatus.SENT, content: res }
                             dispatch(updateMessage({ message: newMsg }))
+                            //向服务器发送消息
+                            realSendMessage(newMsg)
                         },
                         (error) => {
                             console.log('error',error)
@@ -236,7 +233,7 @@ const ChatItem = ({ route }) => {
             default:
                 showToast("Unsupported message type")
         }
-    }
+    },[])
 
     const realSendMessage = (msg) => {
         MessageModule.sendMessage(JSON.stringify(msg))
@@ -272,7 +269,7 @@ const ChatItem = ({ route }) => {
     return (
 
         <VStack flex={1} justifyContent="space-between">
-            <ChatItemHeader title={session.name} moreOps={moreOps} />
+            <ChatItemHeader title={session.name} />
             <KeyboardAvoidingView
                 flex={1}
                 behavior={Platform.OS == "ios" ? "padding" : null}

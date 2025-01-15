@@ -41,6 +41,9 @@ public class CommandHandler extends SimpleChannelInboundHandler<Packet> {
     private FileMessageHandler fileMessageHandler;
 
     @Resource
+    private VoiceMessageHandler voiceMessageHandler;
+
+    @Resource
     private UserFriendshipHandler userFriendshipHandler;
 
     @Resource
@@ -91,6 +94,14 @@ public class CommandHandler extends SimpleChannelInboundHandler<Packet> {
                         packet = new FileMessage(byteBuf,header).additionTimestamp();
                         if (channelHandlerContext.pipeline().get(FileMessageHandler.class) == null){
                             channelHandlerContext.pipeline().addLast(fileMessageHandler).fireChannelRead(packet);
+                        }else {
+                            channelHandlerContext.fireChannelRead(packet);
+                        }
+                        break;
+                    case VOICE_MESSAGE:
+                        packet = new VoiceMessage(byteBuf,header).additionTimestamp();
+                        if (channelHandlerContext.pipeline().get(VoiceMessageHandler.class) == null){
+                            channelHandlerContext.pipeline().addLast(voiceMessageHandler).fireChannelRead(packet);
                         }else {
                             channelHandlerContext.fireChannelRead(packet);
                         }

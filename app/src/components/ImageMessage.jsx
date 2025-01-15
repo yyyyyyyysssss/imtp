@@ -1,6 +1,5 @@
-import { Box, Image, ImageBackground, NativeBaseProvider, Pressable, Spinner, Toast } from 'native-base';
+import { Box, Image, NativeBaseProvider, Pressable } from 'native-base';
 import React, { useState } from 'react';
-import { ImageContext } from '../context';
 import { Modal, StyleSheet } from 'react-native';
 import ImageViewer from 'react-native-image-zoom-viewer';
 import { MessageStatus } from '../enum';
