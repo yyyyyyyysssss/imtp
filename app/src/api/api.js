@@ -39,10 +39,7 @@ api.interceptors.response.use(
     (error) => {
         if (error.response) {
             if (error.response.status === 401 && error.response.config.url != '/login' && error.response.config.url != '/logout') {
-                // navigate('AuthLogin')
-            }
-            if (error.response.status === 403) {
-                return showToast("无权限访问");
+                // todo 退出登录
             }
             if (error.response.status === 500) {
                 showToast(error.message)

@@ -1,3 +1,4 @@
+import { showToast } from "../components/Utils"
 import api from "./api"
 
 // 登录
@@ -30,7 +31,7 @@ export const fetchUserInfo = (token) => {
             }
         })
             .then(res => resolve(res.data))
-            .catch(error => reject(error))
+            .catch(error => handleError)
     })
 }
 
@@ -55,7 +56,7 @@ export const fetchUserSessions = () => {
     return new Promise((resolve, reject) => {
         api.get('/social/userSession/{userId}')
             .then(res => resolve(res.data))
-            .catch(error => reject(error))
+            .catch(error => handleError)
     })
 }
 
@@ -68,7 +69,7 @@ export const createUserSession = (receiverUserId, deliveryMethod) => {
     return new Promise((resolve, reject) => {
         api.post('/social/userSession/{userId}', createUserSessionReq)
             .then(res => resolve(res.data))
-            .catch(error => reject(error))
+            .catch(error => handleError)
     })
 }
 
@@ -80,7 +81,7 @@ export const deleteUserSessionById = (id) => {
     return new Promise((resolve, reject) => {
         api.delete('/social/userSession/{userId}', { data: deleteUserSessionReq })
             .then(res => resolve(res.data))
-            .catch(error => reject(error))
+            .catch(error => handleError)
     })
 }
 
@@ -96,7 +97,7 @@ export const fetchMessageByUserSessionId = (sessionId, pageNum = 1, pageSize = 2
             }
         })
             .then(res => resolve(res.data))
-            .catch(error => reject(error))
+            .catch(error => handleError)
     })
 }
 
@@ -106,7 +107,7 @@ export const fetchUserFriends = () => {
     return new Promise((resolve, reject) => {
         api.get('/social/userFriend/{userId}')
             .then(res => resolve(res.data))
-            .catch(error => reject(error))
+            .catch(error => handleError)
     })
 }
 
@@ -116,6 +117,11 @@ export const fetchUserGroups = () => {
     return new Promise((resolve, reject) => {
         api.get('/social/userGroup/{userId}')
             .then(res => resolve(res.data))
-            .catch(error => reject(error))
+            .catch(error => handleError)
     })
+}
+
+const handleError = (error) => {
+    // 这里可以加入更多的错误处理逻辑，比如发送错误日志、显示错误信息等
+    showToast(error.message || 'An unexpected error occurred');
 }
