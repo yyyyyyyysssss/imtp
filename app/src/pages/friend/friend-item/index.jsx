@@ -9,7 +9,6 @@ import { useSelector, useDispatch } from 'react-redux';
 import { addSession } from '../../../redux/slices/chatSlice';
 import { useNavigation, } from '@react-navigation/native';
 import { DeliveryMethod } from '../../../enum';
-import { UserInfoContext } from '../../../context';
 import { createUserSession } from '../../../api/ApiService';
 
 const FriendItem = ({ route }) => {
@@ -22,7 +21,7 @@ const FriendItem = ({ route }) => {
 
     const dispatch = useDispatch()
 
-    const userInfo = useContext(UserInfoContext)
+    const userInfo = useSelector(state => state.auth.userInfo)
 
 
     const toSend = async () => {

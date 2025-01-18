@@ -13,7 +13,6 @@ import { DeliveryMethod, MessageType } from '../../enum';
 import { fetchUserSessions, deleteUserSessionById, createUserSession } from '../../api/ApiService';
 import { getBitAtPosition } from '../../utils/BitUtil';
 import IdGen from '../../utils/IdGen';
-import { UserInfoContext } from '../../context';
 
 const { MessageModule } = NativeModules
 const MessageModuleNativeEventEmitter = new NativeEventEmitter(MessageModule);
@@ -28,7 +27,7 @@ const Chat = (props) => {
 
     const sessions = useSelector(state => state.chat.entities.sessions)
 
-    const userInfo = useContext(UserInfoContext)
+    const userInfo = useSelector(state => state.auth.userInfo)
 
     const sessionMapRef = useRef(new Map())
 

@@ -5,7 +5,6 @@ import { StyleSheet } from 'react-native';
 import UserFriendItem, { UserFriendItemFooter, UserFriendItemSeparator } from '../../components/UserFriendItem';
 import { useDispatch, useSelector } from 'react-redux';
 import { loadUserGroup, addSession } from '../../redux/slices/chatSlice';
-import { UserInfoContext } from '../../context';
 import { DeliveryMethod } from '../../enum';
 import { createUserSession, fetchUserGroups } from '../../api/ApiService';
 
@@ -19,7 +18,7 @@ const Group = () => {
 
     const dispatch = useDispatch()
 
-    const userInfo = useContext(UserInfoContext)
+    const userInfo = useSelector(state => state.auth.userInfo)
 
     const toChatItem = async (item) => {
         const groupId = item.id

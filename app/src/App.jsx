@@ -15,11 +15,9 @@ import { signIn, signOut } from './redux/slices/authSlice';
 import Home from './pages/home';
 import VideoPlay from './components/VideoPlay';
 import { showToast } from './components/Utils';
-import { NativeModules } from 'react-native';
 import { fetchUserInfo, tokenValid } from './api/ApiService';
 import { navigationRef } from './RootNavigation';
 
-const { MessageModule } = NativeModules
 
 const RootStack = createNativeStackNavigator({
   groups: {
@@ -106,8 +104,6 @@ const App = () => {
   const { userToken, isLoading } = useSelector(state => state.auth)
   const dispatch = useDispatch()
 
-  const [userInfo, setUserInfo] = useState();
-
   useEffect(() => {
     const bootstrapAsync = async () => {
       console.log('App init')
@@ -119,17 +115,17 @@ const App = () => {
             (data) => {
               const { active, userInfo } = data
               if (!active) {
-                logoutHandler()
+                dispatch(signOut())
               } else {
-                loginSuccessHandler(userToken, userInfo)
+                dispatch(signIn({ token: userToken, userInfo: userInfo }))
               }
             },
             (error) => {
-              logoutHandler()
+              dispatch(signOut())
             }
           )
       } else {
-        logoutHandler()
+        dispatch(signOut())
       }
     }
     bootstrapAsync()
@@ -139,45 +135,12 @@ const App = () => {
     signIn: async (userToken) => {
       //登录之后获取用户信息
       const userInfo = await fetchUserInfo(userToken.accessToken)
-      loginSuccessHandler(userToken, userInfo)
+      dispatch(signIn({ token: userToken, userInfo: userInfo }))
     },
     signOut: async () => {
-      logoutHandler()
+      dispatch(signOut())
     }
   }))
-
-  const logoutHandler = async () => {
-    await Storage.multiRemove(['userToken', 'userInfo'])
-    dispatch(signOut())
-    MessageModule.destroy()
-      .then(
-        (res) => {
-          console.log('MessageModule destroy', res ? 'succeed' : 'failed')
-        },
-        (error) => {
-          console.log('MessageModule destroy', 'failed', error.message)
-        }
-      )
-
-  }
-
-  const loginSuccessHandler = async (userToken, userInfo) => {
-    await Storage.batchSave({
-      userInfo: userInfo,
-      userToken: userToken
-    })
-    setUserInfo(userInfo)
-    dispatch(signIn({ token: userToken, userInfo: userInfo }))
-    MessageModule.init(JSON.stringify(userToken))
-      .then(
-        (res) => {
-          console.log('MessageModule init succeed')
-        },
-        (error) => {
-          console.log('MessageModule init error:', error.message)
-        }
-      )
-  }
 
   //未确认用户是否已登录之前显示启动页
   if (isLoading) {
@@ -191,9 +154,7 @@ const App = () => {
   return (
     <AuthContext.Provider value={authContext}>
       <SignInContext.Provider value={isSignedIn}>
-        <UserInfoContext.Provider value={userInfo}>
-          <Navigation ref={navigationRef} />
-        </UserInfoContext.Provider>
+        <Navigation ref={navigationRef} />
       </SignInContext.Provider>
     </AuthContext.Provider>
   )

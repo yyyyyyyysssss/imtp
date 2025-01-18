@@ -2,7 +2,8 @@ import axios from "axios";
 import { showToast } from "../components/Utils";
 import Storage from "../storage/storage";
 import global from "../../global";
-import { navigate } from "../RootNavigation";
+import reduxStore from "../redux/store";
+import { authSlice } from "../redux/slices/authSlice";
 
 
 const api = axios.create({
@@ -39,7 +40,7 @@ api.interceptors.response.use(
     (error) => {
         if (error.response) {
             if (error.response.status === 401 && error.response.config.url != '/login' && error.response.config.url != '/logout') {
-                // todo 退出登录
+                reduxStore.dispatch(authSlice.actions.signOut())
             }
             if (error.response.status === 500) {
                 showToast(error.message)

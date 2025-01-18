@@ -13,7 +13,6 @@ import IdGen from '../../../utils/IdGen';
 import { formatFileSize } from '../../../utils/FormatUtil';
 import { createThumbnail } from "react-native-create-thumbnail";
 import { NativeModules } from 'react-native';
-import { UserInfoContext } from '../../../context';
 import { fetchMessageByUserSessionId } from '../../../api/ApiService';
 import { useNavigation, } from '@react-navigation/native';
 
@@ -25,7 +24,7 @@ const ChatItem = ({ route }) => {
 
     const { sessionId } = route.params;
 
-    const userInfo = useContext(UserInfoContext)
+    const userInfo = useSelector(state => state.auth.userInfo)
 
     const [messageIds, setMessageIds] = useState([])
 
