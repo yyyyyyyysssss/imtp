@@ -1,19 +1,18 @@
 package org.imtp.web.config;
 
 import lombok.extern.slf4j.Slf4j;
+import org.imtp.common.enums.ClientType;
 import org.imtp.web.enums.TokenType;
 import org.imtp.web.service.TokenService;
 import org.imtp.web.service.UserService;
 import org.imtp.web.utils.EncryptUtil;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.codec.Utf8;
 
-import java.security.MessageDigest;
 import java.util.Collections;
+import java.util.function.Function;
 
 /**
  * @Description
@@ -27,85 +26,101 @@ public class RefreshTokenServices {
 
     private TokenService tokenService;
 
-    private String secretKey;
+    public static final GrantedAuthority GRANTED_AUTHORITY = () -> "refresh_token";
 
-    private final GrantedAuthority grantedAuthority = () -> "refresh_token";
-
-    public RefreshTokenServices(String secretKey, UserDetailsService userService, TokenService tokenService){
-        this.secretKey = secretKey;
+    public RefreshTokenServices(UserDetailsService userService, TokenService tokenService){
         this.userService = userService;
         this.tokenService = tokenService;
     }
 
-    public Authentication tokenValid(String token){
-        String base64DecodeStr = EncryptUtil.base64Decode(token);
-        String[] tokens = base64DecodeStr.split(":");
-        if (!isValidTokensLength(tokens)){
-            log.warn("签名长度错误");
-            return null;
-        }
-        long tokenExpiryTime = Long.parseLong(tokens[1]);
-        if (isTokenExpired(tokenExpiryTime)){
-            log.warn("签名已过期");
-            return null;
-        }
+    public Authentication authenticate(String token){
+        RefreshTokenPayloadInfo refreshTokenPayloadInfo = extractPayloadInfo(token);
+        UserDetails userDetails = ((UserService)this.userService).loadUserByUserId(Long.parseLong(refreshTokenPayloadInfo.getSubject()));
+        return new RefreshAuthenticationToken(userDetails,null,refreshTokenPayloadInfo.getClientType().name(), Collections.singleton(GRANTED_AUTHORITY));
+    }
+
+    public boolean tokenValid(String token){
         if (!tokenService.isValid(token, TokenType.REFRESH_TOKEN)){
             log.warn("该refreshToken已失效");
-            return null;
-        }
-        String clientType = tokens[2];
-        String userId = tokens[0];
-        UserDetails userDetails = ((UserService)this.userService).loadUserByUserId(Long.parseLong(userId));
-        if (userDetails == null){
-            log.warn("根据签名中的用户信息查询为空");
-            return null;
-        }
-        String alg = tokens[3];
-        RefreshTokenAlgorithm actualAlgorithm = RefreshTokenAlgorithm.valueOf(alg);
-        String actualTokenSignature = tokens[4];
-        if (!actualAlgorithm.equals(RefreshTokenAlgorithm.SHA256)){
-            log.warn("不支持的算法");
-            return null;
-        }
-        String expectedTokenSignature = EncryptUtil.sha256(userId, tokenExpiryTime + "",clientType, secretKey);
-        if(!equals(expectedTokenSignature, actualTokenSignature)){
-            log.warn("当前签名: {} 预期签名: {}",actualTokenSignature,expectedTokenSignature);
-            return null;
+            return false;
         }
         log.info("签名校验成功");
-        return new RefreshAuthenticationToken(userDetails,actualTokenSignature,clientType, Collections.singleton(grantedAuthority));
+        return true;
     }
 
 
-    private boolean isValidTokensLength(String[] tokens) {
+    private static boolean isValidTokensLength(String[] tokens) {
         return tokens.length == 5;
     }
 
-    protected boolean isTokenExpired(long tokenExpiryTime) {
-        return tokenExpiryTime < System.currentTimeMillis();
-    }
-
-    private static boolean equals(String expected, String actual) {
-        byte[] expectedBytes = bytesUtf8(expected);
-        byte[] actualBytes = bytesUtf8(actual);
-        return MessageDigest.isEqual(expectedBytes, actualBytes);
-    }
-
-    private static byte[] bytesUtf8(String s) {
-        return s != null ? Utf8.encode(s) : null;
-    }
-
-    public static enum RefreshTokenAlgorithm {
+    public enum RefreshTokenAlgorithm {
         SHA256("SHA-256");
 
         private final String digestAlgorithm;
 
-        private RefreshTokenAlgorithm(String digestAlgorithm) {
+        RefreshTokenAlgorithm(String digestAlgorithm) {
             this.digestAlgorithm = digestAlgorithm;
         }
 
         public String getDigestAlgorithm() {
             return this.digestAlgorithm;
+        }
+    }
+
+
+    public static <T> T extractPayloadInfo(String token,Function<RefreshTokenServices.RefreshTokenPayloadInfo,T> claimsResolver){
+        RefreshTokenServices.RefreshTokenPayloadInfo refreshTokenPayloadInfo = extractPayloadInfo(token);
+        return extractPayloadInfo(refreshTokenPayloadInfo,claimsResolver);
+    }
+
+    public static <T> T extractPayloadInfo(RefreshTokenServices.RefreshTokenPayloadInfo refreshTokenPayloadInfo, Function<RefreshTokenServices.RefreshTokenPayloadInfo,T> claimsResolver){
+        return claimsResolver.apply(refreshTokenPayloadInfo);
+    }
+
+    public static RefreshTokenServices.RefreshTokenPayloadInfo extractPayloadInfo(String token){
+        String base64DecodeStr = EncryptUtil.base64Decode(token);
+        String[] tokens = base64DecodeStr.split(":");
+        if (!isValidTokensLength(tokens)){
+            throw new RuntimeException("token length should be 5 but only " + tokens.length);
+        }
+        return new RefreshTokenServices.RefreshTokenPayloadInfo(tokens);
+    }
+
+    public static class RefreshTokenPayloadInfo {
+        private String id;
+        private String subject;
+        private Long expiration;
+        private ClientType clientType;
+        private String algorithm;
+
+        public RefreshTokenPayloadInfo(String[] tokens){
+            this.id = tokens[4];
+            this.subject = tokens[0];
+            this.expiration = Long.parseLong(tokens[1]);
+            this.clientType = ClientType.valueOf(tokens[2]);
+            this.algorithm = tokens[3];
+
+        }
+
+        public String getId() {
+            return id;
+        }
+
+
+        public String getSubject() {
+            return subject;
+        }
+
+        public Long getExpiration() {
+            return expiration;
+        }
+
+        public ClientType getClientType() {
+            return clientType;
+        }
+
+        public String getAlgorithm() {
+            return algorithm;
         }
     }
 

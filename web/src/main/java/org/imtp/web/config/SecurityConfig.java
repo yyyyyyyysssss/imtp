@@ -36,7 +36,6 @@ import org.springframework.security.web.authentication.rememberme.TokenBasedReme
 import org.springframework.security.web.context.SecurityContextHolderFilter;
 import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.security.web.header.HeaderWriterFilter;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 
 import java.util.List;
@@ -114,7 +113,7 @@ public class SecurityConfig {
                                     "/social/**"
                             ).authenticated()
                             //刷新token
-                            .requestMatchers("/refreshToken").hasAuthority("refresh_token")
+                            .requestMatchers("/refreshToken").hasAuthority(RefreshTokenServices.GRANTED_AUTHORITY.getAuthority())
                             //基于请求头授权
                             .requestMatchers(authProperties.requestHeadAuthenticationPath()).hasAuthority("request_header")
                             //必须校验权限的路径
@@ -193,7 +192,7 @@ public class SecurityConfig {
 
     @Bean
     public RefreshTokenServices refreshTokenServices(){
-        return new RefreshTokenServices(authProperties.getJwt().getSecretKey(),userService,tokenService);
+        return new RefreshTokenServices(userService,tokenService);
     }
 
     @Bean
@@ -207,7 +206,7 @@ public class SecurityConfig {
     public RequestHeaderAuthenticationFilter requestHeaderAuthenticationFilter() throws Exception {
         String[] antPaths = authProperties.requestHeadAuthenticationPath();
         RequestHeaderAuthenticationFilter requestHeaderAuthenticationFilter = new RequestHeaderAuthenticationFilter();
-        requestHeaderAuthenticationFilter.setPrincipalRequestHeader("x-apikey-key");
+        requestHeaderAuthenticationFilter.setPrincipalRequestHeader("apikey");
         requestHeaderAuthenticationFilter.setExceptionIfHeaderMissing(false);
         requestHeaderAuthenticationFilter.setRequiresAuthenticationRequestMatcher(new SeparatorAntPathRequestMatcher(antPaths));
         requestHeaderAuthenticationFilter.setAuthenticationManager(authenticationManager());

@@ -13,6 +13,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @Description
@@ -22,6 +23,8 @@ import java.util.*;
 public class RequestHeaderAuthenticationProvider implements AuthenticationProvider {
 
     private List<AuthProperties.RequestHeadAuthenticationConfig> requestHeadAuthentications;
+
+    private Map<String, String> apikeyMap;
 
     private final static PathMatcher PATH_MATCHER = new AntPathMatcher();
 
@@ -33,6 +36,7 @@ public class RequestHeaderAuthenticationProvider implements AuthenticationProvid
         if (requestHeadAuthentications == null || requestHeadAuthentications.isEmpty()){
             throw new NullPointerException("requestHeadAuthentications not null");
         }
+        this.apikeyMap = requestHeadAuthentications.stream().collect(Collectors.toMap(AuthProperties.RequestHeadAuthenticationConfig::getApikey, AuthProperties.RequestHeadAuthenticationConfig::getAntPath));
         this.requestHeadAuthentications = requestHeadAuthentications;
     }
 
@@ -49,13 +53,12 @@ public class RequestHeaderAuthenticationProvider implements AuthenticationProvid
         HttpServletRequest request = requestAttributes.getRequest();
         String requestUrl = request.getRequestURI();
         boolean valid = false;
-        for (AuthProperties.RequestHeadAuthenticationConfig path : requestHeadAuthentications){
-            String antPath = path.getAntPath();
+        String antPath = apikeyMap.get((String) principal);
+        if (antPath != null && !antPath.isEmpty()){
             String[] urls = antPath.split(URL_SEPARATOR);
             List<String> urlList = Arrays.asList(urls);
             if(urlList.stream().anyMatch(m -> PATH_MATCHER.match(m, requestUrl))){
                 valid = true;
-                break;
             }
         }
         if (!valid){

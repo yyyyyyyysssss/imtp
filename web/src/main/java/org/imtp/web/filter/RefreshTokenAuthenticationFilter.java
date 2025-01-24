@@ -47,6 +47,10 @@ public class RefreshTokenAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         SecurityContext securityContext = SecurityContextHolder.getContext();
+        if(securityContext != null && securityContext.getAuthentication() != null){
+            filterChain.doFilter(request, response);
+            return;
+        }
         if (!this.tokenEndpointMatcher.matches(request)) {
             filterChain.doFilter(request, response);
             return;
@@ -56,12 +60,9 @@ public class RefreshTokenAuthenticationFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
             return;
         }
-        //设置请求属性  由RedisSecurityContextRepository加载SecurityContext
-        if (securityContext != null) {
-            Authentication authentication = tokenService.tokenValid(token);
-            if (authentication != null) {
-                securityContext.setAuthentication(authentication);
-            }
+        if (securityContext != null && tokenService.tokenValid(token)) {
+            Authentication authentication = tokenService.authenticate(token);
+            securityContext.setAuthentication(authentication);
         }
         filterChain.doFilter(request,response);
     }

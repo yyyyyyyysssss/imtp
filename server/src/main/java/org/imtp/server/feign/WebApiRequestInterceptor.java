@@ -17,6 +17,6 @@ public class WebApiRequestInterceptor implements RequestInterceptor {
 
     @Override
     public void apply(RequestTemplate requestTemplate) {
-        requestTemplate.header("x-apikey-key",apikey);
+        requestTemplate.header("apikey",apikey);
     }
 }
