@@ -1,0 +1,77 @@
+.other-file-message {
+    position: relative;
+    box-shadow: rgba(149, 157, 165, 0.2) 0px 0px 10px;
+    border-radius: 6px;
+    background-color: white;
+    padding: 7px;
+}
+
+.other-file-message-left {
+    margin-left: 5px;
+}
+
+.other-file-message-left:hover {
+    background-color: #D2D2D2;
+}
+
+.other-file-message-left::before {
+    position: absolute;
+    border-radius: 5px;
+    top: 15px;
+    left: -7px;
+    border-top: 6px solid transparent;
+    border-bottom: 6px solid transparent;
+    border-right: 8px solid white;
+    content: '';
+}
+
+.other-file-message-left:hover::before {
+    position: absolute;
+    border-radius: 5px;
+    top: 15px;
+    left: -7px;
+    border-top: 6px solid transparent;
+    border-bottom: 6px solid transparent;
+    border-right: 8px solid #D2D2D2;
+    content: '';
+}
+
+.other-file-message-right {
+    margin-right: 5px;
+}
+
+.other-file-message-right:hover {
+    background-color: #D2D2D2;
+}
+
+.other-file-message-right:hover::after {
+    position: absolute;
+    border-radius: 5px;
+    top: 15px;
+    right: -7px;
+    border-top: 6px solid transparent;
+    border-bottom: 6px solid transparent;
+    border-left: 8px solid #D2D2D2;
+    content: '';
+}
+
+.other-file-message-right::after {
+    position: absolute;
+    border-radius: 5px;
+    top: 15px;
+    right: -7px;
+    border-top: 6px solid transparent;
+    border-bottom: 6px solid transparent;
+    border-left: 8px solid white;
+    content: '';
+}
+
+.other-file-filename-ellipsis{
+    display: -webkit-box;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	word-wrap: break-word;
+	white-space: normal !important;
+	-webkit-line-clamp: 2;/* 控制在第几行进行加省略号 */
+	-webkit-box-orient: vertical;
+}
