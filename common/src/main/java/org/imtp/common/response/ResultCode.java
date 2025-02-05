@@ -11,6 +11,8 @@ public enum ResultCode {
 
     MINIO_EXCEPTION(6012,"Minio操作异常"),
 
+    OAUTH2_CLIENT_LOGIN_EXCEPTION(4030,"oauth2使用三方账号登录失败"),
+
     DATABASE_EXCEPTION(5070,"数据库操作异常"),
     ;
     private int code;

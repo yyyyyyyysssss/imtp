@@ -11,7 +11,7 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class GoogleUserInfoVO {
+public class GoogleUserInfoVO implements OAuthVO{
 
 
     private String sub;
@@ -43,4 +43,26 @@ public class GoogleUserInfoVO {
                 ", emailVerified=" + emailVerified +
                 '}';
     }
+
+
+    @Override
+    public String getUsername() {
+        return this.sub;
+    }
+
+    @Override
+    public String getNickname() {
+        return this.name;
+    }
+
+    @Override
+    public String getAvatar() {
+        return this.picture;
+    }
+
+    @Override
+    public String getEmail() {
+        return this.email;
+    }
+
 }

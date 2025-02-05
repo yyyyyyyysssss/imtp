@@ -58,10 +58,6 @@ public class LoginService {
             authenticate = authenticationManager.authenticate(authenticationToken);
         }
         User user = (User)authenticate.getPrincipal();
-        //如果是刷新token
-        if (authenticate instanceof RefreshAuthenticationToken){
-            authenticate = UsernamePasswordAuthenticationToken.authenticated(user, null, user.getAuthorities());
-        }
         //记住我token
         String rememberMeToken = null;
         if (rememberMe || authenticate instanceof RememberMeAuthenticationToken){

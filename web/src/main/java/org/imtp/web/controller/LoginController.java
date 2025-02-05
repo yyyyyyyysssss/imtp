@@ -78,9 +78,14 @@ public class LoginController {
     @GetMapping("/refreshToken")
     public Result<?> refreshToken() {
         SecurityContext securityContext = SecurityContextHolder.getContext();
-        RefreshAuthenticationToken refreshAuthenticationToken = (RefreshAuthenticationToken) securityContext.getAuthentication();
-        String clientType = refreshAuthenticationToken.getClientType();
-        TokenInfo tokenInfo = loginService.login(refreshAuthenticationToken, false, ClientType.valueOf(clientType));
+        Authentication authentication = securityContext.getAuthentication();
+        TokenInfo tokenInfo = null;
+        if(authentication instanceof RefreshAuthenticationToken){
+            tokenInfo = loginService.login(authentication, false, ((RefreshAuthenticationToken)authentication).getClientType());
+        }
+        if (tokenInfo == null){
+            throw new BadCredentialsException("Bad Credentials");
+        }
         return ResultGenerator.ok(tokenInfo);
     }
 

@@ -11,7 +11,7 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class GithubUserInfoVO {
+public class GithubUserInfoVO implements OAuthVO{
 
     private String login;
 
@@ -85,5 +85,26 @@ public class GithubUserInfoVO {
                 ", receivedEventsUrl='" + receivedEventsUrl + '\'' +
                 ", email='" + email + '\'' +
                 '}';
+    }
+
+
+    @Override
+    public String getUsername() {
+        return this.id.toString();
+    }
+
+    @Override
+    public String getNickname() {
+        return this.name;
+    }
+
+    @Override
+    public String getAvatar() {
+        return this.avatarUrl;
+    }
+
+    @Override
+    public String getEmail() {
+        return this.email;
     }
 }

@@ -11,11 +11,13 @@ import org.imtp.web.service.TokenService;
 import org.imtp.web.utils.JwtUtil;
 import org.imtp.web.utils.PayloadInfo;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.context.SecurityContextHolderStrategy;
 import org.springframework.security.oauth2.server.resource.web.BearerTokenResolver;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
@@ -32,13 +34,18 @@ import java.util.Collections;
  */
 public class RefreshTokenAuthenticationFilter extends OncePerRequestFilter {
 
+    private SecurityContextHolderStrategy securityContextHolderStrategy = SecurityContextHolder.getContextHolderStrategy();
+
     private BearerTokenResolver bearerTokenResolver;
 
     private RefreshTokenServices tokenService;
 
+    private AuthenticationManager authenticationManager;
+
     private final RequestMatcher tokenEndpointMatcher;
 
-    public RefreshTokenAuthenticationFilter(BearerTokenResolver bearerTokenResolver, RefreshTokenServices refreshTokenServices){
+    public RefreshTokenAuthenticationFilter(AuthenticationManager authenticationManager,BearerTokenResolver bearerTokenResolver, RefreshTokenServices refreshTokenServices){
+        this.authenticationManager = authenticationManager;
         this.bearerTokenResolver = bearerTokenResolver;
         this.tokenService = refreshTokenServices;
         this.tokenEndpointMatcher = new AntPathRequestMatcher("/refreshToken", HttpMethod.GET.name());
@@ -60,9 +67,10 @@ public class RefreshTokenAuthenticationFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
             return;
         }
-        if (securityContext != null && tokenService.tokenValid(token)) {
-            Authentication authentication = tokenService.authenticate(token);
-            securityContext.setAuthentication(authentication);
+        Authentication authentication = tokenService.refreshToken(token);
+        if(authentication != null && securityContext != null){
+            Authentication authenticate = authenticationManager.authenticate(authentication);
+            securityContext.setAuthentication(authenticate);
         }
         filterChain.doFilter(request,response);
     }

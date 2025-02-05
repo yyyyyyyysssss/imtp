@@ -11,7 +11,7 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class SelfUserInfoVO {
+public class SelfUserInfoVO implements OAuthVO{
 
 
     private String sub;
@@ -41,5 +41,26 @@ public class SelfUserInfoVO {
                 ", email='" + email + '\'' +
                 ", phoneNumber='" + phoneNumber + '\'' +
                 '}';
+    }
+
+
+    @Override
+    public String getUsername() {
+        return this.sub;
+    }
+
+    @Override
+    public String getNickname() {
+        return this.name;
+    }
+
+    @Override
+    public String getAvatar() {
+        return this.picture;
+    }
+
+    @Override
+    public String getEmail() {
+        return this.email;
     }
 }

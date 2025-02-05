@@ -94,11 +94,12 @@ public class SecurityConfig {
                     //放行的路径
                     authorize.requestMatchers(
                                     "/login",
+                                    "/refreshToken",
                                     "/sendEmailVerificationCode",
                                     "/error",
                                     "/assets/**",
                                     "/favicon.ico",
-                                    "/oauth/**",
+                                    "/oauth2/client/**",
                                     "/oauth2/consent",
                                     "/oauth2/activate",
                                     "/activated",
@@ -112,8 +113,6 @@ public class SecurityConfig {
                                     "/service/discovery",
                                     "/social/**"
                             ).authenticated()
-                            //刷新token
-                            .requestMatchers("/refreshToken").hasAuthority(RefreshTokenServices.GRANTED_AUTHORITY.getAuthority())
                             //基于请求头授权
                             .requestMatchers(authProperties.requestHeadAuthenticationPath()).hasAuthority("request_header")
                             //必须校验权限的路径
@@ -124,7 +123,7 @@ public class SecurityConfig {
                 //该过滤器解析token并校验通过后由SecurityContextHolderFilter过滤器加载SecurityContext
                 .addFilterBefore(tokenAuthenticationFilter(), SecurityContextHolderFilter.class)
                 .addFilterBefore(rememberMeFilter(), UsernamePasswordAuthenticationFilter.class)
-                .addFilterBefore(refreshTokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
+                .addFilterAfter(refreshTokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
                 //基于请求头的认证
                 .addFilterBefore(requestHeaderAuthenticationFilter(), HeaderWriterFilter.class)
                 .addFilterAfter(logoutFilter(), AuthorizationFilter.class)
@@ -145,6 +144,8 @@ public class SecurityConfig {
                 .authenticationProvider(oAuthClientAuthenticationProvider())
                 //记住我身份认证
                 .authenticationProvider(rememberMeAuthenticationProvider())
+                //刷新token
+                .authenticationProvider(refreshAuthenticationProvider())
                 //基于请求头secret认证
                 .authenticationProvider(requestHeaderAuthenticationProvider())
                 .parentAuthenticationManager(null)
@@ -192,13 +193,18 @@ public class SecurityConfig {
 
     @Bean
     public RefreshTokenServices refreshTokenServices(){
-        return new RefreshTokenServices(userService,tokenService);
+        return new RefreshTokenServices(tokenService);
     }
 
     @Bean
-    public RefreshTokenAuthenticationFilter refreshTokenAuthenticationFilter() {
+    public RefreshTokenAuthenticationFilter refreshTokenAuthenticationFilter() throws Exception {
 
-        return new RefreshTokenAuthenticationFilter(bearerTokenResolver(), refreshTokenServices());
+        return new RefreshTokenAuthenticationFilter(authenticationManager(),bearerTokenResolver(), refreshTokenServices());
+    }
+
+    @Bean
+    public RefreshAuthenticationProvider refreshAuthenticationProvider(){
+        return new RefreshAuthenticationProvider(userService);
     }
 
     //基于请求头的认证

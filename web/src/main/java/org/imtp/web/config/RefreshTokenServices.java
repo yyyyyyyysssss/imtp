@@ -4,14 +4,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.imtp.common.enums.ClientType;
 import org.imtp.web.enums.TokenType;
 import org.imtp.web.service.TokenService;
-import org.imtp.web.service.UserService;
 import org.imtp.web.utils.EncryptUtil;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 
-import java.util.Collections;
 import java.util.function.Function;
 
 /**
@@ -22,21 +17,18 @@ import java.util.function.Function;
 @Slf4j
 public class RefreshTokenServices {
 
-    private UserDetailsService userService;
-
     private TokenService tokenService;
 
-    public static final GrantedAuthority GRANTED_AUTHORITY = () -> "refresh_token";
-
-    public RefreshTokenServices(UserDetailsService userService, TokenService tokenService){
-        this.userService = userService;
+    public RefreshTokenServices(TokenService tokenService){
         this.tokenService = tokenService;
     }
 
-    public Authentication authenticate(String token){
-        RefreshTokenPayloadInfo refreshTokenPayloadInfo = extractPayloadInfo(token);
-        UserDetails userDetails = ((UserService)this.userService).loadUserByUserId(Long.parseLong(refreshTokenPayloadInfo.getSubject()));
-        return new RefreshAuthenticationToken(userDetails,null,refreshTokenPayloadInfo.getClientType().name(), Collections.singleton(GRANTED_AUTHORITY));
+    public Authentication refreshToken(String token){
+        if (tokenValid(token)){
+            RefreshTokenPayloadInfo refreshTokenPayloadInfo = extractPayloadInfo(token);
+            return RefreshAuthenticationToken.unauthenticated(refreshTokenPayloadInfo.getSubject(),null,refreshTokenPayloadInfo.getClientType());
+        }
+        return null;
     }
 
     public boolean tokenValid(String token){

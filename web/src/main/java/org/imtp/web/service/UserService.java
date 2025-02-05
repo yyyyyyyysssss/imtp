@@ -7,7 +7,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 public interface UserService extends UserDetailsService {
 
-    boolean save(User user);
+    boolean saveOrUpdate(User user);
 
     User findByUsername(String username);
 

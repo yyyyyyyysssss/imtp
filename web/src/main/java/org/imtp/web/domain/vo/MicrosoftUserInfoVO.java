@@ -11,7 +11,7 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class MicrosoftUserInfoVO {
+public class MicrosoftUserInfoVO implements OAuthVO{
 
 
     private String sub;
@@ -38,5 +38,25 @@ public class MicrosoftUserInfoVO {
                 ", picture='" + picture + '\'' +
                 ", email='" + email + '\'' +
                 '}';
+    }
+
+    @Override
+    public String getUsername() {
+        return this.sub;
+    }
+
+    @Override
+    public String getNickname() {
+        return this.name;
+    }
+
+    @Override
+    public String getAvatar() {
+        return this.picture;
+    }
+
+    @Override
+    public String getEmail() {
+        return this.email;
     }
 }

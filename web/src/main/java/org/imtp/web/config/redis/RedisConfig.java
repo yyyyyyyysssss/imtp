@@ -2,6 +2,7 @@ package org.imtp.web.config.redis;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.imtp.web.config.EmailAuthenticationToken;
+import org.imtp.web.config.RefreshAuthenticationToken;
 import org.imtp.web.config.RequestUrlAuthority;
 import org.imtp.web.config.oauth2.OAuthClientAuthenticationToken;
 import org.imtp.web.domain.entity.User;
@@ -64,6 +65,7 @@ public class RedisConfig {
         objectMapper.addMixIn(RequestUrlAuthority.class, RequestUrlAuthority.RequestUrlAuthorityMixin.class);
         objectMapper.addMixIn(OAuthClientAuthenticationToken.class, OAuthClientAuthenticationToken.OAuthClientAuthenticationTokenMixin.class);
         objectMapper.addMixIn(EmailAuthenticationToken.class, EmailAuthenticationToken.EmailAuthenticationTokenMixin.class);
+        objectMapper.addMixIn(RefreshAuthenticationToken.class, RefreshAuthenticationToken.RefreshAuthenticationTokenMixin.class);
         objectMapper.addMixIn(User.class,User.RequestUrlAuthorityMixin.class);
         return new GenericJackson2JsonRedisSerializer(objectMapper);
     }

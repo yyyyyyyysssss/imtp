@@ -20,6 +20,7 @@ import emojiMartData from '@emoji-mart/data'
 import Uploader from '../../../components/Uploader';
 import { ChatPanelContext, HomeContext, useWebSocket } from '../../../context';
 import SnowflakeIdWorker from '../../../components/SnowflakeIdWorker';
+import Message from '../../../components/message';
 
 const { Content } = Layout;
 
@@ -471,36 +472,39 @@ const ChatItem = (props) => {
         if (!item) {
             return (<></>);
         }
-        let c;
-        switch (item.type) {
-            case IMAGE_MESSAGE:
-                c = <ImageMessage msg={item} />
-                break;
-            case VIDEO_MESSAGE:
-                c = <VideoMessage msg={item} />
-                break;
-            case TEXT_MESSAGE:
-                c = <TextMessage msg={item} />
-                break;
-            case FILE_MESSAGE:
-                c = <OtherFileMessage msg={item} />
-                break;
-            default:
-                console.log(item);
-        }
-        const self = item.self;
-        const name = item.name;
-        const avatar = item.avatar;
-        const deliveryMethod = item.deliveryMethod;
         return (
-            <Flex gap="small">
-                <Avatar size={45} shape="square" src={avatar} style={{ order: 0 }} />
-                <Flex gap="small" justify='center' align={self ? 'end' : 'start'} style={{ width: '100%', order: self ? -1 : 1 }} vertical>
-                    {deliveryMethod === SINGLE ? <></> : self ? <></> : <label className='chat-item-label-name'>{name}</label>}
-                    {c}
-                </Flex>
-            </Flex>
-        );
+            <Message message={item}/>
+        )
+        // let c;
+        // switch (item.type) {
+        //     case IMAGE_MESSAGE:
+        //         c = <ImageMessage msg={item} />
+        //         break;
+        //     case VIDEO_MESSAGE:
+        //         c = <VideoMessage msg={item} />
+        //         break;
+        //     case TEXT_MESSAGE:
+        //         c = <TextMessage msg={item} />
+        //         break;
+        //     case FILE_MESSAGE:
+        //         c = <OtherFileMessage msg={item} />
+        //         break;
+        //     default:
+        //         console.log(item);
+        // }
+        // const self = item.self;
+        // const name = item.name;
+        // const avatar = item.avatar;
+        // const deliveryMethod = item.deliveryMethod;
+        // return (
+        //     <Flex gap="small">
+        //         <Avatar size={45} shape="square" src={avatar} style={{ order: 0 }} />
+        //         <Flex gap="small" justify='center' align={self ? 'end' : 'start'} style={{ width: '100%', order: self ? -1 : 1 }} vertical>
+        //             {deliveryMethod === SINGLE ? <></> : self ? <></> : <label className='chat-item-label-name'>{name}</label>}
+        //             {c}
+        //         </Flex>
+        //     </Flex>
+        // );
     };
     //列表项渲染回调函数
     const handleRowsRendered = ({ startIndex, stopIndex }) => {

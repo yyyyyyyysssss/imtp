@@ -43,7 +43,7 @@ const Login = () => {
         if (code && state) {
             setLoading(true);
             httpWrapper
-                .get('/oauth/other/login', {
+                .get('/oauth2/client/other/login', {
                     params: {
                         code: code,
                         state: state
@@ -61,7 +61,7 @@ const Login = () => {
     useEffect(() => {
         //获取三方登录的配置信息
         httpWrapper
-            .get('/oauth/other/config')
+            .get('/oauth2/client/other/config')
             .then(
                 (res) => {
                     setOtherLoginConfig({

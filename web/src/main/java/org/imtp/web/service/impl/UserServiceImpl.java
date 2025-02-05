@@ -41,7 +41,7 @@ public class UserServiceImpl implements UserService {
     private AuthorityMapper authorityMapper;
 
     @Override
-    public boolean save(User user) {
+    public boolean saveOrUpdate(User user) {
         User u = findByUsername(user.getUsername());
         if (u == null){
             user.setId(IdGen.genId());

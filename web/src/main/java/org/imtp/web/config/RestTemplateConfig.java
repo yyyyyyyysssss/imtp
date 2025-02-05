@@ -44,8 +44,8 @@ public class RestTemplateConfig {
 
     private String proxy;
 
-    @Bean(name = "oauthClientRestTemplate")
-    public RestTemplate oauthClientRestTemplate() {
+    @Bean(name = "oauth2ClientRestTemplate")
+    public RestTemplate oauth2ClientRestTemplate() {
         return createRestTemplate();
     }
 

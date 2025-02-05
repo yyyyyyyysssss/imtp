@@ -70,6 +70,13 @@ public class GlobalExceptionHandler {
         return ResultGenerator.failed(ResultCode.DATABASE_EXCEPTION,e.getMessage());
     }
 
+    @ResponseStatus(HttpStatus.OK)
+    @ExceptionHandler(OAuth2ClientLoginException.class)
+    public Result<?> oAuth2ClientLoginException(OAuth2ClientLoginException e){
+        log.error("oauth2 client login error: ",e);
+        return ResultGenerator.failed(ResultCode.OAUTH2_CLIENT_LOGIN_EXCEPTION,e.getMessage());
+    }
+
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(Exception.class)
     public Result<?> handleException(Exception e){
