@@ -8,10 +8,11 @@ import TextMessage from './text-message';
 import ImageMessage from './image-message';
 import FileMessage from './file-message';
 import VideoMessage from './video-message';
+import { useSelector } from 'react-redux';
 
 
-const Message = React.memo(({ message }) => {
-    // const message = useSelector(state => state.chat.entities.messages[messageId])
+const Message = React.memo(({ messageId }) => {
+    const message = useSelector(state => state.chat.entities.messages[messageId])
 
     const [progress, setProgress] = useState(0.01)
 

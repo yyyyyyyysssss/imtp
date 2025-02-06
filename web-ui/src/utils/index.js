@@ -109,6 +109,11 @@ export const getVideoPoster = (url) => {
     });
 }
 
+export const createThumbnail = (file) => {
+    const url = URL.createObjectURL(file)
+    return getVideoPoster(url)
+}
+
 
 export const download = (url, filename) => {
     return new Promise((resolve, reject) => {

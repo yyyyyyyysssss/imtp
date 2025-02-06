@@ -1,26 +1,16 @@
-import { Avatar, Badge, Flex, Modal, Tabs } from "antd";
-import React, { forwardRef, useContext, useEffect, useImperativeHandle, useRef, useState } from 'react';
-import { v4 as uuidv4 } from 'uuid';
-import httpWrapper from '../../api/axiosWrapper';
-import VideoPlay from '../../components/VideoPlay';
-import { ChatPanelContext, HomeContext, useWebSocket } from '../../context';
-import { formatChatDate, getBit } from '../../utils';
+import { Avatar, Badge, Flex, Tabs } from "antd";
+import React, { forwardRef, useContext, useEffect, useImperativeHandle, useState } from 'react';
+import { HomeContext, useWebSocket } from '../../context';
+import { getBit } from '../../utils';
 import ChatItem from './chat-item';
 import './index.less';
-
-const TEXT_MESSAGE = 1;
-const IMAGE_MESSAGE = 4;
-const VIDEO_MESSAGE = 5;
-const FILE_MESSAGE = 6;
-
-const MSG_RES = -1;
-
-const SINGLE = "SINGLE";
-const GROUP = "GROUP";
-
-const PENDING = "PENDING";
-const SENT = "SENT";
-const DELIVERED = "DELIVERED";
+import IdGen from "../../utils/IdGen";
+import { normalize, schema } from 'normalizr';
+import { createUserSession, fetchUserSessions } from "../../api/ApiService";
+import { loadSession, removeSession, addMessage, addSession } from '../../redux/slices/chatSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import UserSessionItem from "../../components/user-session-item";
+import { DeliveryMethod, MessageStatus, MessageType } from "../../enum";
 
 const Chat = forwardRef((props, ref) => {
     const {socket} = useWebSocket();
@@ -29,42 +19,29 @@ const Chat = forwardRef((props, ref) => {
     }));
     const { style } = props;
     const { setHeadName,userInfo, findUserInfoByGroup,findGroupByGroupId, findUserInfoByFriendId } = useContext(HomeContext);
-    //视频弹出框
-    const [videoOpen, setVideoOpen] = useState(false);
-    //视频播放选项
-    const [videoOption, setVideoOption] = useState(null);
+
+    const dispatch = useDispatch()
     //当前选中的会话
     const [selectTab, setSelectTab] = useState(null);
     //会话数据
+    const result = useSelector(state => state.chat.result)
     const [data, setData] = useState([]);
     useEffect(() => {
-        httpWrapper.get('/social/userSession/{userId}')
-            .then(
-                (res) => {
-                    setData(res?.data);
-                }
-            )
+        const fetchData = async () => {
+            const userSessionList = await fetchUserSessions() || []
+            if(userSessionList){
+                setData(userSessionList)
+                const message = new schema.Entity('messages')
+                const session = new schema.Entity('sessions', {
+                    messages: [message]
+                })
+                const normalizedData = normalize(userSessionList, [session]);
+                //初始化加载会话
+                dispatch(loadSession(normalizedData))
+            }
+        }
+        fetchData()
     }, []);
-    const handleSenderMessage = (msg,userSessionId) => {
-        setData(prevData => {
-            const us = prevData.find(f => f.id === userSessionId);
-            if (!us.chatItemData) {
-                us.chatItemData = [];
-            }
-            us.chatItemData.push(msg);
-            const latestUs = {
-                ...us,
-                lastMsgType: msg.type,
-                lastMsgContent: msg.content,
-                lastMsgTime: msg.timestamp,
-                lastSendMsgUserId: msg.sender,
-                lastUserName: msg.senderName,
-                count: 0
-            }
-            const newData = prevData.filter(f => f.id !== userSessionId);
-            return [latestUs,...newData];
-        })
-    }
     //接收消息处理
     const handleReceiveMessage = (msg,userSessionItem) => {
         if (!userSessionItem.chatItemData) {
@@ -97,10 +74,10 @@ const Chat = forwardRef((props, ref) => {
                 const realSender = (isGroup === 1) ? receiver : sender;
                 if (sender == 0) {
                     //消息响应
-                    if(cmd === MSG_RES){
+                    if(cmd === MessageType.COMMON_RESPONSE){
                         const msgResUserSessionItem = data.find(f => f.receiverUserId === receiver);
                         const chatItemData = msgResUserSessionItem.chatItemData;
-                        const newArr = chatItemData.map(item => item.ackId === msg.ackId ? {...item,status: DELIVERED} : item)
+                        const newArr = chatItemData.map(item => item.ackId === msg.ackId ? {...item,status: MessageStatus.DELIVERED} : item)
                         setData(prevData => prevData.map(m => m.id === msgResUserSessionItem.id ? {...msgResUserSessionItem,chatItemData: newArr} : m));
                     }
                     return;
@@ -110,26 +87,26 @@ const Chat = forwardRef((props, ref) => {
                     let userItem;
                     if(isGroup === 1){
                         userItem = findGroupByGroupId(receiver);
-                        userItem.type = GROUP;
+                        userItem.type = DeliveryMethod.GROUP;
                     }else {
                         console.log('findUserInfoByFriendId',sender)
                         userItem = findUserInfoByFriendId(sender);
-                        userItem.type = SINGLE;
+                        userItem.type = DeliveryMethod.SINGLE;
                     }
                     
-                    us = await createUserSession(userItem);
+                    us = await createSession(userItem);
                 }
                 switch (cmd) {
-                    case TEXT_MESSAGE:
+                    case MessageType.TEXT_MESSAGE:
                         content = msg.text;
                         break;
-                    case IMAGE_MESSAGE:
+                    case MessageType.IMAGE_MESSAGE:
                         content = msg.url;
                         break;
-                    case VIDEO_MESSAGE:
+                    case MessageType.VIDEO_MESSAGE:
                         content = msg.url;
                         break;
-                    case FILE_MESSAGE:
+                    case MessageType.FILE_MESSAGE:
                         content = msg.url;
                         break;
                 }
@@ -148,7 +125,7 @@ const Chat = forwardRef((props, ref) => {
         let avatar;
         let name;
         let userItem;
-        if (userSessionItem.deliveryMethod === GROUP) {
+        if (userSessionItem.deliveryMethod === DeliveryMethod.GROUP) {
             userItem = findUserInfoByGroup(userSessionItem.receiverUserId, msg.header.sender);
             name = userItem.nickname;
         } else {
@@ -157,9 +134,9 @@ const Chat = forwardRef((props, ref) => {
         }
         avatar = userItem.avatar;
         const message = {
-            id: uuidv4(),
+            id: IdGen.nextId(),
             type: msg.header.cmd,
-            status: 'COMPLETED',
+            status: MessageStatus.COMPLETED,
             sender: msg.header.sender,
             receiver: msg.header.receiver,
             deliveryMethod: userSessionItem.deliveryMethod,
@@ -174,39 +151,6 @@ const Chat = forwardRef((props, ref) => {
         return message;
     }
 
-    const messageContentPre = (messageType,messageContent) => {
-        if(!messageType){
-            return '';
-        }
-        let c;
-        switch(messageType){
-            case TEXT_MESSAGE:
-                c = messageContent;
-                break;
-            case IMAGE_MESSAGE:
-                c = '[图片]';
-                break;
-            case VIDEO_MESSAGE:
-                c = '[视频]';
-                break;
-            case FILE_MESSAGE:
-                c = '[文件]';
-                break;
-            default:
-                c = '';
-        }
-        return c;
-    }
-
-    //更新会话消息
-    const updateChatItem = (userSessionId,chatItemMsg) => {
-        setData(prevData => {
-            const msgResUserSessionItem = prevData.find(f => f.id === userSessionId);
-            const chatItemData = msgResUserSessionItem.chatItemData;
-            const newArr = chatItemData.map(item => item.id === chatItemMsg.id ? {...chatItemMsg} : item);
-            return prevData.map(m => m.id === msgResUserSessionItem.id ? {...msgResUserSessionItem,chatItemData: newArr} : m);
-        });
-    }
 
     //更新会话
     const updateUserSessionData = (item) => {
@@ -240,61 +184,29 @@ const Chat = forwardRef((props, ref) => {
     }
     //添加会话
     const addUserSession = async (userItem) => {
-        const item = data.find(item => item.receiverUserId === userItem.id);
-        if (item) {
-            moveToTop(item);
-        } else {
-            const userSessionItem  = await createUserSession(userItem);
-            moveToTop(userSessionItem);
+        let item = data.find(item => item.receiverUserId === userItem.id);
+        if (!item) {
+            item  = await createSession(userItem);
         }
+        setSelectTab(item.id);
     }
 
-    const createUserSession = async (userItem) => {
+    const createSession = async (userItem) => {
         const userId = userInfo.id;
-        const userSessionReq = {
+        const sessionId = await createUserSession(userItem.id, userItem.type)
+        const session = {
+            id: sessionId,
             userId: userId,
+            name: userItem.nickname === undefined ? userItem.groupName : userItem.nickname,
+            senderUserId: userId,
             receiverUserId: userItem.id,
-            deliveryMethod: userItem.type
+            avatar: userItem.avatar,
+            deliveryMethod: userItem.type,
+            lastMsgContent: userItem.content,
+            lastMsgTime: userItem.timestamp
         }
-        let userSessionItem;
-        await httpWrapper.post('/social/userSession/{userId}', userSessionReq)
-            .then(
-                (res) => {
-                    userSessionItem = {
-                        id: res?.data,
-                        userId: userId,
-                        name: userItem.nickname === undefined ? userItem.groupName : userItem.nickname,
-                        senderUserId: userId,
-                        receiverUserId: userItem.id,
-                        avatar: userItem.avatar,
-                        deliveryMethod: userItem.type,
-                        lastMsgContent: userItem.content,
-                        lastMsgTime: userItem.timestamp
-                    }
-                }
-            );
-        return userSessionItem;
-    }
-
-    //视频播放
-    const handleVideoPlay = (url, fileType) => {
-        console.log('chat play: ', url, fileType);
-        const videoJsOptions = {
-            autoplay: true,
-            controls: true,
-            responsive: true,
-            fluid: true,
-            sources: [{
-                src: url,
-                type: fileType
-            }]
-        };
-        setVideoOption(videoJsOptions)
-        setVideoOpen(true);
-    }
-    //视频关闭
-    const videoOnCancel = () => {
-        setVideoOpen(false);
+        dispatch(addSession({ session: session }))
+        return session;
     }
     return (
         <>
@@ -310,55 +222,24 @@ const Chat = forwardRef((props, ref) => {
                             indicator={{ size: 0 }}
                             centered
                             tabBarGutter={0}
-                            items={data.map((item, i) => {
+                            items={result.map((id, i) => {
                                 return {
-                                    key: item.id,
+                                    key: id,
                                     forceRender: true,
-                                    label: (
-                                        <Flex style={{ padding: '3px', width: '100%' }}>
-                                            <Badge count={item.count}><Avatar size={50} shape="square" src={item.avatar} /></Badge>
-                                            <Flex justify='space-between' style={{ width: '100%', marginLeft: '7px' }} vertical>
-                                                <Flex justify='space-between'>
-                                                    <span className='user-session-name'>{item.name}</span>
-                                                    <span className='user-session-time'>{formatChatDate(item.lastMsgTime)}</span>
-                                                </Flex>
-                                                <Flex justify='space-between'>
-                                                    <span className='user-session-lastMsg'>
-                                                        {messageContentPre(item.lastMsgType,item.lastMsgContent)}
-                                                    </span>
-                                                </Flex>
-                                            </Flex>
-                                        </Flex>
-                                    ),
+                                    label: <UserSessionItem sessionId = {id}/>,
                                     children: (
                                         <div style={{ height: '100%' }}>
-                                            <ChatPanelContext.Provider value={{ handleVideoPlay,handleSenderMessage,updateChatItem }}>
-                                                <ChatItem key={item.id} userSessionItem={item} selectTab={selectTab} />
-                                            </ChatPanelContext.Provider>
+                                            <ChatItem key={id} sessionId={id} selectTab={selectTab} />
                                         </div>
                                     )
 
                                 }
                             })}
                         >
-
                         </Tabs>
                     </div>
                 </Flex>
             </Flex>
-            <Modal
-                centered
-                destroyOnClose={true}
-                maskClosable={false}
-                width={400}
-                open={videoOpen}
-                onCancel={videoOnCancel}
-                footer={null}
-            >
-                <div>
-                    <VideoPlay options={videoOption} />
-                </div>
-            </Modal>
         </>
     );
 })

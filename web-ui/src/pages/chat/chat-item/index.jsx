@@ -1,79 +1,72 @@
 import React, { useState, useRef, useEffect, useCallback, useContext } from 'react'
 import './index.less'
 import Picker from '@emoji-mart/react'
-import Icon, { FileOutlined, LoadingOutlined } from '@ant-design/icons';
-import { Flex, Layout, Avatar, Button, Image as AntdImage } from "antd"
+import { Flex, Layout, Button } from "antd"
 import { List as VirtualizedList, AutoSizer, CellMeasurer, CellMeasurerCache } from 'react-virtualized'
-import { formatFileSize, getVideoDimensionsOfByFile, getVideoPoster, download, dataURLtoFile } from '../../../utils'
+import { formatFileSize, getVideoDimensionsOfByFile, dataURLtoFile, createThumbnail } from '../../../utils'
 import { FieNode } from '../../../components/FileNode'
 import { VideoNode } from '../../../components/VideoNode'
 import { ImageNode } from '../../../components/ImageNode';
 import { v4 as uuidv4 } from 'uuid';
 import emoteImg from '../../../assets/img/emote_icon.png'
-import videoPlayIcon from '../../../assets/img/video-play-48.png'
-import videoLoadingIcon from '../../../assets/img/video-loading50 .gif'
-import sendFailIcon from '../../../assets/img/send_fail.png'
 import { EditorContent, useEditor } from '@tiptap/react'
 import HardBreak from '@tiptap/extension-hard-break'
 import { StarterKit } from '@tiptap/starter-kit';
 import emojiMartData from '@emoji-mart/data'
 import Uploader from '../../../components/Uploader';
-import { ChatPanelContext, HomeContext, useWebSocket } from '../../../context';
-import SnowflakeIdWorker from '../../../components/SnowflakeIdWorker';
+import { HomeContext, useWebSocket } from '../../../context';
 import Message from '../../../components/message';
+import IdGen from '../../../utils/IdGen';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchMessageByUserSessionId } from '../../../api/ApiService';
+import { loadMessage, addMessage, updateMessage, updateMessageStatus } from '../../../redux/slices/chatSlice';
+import { MessageStatus, MessageType } from '../../../enum';
 
 const { Content } = Layout;
 
-const PENDING = "PENDING";
-const SENT = "SENT";
-const DELIVERED = "DELIVERED";
-const FAILED = "FAILED";
-
-const TEXT_MESSAGE = 1;
-const IMAGE_MESSAGE = 4;
-const VIDEO_MESSAGE = 5;
-const FILE_MESSAGE = 6;
-
-const SINGLE = "SINGLE";
-
-const snowflake = new SnowflakeIdWorker(1);
-
-const ChatItem = (props) => {
+const ChatItem = ({ sessionId, selectTab }) => {
     const { socket } = useWebSocket();
     const socketRef = useRef();
     useEffect(() => {
         socketRef.current = socket;
     }, [socket]);
+
+
     const { userInfo } = useContext(HomeContext);
-    const userInfoRef = useRef();
+
+    const session = useSelector(state => state.chat.entities.sessions[sessionId])
+
+    const { messages } = session
+
+    const dispatch = useDispatch()
+
     useEffect(() => {
-        userInfoRef.current = userInfo;
-    }, [userInfo]);
-    const { handleVideoPlay, handleSenderMessage, updateChatItem } = useContext(ChatPanelContext);
-    const { userSessionItem } = props;
+        const fetchData = async () => {
+            const data = await fetchMessageByUserSessionId(sessionId)
+            const messageList = data.list
+            const newMessageList = messageList.map(item => {
+                item.self = userInfo.id === item.senderUserId
+                return item
+            })
+            dispatch(loadMessage({ sessionId: sessionId, messages: newMessageList }))
+        }
+        if (sessionId === selectTab) {
+            if (session.messageInit === undefined || session.messageInit === false) {
+                fetchData()
+            }
+        }
+    }, [sessionId, selectTab])
+
     //聊天内容
-    const [chatContentData, setChatContentData] = useState([]);
-    const chatContentDataRef = useRef(null);
     const chatContentRef = useRef(null);
     //监听数据变化并滚动到末尾
     useEffect(() => {
-        if (chatContentRef.current && chatContentData) {
+        if (chatContentRef.current && messages) {
             requestAnimationFrame(() => {
-                chatContentRef.current.scrollToRow(chatContentData.length - 1);
+                chatContentRef.current.scrollToRow(messages.length - 1);
             });
         }
-        chatContentDataRef.current = chatContentData;
-    }, [chatContentData]);
-    useEffect(() => {
-        const { selectTab, userSessionItem } = props;
-        if (selectTab && selectTab === userSessionItem.id) {
-            const chatItemData = userSessionItem.chatItemData;
-            if (chatItemData) {
-                setChatContentData([...chatItemData]);
-            }
-        }
-
-    }, [props])
+    }, [messages]);
     //表情框显示与隐藏
     const [emojiHide, setEmojiHide] = useState(true);
     const emojiRef = useRef(null);
@@ -292,7 +285,7 @@ const ChatItem = (props) => {
     );
     //聊天内容显示
     const rowRenderer = useCallback(({ index, key, parent, style }) => {
-        const item = chatContentData[index]
+        const item = messages[index]
         return (
             <CellMeasurer
                 key={key}
@@ -303,208 +296,22 @@ const ChatItem = (props) => {
                 parent={parent}
             >
                 {({ registerChild }) => (
-                    <div ref={registerChild} key={item.id} className='chat-item' style={style}>
+                    <div ref={registerChild} key={item} className='chat-item' style={style}>
                         {renderItem(item, index)}
                     </div>
                 )}
 
             </CellMeasurer>
         );
-    }, [chatContentData]);
-    //图片消息
-    const ImageMessage = (({ msg }) => {
-        const self = msg.self;
-        const content = msg.content;
-        const status = msg.status;
-        const mediaHeight = 200 / msg.contentMetadata.width * msg.contentMetadata.height;
-        let preview;
-        let blur;
-        let icon;
-        if (status === PENDING) {
-            preview = false;
-            blur = 'blur(5px)';
-        } else {
-            preview = true;
-            blur = 'blur(0px)';
-        }
-        if (status === DELIVERED) {
-            icon = <LoadingOutlined style={{ fontSize: '15px', order: self ? 0 : 1, display: 'none' }} />;
-        } else if (status === FAILED) {
-            icon = <img src={sendFailIcon} alt='' style={{ width: '20px', height: '20px', order: self ? 0 : 1 }} />;
-        } else {
-            icon = <LoadingOutlined style={{ fontSize: '15px', order: self ? 0 : 1 }} />;
-        }
-        return (
-            <Flex gap="small" justify='center' align='center'>
-                <div style={{ order: self ? 1 : 0 }}>
-                    <AntdImage
-                        className='image-message'
-                        height={mediaHeight}
-                        preview={preview}
-                        src={content}
-                        style={{ filter: blur }}
-                    />
-                </div>
-                {self ? icon : ''}
-            </Flex>
-        );
-    });
-    //视频消息
-    const VideoMessage = (({ msg }) => {
-        const self = msg.self;
-        const content = msg.content;
-        const status = msg.status;
-        const fileType = msg.contentMetadata.mediaType;
-        const thumbnailUrl = msg.contentMetadata.thumbnailUrl;
-        let durationDesc = '';
-        const mediaHeight = 120 / msg.contentMetadata.width * msg.contentMetadata.height;
-        let icon;
-        let videoIcon;
-        if (status === PENDING) {
-            videoIcon = videoLoadingIcon;
-        } else {
-            videoIcon = videoPlayIcon;
-            durationDesc = msg.contentMetadata.durationDesc;
-        }
-        if (status === DELIVERED) {
-            icon = <LoadingOutlined style={{ fontSize: '15px', order: self ? 0 : 1, display: 'none' }} />;
-        } else if (status === FAILED) {
-            icon = <img src={sendFailIcon} alt='' style={{ width: '20px', height: '20px', order: self ? 0 : 1 }} />;
-        } else {
-            icon = <LoadingOutlined style={{ fontSize: '15px', order: self ? 0 : 1 }} />;
-        }
-        return (
-            <Flex gap="small" justify='center' align='center'>
-                <div
-                    style={{ order: self ? 1 : 0 }}
-                    className='video-div'
-                    onClick={() => videoPlay(content, fileType)}
-                >
-                    <AntdImage
-                        className='video-message'
-                        style={{ width: '120px', height: mediaHeight }}
-                        height={mediaHeight}
-                        preview={false}
-                        src={thumbnailUrl}
-                    />
-                    <div className='video-gradient' />
-                    <div className='video-icon'>
-                        <img src={videoIcon} alt='icon' />
-                    </div>
-                    <div className='video-duration'>
-                        <label>{durationDesc}</label>
-                    </div>
-                </div>
-                {self ? icon : ''}
-            </Flex>
-
-        );
-    });
-    //视频播放
-    const videoPlay = (url, fileType) => {
-        handleVideoPlay(url, fileType);
-    }
-    //文字消息
-    const TextMessage = (({ msg }) => {
-        const self = msg.self;
-        const content = msg.content;
-        const status = msg.status;
-        let icon;
-        if (status === DELIVERED) {
-            icon = <LoadingOutlined style={{ fontSize: '15px', order: self ? 0 : 1, display: 'none' }} />;
-        } else if (status === FAILED) {
-            icon = <img src={sendFailIcon} alt='' style={{ width: '20px', height: '20px', order: self ? 0 : 1 }} />;
-        } else {
-            icon = <LoadingOutlined style={{ fontSize: '15px', order: self ? 0 : 1 }} />;
-        }
-        return (
-            <Flex gap="small" align='center' justify={self ? 'end' : 'start'} style={{ width: '100%' }}>
-                <div className={`text-message ${self ? 'text-message-right' : 'text-message-left'}`} style={{ order: self ? 1 : 0 }}>
-                    {content}
-                </div>
-                {self ? icon : ''}
-            </Flex>
-        );
-    });
-    //其他文件消息
-    const OtherFileMessage = (({ msg }) => {
-        const self = msg.self;
-        const fileName = msg.contentMetadata.name;
-        const fileSizeDesc = msg.contentMetadata.sizeDesc;
-        const content = msg.content;
-        const status = msg.status;
-        let overview;
-        if (status === PENDING) {
-            overview = '上传中';
-        } else {
-            overview = fileSizeDesc;
-        }
-        let icon;
-        if (status === DELIVERED) {
-            icon = <LoadingOutlined style={{ fontSize: '15px', order: self ? 0 : 1, display: 'none' }} />;
-        } else if (status === FAILED) {
-            icon = <img src={sendFailIcon} alt='' style={{ width: '20px', height: '20px', order: self ? 0 : 1 }} />;
-        } else {
-            icon = <LoadingOutlined style={{ fontSize: '15px', order: self ? 0 : 1 }} />;
-        }
-        return (
-            <Flex gap="small" justify='center' align='center'>
-                <div style={{ cursor: 'pointer', order: self ? 1 : 0 }} onClick={() => otherFileMessageClick(content, fileName)}>
-                    <Flex align='center' className={`other-file-message ${self ? 'other-file-message-right' : 'other-file-message-left'}`} justify={self ? 'end' : 'start'} gap="middle" style={{ width: '200px', height: '80px', order: self ? 1 : 0 }}>
-                        <Flex style={{ width: '150px', overflow: 'hidden' }} gap="small" vertical>
-                            <label className='other-file-filename-ellipsis' style={{ wordWrap: 'break-word' }}>{fileName}</label>
-                            <label style={{ fontSize: '12px', color: 'gray' }}>{overview}</label>
-                        </Flex>
-                        <Icon component={FileOutlined} style={{ color: 'gray', fontSize: '40px' }} />
-                    </Flex>
-                </div>
-                {self ? icon : ''}
-            </Flex>
-
-        );
-    });
-    //其他文件消息点击下载
-    const otherFileMessageClick = (url, fileName) => {
-        download(url, fileName)
-    }
+    }, [messages]);
     //聊天项渲染函数
     const renderItem = (item, index) => {
         if (!item) {
             return (<></>);
         }
         return (
-            <Message message={item}/>
+            <Message messageId={item} />
         )
-        // let c;
-        // switch (item.type) {
-        //     case IMAGE_MESSAGE:
-        //         c = <ImageMessage msg={item} />
-        //         break;
-        //     case VIDEO_MESSAGE:
-        //         c = <VideoMessage msg={item} />
-        //         break;
-        //     case TEXT_MESSAGE:
-        //         c = <TextMessage msg={item} />
-        //         break;
-        //     case FILE_MESSAGE:
-        //         c = <OtherFileMessage msg={item} />
-        //         break;
-        //     default:
-        //         console.log(item);
-        // }
-        // const self = item.self;
-        // const name = item.name;
-        // const avatar = item.avatar;
-        // const deliveryMethod = item.deliveryMethod;
-        // return (
-        //     <Flex gap="small">
-        //         <Avatar size={45} shape="square" src={avatar} style={{ order: 0 }} />
-        //         <Flex gap="small" justify='center' align={self ? 'end' : 'start'} style={{ width: '100%', order: self ? -1 : 1 }} vertical>
-        //             {deliveryMethod === SINGLE ? <></> : self ? <></> : <label className='chat-item-label-name'>{name}</label>}
-        //             {c}
-        //         </Flex>
-        //     </Flex>
-        // );
     };
     //列表项渲染回调函数
     const handleRowsRendered = ({ startIndex, stopIndex }) => {
@@ -537,7 +344,7 @@ const ChatItem = (props) => {
                     const imageWidth = item.attrs.width;
                     const imageSizeDesc = formatFileSize(imageSize);
                     const imageType = imageFile.type;
-                    const imageMsg = gMessage(IMAGE_MESSAGE, dataUrl);
+                    const imageMsg = messageBase(dataUrl, MessageType.IMAGE_MESSAGE);
                     msg = {
                         ...imageMsg,
                         contentMetadata: {
@@ -549,16 +356,20 @@ const ChatItem = (props) => {
                             sizeDesc: imageSizeDesc
                         }
                     }
+                    //添加消息
+                    dispatch(addMessage({ sessionId: sessionId, message: msg }))
                     uploadFile(imageFile)
-                        .then((url) => {
-                            msg.status = SENT;
-                            msg.content = url;
-                            const sendFlag = realSendMessage(msg);
-                            if (!sendFlag) {
-                                msg.status = FAILED;
+                        .then(
+                            (url) => {
+                                const newMsg = { ...msg, status: MessageStatus.SENT, content: url }
+                                dispatch(updateMessage({ message: newMsg }))
+                                //向服务器发送消息
+                                realSendMessage(newMsg)
+                            },
+                            (error) => {
+                                dispatch(updateMessageStatus({ id: msg.id, newStatus: MessageStatus.FAILED }))
                             }
-                            updateChatItem(userSessionItem.id, msg);
-                        })
+                        )
                     break;
                 case 'fileNode':
                     const fileName = item.attrs.name;
@@ -566,7 +377,7 @@ const ChatItem = (props) => {
                     const fileSizeDesc = formatFileSize(fileSize);
                     const fileType = item.attrs.type;
                     const file = item.attrs.file;
-                    const fileMsg = gMessage(FILE_MESSAGE, '');
+                    const fileMsg = messageBase('', MessageType.FILE_MESSAGE);
                     msg = {
                         ...fileMsg,
                         contentMetadata: {
@@ -576,16 +387,20 @@ const ChatItem = (props) => {
                             sizeDesc: fileSizeDesc
                         }
                     }
+                    //添加消息
+                    dispatch(addMessage({ sessionId: sessionId, message: msg }))
                     uploadFile(file)
-                        .then((url) => {
-                            msg.status = SENT;
-                            msg.content = url;
-                            const sendFlag = realSendMessage(msg);
-                            if (!sendFlag) {
-                                msg.status = FAILED;
+                        .then(
+                            (url) => {
+                                const newMsg = { ...msg, status: MessageStatus.SENT, content: url }
+                                dispatch(updateMessage({ message: newMsg }))
+                                //向服务器发送消息
+                                realSendMessage(newMsg)
+                            },
+                            (error) => {
+                                dispatch(updateMessageStatus({ id: msg.id, newStatus: MessageStatus.FAILED }))
                             }
-                            updateChatItem(userSessionItem.id, msg);
-                        })
+                        )
                     break;
                 case 'videoNode':
                     const videoName = item.attrs.name;
@@ -600,7 +415,7 @@ const ChatItem = (props) => {
                     const seconds = Math.floor(videoDuration % 60);
                     const formattedDuration = `${minutes}:${seconds.toString().padStart(2, '0')}`;
                     console.log(`video height: ${videoHeight} video width: ${videoWidth} video duration: ${formattedDuration}`);
-                    const videoMsg = gMessage(VIDEO_MESSAGE, '');
+                    const videoMsg = messageBase('', MessageType.VIDEO_MESSAGE);
                     msg = {
                         ...videoMsg,
                         contentMetadata: {
@@ -614,28 +429,43 @@ const ChatItem = (props) => {
                             sizeDesc: videoSizeDesc
                         }
                     }
-                    uploadFile(videoFile)
-                        .then((url) => {
-                            msg.content = url;
-                            getVideoPoster(url)
-                                .then(
-                                    ({ poster }) => {
-                                        const thumbnailName = uuidv4() + '.png';
-                                        const thumbnailFile = dataURLtoFile(poster, thumbnailName)
-                                        uploadFile(thumbnailFile)
-                                            .then((url) => {
-                                                msg.status = SENT;
-                                                msg.contentMetadata.thumbnailUrl = url;
-                                                const sendFlag = realSendMessage(msg);
-                                                if (!sendFlag) {
-                                                    msg.status = FAILED;
-                                                }
-                                                updateChatItem(userSessionItem.id, msg);
-                                            });
-
-                                    }
-                                )
-                        })
+                    //添加消息
+                    dispatch(addMessage({ sessionId: sessionId, message: msg }))
+                    //获取视频封面
+                    createThumbnail(videoFile)
+                        .then(
+                            ({ poster }) => {
+                                const thumbnailName = uuidv4() + '.png';
+                                const thumbnailFile = dataURLtoFile(poster, thumbnailName)
+                                //上传视频封面图片
+                                uploadFile(thumbnailFile)
+                                    .then(
+                                        (url) => {
+                                            const newMsg = { ...msg, status: MessageStatus.SENT, contentMetadata: { ...msg.contentMetadata, thumbnailUrl: url } }
+                                            dispatch(updateMessage({ message: newMsg }))
+                                            //上传视频
+                                            uploadFile(videoFile)
+                                                .then(
+                                                    (res) => {
+                                                        const newMsg2 = { ...newMsg, status: MessageStatus.SENT, content: res }
+                                                        dispatch(updateMessage({ message: newMsg2 }))
+                                                        //向服务器发送消息
+                                                        realSendMessage(newMsg2)
+                                                    },
+                                                    (error) => {
+                                                        dispatch(updateMessageStatus({ id: msg.id, newStatus: MessageStatus.FAILED }))
+                                                    }
+                                                )
+                                        },
+                                        (error) => {
+                                            dispatch(updateMessageStatus({ id: msg.id, newStatus: MessageStatus.FAILED }))
+                                        }
+                                    );
+                            },
+                            (error) => {
+                                dispatch(updateMessageStatus({ id: msg.id, newStatus: MessageStatus.FAILED }))
+                            }
+                        )
                     break;
                 case 'paragraph':
                     const content = item?.content;
@@ -651,17 +481,16 @@ const ChatItem = (props) => {
                         }
                     }
                     const text = textMessage.join("");
-                    msg = gMessage(TEXT_MESSAGE, text);
-                    const sendFlag = realSendMessage(msg);
-                    if (!sendFlag) {
-                        msg.status = FAILED;
-                    }
+                    msg = messageBase(text, MessageType.TEXT_MESSAGE);
+                    //添加消息
+                    dispatch(addMessage({ sessionId: sessionId, message: msg }))
+                    //向服务器发送消息
+                    realSendMessage(msg);
                     break;
                 default:
                     message.error('未知的消息类型');
                     continue;
             }
-            handleSenderMessage(msg, userSessionItem.id);
         }
         if (editorFlag) {
             editor.commands.clearContent();
@@ -670,46 +499,30 @@ const ChatItem = (props) => {
 
     const realSendMessage = (msg) => {
         if (socketRef.current.readyState === WebSocket.OPEN) {
-            socketRef.current.send(JSON.stringify({
-                ackId: msg.ackId,
-                sessionId: msg.sessionId,
-                type: msg.type,
-                sender: msg.sender,
-                receiver: msg.receiver,
-                deliveryMethod: msg.deliveryMethod,
-                content: msg.content,
-                contentMetadata: msg.contentMetadata
-            }));
-            setInterval(() => {
-                const chatData = chatContentDataRef.current.filter(f => f.id === msg.id);
-                if (chatData && chatData.status === PENDING) {
-                    msg.status = FAILED;
-                    updateChatItem(userSessionItem.id, msg);
-                }
-            }, 10000);
-            return true;
+            socketRef.current.send(JSON.stringify(msg));
         } else {
-            return false;
+            //更新消息状态
+            dispatch(updateMessageStatus({ id: msg.id, newStatus: MessageStatus.FAILED }))
         }
     }
 
-    const gMessage = (type, content) => {
-        const msg = {
-            id: uuidv4(),
+    const messageBase = (content, type) => {
+        const id = IdGen.nextId()
+        return {
+            id: id,
+            ackId: id,
             type: type,
-            status: PENDING,
-            sessionId: userSessionItem.id,
-            sender: userSessionItem.userId,
-            receiver: userSessionItem.receiverUserId,
-            deliveryMethod: userSessionItem.deliveryMethod,
+            content: content,
+            status: MessageStatus.PENDING,
+            sessionId: sessionId,
+            sender: session.userId,
+            receiver: session.receiverUserId,
+            deliveryMethod: session.deliveryMethod,
             self: true,
-            ackId: snowflake.nextId().toString(),
             timestamp: new Date().getTime(),
-            avatar: userInfoRef.current.avatar,
-            name: userSessionItem.name,
-            content: content
+            name: userInfo.nickname,
+            avatar: userInfo.avatar
         }
-        return msg;
     }
 
     return (
@@ -728,7 +541,7 @@ const ChatItem = (props) => {
                                                 className='content-chat-list'
                                                 width={width}
                                                 height={height}
-                                                rowCount={chatContentData?.length || 0}
+                                                rowCount={messages?.length || 0}
                                                 rowHeight={cache.current.rowHeight}
                                                 deferredMeasurementCache={cache.current}
                                                 rowRenderer={rowRenderer}

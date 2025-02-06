@@ -52,7 +52,10 @@ const VideoMessage = React.memo(({ content, status, contentMetadata }) => {
             >
                 <AntdImage
                     className='video-message'
-                    style={{ width: '120px', height: mediaHeight }}
+                    style={{ 
+                        width: '120px', 
+                        height: mediaHeight
+                    }}
                     height={mediaHeight}
                     preview={false}
                     src={thumbnailUrl}

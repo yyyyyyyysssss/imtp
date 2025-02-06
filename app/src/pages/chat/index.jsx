@@ -43,7 +43,6 @@ const Chat = (props) => {
                     messages: [message]
                 })
                 const normalizedData = normalize(userSessionList, [session]);
-                // console.log('fetchData',normalizedData)
                 //初始化加载会话
                 dispatch(loadSession(normalizedData))
             }
