@@ -1,60 +1,83 @@
-import React, { useState, useEffect, useContext,forwardRef,useRef,useImperativeHandle } from 'react'
+import React, { useState, useEffect, forwardRef, useRef, useImperativeHandle } from 'react'
 import { Flex, Dropdown, Tabs, Avatar, Divider } from "antd"
-import { HomeContext } from '../../context';
-import httpWrapper from '../../api/axiosWrapper';
-import femaleImg from '../../assets/img/gender_female.png'
-import maleImg from '../../assets/img/gender_male.png'
 import moreOpsImg from '../../assets/img/more_ops_icon.png'
 import userFGImg from '../../assets/img/user_fg_send_message.png'
 import './index.less'
+import { fetchUserGroups, createUserSession } from '../../api/ApiService';
+import { useSelector, useDispatch } from 'react-redux';
+import { switchPanel, addSession, loadUserGroup, selectSession } from '../../redux/slices/chatSlice';
+import { DeliveryMethod } from '../../enum';
 
-const Group = forwardRef((props,ref) => {
+const Group = forwardRef((props, ref) => {
 
-    const {style} = props;
+    const { style } = props;
 
-    const {addUserSession} = useContext(HomeContext);
+    const dispatch = useDispatch()
 
-    const [data, setData] = useState([]);
+    const userGroups = useSelector(state => state.chat.userGroups)
 
-    const dataRef = useRef(new Map());
+    const sessions = useSelector(state => state.chat.entities.sessions)
+
+    const userInfo = useSelector(state => state.chat.userInfo)
+
+    const userGroupMapRef = useRef(new Map());
 
     const [selectTab, setSelectTab] = useState(null);
 
     useEffect(() => {
-        httpWrapper.get('/social/userGroup/{userId}')
-            .then(
-                (res) => {
-                    setData(res?.data);
-                }
-            )
+        const fetchData = async () => {
+            const userGroupList = await fetchUserGroups() || []
+            dispatch(loadUserGroup(userGroupList))
+        }
+        fetchData()
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     useEffect(() => {
-        const map = new Map();
-        for(const group of data){
-            for(const userInfo of group.groupUserInfos){
-                map.set(group.id.toString()  + userInfo.id,userInfo).toString();
-            }
+        userGroupMapRef.current = new Map()
+        for (let userGroup of userGroups) {
+            const groupId = userGroup.id
+            userGroupMapRef.current.set(groupId, { id: groupId, note: userGroup.note, avatar: userGroup.avatar })
+            const { groupUserInfos } = userGroup
+            groupUserInfos.forEach(item => userGroupMapRef.current.set(groupId + '-' + item.id, item))
         }
-        dataRef.current = map;
-    },[data])
+    }, [userGroups])
 
     useImperativeHandle(ref, () => ({
         findUserInfoByGroup: findUserInfoByGroup,
         findGroupByGroupId: findGroupByGroupId
     }));
 
-    const findUserInfoByGroup = (groupId,id) => {
-        return dataRef.current.get(groupId.toString() + id.toString());
+    const findUserInfoByGroup = (groupId, friendId) => {
+        const key = groupId + '-' + friendId
+        return userGroupMapRef.current.get(key)
     }
 
     const findGroupByGroupId = (groupId) => {
-        return data.find(f => f.id = groupId);
+
+        return userGroupMapRef.current.get(groupId)
     }
 
-    const handleSendMessage = (item) => {
-        item.type = 'GROUP';
-        addUserSession(item);
+    const handleSendMessage = async (item) => {
+        const groupId = item.id
+        let sessionId;
+        const session = Object.values(sessions).find(s => s.receiverUserId === groupId);
+        if (session) {
+            sessionId = session.id
+        } else {
+            sessionId = await createUserSession(groupId, DeliveryMethod.GROUP)
+            const userSessionItem = {
+                id: sessionId,
+                userId: userInfo.id,
+                name: item.groupName,
+                receiverUserId: groupId,
+                avatar: item.avatar,
+                deliveryMethod: DeliveryMethod.GROUP
+            }
+            dispatch(addSession({ session: userSessionItem }))
+        }
+        dispatch(switchPanel({ panel: 'CHAT_PANEL', sessionId: sessionId }))
+        dispatch(selectSession({ sessionId: sessionId }))
     }
 
     return (
@@ -71,10 +94,10 @@ const Group = forwardRef((props,ref) => {
                             indicator={{ size: 0 }}
                             centered
                             tabBarGutter={0}
-                            items={data.map((item, i) => {
+                            items={userGroups.map((item, i) => {
                                 return {
                                     label: (
-                                        <Flex align='center' justify='center' style={{padding:'3px'}}>
+                                        <Flex align='center' justify='center' style={{ padding: '3px' }}>
                                             <Avatar shape="square" size={50} src={item.avatar} />
                                             <label className='group-name'>{item.groupName}</label>
                                         </Flex>
@@ -91,7 +114,7 @@ const Group = forwardRef((props,ref) => {
                                                         <Flex gap="small" align='center' style={{ width: '100%' }}>
                                                             <label className='group-content-nickname'>{item.groupName}</label>
                                                             <Flex align='end' justify='end' style={{ flex: 1 }}>
-                                                            <Dropdown
+                                                                <Dropdown
                                                                     menu={{
                                                                         items: [
                                                                             {

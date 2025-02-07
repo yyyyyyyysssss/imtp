@@ -106,7 +106,6 @@ const App = () => {
 
   useEffect(() => {
     const bootstrapAsync = async () => {
-      console.log('App init')
       let userToken = await Storage.get('userToken');
       if (userToken) {
         // 验证token是否有效

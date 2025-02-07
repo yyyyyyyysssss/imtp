@@ -3,17 +3,30 @@ import { createSlice } from '@reduxjs/toolkit'
 export const chatSlice = createSlice({
     name: 'chat',
     initialState: {
+        panel: 'CHAT_PANEL',
+        userInfo: null,
         entities: {
             sessions: {},
             messages: {}
         },
         result: [],
         selectedSessionId: null,
+        selectedHeadName: null,
         userFriends: [],
         userGroups: [],
         unreadCount: 0 //未读消息合计
     },
     reducers: {
+        switchPanel: (state, action) => {
+            const { payload } = action
+            const { panel } = payload
+            state.panel = panel
+        },
+        setUserInfo: (state, action) => {
+            const { payload } = action
+            const { userInfo } = payload
+            state.userInfo = userInfo
+        },
         loadSession: (state, action) => {
             const { payload } = action
             state.entities = payload.entities
@@ -30,11 +43,13 @@ export const chatSlice = createSlice({
             const { payload } = action
             const { sessionId } = payload
             state.selectedSessionId = sessionId
-            if(sessionId === null){
+            if (sessionId === null) {
                 return
             }
+            const session = state.entities.sessions[sessionId]
+            state.selectedHeadName = session.name
             //会话未读消息
-            const unreadMessageCount = state.entities.sessions[sessionId].unreadMessageCount || 0
+            const unreadMessageCount = session.unreadMessageCount || 0
             if (unreadMessageCount === 0) {
                 return
             }
@@ -66,12 +81,12 @@ export const chatSlice = createSlice({
                 if (!state.entities.sessions[sessionId].messages) {
                     state.entities.sessions[sessionId].messages = []
                 }
-                if(messageInit === undefined || messageInit === false){
-                    state.entities.sessions[sessionId].messages.push(message.id)
-                }else {
+                if (messageInit === undefined || messageInit === false) {
                     state.entities.sessions[sessionId].messages.unshift(message.id)
+                } else {
+                    state.entities.sessions[sessionId].messages.push(message.id)
                 }
-                
+
             });
             state.entities.sessions[sessionId].messageInit = true
         },
@@ -126,6 +141,6 @@ export const chatSlice = createSlice({
     }
 })
 
-export const { loadSession, addSession, selectSession, removeSession, loadMessage, addMessage, updateMessage, updateMessageStatus, deleteMessage, loadUserFriend, loadUserGroup } = chatSlice.actions
+export const { switchPanel, setUserInfo, loadSession, addSession, selectSession, removeSession, loadMessage, addMessage, updateMessage, updateMessageStatus, deleteMessage, loadUserFriend, loadUserGroup } = chatSlice.actions
 
 export default chatSlice.reducer

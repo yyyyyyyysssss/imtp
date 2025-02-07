@@ -1,50 +1,72 @@
-import React, { useState, useEffect, useContext,forwardRef,useImperativeHandle, useRef } from 'react'
+import React, { useState, useEffect, forwardRef, useImperativeHandle, useRef } from 'react'
 import { Flex, Tabs, Avatar, Divider, Dropdown } from "antd"
-import { HomeContext } from '../../context';
-import httpWrapper from '../../api/axiosWrapper';
 import femaleImg from '../../assets/img/gender_female.png'
 import maleImg from '../../assets/img/gender_male.png'
 import moreOpsImg from '../../assets/img/more_ops_icon.png'
 import userFGImg from '../../assets/img/user_fg_send_message.png'
 import './index.less'
+import { useSelector, useDispatch } from 'react-redux';
+import { createUserSession, fetchUserFriends } from '../../api/ApiService';
+import { switchPanel, addSession, loadUserFriend,selectSession } from '../../redux/slices/chatSlice';
+import { DeliveryMethod } from '../../enum';
 
-const Friend = forwardRef((props,ref) => {
-    const {style} = props;
+const Friend = forwardRef((props, ref) => {
+    const { style } = props;
 
-    const { addUserSession } = useContext(HomeContext);
+    const userFriends = useSelector(state => state.chat.userFriends)
 
-    const [data, setData] = useState([]);
+    const userFriendMapRef = useRef(new Map());
 
-    const dataRef = useRef(new Map());
+    const dispatch = useDispatch()
+
+    const sessions = useSelector(state => state.chat.entities.sessions)
+
+    const userInfo = useSelector(state => state.chat.userInfo)
 
     const [selectTab, setSelectTab] = useState(null);
 
     useEffect(() => {
-        httpWrapper.get('/social/userFriend/{userId}')
-            .then(
-                (res) => {
-                    setData(res?.data);
-                }
-            )
+        const fetchData = async () => {
+            const userFriendList = await fetchUserFriends() || []
+            dispatch(loadUserFriend(userFriendList))
+        }
+        fetchData()
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     useEffect(() => {
-        const map = new Map();
-        data.forEach(item => map.set(item.id, item));
-        dataRef.current = map;
-    },[data])
+        userFriendMapRef.current = new Map()
+        userFriends.forEach(item => userFriendMapRef.current.set(item.id, item))
+    }, [userFriends])
 
     useImperativeHandle(ref, () => ({
         findUserInfoByFriendId: findUserInfoByFriendId
     }));
 
     const findUserInfoByFriendId = (id) => {
-        return dataRef.current.get(id);
+        return userFriendMapRef.current.get(id);
     }
 
-    const handleSendMessage = (item) => {
-        item.type = 'SINGLE';
-        addUserSession(item);
+    const toSend = async (friendItem) => {
+        const friendId = friendItem.id
+        let sessionId;
+        const session = Object.values(sessions).find(s => s.receiverUserId === friendId);
+        if (session) {
+            sessionId = session.id
+        } else {
+            sessionId = await createUserSession(friendId, DeliveryMethod.SINGLE)
+            const userSessionItem = {
+                id: sessionId,
+                userId: userInfo.id,
+                name: friendItem.note,
+                receiverUserId: friendId,
+                avatar: friendItem.avatar,
+                deliveryMethod: DeliveryMethod.SINGLE
+            }
+            dispatch(addSession({ session: userSessionItem }))
+        }
+        dispatch(switchPanel({ panel: 'CHAT_PANEL',sessionId: sessionId }))
+        dispatch(selectSession({ sessionId: sessionId }))
     }
 
     return (
@@ -61,10 +83,10 @@ const Friend = forwardRef((props,ref) => {
                             indicator={{ size: 0 }}
                             centered
                             tabBarGutter={0}
-                            items={data.map((item, i) => {
+                            items={userFriends.map((item, i) => {
                                 return {
                                     label: (
-                                        <Flex align='center' justify='center' style={{padding:'3px'}}>
+                                        <Flex align='center' justify='center' style={{ padding: '3px' }}>
                                             <Avatar shape="square" size={50} src={item.avatar} />
                                             <label className='friend-name'>{item.note ? item.note : item.nickname}</label>
                                         </Flex>
@@ -122,7 +144,7 @@ const Friend = forwardRef((props,ref) => {
                                                 </Flex>
                                                 <Divider />
                                                 <Flex align='center' justify='center' style={{ marginTop: '30px' }}>
-                                                    <Flex className='friend-content-send-flex' align='center' justify='center' onClick={() => handleSendMessage(item)} vertical>
+                                                    <Flex className='friend-content-send-flex' align='center' justify='center' onClick={() => toSend(item)} vertical>
                                                         <img className='friend-content-send-img' src={userFGImg} alt='' />
                                                         <label className='friend-content-send-label'>发消息</label>
                                                     </Flex>

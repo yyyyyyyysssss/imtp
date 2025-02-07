@@ -22,14 +22,10 @@ export const logout = () => {
 }
 
 // 获取当前登录用户的信息
-export const fetchUserInfo = (token) => {
+export const fetchUserInfo = () => {
 
     return new Promise((resolve, reject) => {
-        httpWrapper.get('/social/userInfo', {
-            headers: {
-                Authorization: `Bearer ${token}`
-            }
-        })
+        httpWrapper.get('/social/userInfo')
             .then(res => resolve(res.data))
             .catch(error => handleError)
     })

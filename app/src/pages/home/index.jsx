@@ -11,8 +11,6 @@ const Tab = createBottomTabNavigator();
 
 const Home = () => {
 
-    console.log('Home')
-
     const userFriendRef = useRef()
 
     const findFriendByFriendId = (friendId) => {

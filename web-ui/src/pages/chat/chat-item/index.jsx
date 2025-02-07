@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback, useContext } from 'react'
+import React, { useState, useRef, useEffect, useCallback } from 'react'
 import './index.less'
 import Picker from '@emoji-mart/react'
 import { Flex, Layout, Button } from "antd"
@@ -14,7 +14,7 @@ import HardBreak from '@tiptap/extension-hard-break'
 import { StarterKit } from '@tiptap/starter-kit';
 import emojiMartData from '@emoji-mart/data'
 import Uploader from '../../../components/Uploader';
-import { HomeContext, useWebSocket } from '../../../context';
+import { useWebSocket } from '../../../context';
 import Message from '../../../components/message';
 import IdGen from '../../../utils/IdGen';
 import { useDispatch, useSelector } from 'react-redux';
@@ -24,22 +24,25 @@ import { MessageStatus, MessageType } from '../../../enum';
 
 const { Content } = Layout;
 
-const ChatItem = ({ sessionId, selectTab }) => {
+const ChatItem = React.memo(({ sessionId }) => {
+
+    console.log('ChatItem')
+
     const { socket } = useWebSocket();
     const socketRef = useRef();
     useEffect(() => {
         socketRef.current = socket;
     }, [socket]);
-
-
-    const { userInfo } = useContext(HomeContext);
-
+    //用户信息
+    const userInfo = useSelector(state => state.chat.userInfo) || {}
+    //当前会话
     const session = useSelector(state => state.chat.entities.sessions[sessionId])
-
+    //会话关联的消息
     const { messages } = session
 
     const dispatch = useDispatch()
 
+    const componentRef = useRef(null);
     useEffect(() => {
         const fetchData = async () => {
             const data = await fetchMessageByUserSessionId(sessionId)
@@ -50,12 +53,24 @@ const ChatItem = ({ sessionId, selectTab }) => {
             })
             dispatch(loadMessage({ sessionId: sessionId, messages: newMessageList }))
         }
-        if (sessionId === selectTab) {
-            if (session.messageInit === undefined || session.messageInit === false) {
-                fetchData()
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                // 组件是否可见
+                if (entry.isIntersecting) {
+                    if (session.messageInit === undefined || session.messageInit === false) {
+                        fetchData()
+                        observer.unobserve(componentRef.current);
+                    }
+                }
+            },
+            {
+                threshold: 0.5, // 50% 的元素可见时触发
             }
+        )
+        if (componentRef.current) {
+            observer.observe(componentRef.current);
         }
-    }, [sessionId, selectTab])
+    }, [])
 
     //聊天内容
     const chatContentRef = useRef(null);
@@ -63,7 +78,9 @@ const ChatItem = ({ sessionId, selectTab }) => {
     useEffect(() => {
         if (chatContentRef.current && messages) {
             requestAnimationFrame(() => {
-                chatContentRef.current.scrollToRow(messages.length - 1);
+                setTimeout(() => {
+                    chatContentRef.current.scrollToRow(messages.length - 1);
+                }, 50);
             });
         }
     }, [messages]);
@@ -527,7 +544,7 @@ const ChatItem = ({ sessionId, selectTab }) => {
 
     return (
         <>
-            <div style={{ width: '100%', height: '100%' }}>
+            <div ref={componentRef} style={{ width: '100%', height: '100%' }}>
                 <Content style={{ height: '94%' }}>
                     <Layout style={{ height: '100%' }}>
                         {/* 聊天内容展示 */}
@@ -580,6 +597,6 @@ const ChatItem = ({ sessionId, selectTab }) => {
             </div>
         </>
     );
-}
+})
 
 export default ChatItem;

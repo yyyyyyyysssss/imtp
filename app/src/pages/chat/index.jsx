@@ -113,13 +113,13 @@ const Chat = (props) => {
                 lastUserName: friendInfo.note
             }
         } else {
-            const groupInfo = deliveryMethod === DeliveryMethod.GROUP ? findGroupByGroupId(realSender) : friendInfo
+            const info = deliveryMethod === DeliveryMethod.GROUP ? findGroupByGroupId(realSender) : friendInfo
             const sessionId = await createUserSession(realSender, deliveryMethod)
             session = {
                 id: sessionId,
                 userId: userInfo.id,
-                name: groupInfo.note,
-                avatar: groupInfo.avatar,
+                name: info.note,
+                avatar: info.avatar,
                 receiverUserId: realSender,
                 deliveryMethod: deliveryMethod,
                 lastMsgType: cmd,
