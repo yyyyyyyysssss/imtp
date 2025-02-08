@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.shardingsphere.infra.hint.HintManager;
 import org.imtp.common.enums.DeliveryMethod;
 import org.imtp.common.enums.MessageType;
@@ -32,10 +33,8 @@ import java.util.stream.Collectors;
  * @Date 2024/9/4 11:08
  */
 @Service
+@Slf4j
 public class UserSocialServiceImpl implements UserSocialService {
-
-    @Resource
-    private UserMapper userMapper;
 
     @Resource
     private SessionMapper sessionMapper;

@@ -10,7 +10,10 @@ import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManagerBuil
 import org.apache.hc.client5.http.impl.routing.DefaultProxyRoutePlanner;
 import org.apache.hc.client5.http.ssl.NoopHostnameVerifier;
 import org.apache.hc.client5.http.ssl.SSLConnectionSocketFactoryBuilder;
-import org.apache.hc.core5.http.HttpHost;
+import org.apache.hc.core5.http.*;
+import org.apache.hc.core5.http.protocol.HttpContext;
+import org.imtp.web.config.constant.CommonConstant;
+import org.slf4j.MDC;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,6 +23,7 @@ import org.springframework.web.client.RestTemplate;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.security.cert.X509Certificate;
 import java.util.concurrent.TimeUnit;
@@ -64,6 +68,7 @@ public class RestTemplateConfig {
         try {
             httpClientBuilder = HttpClients
                     .custom()
+                    .addRequestInterceptorFirst(new HttpClientTraceIdInterceptor())
                     .setDefaultRequestConfig(requestConfig)
                     .setConnectionManager(
                             PoolingHttpClientConnectionManagerBuilder
@@ -88,6 +93,17 @@ public class RestTemplateConfig {
             throw new RuntimeException(e);
         }
         return new HttpComponentsClientHttpRequestFactory(httpClientBuilder.build());
+    }
+
+    private static class HttpClientTraceIdInterceptor implements HttpRequestInterceptor{
+
+        @Override
+        public void process(HttpRequest httpRequest, EntityDetails entityDetails, HttpContext httpContext) {
+            String tranceId = MDC.get(CommonConstant.TRACE_ID);
+            if (tranceId != null){
+                httpRequest.addHeader(CommonConstant.TRACE_ID,tranceId);
+            }
+        }
     }
 
     private SSLContext createSSLContext(){
