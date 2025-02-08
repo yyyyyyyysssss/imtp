@@ -1,4 +1,5 @@
 import React from 'react';
+import './index.less'
 import { Avatar, Badge, Flex } from "antd";
 import { useSelector } from 'react-redux';
 import { DeliveryMethod, MessageType } from '../../enum';

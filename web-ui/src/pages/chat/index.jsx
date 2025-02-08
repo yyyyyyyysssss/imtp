@@ -167,14 +167,9 @@ const Chat = (props) => {
                             items={result.map((id, i) => {
                                 return {
                                     key: id,
-                                    forceRender: true,
+                                    forceRender: false,
                                     label: <UserSessionItem sessionId={id} />,
-                                    children: (
-                                        <div style={{ height: '100%' }}>
-                                            <ChatItem key={id} sessionId={id}/>
-                                        </div>
-                                    )
-
+                                    children: <ChatItem sessionId={id}/>
                                 }
                             })}
                         >
