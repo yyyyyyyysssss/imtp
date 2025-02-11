@@ -6,14 +6,12 @@ import { useWebSocket } from '../../../context';
 import Message from '../../../components/message';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchMessageByUserSessionId } from '../../../api/ApiService';
-import { loadMessage} from '../../../redux/slices/chatSlice';
+import { loadMessage } from '../../../redux/slices/chatSlice';
 import ChatItemFooter from '../../../components/chat-item-footer'
 
 const { Content } = Layout;
 
 const ChatItem = React.memo(({ sessionId }) => {
-
-    console.log('ChatItem',sessionId)
 
     const { socket } = useWebSocket();
     const socketRef = useRef();
@@ -44,19 +42,8 @@ const ChatItem = React.memo(({ sessionId }) => {
         }
     }, [])
 
-    //聊天内容
+    //聊天列表ref
     const chatContentRef = useRef(null);
-    //监听数据变化并滚动到末尾
-    useEffect(() => {
-        if (chatContentRef.current && messages) {
-            requestAnimationFrame(() => {
-                setTimeout(() => {
-                    chatContentRef.current.scrollToRow(messages.length - 1);
-                }, 50);
-            });
-        }
-        
-    }, [messages]);
 
     const cache = React.useRef(
         new CellMeasurerCache({
@@ -77,7 +64,7 @@ const ChatItem = React.memo(({ sessionId }) => {
             >
                 {({ registerChild }) => (
                     <div ref={registerChild} key={item} className='chat-item' style={style}>
-                        {renderItem(item, index)}
+                        {renderItem(index, item)}
                     </div>
                 )}
 
@@ -85,7 +72,7 @@ const ChatItem = React.memo(({ sessionId }) => {
         );
     }, [messages]);
     //聊天项渲染函数
-    const renderItem = (item, index) => {
+    const renderItem = (index, item) => {
         if (!item) {
             return (<></>);
         }
@@ -96,10 +83,6 @@ const ChatItem = React.memo(({ sessionId }) => {
     //列表项渲染回调函数
     const handleRowsRendered = ({ startIndex, stopIndex }) => {
 
-    }
-
-    const handleOnScroll = (event) => {
-        // console.log(session.name,event)
     }
     return (
         <>
@@ -122,7 +105,7 @@ const ChatItem = React.memo(({ sessionId }) => {
                                                 deferredMeasurementCache={cache.current}
                                                 rowRenderer={rowRenderer}
                                                 onRowsRendered={handleRowsRendered}
-                                                onScroll={handleOnScroll}
+                                                scrollToIndex={messages?.length - 1}
                                             />
                                         </div>
                                     );
@@ -130,7 +113,7 @@ const ChatItem = React.memo(({ sessionId }) => {
                             </AutoSizer>
                         </Content>
                         <Content style={{ height: '38%' }}>
-                            <ChatItemFooter session={session}/>
+                            <ChatItemFooter session={session} />
                         </Content>
                     </Layout>
                 </Content>

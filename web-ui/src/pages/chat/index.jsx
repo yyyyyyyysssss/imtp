@@ -1,5 +1,5 @@
 import { Flex, Tabs } from "antd";
-import React, { useContext, useEffect, useRef } from 'react';
+import React, { useContext, useEffect, useMemo, useRef } from 'react';
 import { HomeContext, useWebSocket } from '../../context';
 import { getBit } from '../../utils';
 import ChatItem from './chat-item';
@@ -27,7 +27,7 @@ const Chat = (props) => {
     useEffect(() => {
         const fetchData = async () => {
             const userSessionList = await fetchUserSessions() || []
-            if (userSessionList) {
+            if (userSessionList.length > 0) {
                 const message = new schema.Entity('messages')
                 const session = new schema.Entity('sessions', {
                     messages: [message]
@@ -46,7 +46,7 @@ const Chat = (props) => {
         for (const session of Object.values(sessions)) {
             sessionMapRef.current.set(session.receiverUserId, session)
         }
-    }, [result,sessions])
+    }, [result, sessions])
 
     //接收消息
     useEffect(() => {
@@ -150,6 +150,15 @@ const Chat = (props) => {
         dispatch(selectSession({ sessionId: id }))
     }
 
+    const items = useMemo(() => {
+        return result.map((id) => ({
+            key: id,
+            forceRender: false,
+            label: <UserSessionItem sessionId={id} />,
+            children: <ChatItem sessionId={id} />
+        }))
+    }, [result])
+
     return (
         <>
             <Flex className='chat-root-flex' justify='center' align='center'>
@@ -157,6 +166,7 @@ const Chat = (props) => {
                     <div className='chat-panel-tabs' style={style}>
                         <Tabs
                             activeKey={selectedSessionId}
+                            destroyInactiveTabPane = {true}
                             onChange={(key) => handleSelected(key)}
                             key="chat-tabs"
                             className='chat-tabs'
@@ -164,14 +174,7 @@ const Chat = (props) => {
                             indicator={{ size: 0 }}
                             centered
                             tabBarGutter={0}
-                            items={result.map((id, i) => {
-                                return {
-                                    key: id,
-                                    forceRender: false,
-                                    label: <UserSessionItem sessionId={id} />,
-                                    children: <ChatItem sessionId={id}/>
-                                }
-                            })}
+                            items={items}
                         >
                         </Tabs>
                     </div>

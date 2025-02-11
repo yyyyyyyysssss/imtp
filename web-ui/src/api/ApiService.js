@@ -21,6 +21,46 @@ export const logout = () => {
     })
 }
 
+//发送邮箱验证码
+export const sendEmailVerificationCode = (email) => {
+
+    return new Promise((resolve, reject) => {
+        httpWrapper
+            .get('/sendEmailVerificationCode', {
+                params: {
+                    email: email
+                }
+            })
+            .then(res => resolve(res.data))
+            .catch(error => handleError)
+    })
+}
+
+// oauth2 登录
+export const otherLogin = (code, state) => {
+    return new Promise((resolve, reject) => {
+        httpWrapper
+            .get('/oauth2/client/other/login', {
+                params: {
+                    code: code,
+                    state: state
+                }
+            })
+            .then(res => resolve(res.data))
+            .catch(error => handleError)
+    })
+}
+
+// 获取oauth2三方登录的配置信息
+export const fetchOAuth2ClientConfig = () => {
+    return new Promise((resolve, reject) => {
+        httpWrapper
+            .get('/oauth2/client/other/config')
+            .then(res => resolve(res.data))
+            .catch(error => handleError)
+    })
+}
+
 // 获取当前登录用户的信息
 export const fetchUserInfo = () => {
 

@@ -8,11 +8,16 @@ import './index.less'
 import 'antd/dist/reset.css'
 import tmpImg from '../../assets/img/tmp.jpg'
 import TabPane from 'antd/es/tabs/TabPane'
-import httpWrapper from '../../api/axiosWrapper'
 import { urlParamParse } from '../../utils'
+import { fetchOAuth2ClientConfig, login, otherLogin, sendEmailVerificationCode } from '../../api/ApiService'
+import { useDispatch } from 'react-redux';
+import { reset } from '../../redux/slices/chatSlice'
 
 
 const Login = () => {
+
+    const dispatch = useDispatch()
+
     const [form] = Form.useForm();
     //组件跳转
     const navigate = useNavigate();
@@ -42,16 +47,10 @@ const Login = () => {
         const state = params.get('state');
         if (code && state) {
             setLoading(true);
-            httpWrapper
-                .get('/oauth2/client/other/login', {
-                    params: {
-                        code: code,
-                        state: state
-                    }
-                })
+            otherLogin(code, state)
                 .then(
-                    (res) => {
-                        loginSuccessHandler(res.data, null);
+                    (data) => {
+                        loginSuccessHandler(data, null);
                     }
                 );
         }
@@ -60,21 +59,17 @@ const Login = () => {
 
     useEffect(() => {
         //获取三方登录的配置信息
-        httpWrapper
-            .get('/oauth2/client/other/config')
-            .then(
-                (res) => {
-                    setOtherLoginConfig({
-                        Google: res.data?.Google,
-                        Github: res.data?.Github,
-                        Microsoft: res.data?.Microsoft,
-                        Self: res.data?.Self
-                    })
-                },
-                (err) => {
-                    console.log(err)
-                }
-            );
+        const fetchData = async () => {
+            const config = await fetchOAuth2ClientConfig()
+            setOtherLoginConfig({
+                Google: config?.Google,
+                Github: config?.Github,
+                Microsoft: config?.Microsoft,
+                Self: config?.Self
+            })
+        }
+        fetchData()
+        dispatch(reset())
     }, []);
 
     useEffect(() => {
@@ -103,15 +98,10 @@ const Login = () => {
     // 发送验证码
     const handleWithVerificationCode = async () => {
         const email = form.getFieldValue('email');
-        if(!email){
+        if (!email) {
             return message.error("邮箱不可为空");
         }
-        httpWrapper
-            .get('/sendEmailVerificationCode', {
-                params: {
-                    email: email
-                }
-            });
+        sendEmailVerificationCode(email)
         let ti = verificationCode.time;
         setVerificationCode({
             disabled: true,
@@ -214,11 +204,10 @@ const Login = () => {
             }
         }
         setLoading(true);
-        httpWrapper
-            .post("/login", loginRequest)
+        login(loginRequest)
             .then(
-                (res) => {
-                    loginSuccessHandler(res.data, values.rememberMe);
+                (data) => {
+                    loginSuccessHandler(data, values.rememberMe);
                 },
                 (error) => {
                     setLoading(false)

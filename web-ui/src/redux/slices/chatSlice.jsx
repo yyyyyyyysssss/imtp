@@ -1,22 +1,26 @@
 import { createSlice } from '@reduxjs/toolkit'
 
+
+const initialState = {
+    panel: 'CHAT_PANEL',
+    userInfo: null,
+    entities: {
+        sessions: {},
+        messages: {}
+    },
+    result: [],
+    selectedSessionId: null,
+    selectedHeadName: null,
+    userFriends: [],
+    userGroups: [],
+    unreadCount: 0 //未读消息合计
+}
+
 export const chatSlice = createSlice({
     name: 'chat',
-    initialState: {
-        panel: 'CHAT_PANEL',
-        userInfo: null,
-        entities: {
-            sessions: {},
-            messages: {}
-        },
-        result: [],
-        selectedSessionId: null,
-        selectedHeadName: null,
-        userFriends: [],
-        userGroups: [],
-        unreadCount: 0 //未读消息合计
-    },
+    initialState: initialState,
     reducers: {
+        reset: () => initialState,
         switchPanel: (state, action) => {
             const { payload } = action
             const { panel } = payload
@@ -141,6 +145,6 @@ export const chatSlice = createSlice({
     }
 })
 
-export const { switchPanel, setUserInfo, loadSession, addSession, selectSession, removeSession, loadMessage, addMessage, updateMessage, updateMessageStatus, deleteMessage, loadUserFriend, loadUserGroup } = chatSlice.actions
+export const { reset, switchPanel, setUserInfo, loadSession, addSession, selectSession, removeSession, loadMessage, addMessage, updateMessage, updateMessageStatus, deleteMessage, loadUserFriend, loadUserGroup } = chatSlice.actions
 
 export default chatSlice.reducer
