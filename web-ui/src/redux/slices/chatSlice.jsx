@@ -46,6 +46,9 @@ export const chatSlice = createSlice({
         selectSession: (state, action) => {
             const { payload } = action
             const { sessionId } = payload
+            if(sessionId === state.selectedSessionId){
+                return
+            }
             state.selectedSessionId = sessionId
             if (sessionId === null) {
                 return
@@ -65,6 +68,10 @@ export const chatSlice = createSlice({
         removeSession: (state, action) => {
             const { payload } = action
             const { sessionId } = payload
+            if(sessionId === state.selectedSessionId){
+                state.selectedSessionId = null
+                state.selectedHeadName = null
+            }
             // 清除该会话的未读消息
             const unreadMessageCount = state.entities.sessions[sessionId].unreadMessageCount || 0
             // 消息总计

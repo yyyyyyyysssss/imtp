@@ -7,7 +7,7 @@ import './index.less';
 import IdGen from "../../utils/IdGen";
 import { normalize, schema } from 'normalizr';
 import { createUserSession, fetchUserSessions } from "../../api/ApiService";
-import { loadSession, removeSession, addMessage, addSession, selectSession, updateMessageStatus } from '../../redux/slices/chatSlice';
+import { loadSession, addMessage, addSession, selectSession, updateMessageStatus } from '../../redux/slices/chatSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import UserSessionItem from "../../components/user-session-item";
 import { DeliveryMethod, MessageType } from "../../enum";
@@ -145,9 +145,23 @@ const Chat = (props) => {
             avatar: friendInfo.avatar
         }
     }
-    //会话选中
+    //会话选中 已废弃
     const handleSelected = (id) => {
         dispatch(selectSession({ sessionId: id }))
+    }
+
+    //会话选中
+    const state = useRef({ x: 0 });
+    const handleMouseDown = e => {
+        state.current.x = e.screenX;
+    }
+    const handleTabClick = (activeKey,e) => {
+        const delta = Math.abs(e.screenX - state.current.x);
+        if (delta > 10) {
+            e.preventDefault();
+        }else {
+            dispatch(selectSession({ sessionId: activeKey }))
+        }
     }
 
     const items = useMemo(() => {
@@ -167,9 +181,10 @@ const Chat = (props) => {
                         <Tabs
                             activeKey={selectedSessionId}
                             destroyInactiveTabPane = {true}
-                            onChange={(key) => handleSelected(key)}
+                            // onChange={(key) => handleSelected(key)}
+                            onMouseDown={handleMouseDown}
+                            onTabClick={handleTabClick}
                             key="chat-tabs"
-                            className='chat-tabs'
                             tabPosition='left'
                             indicator={{ size: 0 }}
                             centered
