@@ -40,9 +40,6 @@ public class UserSocialServiceImpl implements UserSocialService {
     private SessionMapper sessionMapper;
 
     @Resource
-    private UserSessionMapper userSessionMapper;
-
-    @Resource
     private UserFriendMapper userFriendMapper;
 
     @Resource
@@ -68,7 +65,7 @@ public class UserSocialServiceImpl implements UserSocialService {
 
     @Override
     public List<UserSessionInfo> findSessionByUserId(String userId) {
-        List<UserSessionInfo> userSessionInfos = userSessionMapper.findSessionByUserId(userId);
+        List<UserSessionInfo> userSessionInfos = sessionMapper.findSessionByUserId(userId);
         if (userSessionInfos.isEmpty()){
             return List.of();
         }
