@@ -58,15 +58,15 @@ const RootStack = createNativeStackNavigator({
             )
           }
         },
-        GroupItem: {
-          screen: GroupItem,
-          options: {
-            title: '',
-            headerRight: () => (
-              <Feather name='more-horizontal' size={28} />
-            )
-          }
-        },
+        // GroupItem: {
+        //   screen: GroupItem,
+        //   options: {
+        //     title: '',
+        //     headerRight: () => (
+        //       <Feather name='more-horizontal' size={28} />
+        //     )
+        //   }
+        // },
         VideoPlay: {
           screen: VideoPlay,
           options: {
@@ -91,11 +91,32 @@ const RootStack = createNativeStackNavigator({
           options: {
             headerShown: false
           }
+        },
+        GroupItem: {
+          screen: GroupItem,
+          path: 'groupitem',
+          options: {
+            title: '',
+            headerRight: () => (
+              <Feather name='more-horizontal' size={28} />
+            )
+          }
         }
       }
     }
   }
 })
+
+// 深度链接
+const linking = {
+  prefixes: ['ychat://'],
+  config: {
+    screens: {
+      Login: 'login',
+      GroupItem: 'groupitem'
+    }
+  }
+}
 
 const Navigation = createStaticNavigation(RootStack)
 
@@ -153,7 +174,7 @@ const App = () => {
   return (
     <AuthContext.Provider value={authContext}>
       <SignInContext.Provider value={isSignedIn}>
-        <Navigation ref={navigationRef} />
+        <Navigation linking={linking} ref={navigationRef} />
       </SignInContext.Provider>
     </AuthContext.Provider>
   )

@@ -1,6 +1,6 @@
 import { Input, Flex, Pressable, Text, VStack, Button, HStack, Box, Image, FormControl, ScrollView, KeyboardAvoidingView } from 'native-base';
-import React, { useContext, useState } from 'react';
-import { StyleSheet } from 'react-native';
+import React, { useContext, useEffect, useState } from 'react';
+import { StyleSheet, Linking } from 'react-native';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import AntDesignIcon from 'react-native-vector-icons/AntDesign';
 import { GoogleIcon, MicrosoftIcon } from '../../components/CustomIcon';
@@ -23,6 +23,27 @@ const Login = () => {
             password: ""
         }
     });
+
+    useEffect(() => {
+        // 获取应用启动时的深度链接
+        const getInitialURL = async () => {
+            const url = await Linking.getInitialURL();
+            if (url) {
+                console.log(url)
+            }
+        }
+        getInitialURL()
+
+        // 监听深度链接事件（应用在后台启动时）
+        const handleUrl = ({ url }) => {
+            console.log(url)
+        };
+
+        const linkingSubscription  = Linking.addEventListener('url', handleUrl)
+        return () => {
+            linkingSubscription.remove()
+        }
+    }, [])
 
     const createAccount = () => {
         showToast('Create Account')
