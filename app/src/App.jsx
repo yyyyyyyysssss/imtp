@@ -36,7 +36,7 @@ const RootStack = createNativeStackNavigator({
         ChatItem: {
           screen: ChatItem,
           linking: {
-            path: 'chatItem/:sessionId',
+            path: 'chatItem/:sessionId?',
             parse: {
               sessionId: (sessionId) => sessionId.replace(/^@/, ''),
             }
