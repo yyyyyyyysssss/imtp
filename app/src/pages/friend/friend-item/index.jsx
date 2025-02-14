@@ -1,5 +1,5 @@
 import { Avatar, Center, Divider, HStack, Image, Pressable, Text, VStack } from 'native-base';
-import React, { useContext, useEffect, useRef, useState } from 'react';
+import React from 'react';
 import { StyleSheet } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
@@ -10,10 +10,17 @@ import { addSession } from '../../../redux/slices/chatSlice';
 import { useNavigation, } from '@react-navigation/native';
 import { DeliveryMethod } from '../../../enum';
 import { createUserSession } from '../../../api/ApiService';
+import NotFound from '../../NotFound';
 
 const FriendItem = ({ route }) => {
 
-    const { friendItem } = route.params;
+    const { friendId } = route.params;
+
+    if(!friendId){
+        return <NotFound/>
+    }
+
+    const friendItem = useSelector(state => state.chat.userFriends.entities.friends[friendId])
 
     const navigation = useNavigation();
 

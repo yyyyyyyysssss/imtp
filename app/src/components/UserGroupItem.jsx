@@ -3,11 +3,11 @@ import React from 'react';
 import { StyleSheet } from 'react-native';
 import { useSelector } from 'react-redux';
 
-const UserFriendItem = React.memo(({ friendId, isPressed }) => {
+const UserGroupItem = React.memo(({ groupId, isPressed }) => {
 
-    const friendItem = useSelector(state => state.chat.userFriends.entities.friends[friendId])
+    const groupItem = useSelector(state => state.chat.userGroups.entities.groups[groupId])
 
-    const { avatar, note } = friendItem
+    const { avatar, note } = groupItem
 
     return (
         <HStack flex={1} space={5} alignItems='center' style={{ backgroundColor: isPressed ? '#C8C6C5' : '#F5F5F5', padding: 10, paddingRight: 0 }}>
@@ -39,10 +39,10 @@ const styles = StyleSheet.create({
     },
 })
 
-export default UserFriendItem
+export default UserGroupItem
 
 
-export const UserFriendItemSeparator = () => {
+export const UserGroupItemSeparator = () => {
 
     return (
         <HStack flex={1} space={5} alignItems='flex-end' justifyContent='center'>
@@ -63,7 +63,7 @@ export const UserFriendItemSeparator = () => {
     )
 }
 
-export const UserFriendItemFooter = () => {
+export const UserGroupItemFooter = () => {
 
     return (
         <HStack style={{

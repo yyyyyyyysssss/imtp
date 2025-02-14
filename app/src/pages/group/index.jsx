@@ -2,11 +2,11 @@ import { FlatList, Pressable, VStack } from 'native-base';
 import React, { useEffect, useCallback, useContext } from 'react';
 import { useNavigation, } from '@react-navigation/native';
 import { StyleSheet } from 'react-native';
-import UserFriendItem, { UserFriendItemFooter, UserFriendItemSeparator } from '../../components/UserFriendItem';
+import UserGroupItem, { UserGroupItemFooter, UserGroupItemSeparator } from '../../components/UserGroupItem';
 import { useDispatch, useSelector } from 'react-redux';
 import { loadUserGroup, addSession } from '../../redux/slices/chatSlice';
 import { DeliveryMethod } from '../../enum';
-import { createUserSession, fetchUserGroups } from '../../api/ApiService';
+import { createUserSession } from '../../api/ApiService';
 
 const Group = () => {
 
@@ -14,14 +14,15 @@ const Group = () => {
 
     const sessions = useSelector(state => state.chat.entities.sessions)
 
-    const userGroups = useSelector(state => state.chat.userGroups)
+    const userGroupResult = useSelector(state => state.chat.userGroups.result)
+    const userGroups = useSelector(state => state.chat.userGroups.entities.groups)
 
     const dispatch = useDispatch()
 
     const userInfo = useSelector(state => state.auth.userInfo)
 
-    const toChatItem = async (item) => {
-        const groupId = item.id
+    const toChatItem = async (groupId) => {
+        const item = userGroups[groupId]
         let sessionId;
         const session = Object.values(sessions).find(s => s.receiverUserId === groupId);
         if (session) {
@@ -45,7 +46,7 @@ const Group = () => {
 
     const itemSeparator = useCallback(() => {
         return (
-            <UserFriendItemSeparator />
+            <UserGroupItemSeparator />
         )
     }, [])
 
@@ -57,11 +58,7 @@ const Group = () => {
             >
                 {({ isHovered, isFocused, isPressed }) => {
                     return (
-                        <UserFriendItem
-                            avatar={item.avatar}
-                            name={item.note}
-                            isPressed={isPressed}
-                        />
+                        <UserGroupItem groupId = {item} isPressed={isPressed}/>
                     )
                 }}
             </Pressable>
@@ -77,10 +74,10 @@ const Group = () => {
                         padding: 10,
                         paddingRight: 0
                     }}
-                    data={userGroups}
+                    data={userGroupResult}
                     renderItem={renderItem}
                     ItemSeparatorComponent={itemSeparator}
-                    ListFooterComponent={<UserFriendItemFooter />}
+                    ListFooterComponent={<UserGroupItemFooter />}
                 />
             </VStack>
         </>

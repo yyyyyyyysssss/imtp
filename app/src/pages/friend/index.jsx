@@ -1,5 +1,5 @@
 import { Pressable, Image, VStack, Divider, Box, Text, HStack } from 'native-base';
-import React, { useEffect, useState, useCallback, useRef, forwardRef, useImperativeHandle } from 'react';
+import React, { useEffect, useCallback, forwardRef, useImperativeHandle } from 'react';
 import { useNavigation, } from '@react-navigation/native';
 import { StyleSheet } from 'react-native';
 import Search from '../../components/Search';
@@ -8,24 +8,21 @@ import UserFriendItem, { UserFriendItemFooter, UserFriendItemSeparator } from '.
 import { useDispatch, useSelector } from 'react-redux';
 import { loadUserFriend, loadUserGroup } from '../../redux/slices/chatSlice';
 import { fetchUserFriends, fetchUserGroups } from '../../api/ApiService';
+import { normalize, schema } from 'normalizr';
 
 const alphabet = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
 
 const Friend = forwardRef((props, ref) => {
     const navigation = useNavigation();
 
-    const userFriends = useSelector(state => state.chat.userFriends)
-    const userGroups = useSelector(state => state.chat.userGroups)
-
-    const userFriendMapRef = useRef(new Map())
-    const userGroupMapRef = useRef(new Map())
+    const friendResult = useSelector(state => state.chat.userFriends.result)
+    const friends = useSelector(state => state.chat.userFriends.entities.friends)
+    const groups = useSelector(state => state.chat.userGroups.entities.groups)
+    const groupUserInfos = useSelector(state => state.chat.userGroups.entities.groupUserInfos)
 
     const dispatch = useDispatch()
 
     const fetchUserFriendData = async () => {
-        if (userFriends && userFriends.length) {
-            return userFriends
-        }
         try {
             const userFriendList = await fetchUserFriends() || []
             for (let userFriend of userFriendList) {
@@ -37,25 +34,27 @@ const Friend = forwardRef((props, ref) => {
                     userFriend.value = '#'
                 }
             }
-            dispatch(loadUserFriend(userFriendList))
-            return userFriendList
+            const friendSchema = new schema.Entity('friends')
+            const normalizedData = normalize(userFriendList, [friendSchema])
+            dispatch(loadUserFriend(normalizedData))
         } catch (error) {
-            console.error('Error fetching user friends:', error);
-            return []
+            console.error('Error fetching user friends:', error)
         }
     }
 
     const fetchUserGroupData = async () => {
-        if (userGroups && userGroups.length) {
-            return userGroups
-        }
         try {
             const userGroupList = await fetchUserGroups() || []
-            dispatch(loadUserGroup(userGroupList))
-            return userGroupList
+            const groupUserInfos = new schema.Entity('groupUserInfos',undefined,{
+                idAttribute: (value) => (value.groupId + '-' + value.id)
+            })
+            const groupSchema = new schema.Entity('groups', {
+                groupUserInfos: [groupUserInfos]
+            })
+            const normalizedData = normalize(userGroupList, [groupSchema])
+            dispatch(loadUserGroup(normalizedData))
         } catch (error) {
             console.error('Error fetching user groups:', error);
-            return []
         }
     }
 
@@ -63,21 +62,6 @@ const Friend = forwardRef((props, ref) => {
         fetchUserFriendData()
         fetchUserGroupData()
     }, [])
-
-    useEffect(() => {
-        userFriendMapRef.current = new Map()
-        userFriends.forEach(item => userFriendMapRef.current.set(item.id, item))
-    }, [userFriends])
-
-    useEffect(() => {
-        userGroupMapRef.current = new Map()
-        for (let userGroup of userGroups) {
-            const groupId = userGroup.id
-            userGroupMapRef.current.set(groupId, {id: groupId,note: userGroup.note,avatar: userGroup.avatar})
-            const { groupUserInfos } = userGroup
-            groupUserInfos.forEach(item => userGroupMapRef.current.set(groupId + '-' + item.id, item))
-        }
-    }, [userGroups])
 
     useImperativeHandle(ref, () => ({
         findFriendByFriendId: findFriendByFriendId,
@@ -87,22 +71,22 @@ const Friend = forwardRef((props, ref) => {
 
     const findFriendByFriendId = (friendId) => {
 
-        return userFriendMapRef.current.get(friendId)
+        return friends[friendId]
     }
 
     const findGroupByGroupId = (groupId) => {
 
-        return userGroupMapRef.current.get(groupId)
+        return groups[groupId]
     }
 
     const findFriendByGroupIdAndFriendId = (groupId, friendId) => {
         const key = groupId + '-' + friendId
-        return userGroupMapRef.current.get(key)
+        return groupUserInfos[key]
     }
 
     const toFriendItem = (item) => {
         navigation.navigate('FriendItem', {
-            friendItem: item
+            friendId: item.id
         })
     }
 
@@ -160,11 +144,7 @@ const Friend = forwardRef((props, ref) => {
             >
                 {({ isHovered, isFocused, isPressed }) => {
                     return (
-                        <UserFriendItem
-                            avatar={item.avatar}
-                            name={item.note}
-                            isPressed={isPressed}
-                        />
+                        <UserFriendItem friendId={item.id} isPressed={isPressed} />
                     )
                 }}
             </Pressable>
@@ -179,7 +159,7 @@ const Friend = forwardRef((props, ref) => {
                 <AlphabetList
                     scrollEnabled={true}
                     style={styles.alphabetList}
-                    data={userFriends}
+                    data={friendResult}
                     indexLetterStyle={{
                         color: 'black',
                         fontSize: 12,

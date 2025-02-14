@@ -29,14 +29,14 @@ const Login = () => {
         const getInitialURL = async () => {
             const url = await Linking.getInitialURL();
             if (url) {
-                console.log(url)
+                // console.log(url)
             }
         }
         getInitialURL()
 
         // 监听深度链接事件（应用在后台启动时）
         const handleUrl = ({ url }) => {
-            console.log(url)
+            // console.log(url)
         };
 
         const linkingSubscription  = Linking.addEventListener('url', handleUrl)

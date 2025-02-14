@@ -9,8 +9,19 @@ export const chatSlice = createSlice({
         },
         result: [],
         selectedSessionId: null,
-        userFriends: [],
-        userGroups: [],
+        userFriends: {
+            result: [],
+            entities: {
+                friends: {}
+            }
+        },
+        userGroups: {
+            result: [],
+            entities: {
+                groups: {},
+                groupUserInfos: {}
+            }
+        },
         unreadCount: 0 //未读消息合计
     },
     reducers: {
@@ -30,7 +41,7 @@ export const chatSlice = createSlice({
             const { payload } = action
             const { sessionId } = payload
             state.selectedSessionId = sessionId
-            if(sessionId === null){
+            if (sessionId === null) {
                 return
             }
             //会话未读消息
@@ -66,12 +77,12 @@ export const chatSlice = createSlice({
                 if (!state.entities.sessions[sessionId].messages) {
                     state.entities.sessions[sessionId].messages = []
                 }
-                if(messageInit === undefined || messageInit === false){
+                if (messageInit === undefined || messageInit === false) {
                     state.entities.sessions[sessionId].messages.push(message.id)
-                }else {
+                } else {
                     state.entities.sessions[sessionId].messages.unshift(message.id)
                 }
-                
+
             });
             state.entities.sessions[sessionId].messageInit = true
         },
@@ -117,11 +128,15 @@ export const chatSlice = createSlice({
         },
         loadUserFriend: (state, action) => {
             const { payload } = action
-            state.userFriends = payload
+            const { entities, result } = payload
+            state.userFriends.entities = entities
+            state.userFriends.result = result.map(id => ({ id: entities.friends[id].id, key: entities.friends[id].key, value: entities.friends[id].value }))
         },
         loadUserGroup: (state, action) => {
             const { payload } = action
-            state.userGroups = payload
+            const { entities, result } = payload
+            state.userGroups.entities = entities
+            state.userGroups.result = result
         }
     }
 })

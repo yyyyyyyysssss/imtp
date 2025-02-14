@@ -1,12 +1,11 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { createStaticNavigation, useNavigation } from '@react-navigation/native';
+import { createStaticNavigation, getStateFromPath, NavigationContainer, useNavigation } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Splash from './pages/Splash';
 import Login from './pages/login';
 import ChatItem from './pages/chat/chat-item';
 import FriendItem from './pages/friend/friend-item';
 import Group from './pages/group';
-import GroupItem from './pages/group/group-item';
 import Feather from 'react-native-vector-icons/Feather';
 import { AuthContext, SignInContext, useIsSignedIn, useIsSignedOut, UserInfoContext } from './context';
 import Storage from './storage/storage';
@@ -14,9 +13,9 @@ import { useSelector, useDispatch } from 'react-redux'
 import { signIn, signOut } from './redux/slices/authSlice';
 import Home from './pages/home';
 import VideoPlay from './components/VideoPlay';
-import { showToast } from './components/Utils';
 import { fetchUserInfo, tokenValid } from './api/ApiService';
-import { navigationRef } from './RootNavigation';
+import { navigate, navigationRef } from './RootNavigation';
+import NotFound from './pages/NotFound';
 
 
 const RootStack = createNativeStackNavigator({
@@ -26,14 +25,22 @@ const RootStack = createNativeStackNavigator({
       if: useIsSignedIn,
       screens: {
         Home: {
-          if: useIsSignedIn,
           screen: Home,
+          linking: {
+            path: 'home'
+          },
           options: {
             headerShown: false
           }
         },
         ChatItem: {
           screen: ChatItem,
+          linking: {
+            path: 'chatItem/:sessionId',
+            parse: {
+              sessionId: (sessionId) => sessionId.replace(/^@/, ''),
+            }
+          },
           options: {
             headerShown: false,
             animation: 'slide_from_right',
@@ -42,6 +49,12 @@ const RootStack = createNativeStackNavigator({
         },
         FriendItem: {
           screen: FriendItem,
+          linking: {
+            path: 'friendItem/:friendId?',
+            parse: {
+              friendId: (friendId) => friendId.replace(/^@/, ''),
+            }
+          },
           options: {
             title: '',
             headerRight: () => (
@@ -51,6 +64,9 @@ const RootStack = createNativeStackNavigator({
         },
         Group: {
           screen: Group,
+          linking: {
+            path: 'group'
+          },
           options: {
             title: '',
             headerRight: () => (
@@ -58,15 +74,6 @@ const RootStack = createNativeStackNavigator({
             )
           }
         },
-        // GroupItem: {
-        //   screen: GroupItem,
-        //   options: {
-        //     title: '',
-        //     headerRight: () => (
-        //       <Feather name='more-horizontal' size={28} />
-        //     )
-        //   }
-        // },
         VideoPlay: {
           screen: VideoPlay,
           options: {
@@ -86,35 +93,31 @@ const RootStack = createNativeStackNavigator({
       if: useIsSignedOut,
       screens: {
         Login: {
-          if: useIsSignedOut,
           screen: Login,
+          linking: {
+            path: 'login'
+          },
           options: {
             headerShown: false
           }
-        },
-        GroupItem: {
-          screen: GroupItem,
-          path: 'groupitem',
-          options: {
-            title: '',
-            headerRight: () => (
-              <Feather name='more-horizontal' size={28} />
-            )
-          }
         }
       }
+    }
+  },
+  screens: {
+    NotFound: {
+      screen: NotFound
     }
   }
 })
 
 // 深度链接
 const linking = {
-  prefixes: ['ychat://'],
+  // 自动为所有屏幕生成路径
+  enabled: 'auto',
+  prefixes: ['ychat://', 'https://ychat.com', 'http://ychat.com'],
   config: {
-    screens: {
-      Login: 'login',
-      GroupItem: 'groupitem'
-    }
+
   }
 }
 
@@ -133,33 +136,37 @@ const App = () => {
         tokenValid(userToken.accessToken)
           .then(
             (data) => {
-              const { active, userInfo } = data
+              const { active } = data
               if (!active) {
-                dispatch(signOut())
+                logout()
               } else {
-                dispatch(signIn({ token: userToken, userInfo: userInfo }))
+                login(userToken)
               }
             },
             (error) => {
-              dispatch(signOut())
+              logout()
             }
           )
       } else {
-        dispatch(signOut())
+        logout()
       }
     }
     bootstrapAsync()
   }, [])
 
+  const login = async (userToken) => {
+    //登录之后获取用户信息
+    const userInfo = await fetchUserInfo(userToken.accessToken)
+    dispatch(signIn({ token: userToken, userInfo: userInfo }))
+  }
+
+  const logout = async () => {
+    dispatch(signOut())
+  }
+
   const authContext = useMemo(() => ({
-    signIn: async (userToken) => {
-      //登录之后获取用户信息
-      const userInfo = await fetchUserInfo(userToken.accessToken)
-      dispatch(signIn({ token: userToken, userInfo: userInfo }))
-    },
-    signOut: async () => {
-      dispatch(signOut())
-    }
+    signIn: login,
+    signOut: logout
   }))
 
   //未确认用户是否已登录之前显示启动页
@@ -174,7 +181,7 @@ const App = () => {
   return (
     <AuthContext.Provider value={authContext}>
       <SignInContext.Provider value={isSignedIn}>
-        <Navigation linking={linking} ref={navigationRef} />
+        <Navigation linking={linking} ref={navigationRef}/>
       </SignInContext.Provider>
     </AuthContext.Provider>
   )
