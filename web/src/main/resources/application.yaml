@@ -107,7 +107,7 @@ auth:
       clientSecret: xxx
       redirectUrl: http://localhost:3000/login
       scope: userInfo+openid
-      authCodeUrl: http://127.0.0.1:9090/oauth2/authorize?client_id=${auth.other-login.self.clientId}&scope=${auth.other-login.self.scope}&redirect_uri=${auth.other-login.self.redirectUrl}&response_type=code&state=Self
+      authCodeUrl: http://127.0.0.1:9090/oauth2/authorize?client_id=${auth.other-login.self.clientId}&scope=${auth.other-login.self.scope}&response_type=code&state=Self&redirect_uri=${auth.other-login.self.redirectUrl}
       deviceCodeUrl: http://127.0.0.1:9090/oauth2/device_authorization?client_id=${auth.other-login.self.clientId}&client_secret=${auth.other-login.self.clientSecret}&scope=userInfo
       tokenUrl: http://127.0.0.1:9090/oauth2/token
       userInfoUrl: http://127.0.0.1:9090/userinfo
@@ -117,7 +117,7 @@ auth:
       clientSecret: xxx
       redirectUrl: http://localhost:3000/login
       scope: user
-      authCodeUrl: https://github.com/login/oauth/authorize?client_id=${auth.other-login.github.clientId}&redirect_uri=${auth.other-login.github.redirectUrl}&scope=${auth.other-login.github.scope}&state=Github
+      authCodeUrl: https://github.com/login/oauth/authorize?client_id=${auth.other-login.github.clientId}&scope=${auth.other-login.github.scope}&state=Github&redirect_uri=${auth.other-login.github.redirectUrl}
       tokenUrl: https://github.com/login/oauth/access_token
       userInfoUrl: https://api.github.com/user
       userEmailsUrl: https://api.github.com/user/emails
@@ -125,9 +125,10 @@ auth:
       clientName: Google
       clientId: xxx
       clientSecret: xxx
-      redirectUrl: http://localhost:3000/login
+      redirectUrlWeb: http://localhost:3000/login
+      redirectUrlApp: http://ychat.com/login
       scope: https://www.googleapis.com/auth/userinfo.email+https://www.googleapis.com/auth/userinfo.profile+openid
-      authCodeUrl: https://accounts.google.com/o/oauth2/v2/auth?client_id=${auth.other-login.google.clientId}&redirect_uri=${auth.other-login.google.redirectUrl}&scope=${auth.other-login.google.scope}&response_type=code&access_type=offline&prompt=consent&state=Google
+      authCodeUrl: https://accounts.google.com/o/oauth2/v2/auth?client_id=${auth.other-login.google.clientId}&scope=${auth.other-login.google.scope}&response_type=code&access_type=offline&prompt=consent&state=Google
       tokenUrl: https://oauth2.googleapis.com/token
       userInfoUrl: https://www.googleapis.com/oauth2/v3/userinfo
     microsoft:
@@ -137,7 +138,7 @@ auth:
       tenantId: c719f474-19d6-42af-a36f-1f264ac08653
       redirectUrl: http://localhost:3000/login
       scope: https://graph.microsoft.com/User.Read
-      authCodeUrl: https://login.microsoftonline.com/${auth.other-login.microsoft.tenantId}/oauth2/v2.0/authorize?client_id=${auth.other-login.microsoft.clientId}&client_secret=${auth.other-login.microsoft.clientSecret}&redirect_uri=${auth.other-login.microsoft.redirectUrl}&scope=${auth.other-login.microsoft.scope}&response_type=code&state=Microsoft
+      authCodeUrl: https://login.microsoftonline.com/${auth.other-login.microsoft.tenantId}/oauth2/v2.0/authorize?client_id=${auth.other-login.microsoft.clientId}&client_secret=${auth.other-login.microsoft.clientSecret}&scope=${auth.other-login.microsoft.scope}&response_type=code&state=Microsoft&redirect_uri=${auth.other-login.microsoft.redirectUrl}
       tokenUrl: https://login.microsoftonline.com/${auth.other-login.microsoft.tenantId}/oauth2/v2.0/token
       userInfoUrl: https://graph.microsoft.com/oidc/userinfo
 

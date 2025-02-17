@@ -10,15 +10,10 @@ import { addSession } from '../../../redux/slices/chatSlice';
 import { useNavigation, } from '@react-navigation/native';
 import { DeliveryMethod } from '../../../enum';
 import { createUserSession } from '../../../api/ApiService';
-import NotFound from '../../NotFound';
 
 const FriendItem = ({ route }) => {
 
     const { friendId } = route.params;
-
-    if(!friendId){
-        return <NotFound/>
-    }
 
     const friendItem = useSelector(state => state.chat.userFriends.entities.friends[friendId])
 

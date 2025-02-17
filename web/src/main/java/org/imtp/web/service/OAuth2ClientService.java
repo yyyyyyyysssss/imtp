@@ -2,6 +2,7 @@ package org.imtp.web.service;
 
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.imtp.common.enums.ClientType;
 import org.imtp.common.response.ResultGenerator;
 import org.imtp.web.config.exception.OAuth2ClientLoginException;
 import org.imtp.web.config.oauth2.*;
@@ -143,12 +144,12 @@ public class OAuth2ClientService {
         return loginService.login(oAuthClientAuthenticationToken);
     }
 
-    public TokenInfo googleLogin(String authorizationCode){
+    public TokenInfo googleLogin(String authorizationCode, ClientType clientType){
         //获取token
         String tokenUrl = googleProperties.getTokenUrl()
                 + "?client_id=" + googleProperties.getClientId()
                 + "&client_secret=" + googleProperties.getClientSecret()
-                + "&redirect_uri=" + googleProperties.getRedirectUrl()
+                + "&redirect_uri=" + googleProperties.getRedirectUrl(clientType)
                 + "&grant_type=authorization_code"
                 + "&code=" + authorizationCode;
         HttpEntity<?> tokenRequestEntity = new HttpEntity<>("".getBytes(StandardCharsets.UTF_8), new HttpHeaders());

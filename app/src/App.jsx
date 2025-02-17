@@ -15,7 +15,6 @@ import Home from './pages/home';
 import VideoPlay from './components/VideoPlay';
 import { fetchUserInfo, tokenValid } from './api/ApiService';
 import { navigate, navigationRef } from './RootNavigation';
-import NotFound from './pages/NotFound';
 
 
 const RootStack = createNativeStackNavigator({
@@ -36,7 +35,7 @@ const RootStack = createNativeStackNavigator({
         ChatItem: {
           screen: ChatItem,
           linking: {
-            path: 'chatItem/:sessionId?',
+            path: 'chatItem/:sessionId',
             parse: {
               sessionId: (sessionId) => sessionId.replace(/^@/, ''),
             }
@@ -50,7 +49,7 @@ const RootStack = createNativeStackNavigator({
         FriendItem: {
           screen: FriendItem,
           linking: {
-            path: 'friendItem/:friendId?',
+            path: 'friendItem/:friendId',
             parse: {
               friendId: (friendId) => friendId.replace(/^@/, ''),
             }
@@ -105,9 +104,7 @@ const RootStack = createNativeStackNavigator({
     }
   },
   screens: {
-    NotFound: {
-      screen: NotFound
-    }
+    
   }
 })
 

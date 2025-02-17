@@ -2,6 +2,7 @@ package org.imtp.web.controller;
 
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.imtp.common.enums.ClientType;
 import org.imtp.common.response.Result;
 import org.imtp.common.response.ResultGenerator;
 import org.imtp.web.config.oauth2.GithubProperties;
@@ -45,12 +46,11 @@ public class OAuth2ClientController {
     private OAuth2ClientService oAuth2ClientService;
 
     @GetMapping("/other/config")
-    public Result<?> otherConfig(){
+    public Result<?> otherConfig(@RequestParam(value = "clientType",required = false)ClientType clientType){
         Map<String,Object> config = new HashMap<>();
-//        config.put(selfProperties.getClientName(), new OtherConfig(OtherConfig.DEVICE_CODE_TYPE, selfProperties.getDeviceCodeUrl()));
         config.put(selfProperties.getClientName(), new OtherConfig(selfProperties.getAuthCodeUrl()));
         config.put(githubProperties.getClientName(),new OtherConfig(githubProperties.getAuthCodeUrl()));
-        config.put(googleProperties.getClientName(),new OtherConfig(googleProperties.getAuthCodeUrl()));
+        config.put(googleProperties.getClientName(),new OtherConfig(googleProperties.getAuthCodeUrl(clientType)));
         config.put(microsoftProperties.getClientName(),new OtherConfig(microsoftProperties.getAuthCodeUrl()));
         return ResultGenerator.ok(config);
     }
@@ -85,7 +85,7 @@ public class OAuth2ClientController {
     }
 
     @GetMapping("/other/login")
-    public Result<?> otherLogin(@RequestParam("code") String code,@RequestParam("state") String state){
+    public Result<?> otherLogin(@RequestParam("code") String code, @RequestParam("state") String state, @RequestParam(value = "clientType",required = false)ClientType clientType){
         TokenInfo tokenInfo = null;
         switch (state){
             case "Self" :
@@ -95,7 +95,7 @@ public class OAuth2ClientController {
                 tokenInfo = oAuth2ClientService.githubLogin(code);
                 break;
             case "Google":
-                tokenInfo = oAuth2ClientService.googleLogin(code);
+                tokenInfo = oAuth2ClientService.googleLogin(code,clientType);
                 break;
             case "Microsoft":
                 tokenInfo = oAuth2ClientService.microsoftLogin(code);
@@ -123,9 +123,9 @@ public class OAuth2ClientController {
 
     //使用google登录
     @GetMapping("/google/login")
-    public Result<?> googleLogin(@RequestParam("code") String code) {
+    public Result<?> googleLogin(@RequestParam("code") String code,@RequestParam(value = "clientType",required = false)ClientType clientType) {
         log.info("google authorization code:{}",code);
-        TokenInfo tokenInfo = oAuth2ClientService.googleLogin(code);
+        TokenInfo tokenInfo = oAuth2ClientService.googleLogin(code,clientType);
         return ResultGenerator.ok(tokenInfo);
     }
 

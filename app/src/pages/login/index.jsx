@@ -7,7 +7,7 @@ import { GoogleIcon, MicrosoftIcon } from '../../components/CustomIcon';
 import { useForm, Controller } from 'react-hook-form';
 import { showToast } from '../../components/Utils';
 import { AuthContext } from '../../context';
-import { login } from '../../api/ApiService';
+import { fetchOAuth2ClientConfig, login } from '../../api/ApiService';
 
 const Login = () => {
 
@@ -17,6 +17,13 @@ const Login = () => {
 
     const [loading, setLoading] = useState(false)
 
+    //三方登录配置
+    const [otherLoginConfig, setOtherLoginConfig] = useState({
+        Google: null,
+        Github: null,
+        Microsoft: null
+    });
+
     const { control, handleSubmit, formState: { errors } } = useForm({
         defaultValues: {
             username: "",
@@ -25,21 +32,32 @@ const Login = () => {
     });
 
     useEffect(() => {
+        //获取三方登录的配置信息
+        const otherLoginConfig = async () => {
+            const config = await fetchOAuth2ClientConfig()
+            setOtherLoginConfig({
+                Google: config?.Google,
+                Github: config?.Github,
+                Microsoft: config?.Microsoft
+            })
+        }
+        otherLoginConfig()
+
         // 获取应用启动时的深度链接
         const getInitialURL = async () => {
             const url = await Linking.getInitialURL();
-            if (url) {
-                // console.log(url)
-            }
+            handleUrl({ url: url })
         }
         getInitialURL()
 
         // 监听深度链接事件（应用在后台启动时）
         const handleUrl = ({ url }) => {
-            // console.log(url)
+            if (url) {
+                console.log(url)
+            }
         };
 
-        const linkingSubscription  = Linking.addEventListener('url', handleUrl)
+        const linkingSubscription = Linking.addEventListener('url', handleUrl)
         return () => {
             linkingSubscription.remove()
         }
@@ -50,7 +68,11 @@ const Login = () => {
     }
 
     const googleLogin = () => {
-        showToast('Google Login')
+        if (otherLoginConfig.Google) {
+            Linking.openURL(otherLoginConfig.Google.url)
+        } else {
+            showToast('获取Google登录配置失败,请尝试退出APP后重新进入')
+        }
     }
 
     const githubLogin = () => {

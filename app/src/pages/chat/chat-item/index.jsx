@@ -24,10 +24,6 @@ const ChatItem = ({ route }) => {
 
     const { sessionId } = route.params;
 
-    if(!sessionId){
-        return <NotFound/>
-    }
-
     const userInfo = useSelector(state => state.auth.userInfo)
 
     const [messageIds, setMessageIds] = useState([])

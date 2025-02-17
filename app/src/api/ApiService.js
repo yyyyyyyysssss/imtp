@@ -21,6 +21,20 @@ export const logout = () => {
     })
 }
 
+// 获取oauth2三方登录的配置信息
+export const fetchOAuth2ClientConfig = () => {
+    return new Promise((resolve, reject) => {
+        api
+            .get('/oauth2/client/other/config',{
+                params: {
+                    clientType: 'APP'
+                }
+            })
+            .then(res => resolve(res.data))
+            .catch(error => handleError)
+    })
+}
+
 // 获取当前登录用户的信息
 export const fetchUserInfo = (token) => {
 
