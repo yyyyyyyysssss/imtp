@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import './index.less'
 import { Modal, Image as AntdImage } from "antd"
-import videoPlayIcon from '../../../assets/img/video-play-48.png'
-import videoLoadingIcon from '../../../assets/img/video-loading50 .gif'
 import { MessageStatus } from '../../../enum'
 import VideoPlay from '../../../components/VideoPlay';
 
@@ -29,12 +27,6 @@ const VideoMessage = React.memo(({ content, status, contentMetadata }) => {
     }, [content, mediaType])
 
     const mediaHeight = 120 / width * height;
-    let videoIcon;
-    if (status === MessageStatus.PENDING) {
-        videoIcon = videoLoadingIcon;
-    } else {
-        videoIcon = videoPlayIcon;
-    }
     //视频播放
     const videoPlay = () => {
         setVideoOpen(true);
@@ -61,9 +53,6 @@ const VideoMessage = React.memo(({ content, status, contentMetadata }) => {
                     src={thumbnailUrl}
                 />
                 <div className='video-gradient' />
-                <div className='video-icon'>
-                    <img src={videoIcon} alt='icon' />
-                </div>
                 <div className='video-duration'>
                     <label>{durationDesc}</label>
                 </div>

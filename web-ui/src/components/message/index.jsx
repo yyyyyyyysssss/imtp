@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import './index.less'
 import { MessageType, MessageStatus } from '../../enum';
 import sendFailIcon from '../../assets/img/send_fail.png'
@@ -8,15 +8,17 @@ import TextMessage from './text-message';
 import ImageMessage from './image-message';
 import FileMessage from './file-message';
 import VideoMessage from './video-message';
+import VoiceMessage from './voice-message';
 import { useSelector } from 'react-redux';
+import ProgressOverlayBox from '../ProgressOverlayBox';
 
 
 const Message = React.memo(({ messageId }) => {
     const message = useSelector(state => state.chat.entities.messages[messageId])
 
-    const [progress, setProgress] = useState(0.01)
-
     const { type, name, avatar, deliveryMethod, self, status, content, contentMetadata, progressId } = message || {}
+
+    const progressInfo = useSelector(state => state.chat.uploadProgress[progressId])
 
     let messageStatusIcon;
     switch (status) {
@@ -43,20 +45,35 @@ const Message = React.memo(({ messageId }) => {
                 return <TextMessage content={content} direction={self ? 'RIGHT' : 'LEFT'} />
             case MessageType.IMAGE_MESSAGE:
                 return (
-                    <ImageMessage content={content} contentMetadata={contentMetadata} status={status} />
+                    <ProgressOverlayBox
+                        enabled={status && status === MessageStatus.PENDING}
+                        progress={progress}
+                    >
+                        <ImageMessage content={content} contentMetadata={contentMetadata} status={status} />
+                    </ProgressOverlayBox>
                 )
-
             case MessageType.VIDEO_MESSAGE:
                 return (
-                    <VideoMessage content={content} contentMetadata={contentMetadata} status={status}/>
+                    <ProgressOverlayBox
+                        enabled={status && status === MessageStatus.PENDING}
+                        progress={progress}
+                    >
+                        <VideoMessage content={content} contentMetadata={contentMetadata} status={status} />
+                    </ProgressOverlayBox>
+
                 )
             case MessageType.VOICE_MESSAGE:
                 return (
-                    <></>
+                    <VoiceMessage content={content} status={status} duration={contentMetadata.duration} direction={self ? 'RIGHT' : 'LEFT'} />
                 )
             case MessageType.FILE_MESSAGE:
                 return (
-                    <FileMessage content={content} filename={contentMetadata.name} fileSize={contentMetadata.sizeDesc} direction={self ? 'RIGHT' : 'LEFT'}/>
+                    <ProgressOverlayBox
+                        enabled={status && status === MessageStatus.PENDING}
+                        progress={progress}
+                    >
+                        <FileMessage content={content} filename={contentMetadata.name} fileSize={contentMetadata.sizeDesc} direction={self ? 'RIGHT' : 'LEFT'} />
+                    </ProgressOverlayBox>
                 )
         }
     }
@@ -70,8 +87,8 @@ const Message = React.memo(({ messageId }) => {
                         <label className='chat-item-label-name'>{name}</label>
                     </Flex>
                 )}
-                <Flex gap="small" style={{ flexDirection: self ? 'row-reverse' : '',width: '100%' }} align='center'>
-                    {renderItem(type, self, status, content, contentMetadata, progress)}
+                <Flex gap="small" style={{ flexDirection: self ? 'row-reverse' : '', width: '100%' }} align='center'>
+                    {renderItem(type, self, status, content, contentMetadata, progressInfo?.percentage)}
                     {messageStatusIcon}
                 </Flex>
             </Flex>

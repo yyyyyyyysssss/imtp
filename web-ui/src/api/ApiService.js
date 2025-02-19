@@ -156,6 +156,15 @@ export const fetchUserGroups = () => {
     })
 }
 
+export const fetchUploadId = (fileInfo) => {
+
+    return new Promise((resolve, reject) => {
+        httpWrapper.post('/file/uploadId', fileInfo)
+            .then(res => resolve(res.data))
+            .catch(error => handleError)
+    })
+}
+
 const handleError = (error) => {
     // 这里可以加入更多的错误处理逻辑，比如发送错误日志、显示错误信息等
     message.error(error.message || 'An unexpected error occurred');

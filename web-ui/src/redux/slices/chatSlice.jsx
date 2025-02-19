@@ -13,7 +13,8 @@ const initialState = {
     selectedHeadName: null,
     userFriends: [],
     userGroups: [],
-    unreadCount: 0 //未读消息合计
+    unreadCount: 0, //未读消息合计
+    uploadProgress: {}  //上传进度
 }
 
 export const chatSlice = createSlice({
@@ -46,7 +47,7 @@ export const chatSlice = createSlice({
         selectSession: (state, action) => {
             const { payload } = action
             const { sessionId } = payload
-            if(sessionId === state.selectedSessionId){
+            if (sessionId === state.selectedSessionId) {
                 return
             }
             state.selectedSessionId = sessionId
@@ -68,7 +69,7 @@ export const chatSlice = createSlice({
         removeSession: (state, action) => {
             const { payload } = action
             const { sessionId } = payload
-            if(sessionId === state.selectedSessionId){
+            if (sessionId === state.selectedSessionId) {
                 state.selectedSessionId = null
                 state.selectedHeadName = null
             }
@@ -148,10 +149,30 @@ export const chatSlice = createSlice({
         loadUserGroup: (state, action) => {
             const { payload } = action
             state.userGroups = payload
+        },
+        addUploadProgress: (state, action) => {
+            const { payload } = action
+            const { progressId, progressInfo } = payload
+            state.uploadProgress[progressId] = progressInfo
+        },
+        updateUploadProgress: (state, action) => {
+            const { payload } = action
+            const { progressId, progress } = payload
+            const progressInfo = state.uploadProgress[progressId]
+            if (progressInfo) {
+                const totalSize = progressInfo.totalSize
+                const newProgress = progressInfo.progress + progress
+                const newProgressInfo = {
+                    totalSize: totalSize,
+                    progress: newProgress,
+                    percentage: (newProgress / totalSize) * 100
+                }
+                state.uploadProgress[progressId] = { ...newProgressInfo }
+            }
         }
     }
 })
 
-export const { reset, switchPanel, setUserInfo, loadSession, addSession, selectSession, removeSession, loadMessage, addMessage, updateMessage, updateMessageStatus, deleteMessage, loadUserFriend, loadUserGroup } = chatSlice.actions
+export const { reset, switchPanel, setUserInfo, loadSession, addSession, selectSession, removeSession, loadMessage, addMessage, updateMessage, updateMessageStatus, deleteMessage, loadUserFriend, loadUserGroup, addUploadProgress, updateUploadProgress } = chatSlice.actions
 
 export default chatSlice.reducer

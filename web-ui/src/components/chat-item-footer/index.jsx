@@ -128,8 +128,8 @@ const ChatItemFooter = React.memo(({ session }) => {
         beforeUpload: beforeUpload,
         customRequest: customRequest
     }
-    const uploadFile = async (file) => {
-        return uploaderRef.current.uploadFile(file);
+    const uploadFile = async (file, progressId = null) => {
+        return uploaderRef.current.uploadFile(file, progressId);
     }
     //文本编辑
     const editor = useEditor({
@@ -314,9 +314,10 @@ const ChatItemFooter = React.memo(({ session }) => {
                             sizeDesc: fileSizeDesc
                         }
                     }
+                    msg.progressId = IdGen.nextId()
                     //添加消息
                     dispatch(addMessage({ sessionId: sessionId, message: msg }))
-                    uploadFile(file)
+                    uploadFile(file, msg.progressId)
                         .then(
                             (url) => {
                                 const newMsg = { ...msg, status: MessageStatus.SENT, content: url }
