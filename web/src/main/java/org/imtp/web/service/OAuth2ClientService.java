@@ -144,12 +144,12 @@ public class OAuth2ClientService {
         return loginService.login(oAuthClientAuthenticationToken);
     }
 
-    public TokenInfo googleLogin(String authorizationCode, ClientType clientType){
+    public TokenInfo googleLogin(String authorizationCode){
         //获取token
         String tokenUrl = googleProperties.getTokenUrl()
                 + "?client_id=" + googleProperties.getClientId()
                 + "&client_secret=" + googleProperties.getClientSecret()
-                + "&redirect_uri=" + googleProperties.getRedirectUrl(clientType)
+                + "&redirect_uri=" + googleProperties.getRedirectUrl()
                 + "&grant_type=authorization_code"
                 + "&code=" + authorizationCode;
         HttpEntity<?> tokenRequestEntity = new HttpEntity<>("".getBytes(StandardCharsets.UTF_8), new HttpHeaders());
