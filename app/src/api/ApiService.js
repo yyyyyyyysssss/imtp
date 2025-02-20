@@ -35,6 +35,20 @@ export const fetchOAuth2ClientConfig = () => {
     })
 }
 
+// 获取oauth2三方登录的配置信息
+export const loginByGoogle = (code) => {
+    return new Promise((resolve, reject) => {
+        api
+            .get('/oauth2/client/google/login',{
+                params: {
+                    code: code
+                }
+            })
+            .then(res => resolve(res.data))
+            .catch(error => handleError)
+    })
+}
+
 // 获取当前登录用户的信息
 export const fetchUserInfo = (token) => {
 

@@ -63,6 +63,9 @@ const Chat = (props) => {
 
     useEffect(() => {
         sessionMapRef.current = new Map()
+        if(!sessions){
+            return
+        }
         for (const session of Object.values(sessions)) {
             sessionMapRef.current.set(session.receiverUserId, session)
         }

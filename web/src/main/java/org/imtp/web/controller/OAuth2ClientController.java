@@ -48,24 +48,26 @@ public class OAuth2ClientController {
     @GetMapping("/other/config")
     public Result<?> otherConfig(){
         Map<String,Object> config = new HashMap<>();
-        config.put(selfProperties.getClientName(), new OtherConfig(selfProperties.getAuthCodeUrl()));
-        config.put(githubProperties.getClientName(),new OtherConfig(githubProperties.getAuthCodeUrl()));
-        config.put(googleProperties.getClientName(),new OtherConfig(googleProperties.getAuthCodeUrl()));
-        config.put(microsoftProperties.getClientName(),new OtherConfig(microsoftProperties.getAuthCodeUrl()));
+        config.put(selfProperties.getClientName(), new OtherConfig(selfProperties.getClientId(),selfProperties.getAuthCodeUrl()));
+        config.put(githubProperties.getClientName(),new OtherConfig(githubProperties.getClientId(),githubProperties.getAuthCodeUrl()));
+        config.put(googleProperties.getClientName(),new OtherConfig(googleProperties.getClientId(),googleProperties.getAuthCodeUrl()));
+        config.put(microsoftProperties.getClientName(),new OtherConfig(microsoftProperties.getClientId(),microsoftProperties.getAuthCodeUrl()));
         return ResultGenerator.ok(config);
     }
 
     static class OtherConfig{
         private static final String AUTH_CODE_TYPE = "auth_code";
         private static final String DEVICE_CODE_TYPE = "device_code";
-        public OtherConfig(String url){
-            this(AUTH_CODE_TYPE,url);
+        public OtherConfig(String clientId,String url){
+            this(AUTH_CODE_TYPE,clientId,url);
         }
-        public OtherConfig(String type,String url){
+        public OtherConfig(String type,String clientId,String url){
             this.type = type;
+            this.clientId = clientId;
             this.url = url;
         }
         private String type;
+        private String clientId;
         private String url;
         public String getType() {
             return type;
@@ -73,6 +75,14 @@ public class OAuth2ClientController {
 
         public void setType(String type) {
             this.type = type;
+        }
+
+        public String getClientId() {
+            return clientId;
+        }
+
+        public void setClientId(String clientId) {
+            this.clientId = clientId;
         }
 
         public String getUrl() {

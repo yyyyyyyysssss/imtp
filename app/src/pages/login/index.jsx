@@ -1,4 +1,4 @@
-import { Input, Flex, Pressable, Text, VStack, Button, HStack, Box, Image, FormControl, ScrollView, KeyboardAvoidingView } from 'native-base';
+import { Input, Flex, Pressable, Text, VStack, Button, HStack, Box, Image, FormControl, ScrollView, KeyboardAvoidingView, View } from 'native-base';
 import React, { useContext, useEffect, useState } from 'react';
 import { StyleSheet, Linking } from 'react-native';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
@@ -7,7 +7,11 @@ import { GoogleIcon, MicrosoftIcon } from '../../components/CustomIcon';
 import { useForm, Controller } from 'react-hook-form';
 import { showToast } from '../../components/Utils';
 import { AuthContext } from '../../context';
-import { fetchOAuth2ClientConfig, login } from '../../api/ApiService';
+import { fetchOAuth2ClientConfig, login, loginByGoogle } from '../../api/ApiService';
+import {
+    GoogleSignin,
+    GoogleSigninButton
+} from '@react-native-google-signin/google-signin';
 
 const Login = () => {
 
@@ -63,16 +67,32 @@ const Login = () => {
         }
     }, [])
 
+    useEffect(() => {
+        if(otherLoginConfig.Google){
+            GoogleSignin.configure({
+                webClientId: otherLoginConfig.Google.clientId,
+                offlineAccess: true
+            })
+        }
+    },[otherLoginConfig])
+
     const createAccount = () => {
         showToast('Create Account')
     }
 
-    const googleLogin = () => {
-        if (otherLoginConfig.Google) {
-            Linking.openURL(otherLoginConfig.Google.url)
-        } else {
-            showToast('获取Google登录配置失败,请尝试退出APP后重新进入')
+    const googleLogin = async () => {
+        try {
+            setLoading(true)
+            await GoogleSignin.hasPlayServices()
+            const response = await GoogleSignin.signIn()
+            const { serverAuthCode } = response.data
+            const userToken = await loginByGoogle(serverAuthCode)
+            await signIn(userToken)
+        } catch (error) {
+            showToast(error.message)
+            setLoading(false)
         }
+
     }
 
     const githubLogin = () => {
@@ -137,10 +157,7 @@ const Login = () => {
                                                 borderRadius={14}
                                                 style={styles.usernameInput}
                                                 height={55}
-                                                w={{
-                                                    base: "100%",
-                                                    md: "25%"
-                                                }}
+                                                width={280}
                                                 isReadOnly={loading}
                                                 placeholder="用户名" />
                                         )}
@@ -163,10 +180,7 @@ const Login = () => {
                                                 borderRadius={14}
                                                 style={styles.passwordInput}
                                                 height={55}
-                                                w={{
-                                                    base: "100%",
-                                                    md: "25%"
-                                                }}
+                                                width={280}
                                                 InputRightElement={
                                                     <Pressable style={{ marginRight: 8 }} onPress={() => setShow(!show)}>
                                                         <MaterialIcon name={show ? "visibility" : "visibility-off"} size={28} mr="2" color="gray" />
@@ -201,7 +215,6 @@ const Login = () => {
                                         <GoogleIcon size={35} />
                                     </Box>
                                 </Pressable>
-
                                 <Pressable onPress={githubLogin} isDisabled={loading}>
                                     <Box style={styles.threePartyLoginBox} p="2">
                                         <AntDesignIcon name="github" size={35} />
@@ -213,7 +226,6 @@ const Login = () => {
                                         <MicrosoftIcon size={35} />
                                     </Box>
                                 </Pressable>
-
                             </HStack>
                         </VStack>
                         <HStack style={styles.loginBottom} justifyContent='flex-end' alignItems="center">
@@ -265,7 +277,7 @@ const styles = StyleSheet.create({
         backgroundColor: "#70BFFF"
     },
     threePartyLogin: {
-        padding: 10
+        padding: 10,
     },
     threePartyLoginBox: {
         borderColor: '#f3f0f3',

@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "12569500152",
+    "project_id": "ychat-b9eea",
+    "storage_bucket": "ychat-b9eea.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:12569500152:android:50576a16ad0f6388de9e0d",
+        "android_client_info": {
+          "package_name": "org.imtp.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "12569500152-sn1b902rr7m3se09m9qt5t2g28uast5g.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCv0-4w1SdzEbvvIxn_g3b9eXfXx6Fml24"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "12569500152-sn1b902rr7m3se09m9qt5t2g28uast5g.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
