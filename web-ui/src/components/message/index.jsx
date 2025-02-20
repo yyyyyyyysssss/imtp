@@ -72,7 +72,7 @@ const Message = React.memo(({ messageId }) => {
                         enabled={status && status === MessageStatus.PENDING}
                         progress={progress}
                     >
-                        <FileMessage content={content} filename={contentMetadata.name} fileSize={contentMetadata.sizeDesc} direction={self ? 'RIGHT' : 'LEFT'} />
+                        <FileMessage content={content} status={status} filename={contentMetadata.name} fileSize={contentMetadata.sizeDesc} direction={self ? 'RIGHT' : 'LEFT'} />
                     </ProgressOverlayBox>
                 )
         }

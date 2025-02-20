@@ -3,6 +3,7 @@ import './index.less'
 import { Modal, Image as AntdImage } from "antd"
 import { MessageStatus } from '../../../enum'
 import VideoPlay from '../../../components/VideoPlay';
+import videoPlayIcon from '../../../assets/img/video-play-48.png'
 
 
 const VideoMessage = React.memo(({ content, status, contentMetadata }) => {
@@ -40,19 +41,31 @@ const VideoMessage = React.memo(({ content, status, contentMetadata }) => {
         <>
             <div
                 className='video-div'
+                style={{
+                    backgroundColor: status && status === MessageStatus.PENDING ? 'black' : '',
+                    width: '120px',
+                    height: mediaHeight
+                }}
                 onClick={videoPlay}
             >
-                <AntdImage
-                    className='video-message'
-                    style={{ 
-                        width: '120px', 
-                        height: mediaHeight
-                    }}
-                    height={mediaHeight}
-                    preview={false}
-                    src={thumbnailUrl}
-                />
+                {thumbnailUrl && (
+                    <AntdImage
+                        className='video-message'
+                        style={{
+                            width: '120px',
+                            height: mediaHeight
+                        }}
+                        height={mediaHeight}
+                        preview={false}
+                        src={thumbnailUrl}
+                    />
+                )}
                 <div className='video-gradient' />
+                {((status && status !== MessageStatus.PENDING) || !status) && (
+                    <div className='video-icon'>
+                        <img src={videoPlayIcon} alt='icon' />
+                    </div>
+                )}
                 <div className='video-duration'>
                     <label>{durationDesc}</label>
                 </div>
