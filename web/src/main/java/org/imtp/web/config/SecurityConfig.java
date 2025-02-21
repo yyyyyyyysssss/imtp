@@ -1,6 +1,9 @@
 package org.imtp.web.config;
 
 import jakarta.annotation.Resource;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.imtp.web.config.oauth2.OAuthClientAuthenticationProvider;
 import org.imtp.web.filter.RefreshTokenAuthenticationFilter;
 import org.imtp.web.filter.TokenAuthenticationFilter;
@@ -11,21 +14,27 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.RememberMeAuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.authentication.ott.JdbcOneTimeTokenService;
+import org.springframework.security.authentication.ott.OneTimeTokenAuthenticationProvider;
+import org.springframework.security.authentication.ott.OneTimeTokenService;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.server.resource.web.BearerTokenResolver;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.intercept.AuthorizationFilter;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
@@ -38,6 +47,7 @@ import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.security.web.header.HeaderWriterFilter;
 import org.springframework.web.cors.CorsConfiguration;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -67,6 +77,9 @@ public class SecurityConfig {
     @Resource
     private RedisTemplate<String, Object> redisTemplate;
 
+    @Resource
+    private JdbcTemplate jdbcTemplate;
+
     @Bean
     @Order(Ordered.HIGHEST_PRECEDENCE + 1)
     public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
@@ -94,6 +107,7 @@ public class SecurityConfig {
                     //放行的路径
                     authorize.requestMatchers(
                                     "/login",
+                                    "/login/ott",
                                     "/refreshToken",
                                     "/sendEmailVerificationCode",
                                     "/error",
@@ -111,7 +125,8 @@ public class SecurityConfig {
                                     "/logout",
                                     "/file/**",
                                     "/service/discovery",
-                                    "/social/**"
+                                    "/social/**",
+                                    "/ott/generate"
                             ).authenticated()
                             //基于请求头授权
                             .requestMatchers(authProperties.requestHeadAuthenticationPath()).hasAuthority("request_header")
@@ -119,7 +134,21 @@ public class SecurityConfig {
                             .anyRequest()
                             .access(requestPathAuthorizationManager());
                 })
+                //记住我
                 .rememberMe(rememberMe -> rememberMe.rememberMeServices(rememberMeServices()))
+                //一次性令牌
+                .oneTimeTokenLogin((ott) -> {
+                    //生成一次性令牌的路径
+                    ott.tokenGeneratingUrl("/ott/generate");
+                    //登录处理路径
+                    ott.loginProcessingUrl("/login/ott");
+                    //禁用默认提交页面
+                    ott.showDefaultSubmitPage(false);
+                    //令牌生成以及存储
+                    ott.tokenService(oneTimeTokenService());
+                    //令牌生成成功处理器
+                    ott.tokenGenerationSuccessHandler(new MagicLinkOneTimeTokenGenerationSuccessHandler(authProperties.getLoginPage()));
+                })
                 //该过滤器解析token并校验通过后由SecurityContextHolderFilter过滤器加载SecurityContext
                 .addFilterBefore(tokenAuthenticationFilter(), SecurityContextHolderFilter.class)
                 .addFilterBefore(rememberMeFilter(), UsernamePasswordAuthenticationFilter.class)
@@ -144,6 +173,8 @@ public class SecurityConfig {
                 .authenticationProvider(oAuthClientAuthenticationProvider())
                 //记住我身份认证
                 .authenticationProvider(rememberMeAuthenticationProvider())
+                //一次性令牌认证
+                .authenticationProvider(oneTimeTokenAuthenticationProvider())
                 //刷新token
                 .authenticationProvider(refreshAuthenticationProvider())
                 //基于请求头secret认证
@@ -191,6 +222,7 @@ public class SecurityConfig {
         return new TokenAuthenticationFilter(bearerTokenResolver(), tokenService);
     }
 
+    //刷新token
     @Bean
     public RefreshTokenServices refreshTokenServices(){
         return new RefreshTokenServices(tokenService);
@@ -270,6 +302,18 @@ public class SecurityConfig {
     public RememberMeAuthenticationProvider rememberMeAuthenticationProvider() {
         String secretKey = authProperties.getRememberMe().getSecretKey();
         return new RememberMeAuthenticationProvider(secretKey);
+    }
+
+    //一次性令牌
+    //使用数据库存储
+    @Bean
+    public OneTimeTokenService oneTimeTokenService() {
+        return new JdbcOneTimeTokenService(jdbcTemplate);
+    }
+
+    @Bean
+    public OneTimeTokenAuthenticationProvider oneTimeTokenAuthenticationProvider() {
+        return new OneTimeTokenAuthenticationProvider(oneTimeTokenService(),userService);
     }
 
 }

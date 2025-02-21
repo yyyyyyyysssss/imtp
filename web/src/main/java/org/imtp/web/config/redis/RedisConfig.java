@@ -2,6 +2,7 @@ package org.imtp.web.config.redis;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.imtp.web.config.EmailAuthenticationToken;
+import org.imtp.web.config.OneTimeTokenAuthenticationTokenMixin;
 import org.imtp.web.config.RefreshAuthenticationToken;
 import org.imtp.web.config.RequestUrlAuthority;
 import org.imtp.web.config.oauth2.OAuthClientAuthenticationToken;
@@ -13,6 +14,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
+import org.springframework.security.authentication.ott.OneTimeTokenAuthenticationToken;
 import org.springframework.security.jackson2.CoreJackson2Module;
 import org.springframework.security.web.jackson2.WebServletJackson2Module;
 
@@ -66,6 +68,7 @@ public class RedisConfig {
         objectMapper.addMixIn(OAuthClientAuthenticationToken.class, OAuthClientAuthenticationToken.OAuthClientAuthenticationTokenMixin.class);
         objectMapper.addMixIn(EmailAuthenticationToken.class, EmailAuthenticationToken.EmailAuthenticationTokenMixin.class);
         objectMapper.addMixIn(RefreshAuthenticationToken.class, RefreshAuthenticationToken.RefreshAuthenticationTokenMixin.class);
+        objectMapper.addMixIn(OneTimeTokenAuthenticationToken.class, OneTimeTokenAuthenticationTokenMixin.class);
         objectMapper.addMixIn(User.class,User.RequestUrlAuthorityMixin.class);
         return new GenericJackson2JsonRedisSerializer(objectMapper);
     }

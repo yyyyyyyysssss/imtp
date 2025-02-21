@@ -20,6 +20,8 @@ import java.util.stream.Stream;
 @ConfigurationProperties(prefix = "auth")
 public class AuthProperties {
 
+    private String loginPage;
+
     private Integer coexistToken;
 
     private KeyConfig jwt = new KeyConfig();

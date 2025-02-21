@@ -8,6 +8,7 @@ import org.imtp.common.response.ResultGenerator;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
@@ -47,6 +48,13 @@ public class GlobalExceptionHandler {
     public Result<?> handlerAccessDeniedException(AccessDeniedException accessDeniedException){
         log.error("Access Denied: ",accessDeniedException);
         return ResultGenerator.failed(ResultCode.ACCESS_AUTHORIZED_EXCEPTION);
+    }
+
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    @ExceptionHandler({AuthenticationException.class})
+    public Result<?> handlerAuthenticationException(AuthenticationException authenticationException){
+        log.error("Authentication Exception: ",authenticationException);
+        return ResultGenerator.failed(ResultCode.IDENTITY_AUTHENTICATION_EXCEPTION);
     }
 
     @ResponseStatus(HttpStatus.OK)

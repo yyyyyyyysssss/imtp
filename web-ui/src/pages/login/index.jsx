@@ -9,7 +9,7 @@ import 'antd/dist/reset.css'
 import tmpImg from '../../assets/img/tmp.jpg'
 import TabPane from 'antd/es/tabs/TabPane'
 import { urlParamParse } from '../../utils'
-import { fetchOAuth2ClientConfig, login, otherLogin, sendEmailVerificationCode } from '../../api/ApiService'
+import { fetchOAuth2ClientConfig, login, loginByOTT, oauth2Login, sendEmailVerificationCode } from '../../api/ApiService'
 import { useDispatch } from 'react-redux';
 import { reset } from '../../redux/slices/chatSlice'
 
@@ -43,16 +43,37 @@ const Login = () => {
 
     //其它登录方式回调处理
     useLayoutEffect(() => {
+        const ottLogin = async () => {
+            setLoading(true);
+            try {
+                const data = await loginByOTT(ottToken)
+                loginSuccessHandler(data, null);
+            } catch (error) {
+                setLoading(false);
+            }
+
+        }
+
+        const ottToken = params.get('ottToken');
+        if (ottToken) {
+            ottLogin()
+            return
+        }
+
+        const oauthCodeLogin = async (code, state) => {
+            setLoading(true);
+            try {
+                const data = await oauth2Login(code, state)
+                loginSuccessHandler(data, null);
+            } catch (error) {
+                setLoading(false);
+            }
+        }
         const code = params.get('code');
         const state = params.get('state');
         if (code && state) {
-            setLoading(true);
-            otherLogin(code, state)
-                .then(
-                    (data) => {
-                        loginSuccessHandler(data, null);
-                    }
-                );
+            oauthCodeLogin(code, state)
+            return
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);

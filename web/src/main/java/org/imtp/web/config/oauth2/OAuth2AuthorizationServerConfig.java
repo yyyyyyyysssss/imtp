@@ -9,6 +9,7 @@ import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.imtp.web.config.AuthProperties;
 import org.imtp.web.config.RequestUrlAuthority;
 import org.imtp.web.domain.entity.User;
 import org.imtp.web.filter.TokenAuthenticationFilter;
@@ -74,6 +75,9 @@ public class OAuth2AuthorizationServerConfig {
     @Resource
     private SecurityContextRepository securityContextRepository;
 
+    @Resource
+    private AuthProperties authProperties;
+
     //oauth2 服务器
     @Bean
     @Order(Ordered.HIGHEST_PRECEDENCE)
@@ -107,7 +111,7 @@ public class OAuth2AuthorizationServerConfig {
                 // 当未登录时访问认证端点时重定向至login页面
                 .exceptionHandling((exceptions) -> exceptions
                         .defaultAuthenticationEntryPointFor(
-                                new LoginTargetAuthenticationEntryPoint("http://localhost:3000/login"),
+                                new LoginTargetAuthenticationEntryPoint(authProperties.getLoginPage()),
                                 new MediaTypeRequestMatcher(MediaType.TEXT_HTML)))
                 .securityContext(securityContext -> {
                     securityContext.securityContextRepository(securityContextRepository);

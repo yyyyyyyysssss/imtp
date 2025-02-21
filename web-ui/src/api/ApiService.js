@@ -11,6 +11,21 @@ export const login = (req) => {
     })
 }
 
+// 一次性token登录
+export const loginByOTT = (ottToken) => {
+
+    return new Promise((resolve, reject) => {
+        httpWrapper.get('/login/ott', {
+            params: {
+                ottToken: ottToken,
+                clientType: 'WEB'
+            }
+        })
+            .then(res => resolve(res.data))
+            .catch(error => reject(error))
+    })
+}
+
 // 登出
 export const logout = () => {
 
@@ -37,7 +52,7 @@ export const sendEmailVerificationCode = (email) => {
 }
 
 // oauth2 登录
-export const otherLogin = (code, state) => {
+export const oauth2Login = (code, state) => {
     return new Promise((resolve, reject) => {
         httpWrapper
             .get('/oauth2/client/other/login', {
