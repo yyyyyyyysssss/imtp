@@ -94,7 +94,7 @@ export const chatSlice = createSlice({
             state.entities.messages[message.id] = { ...message }
             //添加会话关联的消息id
             state.entities.sessions[sessionId].messages = state.entities.sessions[sessionId].messages || []
-            state.entities.sessions[sessionId].messages.push(message.id)
+            state.entities.sessions[sessionId].messages.unshift(message.id)
             //更新会话最新消息
             state.entities.sessions[sessionId].lastMsgType = message.type
             state.entities.sessions[sessionId].lastMsgContent = message.content

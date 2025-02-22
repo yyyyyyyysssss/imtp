@@ -277,7 +277,7 @@ const ChatItem = ({ route }) => {
                 <HStack flex={9} style={styles.contentHstack}>
                     <FlatList
                         style={styles.messageList}
-                        data={messageIds ? [...messageIds].reverse() : []}
+                        data={messageIds}
                         renderItem={renderItem}
                         scrollEnabled={true}
                         inverted={true}

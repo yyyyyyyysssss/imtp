@@ -286,7 +286,6 @@ public class UserSocialServiceImpl implements UserSocialService {
         if (messageInfos == null || messageInfos.isEmpty()){
             return PageInfo.of(new ArrayList<>());
         }
-        messageInfos = messageInfos.stream().sorted(Comparator.comparingLong(MessageInfo::getSendTime)).toList();
         PageInfo<MessageInfo> messageInfoPageInfo = new PageInfo<>();
         messageInfoPageInfo.setList(messageInfos);
         messageInfoPageInfo.setPageNum(pageNum);
