@@ -86,7 +86,7 @@ const UserSessionItem = React.memo(({ sessionId }) => {
             }}
         >
             <Flex flex={1} style={{ transition: 'transform 0.3s', transform: showDelete ? 'translateX(-60px)' : 'translateX(0)' }}>
-                <Badge style={{ userSelect: 'none' }} count={unreadMessageCount}><Avatar style={{ userSelect: 'none' }} size={50} shape="square" src={avatar} /></Badge>
+                <Badge style={{ userSelect: 'none',marginTop: '7px',marginRight: '4px' }} count={unreadMessageCount}><Avatar style={{ userSelect: 'none' }} size={50} shape="square" src={avatar} /></Badge>
                 <Flex justify='space-between' style={{ width: '100%', marginLeft: '7px' }} vertical>
                     <Flex justify='space-between'>
                         <span className='user-session-name'>{name}</span>

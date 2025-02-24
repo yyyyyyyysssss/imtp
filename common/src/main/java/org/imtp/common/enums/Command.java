@@ -31,6 +31,10 @@ public enum Command {
     VIDEO_MESSAGE((byte) 5,"视频"),
     FILE_MESSAGE((byte) 6,"文件"),
 
+    SIGNALING_OFFER((byte) 40,"webrtc信令提案"),
+    SIGNALING_ANSWER((byte) 41,"webrtc信令应答"),
+    SIGNALING_CANDIDATE((byte) 42,"webrtc信令候选信息"),
+
     MSG_RES((byte) -1, "通用消息响应"),
 
     HEARTBEAT_REQ((byte) 127, "心跳请求"),

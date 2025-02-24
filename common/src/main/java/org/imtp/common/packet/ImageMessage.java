@@ -1,5 +1,6 @@
 package org.imtp.common.packet;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.netty.buffer.ByteBuf;
 import org.imtp.common.enums.Command;
 import org.imtp.common.enums.DeliveryMethod;
@@ -10,6 +11,7 @@ import org.imtp.common.packet.base.Header;
  * @Author ys
  * @Date 2024/6/25 11:40
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class ImageMessage extends AbstractTextMessage{
 
     public ImageMessage(){}

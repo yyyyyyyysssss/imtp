@@ -1,5 +1,6 @@
 package org.imtp.common.packet;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.netty.buffer.ByteBuf;
 import org.imtp.common.enums.Command;
 import org.imtp.common.packet.base.Header;
@@ -9,6 +10,7 @@ import org.imtp.common.packet.base.Header;
  * @Author ys
  * @Date 2024/9/21 12:50
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class VoiceMessage extends AbstractTextMessage{
 
     public VoiceMessage(){}

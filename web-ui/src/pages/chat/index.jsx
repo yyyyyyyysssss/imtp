@@ -181,7 +181,6 @@ const Chat = (props) => {
                         <Tabs
                             activeKey={selectedSessionId}
                             destroyInactiveTabPane = {true}
-                            // onChange={(key) => handleSelected(key)}
                             onMouseDown={handleMouseDown}
                             onTabClick={handleTabClick}
                             key="chat-tabs"
