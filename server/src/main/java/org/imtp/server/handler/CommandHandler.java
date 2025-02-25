@@ -56,6 +56,15 @@ public class CommandHandler extends SimpleChannelInboundHandler<Packet> {
     private UserSessionHandler userSessionHandler;
 
     @Resource
+    private SignalingOfferHandler signalingOfferHandler;
+
+    @Resource
+    private SignalingAnswerHandler signalingAnswerHandler;
+
+    @Resource
+    private SignalingCandidateHandler signalingCandidateHandler;
+
+    @Resource
     private ChatService chatService;
 
     @Override
@@ -102,6 +111,30 @@ public class CommandHandler extends SimpleChannelInboundHandler<Packet> {
                         packet = new VoiceMessage(byteBuf,header).additionTimestamp();
                         if (channelHandlerContext.pipeline().get(VoiceMessageHandler.class) == null){
                             channelHandlerContext.pipeline().addLast(voiceMessageHandler).fireChannelRead(packet);
+                        }else {
+                            channelHandlerContext.fireChannelRead(packet);
+                        }
+                        break;
+                    case SIGNALING_OFFER:
+                        packet = new SignalingOfferMessage(byteBuf,header);
+                        if (channelHandlerContext.pipeline().get(SignalingOfferHandler.class) == null){
+                            channelHandlerContext.pipeline().addLast(signalingOfferHandler).fireChannelRead(packet);
+                        }else {
+                            channelHandlerContext.fireChannelRead(packet);
+                        }
+                        break;
+                    case SIGNALING_ANSWER:
+                        packet = new SignalingAnswerMessage(byteBuf,header);
+                        if (channelHandlerContext.pipeline().get(SignalingAnswerHandler.class) == null){
+                            channelHandlerContext.pipeline().addLast(signalingAnswerHandler).fireChannelRead(packet);
+                        }else {
+                            channelHandlerContext.fireChannelRead(packet);
+                        }
+                        break;
+                    case SIGNALING_CANDIDATE:
+                        packet = new SignalingCandidateMessage(byteBuf,header);
+                        if (channelHandlerContext.pipeline().get(SignalingCandidateHandler.class) == null){
+                            channelHandlerContext.pipeline().addLast(signalingCandidateHandler).fireChannelRead(packet);
                         }else {
                             channelHandlerContext.fireChannelRead(packet);
                         }

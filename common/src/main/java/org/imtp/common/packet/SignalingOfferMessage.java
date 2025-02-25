@@ -11,7 +11,7 @@ import org.imtp.common.packet.base.Header;
  * @Date 2025/2/24 16:39
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class SignalingOfferMessage extends AbstractTextMessage{
+public class SignalingOfferMessage extends AbstractSignalingMessage{
 
     public SignalingOfferMessage() {
     }
@@ -20,8 +20,8 @@ public class SignalingOfferMessage extends AbstractTextMessage{
         super(byteBuf, header);
     }
 
-    public SignalingOfferMessage(String message, long sender, long receiver, Long ackId, boolean groupFlag) {
-        super(message,null,0, sender, receiver, Command.SIGNALING_OFFER, ackId, groupFlag);
+    public SignalingOfferMessage(String message, long sender, long receiver, boolean groupFlag) {
+        super(message,sender, receiver, Command.SIGNALING_OFFER, groupFlag);
     }
 
     @Override

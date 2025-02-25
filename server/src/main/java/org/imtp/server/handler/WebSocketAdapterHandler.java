@@ -10,9 +10,11 @@ import io.netty.handler.codec.http.websocketx.*;
 import io.netty.util.AttributeKey;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.imtp.common.enums.MessageType;
 import org.imtp.common.packet.CommandPacket;
 import org.imtp.common.packet.WebSocketAdapterMessage;
 import org.imtp.common.packet.WebSocketMessage;
+import org.imtp.common.packet.WebSocketSignalingAdapterMessage;
 import org.imtp.common.packet.base.Header;
 import org.imtp.common.packet.base.Packet;
 import org.imtp.common.utils.CRC16Util;
@@ -44,7 +46,7 @@ public class WebSocketAdapterHandler extends SimpleChannelInboundHandler<WebSock
         if (msg instanceof TextWebSocketFrame textWebSocketFrame) {
             String text = textWebSocketFrame.text();
             WebSocketMessage webSocketMessage = JsonUtil.parseObject(text, WebSocketMessage.class);
-            WebSocketAdapterMessage webSocketAdapterMessage = new WebSocketAdapterMessage(webSocketMessage);
+            Packet webSocketAdapterMessage = createWebSocketAdapterMessage(webSocketMessage);
             Header header = webSocketAdapterMessage.getHeader();
             header.setLength(webSocketAdapterMessage.getBodyLength());
             ByteBuf byteBuf = Unpooled.buffer();
@@ -84,6 +86,14 @@ public class WebSocketAdapterHandler extends SimpleChannelInboundHandler<WebSock
         channelInactiveHandle(channel);
         log.error("exception message", cause);
         ctx.close();
+    }
+
+    private Packet createWebSocketAdapterMessage(WebSocketMessage webSocketMessage) {
+        MessageType type = webSocketMessage.getType();
+        if (type.equals(MessageType.SIGNALING_OFFER) || type.equals(MessageType.SIGNALING_ANSWER) || type.equals(MessageType.SIGNALING_CANDIDATE)) {
+            return new WebSocketSignalingAdapterMessage(webSocketMessage);
+        }
+        return new WebSocketAdapterMessage(webSocketMessage);
     }
 
     private void channelInactiveHandle(Channel channel) {

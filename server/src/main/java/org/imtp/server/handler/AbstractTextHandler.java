@@ -30,35 +30,7 @@ public abstract class AbstractTextHandler<T extends AbstractTextMessage>  extend
         ChannelSession senderChannelSession = ChannelContextHolder.channelContext().getChannel(ctx.channel().id().asLongText());
         senderChannelSession.sendMessage(new MessageStateResponse(MessageState.DELIVERED,msg));
         //转发
-        List<String> forwardChannelIds = new ArrayList<>();
-        List<String> offlineReceivers = new ArrayList<>();
-        List<String> receiverUserIds = fetchReceiverUserIdByPacket(msg);
-        //根据用户id获取关联的channel
-        Map<String,Set<String>> map = chatService.fetchActiveChannelIdByUserIds(receiverUserIds);
-        for (String userId : map.keySet()){
-            Set<String> channelIds = map.get(userId);
-            //null表示用户未上线
-            if(channelIds == null){
-                offlineReceivers.add(userId);
-                continue;
-            }
-            for(String channelId : channelIds){
-                ChannelSession channel = ChannelContextHolder.channelContext().getChannel(channelId);
-                if(channel != null){
-                    if(!channel.id().equals(ctx.channel().id().asLongText())){
-                        channel.sendMessage(msg);
-                    }
-                }else {
-                    forwardChannelIds.add(channelId);
-                }
-            }
-        }
-        //发布
-        if(!forwardChannelIds.isEmpty()){
-            ForwardMessage forwardMessage = new ForwardMessage(forwardChannelIds, msg);
-            redisWrapper.publishMsg(forwardMessage);
-        }
-
+        forwardMessage(ctx,msg);
         //消息落库
         ctx.channel().eventLoop().execute(() -> {
             MessageDTO messageDTO = new MessageDTO(msg);

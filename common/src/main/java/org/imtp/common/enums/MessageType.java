@@ -6,6 +6,8 @@ import lombok.Getter;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.imtp.common.enums.Command.*;
+
 @Getter
 public enum MessageType {
 
@@ -14,7 +16,10 @@ public enum MessageType {
     MEME_MESSAGE((int) Command.MEME_MESSAGE.getCmdCode()),
     IMAGE_MESSAGE((int) Command.IMAGE_MESSAGE.getCmdCode()),
     VIDEO_MESSAGE((int) Command.VIDEO_MESSAGE.getCmdCode()),
-    FILE_MESSAGE((int) Command.FILE_MESSAGE.getCmdCode());
+    FILE_MESSAGE((int) Command.FILE_MESSAGE.getCmdCode()),
+    SIGNALING_OFFER((int) Command.SIGNALING_OFFER.getCmdCode()),
+    SIGNALING_ANSWER((int) Command.SIGNALING_ANSWER.getCmdCode()),
+    SIGNALING_CANDIDATE((int) Command.SIGNALING_CANDIDATE.getCmdCode());
 
     private final Integer value;
 

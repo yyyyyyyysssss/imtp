@@ -4,7 +4,10 @@ export const MessageType = Object.freeze({
     VOICE_MESSAGE: 2,
     IMAGE_MESSAGE: 4,
     VIDEO_MESSAGE: 5,
-    FILE_MESSAGE: 6
+    FILE_MESSAGE: 6,
+    SIGNALING_OFFER: 40,
+    SIGNALING_ANSWER: 41,
+    SIGNALING_CANDIDATE: 42,
 })
 
 

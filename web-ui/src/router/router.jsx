@@ -23,8 +23,8 @@ const routes = [
     },
     {
         path: "/rtc",
-        element: <RTC />,
-        protected: false
+        element: <WebSocketProvider><RTC /></WebSocketProvider>,
+        protected: true
     },
     {
         path: "/consent",
