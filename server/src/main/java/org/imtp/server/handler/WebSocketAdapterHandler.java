@@ -5,7 +5,6 @@ import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.websocketx.*;
 import io.netty.util.AttributeKey;
 import jakarta.annotation.Resource;
@@ -32,7 +31,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @ChannelHandler.Sharable
-public class WebSocketAdapterHandler extends SimpleChannelInboundHandler<WebSocketFrame> {
+public class WebSocketAdapterHandler extends AbstractHandler<WebSocketFrame> {
 
 
     @Resource
@@ -94,15 +93,5 @@ public class WebSocketAdapterHandler extends SimpleChannelInboundHandler<WebSock
             return new WebSocketSignalingAdapterMessage(webSocketMessage);
         }
         return new WebSocketAdapterMessage(webSocketMessage);
-    }
-
-    private void channelInactiveHandle(Channel channel) {
-        AttributeKey<String> attributeKey = AttributeKey.valueOf(ProjectConstant.CHANNEL_ATTR_LOGIN_USER);
-        String userId = channel.attr(attributeKey).get();
-        log.warn("用户[{}]已断开连接", userId);
-        //移除用户在线状态
-        chatService.userOffline(userId, channel.id().asLongText());
-        //移除
-        ChannelContextHolder.channelContext().removeChannel(channel.id().asLongText());
     }
 }

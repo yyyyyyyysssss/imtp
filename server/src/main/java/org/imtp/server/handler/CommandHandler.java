@@ -26,7 +26,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @ChannelHandler.Sharable
-public class CommandHandler extends SimpleChannelInboundHandler<Packet> {
+public class CommandHandler extends AbstractHandler<Packet> {
 
     @Resource
     private TextMessageHandler textMessageHandler;
@@ -198,15 +198,4 @@ public class CommandHandler extends SimpleChannelInboundHandler<Packet> {
         log.error("exception message",cause);
         ctx.close();
     }
-
-    private void channelInactiveHandle(Channel channel){
-        AttributeKey<String> attributeKey = AttributeKey.valueOf(ProjectConstant.CHANNEL_ATTR_LOGIN_USER);
-        String userId = channel.attr(attributeKey).get();
-        log.warn("用户[{}]已断开连接",userId);
-        //移除用户在线状态
-        chatService.userOffline(userId, channel.id().asLongText());
-        //移除
-        ChannelContextHolder.channelContext().removeChannel(channel.id().asLongText());
-    }
-
 }

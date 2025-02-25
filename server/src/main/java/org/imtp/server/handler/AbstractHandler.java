@@ -1,11 +1,15 @@
 package org.imtp.server.handler;
 
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.util.AttributeKey;
 import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
 import org.imtp.common.packet.base.Packet;
 import org.imtp.common.response.Result;
 import org.imtp.server.config.RedisWrapper;
+import org.imtp.server.constant.ProjectConstant;
 import org.imtp.server.context.ChannelContextHolder;
 import org.imtp.server.context.ChannelSession;
 import org.imtp.server.feign.WebApi;
@@ -22,6 +26,7 @@ import java.util.Set;
  * @Author ys
  * @Date 2024/4/28 16:48
  */
+@Slf4j
 public abstract class AbstractHandler<I> extends SimpleChannelInboundHandler<I> {
 
     @Resource
@@ -63,6 +68,15 @@ public abstract class AbstractHandler<I> extends SimpleChannelInboundHandler<I> 
         }
     }
 
+    protected void channelInactiveHandle(Channel channel){
+        AttributeKey<String> attributeKey = AttributeKey.valueOf(ProjectConstant.CHANNEL_ATTR_LOGIN_USER);
+        String userId = channel.attr(attributeKey).get();
+        log.warn("用户[{}]已断开连接",userId);
+        //移除用户在线状态
+        chatService.userOffline(userId, channel.id().asLongText());
+        //移除
+        ChannelContextHolder.channelContext().removeChannel(channel.id().asLongText());
+    }
 
     protected List<String> fetchReceiverUserIdByPacket(Packet packet){
         List<String> receivers;
