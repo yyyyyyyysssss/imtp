@@ -5,17 +5,12 @@ import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.SimpleChannelInboundHandler;
-import io.netty.util.AttributeKey;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.imtp.common.enums.Command;
 import org.imtp.common.packet.*;
 import org.imtp.common.packet.base.Header;
 import org.imtp.common.packet.base.Packet;
-import org.imtp.server.constant.ProjectConstant;
-import org.imtp.server.context.ChannelContextHolder;
-import org.imtp.server.service.ChatService;
 import org.springframework.stereotype.Component;
 
 /**
@@ -63,9 +58,6 @@ public class CommandHandler extends AbstractHandler<Packet> {
 
     @Resource
     private SignalingCandidateHandler signalingCandidateHandler;
-
-    @Resource
-    private ChatService chatService;
 
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, Packet packet) {

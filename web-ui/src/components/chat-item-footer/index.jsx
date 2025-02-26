@@ -1,12 +1,14 @@
 import React, { useEffect, useRef, useState } from 'react';
 import './index.less'
-import { Flex, Layout, Button } from "antd"
+import { Flex, Layout, Button, Modal, Avatar } from "antd"
 import { EditorContent, useEditor } from '@tiptap/react'
 import HardBreak from '@tiptap/extension-hard-break'
 import { StarterKit } from '@tiptap/starter-kit';
 import emojiMartData from '@emoji-mart/data'
 import Picker from '@emoji-mart/react'
 import emoteImg from '../../assets/img/emote_icon.png'
+import voiceCallImg from '../../assets/img/voice_call-50.png'
+import videoCallImg from '../../assets/img/video_call-50.png'
 import { FieNode } from '../FileNode'
 import { VideoNode } from '../VideoNode'
 import { ImageNode } from '../ImageNode';
@@ -18,10 +20,13 @@ import { addMessage, updateMessage, updateMessageStatus } from '../../redux/slic
 import { MessageStatus, MessageType } from '../../enum';
 import { formatFileSize, getVideoDimensionsOfByFile, dataURLtoFile, createThumbnail } from '../../utils'
 import { v4 as uuidv4 } from 'uuid';
+import { CloseOutlined } from '@ant-design/icons'
 
 const { Content } = Layout;
 
 const ChatItemFooter = React.memo(({ session }) => {
+
+    const [vioceModalOpen, setVioceModalOpen] = useState(false);
 
     const { socket } = useWebSocket();
     const socketRef = useRef();
@@ -434,6 +439,11 @@ const ChatItemFooter = React.memo(({ session }) => {
         }
     }
 
+    const voiceCall = () => {
+        setVioceModalOpen(true)
+        // window.open('https://www.baidu.com', '_self'); 
+    }
+
     const messageBase = (content, type) => {
         const id = IdGen.nextId()
         return {
@@ -463,8 +473,10 @@ const ChatItemFooter = React.memo(({ session }) => {
                             <div ref={emojiRef} className='div-Picker' hidden={emojiHide}>
                                 <Picker set="native" previewPosition="none" searchPosition="none" data={emojiMartData} onEmojiSelect={emojiSelectHandler} />
                             </div>
-                            <img src={emoteImg} alt='表情' style={{ width: '20px', height: '20px' }} onClick={showEmojiFrame} />
+                            <img src={emoteImg} title='表情' alt='表情' style={{ width: '20px', height: '20px', cursor: 'pointer' }} onClick={showEmojiFrame} />
                             <Uploader ref={uploaderRef} {...uploadProps} />
+                            <img src={voiceCallImg} onClick={voiceCall} title='语音通话' alt='语音通话' style={{ width: '22px', height: '22px', cursor: 'pointer' }} />
+                            <img src={videoCallImg} title='视频通话' alt='视频通话' style={{ width: '24px', height: '24px', cursor: 'pointer' }} />
                         </Flex>
                     </Content>
                 </Flex>
@@ -483,6 +495,43 @@ const ChatItemFooter = React.memo(({ session }) => {
                     </Content>
                 </Flex>
             </Flex>
+            <Modal
+                width={350}
+                centered
+                open={vioceModalOpen}
+                onCancel={() => setVioceModalOpen(false)}
+                footer={null}
+                mask={false}
+                maskClosable={false}
+                keyboard={false}
+            >
+                <Flex gap={20} vertical>
+                    {/* header */}
+                    <Flex
+                        style={{
+                            justifyContent: 'center',
+                            backgroundColor: 'red'
+                        }}
+                    >
+                        <Flex flex={1} style={{ justifyContent: 'center' }}>
+                            <div>语音通话</div>
+                        </Flex>
+                        <Flex>
+                            <CloseOutlined />
+                        </Flex>
+                    </Flex>
+                    <Flex gap={10}>
+                        <Avatar style={{ userSelect: 'none' }} size={50} shape="circle" src={session.avatar} />
+                        <Flex gap={5} vertical>
+                            <div>{session.name}</div>
+                            <div>正在呼叫...</div>
+                        </Flex>
+                    </Flex>
+                    <Flex>
+
+                    </Flex>
+                </Flex>
+            </Modal>
         </Layout>
     )
 })

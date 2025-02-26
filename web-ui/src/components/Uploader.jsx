@@ -1,5 +1,5 @@
 import React, { useImperativeHandle, forwardRef } from 'react'
-import { Upload, message } from "antd"
+import { Upload } from "antd"
 import httpWrapper from '../api/axiosWrapper'
 import styled from 'styled-components'
 import fileImg from '../assets/img/file_icon.png'
@@ -82,7 +82,6 @@ const Uploader = forwardRef((props, ref) => {
     const uploadByFormData = (uploadFormData, progressId = null) => {
         return new Promise((resolve) => {
             let latestUploadSize = 0
-            const file = uploadFormData.get('file')
             httpWrapper
                 .post("/file/upload/chunk", uploadFormData, {
                     headers: {
@@ -122,7 +121,7 @@ const Uploader = forwardRef((props, ref) => {
     return (
         <>
             <StyledUpload {...props}>
-                <img src={fileImg} alt='文件' style={{ width: '20px', height: '20px', display: 'flex' }} />
+                <img src={fileImg} title='文件' alt='文件' style={{ width: '20px', height: '20px', display: 'flex',cursor: 'pointer' }} />
             </StyledUpload>
         </>
     );

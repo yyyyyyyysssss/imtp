@@ -145,10 +145,6 @@ const Chat = (props) => {
             avatar: friendInfo.avatar
         }
     }
-    //会话选中 已废弃
-    const handleSelected = (id) => {
-        dispatch(selectSession({ sessionId: id }))
-    }
 
     //会话选中
     const state = useRef({ x: 0 });

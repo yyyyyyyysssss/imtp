@@ -6,7 +6,6 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.websocketx.*;
-import io.netty.util.AttributeKey;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.imtp.common.enums.MessageType;
@@ -18,9 +17,6 @@ import org.imtp.common.packet.base.Header;
 import org.imtp.common.packet.base.Packet;
 import org.imtp.common.utils.CRC16Util;
 import org.imtp.common.utils.JsonUtil;
-import org.imtp.server.constant.ProjectConstant;
-import org.imtp.server.context.ChannelContextHolder;
-import org.imtp.server.service.ChatService;
 import org.springframework.stereotype.Component;
 
 /**
@@ -32,10 +28,6 @@ import org.springframework.stereotype.Component;
 @Component
 @ChannelHandler.Sharable
 public class WebSocketAdapterHandler extends AbstractHandler<WebSocketFrame> {
-
-
-    @Resource
-    private ChatService chatService;
 
     @Resource
     private CommandHandler commandHandler;

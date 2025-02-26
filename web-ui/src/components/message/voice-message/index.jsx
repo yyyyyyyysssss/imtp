@@ -43,7 +43,7 @@ const VoiceMessage = React.memo(({ content, status, duration, direction }) => {
         <div onClick={playVoice} className={`voice-message ${direction === 'RIGHT' ? 'voice-message-right' : 'voice-message-left'}`}>
             <Flex style={{ width: calcWidthByDuration, flexDirection: direction === 'LEFT' ? 'row-reverse' : '' }} justify='space-between'>
                 <audio autoPlay={false} onEnded={playCompleted} ref={audioRef} src={content} preload='metadata' />
-                <div style={{ fontSize: 18 }}>{durationDesc}</div>
+                <div style={{ fontSize: 18,paddingLeft: 5 }}>{durationDesc}</div>
                 <img
                     style={{
                         transform: direction === 'LEFT' ? 'rotate(90deg)' : 'rotate(-90deg)'
