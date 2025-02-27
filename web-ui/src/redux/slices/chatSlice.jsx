@@ -1,4 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit'
+import { message } from 'antd'
 
 
 const initialState = {
@@ -14,7 +15,12 @@ const initialState = {
     userFriends: [],
     userGroups: [],
     unreadCount: 0, //未读消息合计
-    uploadProgress: {}  //上传进度
+    uploadProgress: {},  //上传进度
+    voiceCall: {
+        visible: false,
+        type: null,
+        sessionId: null
+    }
 }
 
 export const chatSlice = createSlice({
@@ -169,10 +175,32 @@ export const chatSlice = createSlice({
                 }
                 state.uploadProgress[progressId] = { ...newProgressInfo }
             }
+        },
+        startVoiceCall: (state, action) => {
+            const { payload } = action
+            const { sessionId, type } = payload
+            if (state.voiceCall.visible) {
+                message.error('正在通话中...')
+            } else {
+                state.voiceCall = {
+                    ...state.voiceCall,
+                    visible: true,
+                    sessionId: sessionId,
+                    type: type
+                }
+            }
+        },
+        stopVoiceCall: (state, action) => {
+            state.voiceCall = {
+                ...state.voiceCall,
+                visible: false,
+                sessionId: null,
+                type: null
+            }
         }
     }
 })
 
-export const { reset, switchPanel, setUserInfo, loadSession, addSession, selectSession, removeSession, loadMessage, addMessage, updateMessage, updateMessageStatus, deleteMessage, loadUserFriend, loadUserGroup, addUploadProgress, updateUploadProgress } = chatSlice.actions
+export const { reset, switchPanel, setUserInfo, loadSession, addSession, selectSession, removeSession, loadMessage, addMessage, updateMessage, updateMessageStatus, deleteMessage, loadUserFriend, loadUserGroup, addUploadProgress, updateUploadProgress, startVoiceCall, stopVoiceCall } = chatSlice.actions
 
 export default chatSlice.reducer

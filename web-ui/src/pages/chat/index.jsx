@@ -1,4 +1,4 @@
-import { Flex, Tabs } from "antd";
+import { Flex, message, Tabs } from "antd";
 import React, { useContext, useEffect, useMemo, useRef } from 'react';
 import { HomeContext, useWebSocket } from '../../context';
 import { getBit } from '../../utils';
@@ -11,6 +11,7 @@ import { loadSession, addMessage, addSession, selectSession, updateMessageStatus
 import { useDispatch, useSelector } from 'react-redux';
 import UserSessionItem from "../../components/user-session-item";
 import { DeliveryMethod, MessageType } from "../../enum";
+import VoiceCall from "../voice-call";
 
 const Chat = (props) => {
     const { socket } = useWebSocket();
@@ -151,11 +152,11 @@ const Chat = (props) => {
     const handleMouseDown = e => {
         state.current.x = e.screenX;
     }
-    const handleTabClick = (activeKey,e) => {
+    const handleTabClick = (activeKey, e) => {
         const delta = Math.abs(e.screenX - state.current.x);
         if (delta > 10) {
             e.preventDefault();
-        }else {
+        } else {
             dispatch(selectSession({ sessionId: activeKey }))
         }
     }
@@ -176,7 +177,7 @@ const Chat = (props) => {
                     <div className='chat-panel-tabs' style={style}>
                         <Tabs
                             activeKey={selectedSessionId}
-                            destroyInactiveTabPane = {true}
+                            destroyInactiveTabPane={true}
                             onMouseDown={handleMouseDown}
                             onTabClick={handleTabClick}
                             key="chat-tabs"
@@ -190,6 +191,7 @@ const Chat = (props) => {
                     </div>
                 </Flex>
             </Flex>
+            <VoiceCall />
         </>
     );
 }

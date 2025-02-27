@@ -4,6 +4,7 @@ import AuthProvider from "./AuthProvider";
 import LoginProvider from "./LoginProvider.jsx";
 import { WebSocketProvider } from '../context'
 import RTC from "../pages/rtc/index.jsx";
+import VoiceCall from "../pages/voice-call/index.jsx";
 const Login = lazy(() => import('../pages/login'));
 const Home = lazy(() => import('../pages/home'));
 const Consent = lazy(() => import('../pages/consent'));
@@ -44,6 +45,11 @@ const routes = [
     {
         path: "/home",
         element: <WebSocketProvider><Home /></WebSocketProvider>,
+        protected: true
+    },
+    {
+        path: "/voice/call",
+        element: <WebSocketProvider><VoiceCall /></WebSocketProvider>,
         protected: true
     }
 ]

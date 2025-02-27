@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import './index.less'
-import { Flex, Layout, Button, Modal, Avatar } from "antd"
+import { Flex, Layout, Button } from "antd"
 import { EditorContent, useEditor } from '@tiptap/react'
 import HardBreak from '@tiptap/extension-hard-break'
 import { StarterKit } from '@tiptap/starter-kit';
@@ -16,17 +16,14 @@ import Uploader from '../Uploader';
 import { useWebSocket } from '../../context';
 import IdGen from '../../utils/IdGen';
 import { useDispatch, useSelector } from 'react-redux';
-import { addMessage, updateMessage, updateMessageStatus } from '../../redux/slices/chatSlice';
-import { MessageStatus, MessageType } from '../../enum';
+import { addMessage, updateMessage, updateMessageStatus,startVoiceCall } from '../../redux/slices/chatSlice';
+import { MessageStatus, MessageType, VoiceCallType } from '../../enum';
 import { formatFileSize, getVideoDimensionsOfByFile, dataURLtoFile, createThumbnail } from '../../utils'
 import { v4 as uuidv4 } from 'uuid';
-import { CloseOutlined } from '@ant-design/icons'
 
 const { Content } = Layout;
 
 const ChatItemFooter = React.memo(({ session }) => {
-
-    const [vioceModalOpen, setVioceModalOpen] = useState(false);
 
     const { socket } = useWebSocket();
     const socketRef = useRef();
@@ -440,8 +437,10 @@ const ChatItemFooter = React.memo(({ session }) => {
     }
 
     const voiceCall = () => {
-        setVioceModalOpen(true)
-        // window.open('https://www.baidu.com', '_self'); 
+        dispatch(startVoiceCall({
+            sessionId: session.id,
+            type: VoiceCallType.INVITE
+        }))
     }
 
     const messageBase = (content, type) => {
@@ -464,7 +463,7 @@ const ChatItemFooter = React.memo(({ session }) => {
     }
 
     return (
-        <Layout style={{ height: '100%' }}>
+        <Layout style={{ height: '100%'}}>
             <Flex flex={1} vertical>
                 {/* 聊天工具栏 */}
                 <Flex flex={2}>
@@ -495,43 +494,6 @@ const ChatItemFooter = React.memo(({ session }) => {
                     </Content>
                 </Flex>
             </Flex>
-            <Modal
-                width={350}
-                centered
-                open={vioceModalOpen}
-                onCancel={() => setVioceModalOpen(false)}
-                footer={null}
-                mask={false}
-                maskClosable={false}
-                keyboard={false}
-            >
-                <Flex gap={20} vertical>
-                    {/* header */}
-                    <Flex
-                        style={{
-                            justifyContent: 'center',
-                            backgroundColor: 'red'
-                        }}
-                    >
-                        <Flex flex={1} style={{ justifyContent: 'center' }}>
-                            <div>语音通话</div>
-                        </Flex>
-                        <Flex>
-                            <CloseOutlined />
-                        </Flex>
-                    </Flex>
-                    <Flex gap={10}>
-                        <Avatar style={{ userSelect: 'none' }} size={50} shape="circle" src={session.avatar} />
-                        <Flex gap={5} vertical>
-                            <div>{session.name}</div>
-                            <div>正在呼叫...</div>
-                        </Flex>
-                    </Flex>
-                    <Flex>
-
-                    </Flex>
-                </Flex>
-            </Modal>
         </Layout>
     )
 })

@@ -22,3 +22,9 @@ export const DeliveryMethod = Object.freeze({
     SINGLE: 'SINGLE',
     GROUP: 'GROUP'
 })
+
+
+export const VoiceCallType = Object.freeze({
+    INVITE: 'INVITE',
+    ACCEPT: 'ACCEPT'
+})

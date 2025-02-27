@@ -113,7 +113,7 @@ const ChatItem = React.memo(({ sessionId }) => {
                             </AutoSizer>
                         </Content>
                         <Content style={{ height: '38%' }}>
-                            <ChatItemFooter session={session} />
+                            <ChatItemFooter session={session}/>
                         </Content>
                     </Layout>
                 </Content>
