@@ -19,8 +19,10 @@ public enum MessageType {
     FILE_MESSAGE((int) Command.FILE_MESSAGE.getCmdCode()),
     SIGNALING_OFFER((int) Command.SIGNALING_OFFER.getCmdCode()),
     SIGNALING_ANSWER((int) Command.SIGNALING_ANSWER.getCmdCode()),
-    SIGNALING_CANDIDATE((int) Command.SIGNALING_CANDIDATE.getCmdCode());
+    SIGNALING_CANDIDATE((int) Command.SIGNALING_CANDIDATE.getCmdCode()),
+    SIGNALING_CLOSE((int) Command.SIGNALING_CLOSE.getCmdCode()),
 
+    ;
     private final Integer value;
 
     private static final Map<Integer, MessageType> cacheMap = new HashMap<Integer, MessageType>();

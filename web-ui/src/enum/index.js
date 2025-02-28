@@ -8,6 +8,7 @@ export const MessageType = Object.freeze({
     SIGNALING_OFFER: 40,
     SIGNALING_ANSWER: 41,
     SIGNALING_CANDIDATE: 42,
+    SIGNALING_CLOSE: 49,
 })
 
 

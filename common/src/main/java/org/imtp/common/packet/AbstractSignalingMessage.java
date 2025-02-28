@@ -30,13 +30,22 @@ public abstract class AbstractSignalingMessage extends Packet {
     public AbstractSignalingMessage(ByteBuf byteBuf, Header header){
         super(header);
         int textLength = byteBuf.readInt();
-        byte[] bytes = new byte[textLength];
-        byteBuf.readBytes(bytes);
-        this.content = new String(bytes, StandardCharsets.UTF_8);
+        if (textLength == 0){
+            this.content = null;
+        }else {
+            byte[] bytes = new byte[textLength];
+            byteBuf.readBytes(bytes);
+            this.content = new String(bytes, StandardCharsets.UTF_8);
+        }
     }
 
     @Override
     public void encodeBodyAsByteBuf(ByteBuf byteBuf) {
+        if(this.content == null || this.content.isEmpty()){
+            byteBuf.writeInt(0);
+            encodeBodyAsByteBuf0(byteBuf);
+            return;
+        }
         byte[] bytes = this.content.getBytes(StandardCharsets.UTF_8);
         //文本消息长度
         byteBuf.writeInt(bytes.length);
@@ -50,7 +59,8 @@ public abstract class AbstractSignalingMessage extends Packet {
     @JsonIgnore
     @Override
     public int getBodyLength() {
-        return this.content.getBytes(StandardCharsets.UTF_8).length + 4 + getBodyLength0();
+        int contentLength = this.content == null || this.content.isEmpty() ? 0 : this.content.getBytes(StandardCharsets.UTF_8).length;
+        return contentLength + 4 + getBodyLength0();
     }
 
     @JsonIgnore

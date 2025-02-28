@@ -34,6 +34,7 @@ public enum Command {
     SIGNALING_OFFER((byte) 40,"webrtc信令提案"),
     SIGNALING_ANSWER((byte) 41,"webrtc信令应答"),
     SIGNALING_CANDIDATE((byte) 42,"webrtc信令候选信息"),
+    SIGNALING_CLOSE((byte) 49,"webrtc信令关闭"),
 
     MSG_RES((byte) -1, "通用消息响应"),
 

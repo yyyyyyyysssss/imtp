@@ -1,5 +1,5 @@
 import { Flex, message, Tabs } from "antd";
-import React, { useContext, useEffect, useMemo, useRef } from 'react';
+import React, { useCallback, useContext, useEffect, useMemo, useRef } from 'react';
 import { HomeContext, useWebSocket } from '../../context';
 import { getBit } from '../../utils';
 import ChatItem from './chat-item';
@@ -7,17 +7,22 @@ import './index.less';
 import IdGen from "../../utils/IdGen";
 import { normalize, schema } from 'normalizr';
 import { createUserSession, fetchUserSessions } from "../../api/ApiService";
-import { loadSession, addMessage, addSession, selectSession, updateMessageStatus } from '../../redux/slices/chatSlice';
+import { loadSession, addMessage, addSession, selectSession, updateMessageStatus, startVoiceCall } from '../../redux/slices/chatSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import UserSessionItem from "../../components/user-session-item";
-import { DeliveryMethod, MessageType } from "../../enum";
+import { DeliveryMethod, MessageType, VoiceCallType } from "../../enum";
 import VoiceCall from "../voice-call";
 
 const Chat = (props) => {
-    const { socket } = useWebSocket();
+    const { socket } = useWebSocket()
     const { style } = props;
+    //语音通话ref
+    const voiceCallRef = useRef()
+    //好友以及群组信息
     const { findUserInfoByGroup, findGroupByGroupId, findUserInfoByFriendId } = useContext(HomeContext);
+    //用户信息
     const userInfo = useSelector(state => state.chat.userInfo) || {}
+    //会话信息map
     const sessionMapRef = useRef(new Map())
     const dispatch = useDispatch()
     //会话数据
@@ -71,16 +76,33 @@ const Chat = (props) => {
                 switch (cmd) {
                     case MessageType.TEXT_MESSAGE:
                         content = msg.text;
-                        break;
+                        break
                     case MessageType.IMAGE_MESSAGE:
                         content = msg.url;
-                        break;
+                        break
                     case MessageType.VIDEO_MESSAGE:
                         content = msg.url;
-                        break;
+                        break
                     case MessageType.FILE_MESSAGE:
                         content = msg.url;
-                        break;
+                        break
+                    case MessageType.SIGNALING_OFFER:
+                        let session = sessionMapRef.current.get(realSender)
+                        dispatch(startVoiceCall({
+                            sessionId: session.id,
+                            type: VoiceCallType.ACCEPT,
+                            offerSdp: msg.content
+                        }))
+                        return
+                    case MessageType.SIGNALING_ANSWER:
+                        voiceCallRef.current.receiveSignalingAnswer(msg.content)
+                        return
+                    case MessageType.SIGNALING_CANDIDATE:
+                        voiceCallRef.current.receiveSignalingCandidate(msg.content)
+                        return
+                    case MessageType.SIGNALING_CLOSE:
+                        voiceCallRef.current.receiveSignalingClose()
+                        return
                     default:
                         return
                 }
@@ -123,6 +145,11 @@ const Chat = (props) => {
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [socket]);
+
+    //发送消息
+    const sendMessage = useCallback((msg) => {
+        socket.send(JSON.stringify(msg))
+    }, [socket])
 
     const findFriendInfo = (friendId, groupId, deliveryMethod) => {
 
@@ -191,7 +218,7 @@ const Chat = (props) => {
                     </div>
                 </Flex>
             </Flex>
-            <VoiceCall />
+            <VoiceCall ref={voiceCallRef} sendMessage={sendMessage} />
         </>
     );
 }

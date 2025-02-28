@@ -19,6 +19,7 @@ const initialState = {
     voiceCall: {
         visible: false,
         type: null,
+        offerSdp: null,
         sessionId: null
     }
 }
@@ -178,15 +179,16 @@ export const chatSlice = createSlice({
         },
         startVoiceCall: (state, action) => {
             const { payload } = action
-            const { sessionId, type } = payload
+            const { sessionId, type, offerSdp } = payload
             if (state.voiceCall.visible) {
-                message.error('正在通话中...')
+                message.info('正在通话中...')
             } else {
                 state.voiceCall = {
                     ...state.voiceCall,
                     visible: true,
                     sessionId: sessionId,
-                    type: type
+                    type: type,
+                    offerSdp: offerSdp
                 }
             }
         },
@@ -195,7 +197,8 @@ export const chatSlice = createSlice({
                 ...state.voiceCall,
                 visible: false,
                 sessionId: null,
-                type: null
+                type: null,
+                offerSdp: null
             }
         }
     }
