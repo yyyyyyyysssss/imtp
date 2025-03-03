@@ -62,6 +62,9 @@ public class CommandHandler extends AbstractHandler<Packet> {
     @Resource
     private SignalingCloseHandler signalingCloseHandler;
 
+    @Resource
+    private SignalingBusyHandler signalingBusyHandler;
+
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, Packet packet) {
         if(packet instanceof CommandPacket commandPacket){
@@ -130,6 +133,14 @@ public class CommandHandler extends AbstractHandler<Packet> {
                         packet = new SignalingCandidateMessage(byteBuf,header);
                         if (channelHandlerContext.pipeline().get(SignalingCandidateHandler.class) == null){
                             channelHandlerContext.pipeline().addLast(signalingCandidateHandler).fireChannelRead(packet);
+                        }else {
+                            channelHandlerContext.fireChannelRead(packet);
+                        }
+                        break;
+                    case SIGNALING_BUSY:
+                        packet = new SignalingBusyMessage(byteBuf,header);
+                        if (channelHandlerContext.pipeline().get(SignalingBusyHandler.class) == null){
+                            channelHandlerContext.pipeline().addLast(signalingBusyHandler).fireChannelRead(packet);
                         }else {
                             channelHandlerContext.fireChannelRead(packet);
                         }

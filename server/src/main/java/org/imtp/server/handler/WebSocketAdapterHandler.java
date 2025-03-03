@@ -84,6 +84,7 @@ public class WebSocketAdapterHandler extends AbstractHandler<WebSocketFrame> {
         if (type.equals(MessageType.SIGNALING_OFFER)
                 || type.equals(MessageType.SIGNALING_ANSWER)
                 || type.equals(MessageType.SIGNALING_CANDIDATE)
+                || type.equals(MessageType.SIGNALING_BUSY)
                 || type.equals(MessageType.SIGNALING_CLOSE)) {
             return new WebSocketSignalingAdapterMessage(webSocketMessage);
         }

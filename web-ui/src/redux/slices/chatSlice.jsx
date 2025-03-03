@@ -1,5 +1,4 @@
 import { createSlice } from '@reduxjs/toolkit'
-import { message } from 'antd'
 
 
 const initialState = {
@@ -180,16 +179,12 @@ export const chatSlice = createSlice({
         startVoiceCall: (state, action) => {
             const { payload } = action
             const { sessionId, type, offerSdp } = payload
-            if (state.voiceCall.visible) {
-                message.info('正在通话中...')
-            } else {
-                state.voiceCall = {
-                    ...state.voiceCall,
-                    visible: true,
-                    sessionId: sessionId,
-                    type: type,
-                    offerSdp: offerSdp
-                }
+            state.voiceCall = {
+                ...state.voiceCall,
+                visible: true,
+                sessionId: sessionId,
+                type: type,
+                offerSdp: offerSdp
             }
         },
         stopVoiceCall: (state, action) => {

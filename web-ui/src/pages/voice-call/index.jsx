@@ -2,28 +2,43 @@ import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } f
 import './index.less'
 import { CloseOutlined, AudioOutlined, AudioMutedOutlined, PhoneOutlined } from '@ant-design/icons'
 import { HangUpOutlined } from '../../components/customIcon';
-import { Avatar, Flex } from 'antd';
+import { Avatar, Flex, message, Spin } from 'antd';
 import { MessageType, VoiceCallType } from '../../enum';
 import useTimer from '../../hooks/useTimer';
 import Draggable from 'react-draggable';
 import { useDispatch, useSelector } from 'react-redux';
-import { stopVoiceCall } from '../../redux/slices/chatSlice';
+import { startVoiceCall, stopVoiceCall } from '../../redux/slices/chatSlice';
 import IdGen from '../../utils/IdGen';
 
+// 通话状态 1 初始状态 2 连接中 3 通话中
+const PENDING = 1
+const CONNECTING = 2
+const CALLING = 3
 
 const VoiceCall = forwardRef(({ sendMessage }, ref) => {
 
     console.log('VoiceCall')
 
     useImperativeHandle(ref, () => ({
+        receiveSignalingOffer: receiveSignalingOffer,
         receiveSignalingAnswer: receiveSignalingAnswer,
         receiveSignalingCandidate: receiveSignalingCandidate,
+        receiveSignalingBusy: receiveSignalingBusy,
         receiveSignalingClose: receiveSignalingClose
     }))
 
     const dispatch = useDispatch()
 
     const voiceCall = useSelector(state => state.chat.voiceCall)
+
+    const nodeRef = useRef(null)
+
+    //是否静音
+    const [isMute, setIsMute] = useState(false)
+    const [callStatus, setCallStatus] = useState(PENDING)
+
+    //计时器
+    const { timer, toggleTimer, resetTimer } = useTimer()
 
     const { visible, type, sessionId, offerSdp } = voiceCall
     //用户信息
@@ -37,6 +52,30 @@ const VoiceCall = forwardRef(({ sendMessage }, ref) => {
     const localStreamRef = useRef()
     const localRef = useRef()
     const remoteRef = useRef()
+
+    useEffect(() => {
+        const invite = async () => {
+            if (type === VoiceCallType.INVITE) {
+                await initRTC()
+                //创建offer并发送给对方
+                createOffer()
+            }
+        }
+        //页面刷新前直接挂断
+        const handleRefresh = (e) => {
+            hangUpPhone()
+        }
+        if (visible) {
+            invite()
+            window.addEventListener("beforeunload", handleRefresh)
+        } else {
+            window.removeEventListener("beforeunload", handleRefresh)
+        }
+
+        return () => {
+            destroy()
+        }
+    }, [visible])
 
     const initRTC = async () => {
         rtcRef.current = new RTCPeerConnection({
@@ -58,7 +97,6 @@ const VoiceCall = forwardRef(({ sendMessage }, ref) => {
         await addLocalVoiceStream()
         //监听远程轨道
         rtcRef.current.ontrack = (event) => {
-            console.log('ontrack')
             //设置远程音频流
             remoteRef.current.srcObject = event.streams[0]
             //开始通话
@@ -73,12 +111,7 @@ const VoiceCall = forwardRef(({ sendMessage }, ref) => {
 
     //添加本地音频流
     const addLocalVoiceStream = async () => {
-        const localStream = await navigator.mediaDevices.getUserMedia({
-            video: false,
-            audio: true,
-        })
-        //本地音频流
-        localStreamRef.current = localStream
+        const localStream = await getLocalVoiceStream()
         //设置本地音频流播放
         localRef.current.srcObject = localStream
         //本地音频流轨道添加到rtc中
@@ -87,6 +120,20 @@ const VoiceCall = forwardRef(({ sendMessage }, ref) => {
             //轨道添加到rtc中
             rtcRef.current.addTrack(track, localStream)
         }
+    }
+
+    //获取本地音频流
+    const getLocalVoiceStream = async () => {
+        if(localStreamRef.current){
+            return localStreamRef.current
+        }
+        const localStream = await navigator.mediaDevices.getUserMedia({
+            video: false,
+            audio: true,
+        })
+        //本地音频流
+        localStreamRef.current = localStream
+        return localStream
     }
 
     //销毁
@@ -104,13 +151,7 @@ const VoiceCall = forwardRef(({ sendMessage }, ref) => {
         const offer = await rtcRef.current.createOffer()
         //设置本地提案
         await rtcRef.current.setLocalDescription(offer)
-        //监听服务器返回的新的候选地址 并通过信令服务器传递给对方 无需等待对应是否准备好 该地址会缓存 直到准备完成后会立即处理
-        rtcRef.current.onicecandidate = async (e) => {
-            if (e.candidate) {
-                const msg = signalingMessage(MessageType.SIGNALING_CANDIDATE, JSON.stringify(e.candidate))
-                sendMessage(msg)
-            }
-        }
+        //发送提案
         const msg = signalingMessage(MessageType.SIGNALING_OFFER, offer.sdp)
         sendMessage(msg)
         return offer
@@ -131,8 +172,31 @@ const VoiceCall = forwardRef(({ sendMessage }, ref) => {
                 sendMessage(msg)
             }
         }
+        //发送应答
         const msg = signalingMessage(MessageType.SIGNALING_ANSWER, answer.sdp)
         await sendMessage(msg)
+
+    }
+
+    //接收offer
+    const receiveSignalingOffer = async (session, sdp) => {
+        if (visible) {
+            //发送忙线
+            const msg = signalingMessage(MessageType.SIGNALING_BUSY, null)
+            const newMsg = {
+                ...msg,
+                sessionId: session.id,
+                receiver: session.receiverUserId,
+                deliveryMethod: session.deliveryMethod,
+            }
+            await sendMessage(newMsg)
+        } else {
+            dispatch(startVoiceCall({
+                sessionId: session.id,
+                type: VoiceCallType.ACCEPT,
+                offerSdp: sdp
+            }))
+        }
 
     }
 
@@ -142,6 +206,13 @@ const VoiceCall = forwardRef(({ sendMessage }, ref) => {
             type: 'answer',
             sdp: sdp
         }))
+        //监听服务器返回的新的候选地址
+        rtcRef.current.onicecandidate = async (e) => {
+            if (e.candidate) {
+                const msg = signalingMessage(MessageType.SIGNALING_CANDIDATE, JSON.stringify(e.candidate))
+                sendMessage(msg)
+            }
+        }
     }
 
     //接收candidate
@@ -149,47 +220,28 @@ const VoiceCall = forwardRef(({ sendMessage }, ref) => {
         rtcRef.current?.addIceCandidate(new RTCIceCandidate(JSON.parse(candidate)))
     }
 
+    //接收busy
+    const receiveSignalingBusy = async () => {
+        message.info('对方正在通话中，请稍后再试')
+        stopCall()
+    }
+
     //接收close
     const receiveSignalingClose = async () => {
         stopCall()
     }
 
-    useEffect(() => {
-        const invite = async () => {
-            if (type === VoiceCallType.INVITE) {
-                await initRTC()
-                //创建offer并发送给对方
-                createOffer()
-            }
-        }
-        if (visible) {
-            invite()
-        }
-        return () => {
-            destroy()
-        }
-    }, [visible])
-
-    const nodeRef = useRef(null)
-
-    //是否静音
-    const [isMute, setIsMute] = useState(false)
-    const [inCall, setInCall] = useState(false)
-
-    //计时器
-    const { timer, toggleTimer, resetTimer } = useTimer()
-
     //开始通话
     const startCall = async () => {
         toggleTimer()
-        setInCall(true)
+        setCallStatus(CALLING)
     }
 
     //关闭通话
     const stopCall = () => {
         dispatch(stopVoiceCall())
         resetTimer()
-        setInCall(false)
+        setCallStatus(PENDING)
         destroy()
     }
 
@@ -199,16 +251,25 @@ const VoiceCall = forwardRef(({ sendMessage }, ref) => {
         sendMessage(msg)
     }
 
-    const mute = () => {
+    const mute = async () => {
+        const stream = await getLocalVoiceStream()
+        let audioTracks = stream.getAudioTracks()
         if (isMute) {
             //开启声音
+            audioTracks.forEach(track => {
+                track.enabled = true
+            })
         } else {
             //关闭声音
+            audioTracks.forEach(track => {
+                track.enabled = false
+            })
         }
         setIsMute((prev) => !prev)
     }
 
     const accept = async () => {
+        setCallStatus(CONNECTING)
         await initRTC()
         //创建应答
         createAnswer(offerSdp)
@@ -223,7 +284,7 @@ const VoiceCall = forwardRef(({ sendMessage }, ref) => {
             type: type,
             content: content,
             sessionId: session.id,
-            sender: session.userId,
+            sender: userInfo.id,
             receiver: session.receiverUserId,
             deliveryMethod: session.deliveryMethod,
             self: true,
@@ -273,24 +334,24 @@ const VoiceCall = forwardRef(({ sendMessage }, ref) => {
                                         {name}
                                     </div>
                                     <div style={{ color: 'white', userSelect: 'none' }}>
-                                        {inCall ? timer : type === VoiceCallType.INVITE ? '正在呼叫...' : '邀请你语音通话'}
+                                        {callStatus === CALLING ? timer : type === VoiceCallType.INVITE ? '正在呼叫...' : '邀请你语音通话'}
                                     </div>
                                 </Flex>
                             </Flex>
-                            <Flex justify='space-between' gap={20} style={{ paddingLeft: 10, paddingRight: 10, flexDirection: inCall ? 'row-reverse' : type === VoiceCallType.ACCEPT ? '' : 'row-reverse' }}>
+                            <Flex justify='space-between' gap={20} style={{ paddingLeft: 10, paddingRight: 10, flexDirection: callStatus === CALLING ? 'row-reverse' : type === VoiceCallType.ACCEPT ? '' : 'row-reverse' }}>
                                 <div
                                     style={{
                                         padding: 10,
                                         backgroundColor: 'red',
                                         borderRadius: 100,
-                                        display: 'flex'
+                                        display: 'flex',
                                     }}
                                     onClick={hangUpPhone}
                                 >
                                     <HangUpOutlined />
                                 </div>
                                 {
-                                    inCall || type === VoiceCallType.INVITE
+                                    callStatus === CALLING || type === VoiceCallType.INVITE
                                         ?
                                         (
                                             <div
@@ -308,17 +369,20 @@ const VoiceCall = forwardRef(({ sendMessage }, ref) => {
                                         )
                                         :
                                         (
-                                            <div
-                                                style={{
-                                                    padding: 10,
-                                                    backgroundColor: '#00B853',
-                                                    borderRadius: 100,
-                                                    display: 'flex'
-                                                }}
-                                                onClick={accept}
-                                            >
-                                                <PhoneOutlined style={{ fontSize: 25, color: 'white' }} />
-                                            </div>
+
+                                            <Spin spinning={callStatus === CONNECTING}>
+                                                <div
+                                                    style={{
+                                                        padding: 10,
+                                                        backgroundColor: '#00B853',
+                                                        borderRadius: 100,
+                                                        display: 'flex',
+                                                    }}
+                                                    onClick={accept}
+                                                >
+                                                    <PhoneOutlined style={{ fontSize: 25, color: 'white' }} />
+                                                </div>
+                                            </Spin>
                                         )
                                 }
 

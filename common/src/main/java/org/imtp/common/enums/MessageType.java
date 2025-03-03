@@ -20,6 +20,7 @@ public enum MessageType {
     SIGNALING_OFFER((int) Command.SIGNALING_OFFER.getCmdCode()),
     SIGNALING_ANSWER((int) Command.SIGNALING_ANSWER.getCmdCode()),
     SIGNALING_CANDIDATE((int) Command.SIGNALING_CANDIDATE.getCmdCode()),
+    SIGNALING_BUSY((int) Command.SIGNALING_BUSY.getCmdCode()),
     SIGNALING_CLOSE((int) Command.SIGNALING_CLOSE.getCmdCode()),
 
     ;

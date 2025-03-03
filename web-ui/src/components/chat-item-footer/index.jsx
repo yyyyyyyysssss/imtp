@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import './index.less'
-import { Flex, Layout, Button } from "antd"
+import { Flex, Layout, Button, message } from "antd"
 import { EditorContent, useEditor } from '@tiptap/react'
 import HardBreak from '@tiptap/extension-hard-break'
 import { StarterKit } from '@tiptap/starter-kit';
@@ -16,7 +16,7 @@ import Uploader from '../Uploader';
 import { useWebSocket } from '../../context';
 import IdGen from '../../utils/IdGen';
 import { useDispatch, useSelector } from 'react-redux';
-import { addMessage, updateMessage, updateMessageStatus,startVoiceCall } from '../../redux/slices/chatSlice';
+import { addMessage, updateMessage, updateMessageStatus, startVoiceCall } from '../../redux/slices/chatSlice';
 import { MessageStatus, MessageType, VoiceCallType } from '../../enum';
 import { formatFileSize, getVideoDimensionsOfByFile, dataURLtoFile, createThumbnail } from '../../utils'
 import { v4 as uuidv4 } from 'uuid';
@@ -32,6 +32,7 @@ const ChatItemFooter = React.memo(({ session }) => {
     }, [socket]);
 
     const dispatch = useDispatch()
+    const voiceCallVisible = useSelector(state => state.chat.voiceCall.visible)
     //用户信息
     const userInfo = useSelector(state => state.chat.userInfo) || {}
     //表情框显示与隐藏
@@ -437,10 +438,15 @@ const ChatItemFooter = React.memo(({ session }) => {
     }
 
     const voiceCall = () => {
-        dispatch(startVoiceCall({
-            sessionId: session.id,
-            type: VoiceCallType.INVITE
-        }))
+        if (voiceCallVisible) {
+            message.info('正在通话中...')
+        } else {
+            dispatch(startVoiceCall({
+                sessionId: session.id,
+                type: VoiceCallType.INVITE
+            }))
+        }
+
     }
 
     const messageBase = (content, type) => {
@@ -463,7 +469,7 @@ const ChatItemFooter = React.memo(({ session }) => {
     }
 
     return (
-        <Layout style={{ height: '100%'}}>
+        <Layout style={{ height: '100%' }}>
             <Flex flex={1} vertical>
                 {/* 聊天工具栏 */}
                 <Flex flex={2}>
