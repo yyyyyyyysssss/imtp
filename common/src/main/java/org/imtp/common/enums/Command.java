@@ -30,6 +30,8 @@ public enum Command {
     IMAGE_MESSAGE((byte) 4,"图片"),
     VIDEO_MESSAGE((byte) 5,"视频"),
     FILE_MESSAGE((byte) 6,"文件"),
+    VOICE_CALL_MESSAGE((byte) 7,"语音通话"),
+    VIDEO_CALL_MESSAGE((byte) 8,"视频通话"),
 
     SIGNALING_OFFER((byte) 40,"webrtc信令提案"),
     SIGNALING_ANSWER((byte) 41,"webrtc信令应答"),

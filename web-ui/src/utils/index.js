@@ -34,7 +34,7 @@ export const formatFileSize = (size) => {
 }
 const weekdays = ["星期天", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"];
 export const formatChatDate = (timestamp) => {
-    if(!timestamp){
+    if (!timestamp) {
         return '';
     }
     const date = new Date(Number(timestamp));
@@ -46,15 +46,15 @@ export const formatChatDate = (timestamp) => {
     const nowyear = now.getFullYear();
     const nowmonth = String(now.getMonth() + 1).padStart(2, '0');
     const nowday = String(now.getDate()).padStart(2, '0');
-    if(year !== nowyear || month !== nowmonth || nowday - day > 7){
+    if (year !== nowyear || month !== nowmonth || nowday - day > 7) {
         return `${year}/${month}/${day}`;
-    }else {
-        if ( nowday === day ) {
+    } else {
+        if (nowday === day) {
             const hours = String(date.getHours()).padStart(2, '0');
             const minutes = String(date.getMinutes()).padStart(2, '0');
             return `${hours}:${minutes}`;
-        }else{
-            if(nowday - day === 1){
+        } else {
+            if (nowday - day === 1) {
                 return '昨天';
             }
             let gap = date.getDay();
@@ -117,31 +117,46 @@ export const createThumbnail = (file) => {
 
 export const download = (url, filename) => {
     return new Promise((resolve, reject) => {
-        fetch(url,{method:'GET'})
-        .then( res => {
-            if(res.ok){
-                return res.blob();
-            }else{
-                return reject(res.statusText);
-            }
-        }).then(blob => {
-            let a = document.createElement("a");
-            a.href = URL.createObjectURL(blob);
-            a.download = filename;
-            a.style.display = "none";
-            document.body.appendChild(a);
-            a.click();
-            URL.revokeObjectURL(a.href);
-            document.body.removeChild(a);
-            return resolve(true);
-        }).catch(err => {
-            return reject(err);
-        });
+        fetch(url, { method: 'GET' })
+            .then(res => {
+                if (res.ok) {
+                    return res.blob();
+                } else {
+                    return reject(res.statusText);
+                }
+            }).then(blob => {
+                let a = document.createElement("a");
+                a.href = URL.createObjectURL(blob);
+                a.download = filename;
+                a.style.display = "none";
+                document.body.appendChild(a);
+                a.click();
+                URL.revokeObjectURL(a.href);
+                document.body.removeChild(a);
+                return resolve(true);
+            }).catch(err => {
+                return reject(err);
+            });
     });
 }
 
 
-export const getBit = (num,n) => {
+export const getBit = (num, n) => {
     let mask = 1 << n
-    return (num & mask) >> n; 
+    return (num & mask) >> n;
+}
+
+
+export const timeToSeconds = (time) => {
+    const [hours, minutes, seconds] = time.split(':').map(Number)
+    return hours * 3600 + minutes * 60 + seconds
+}
+
+export const formatTimeString = (time) => {
+    const [hours, minutes, seconds] = time.split(':').map(Number)
+    if(hours === 0){
+        return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
+    } else {
+        return time
+    }
 }

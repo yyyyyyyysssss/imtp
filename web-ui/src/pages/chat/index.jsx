@@ -68,7 +68,7 @@ const Chat = (props) => {
                     return
                 }
                 //授权消息响应
-                if(cmd === MessageType.AUTHORIZATION_RES){
+                if (cmd === MessageType.AUTHORIZATION_RES) {
                     return
                 }
                 const { contentMetadata, timestamp } = msg
@@ -82,7 +82,7 @@ const Chat = (props) => {
                 if (!session) {
                     const info = deliveryMethod === DeliveryMethod.GROUP ? findGroupByGroupId(realSender) : friendInfo
                     const sessionId = await createUserSession(realSender, deliveryMethod)
-                    console.log('userInfo.id',userInfo.id)
+                    console.log('userInfo.id', userInfo.id)
                     session = {
                         id: sessionId,
                         userId: userInfo.id,
@@ -106,6 +106,9 @@ const Chat = (props) => {
                         break
                     case MessageType.FILE_MESSAGE:
                         content = msg.url;
+                        break
+                    case MessageType.VOICE_CALL_MESSAGE:
+                        content = null;
                         break
                     case MessageType.SIGNALING_OFFER:
                         voiceCallRef.current.receiveSignalingOffer(session, msg.content)
@@ -135,7 +138,7 @@ const Chat = (props) => {
             }
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [socket,userInfo]);
+    }, [socket, userInfo]);
 
     //发送消息
     const sendMessage = useCallback((msg) => {

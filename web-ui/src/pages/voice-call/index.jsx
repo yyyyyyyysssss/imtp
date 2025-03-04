@@ -1,5 +1,6 @@
 import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import './index.less'
+import adapter from 'webrtc-adapter'
 import { CloseOutlined, AudioOutlined, AudioMutedOutlined, PhoneOutlined } from '@ant-design/icons'
 import { HangUpOutlined } from '../../components/customIcon';
 import { Avatar, Flex, message, Spin } from 'antd';
@@ -7,8 +8,9 @@ import { MessageType, VoiceCallType } from '../../enum';
 import useTimer from '../../hooks/useTimer';
 import Draggable from 'react-draggable';
 import { useDispatch, useSelector } from 'react-redux';
-import { startVoiceCall, stopVoiceCall } from '../../redux/slices/chatSlice';
+import { addMessage, startVoiceCall, stopVoiceCall } from '../../redux/slices/chatSlice';
 import IdGen from '../../utils/IdGen';
+import { formatTimeString, timeToSeconds } from '../../utils';
 
 // 通话状态 1 初始状态 2 连接中 3 通话中
 const PENDING = 1
@@ -37,10 +39,16 @@ const VoiceCall = forwardRef(({ sendMessage }, ref) => {
     const [isMute, setIsMute] = useState(false)
     const [callStatus, setCallStatus] = useState(PENDING)
 
+    const callStatusRef = useRef()
+    useEffect(() => {
+        callStatusRef.current = callStatus
+    }, [callStatus])
+
     //计时器
     const { timer, toggleTimer, resetTimer } = useTimer()
 
     const { visible, type, sessionId, offerSdp } = voiceCall
+    const visibleRef = useRef()
     //用户信息
     const userInfo = useSelector(state => state.chat.userInfo) || {}
     //会话
@@ -54,6 +62,7 @@ const VoiceCall = forwardRef(({ sendMessage }, ref) => {
     const remoteRef = useRef()
 
     useEffect(() => {
+        visibleRef.current = visible
         const invite = async () => {
             if (type === VoiceCallType.INVITE) {
                 await initRTC()
@@ -63,7 +72,9 @@ const VoiceCall = forwardRef(({ sendMessage }, ref) => {
         }
         //页面刷新前直接挂断
         const handleRefresh = (e) => {
-            hangUpPhone()
+            if (visibleRef.current) {
+                hangUpPhone()
+            }
         }
         if (visible) {
             invite()
@@ -91,7 +102,7 @@ const VoiceCall = forwardRef(({ sendMessage }, ref) => {
         const voiceChannel = rtcRef.current.createDataChannel('voice_channel')
         //监听通道关闭事件
         voiceChannel.onclose = (event) => {
-            stopCall()
+
         }
         //本地音频流通道
         await addLocalVoiceStream()
@@ -124,7 +135,7 @@ const VoiceCall = forwardRef(({ sendMessage }, ref) => {
 
     //获取本地音频流
     const getLocalVoiceStream = async () => {
-        if(localStreamRef.current){
+        if (localStreamRef.current) {
             return localStreamRef.current
         }
         const localStream = await navigator.mediaDevices.getUserMedia({
@@ -246,9 +257,40 @@ const VoiceCall = forwardRef(({ sendMessage }, ref) => {
     }
 
     const hangUpPhone = () => {
+        sendVoiceCallMessage()
         stopCall()
-        const msg = signalingMessage(MessageType.SIGNALING_CLOSE, null)
-        sendMessage(msg)
+        //信令消息
+        const signalingMsg = signalingMessage(MessageType.SIGNALING_CLOSE, null)
+        sendMessage(signalingMsg)
+    }
+
+    const sendVoiceCallMessage = () => {
+        //消息
+        let msg = signalingMessage(MessageType.VOICE_CALL_MESSAGE, '#')
+        let callStatus = 'COMPLETED'
+        if (type === VoiceCallType.INVITE) {
+            if (callStatusRef.current === PENDING || callStatusRef.current === CONNECTING) {
+                callStatus = 'CANCELLED'
+            }
+
+        } else {
+            if (callStatusRef.current === PENDING || callStatusRef.current === CONNECTING) {
+                callStatus = 'REFUSED'
+            }
+        }
+        if (msg) {
+            msg = {
+                ...msg,
+                contentMetadata: {
+                    callStatus: callStatus,
+                    duration: timeToSeconds(timer),
+                    durationDesc: formatTimeString(timer)
+                }
+            }
+            //添加消息
+            dispatch(addMessage({ sessionId: sessionId, message: msg }))
+            sendMessage(msg)
+        }
     }
 
     const mute = async () => {

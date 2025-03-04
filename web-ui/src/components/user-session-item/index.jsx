@@ -52,14 +52,20 @@ const UserSessionItem = React.memo(({ sessionId }) => {
         case MessageType.IMAGE_MESSAGE:
             messageContent = '[图片]'
             break
+        case MessageType.VOICE_MESSAGE:
+            messageContent = '[语音]'
+            break
         case MessageType.VIDEO_MESSAGE:
             messageContent = '[视频]'
             break
         case MessageType.FILE_MESSAGE:
             messageContent = '[文件]'
             break
-        case MessageType.VOICE_MESSAGE:
-            messageContent = '[语音]'
+        case MessageType.VOICE_CALL_MESSAGE:
+            messageContent = '[语音通话]'
+            break
+        case MessageType.VIDEO_CALL_MESSAGE:
+            messageContent = '[视频通话]'
             break
     }
     if (messageContent && deliveryMethod === DeliveryMethod.GROUP) {
@@ -86,7 +92,7 @@ const UserSessionItem = React.memo(({ sessionId }) => {
             }}
         >
             <Flex flex={1} style={{ transition: 'transform 0.3s', transform: showDelete ? 'translateX(-60px)' : 'translateX(0)' }}>
-                <Badge style={{ userSelect: 'none',marginTop: '7px',marginRight: '4px' }} count={unreadMessageCount}><Avatar style={{ userSelect: 'none' }} size={50} shape="square" src={avatar} /></Badge>
+                <Badge style={{ userSelect: 'none', marginTop: '7px', marginRight: '4px' }} count={unreadMessageCount}><Avatar style={{ userSelect: 'none' }} size={50} shape="square" src={avatar} /></Badge>
                 <Flex justify='space-between' style={{ width: '100%', marginLeft: '7px' }} vertical>
                     <Flex justify='space-between'>
                         <span className='user-session-name'>{name}</span>

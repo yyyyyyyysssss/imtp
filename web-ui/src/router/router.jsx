@@ -3,7 +3,6 @@ import { Navigate,createBrowserRouter } from 'react-router-dom';
 import AuthProvider from "./AuthProvider";
 import LoginProvider from "./LoginProvider.jsx";
 import { WebSocketProvider } from '../context'
-import RTC from "../pages/rtc/index.jsx";
 import VoiceCall from "../pages/voice-call/index.jsx";
 const Login = lazy(() => import('../pages/login'));
 const Home = lazy(() => import('../pages/home'));
@@ -21,11 +20,6 @@ const routes = [
         path: "/login",
         element: <LoginProvider><Login/></LoginProvider>,
         protected: false
-    },
-    {
-        path: "/rtc",
-        element: <WebSocketProvider><RTC /></WebSocketProvider>,
-        protected: true
     },
     {
         path: "/consent",

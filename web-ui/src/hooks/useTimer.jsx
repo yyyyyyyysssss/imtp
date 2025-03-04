@@ -44,7 +44,7 @@ const useTimer = () => {
     }
 
     const timer = useMemo(() => {
-        return `${String(hours).padStart(2, '0')} : ${String(minutes).padStart(2, '0')} : ${String(seconds).padStart(2, '0')}`
+        return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
     },[hours,minutes,seconds])
 
     return {

@@ -33,10 +33,16 @@ public class CommandHandler extends AbstractHandler<Packet> {
     private VideoMessageHandler videoMessageHandler;
 
     @Resource
+    private VoiceMessageHandler voiceMessageHandler;
+
+    @Resource
     private FileMessageHandler fileMessageHandler;
 
     @Resource
-    private VoiceMessageHandler voiceMessageHandler;
+    private VoiceCallMessageHandler voiceCallMessageHandler;
+
+    @Resource
+    private VideoCallMessageHandler videoCallMessageHandler;
 
     @Resource
     private UserFriendshipHandler userFriendshipHandler;
@@ -97,6 +103,14 @@ public class CommandHandler extends AbstractHandler<Packet> {
                             channelHandlerContext.fireChannelRead(packet);
                         }
                         break;
+                    case VOICE_MESSAGE:
+                        packet = new VoiceMessage(byteBuf,header).additionTimestamp();
+                        if (channelHandlerContext.pipeline().get(VoiceMessageHandler.class) == null){
+                            channelHandlerContext.pipeline().addLast(voiceMessageHandler).fireChannelRead(packet);
+                        }else {
+                            channelHandlerContext.fireChannelRead(packet);
+                        }
+                        break;
                     case FILE_MESSAGE:
                         packet = new FileMessage(byteBuf,header).additionTimestamp();
                         if (channelHandlerContext.pipeline().get(FileMessageHandler.class) == null){
@@ -105,10 +119,18 @@ public class CommandHandler extends AbstractHandler<Packet> {
                             channelHandlerContext.fireChannelRead(packet);
                         }
                         break;
-                    case VOICE_MESSAGE:
-                        packet = new VoiceMessage(byteBuf,header).additionTimestamp();
-                        if (channelHandlerContext.pipeline().get(VoiceMessageHandler.class) == null){
-                            channelHandlerContext.pipeline().addLast(voiceMessageHandler).fireChannelRead(packet);
+                    case VOICE_CALL_MESSAGE:
+                        packet = new VoiceCallMessage(byteBuf,header).additionTimestamp();
+                        if (channelHandlerContext.pipeline().get(VoiceCallMessageHandler.class) == null){
+                            channelHandlerContext.pipeline().addLast(voiceCallMessageHandler).fireChannelRead(packet);
+                        }else {
+                            channelHandlerContext.fireChannelRead(packet);
+                        }
+                        break;
+                    case VIDEO_CALL_MESSAGE:
+                        packet = new VideoCallMessage(byteBuf,header).additionTimestamp();
+                        if (channelHandlerContext.pipeline().get(VideoCallMessageHandler.class) == null){
+                            channelHandlerContext.pipeline().addLast(videoCallMessageHandler).fireChannelRead(packet);
                         }else {
                             channelHandlerContext.fireChannelRead(packet);
                         }

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import './index.less'
 import { MessageType, MessageStatus } from '../../enum';
 import sendFailIcon from '../../assets/img/send_fail.png'
@@ -11,6 +11,7 @@ import VideoMessage from './video-message';
 import VoiceMessage from './voice-message';
 import { useSelector } from 'react-redux';
 import ProgressOverlayBox from '../ProgressOverlayBox';
+import VoiceCallMessage from './voice-call-message';
 
 
 const Message = React.memo(({ messageId }) => {
@@ -75,6 +76,11 @@ const Message = React.memo(({ messageId }) => {
                         <FileMessage content={content} status={status} filename={contentMetadata.name} fileSize={contentMetadata.sizeDesc} direction={self ? 'RIGHT' : 'LEFT'} />
                     </ProgressOverlayBox>
                 )
+            case MessageType.VOICE_CALL_MESSAGE:
+                return (
+                    <VoiceCallMessage callStatus={contentMetadata.callStatus} duration={contentMetadata.duration} durationDesc={contentMetadata.durationDesc} self={self}/>
+                )
+            default:
         }
     }
 

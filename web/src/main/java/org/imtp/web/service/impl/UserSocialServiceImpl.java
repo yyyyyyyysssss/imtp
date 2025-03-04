@@ -231,34 +231,34 @@ public class UserSocialServiceImpl implements UserSocialService {
         if (insert == 0){
             throw new RuntimeException("insert error");
         }
-        UserMessageBox outboxUserMessageBox = UserMessageBox
-                .builder()
-                .id(IdGen.genId())
-                .userId(messageDTO.getSenderUserId())
-                .sessionId(message.getSessionId())
-                .msgId(message.getId())
-                .boxType(MessageBoxType.OUTBOX)
-                .build();
-        userMessageBoxMapper.insert(outboxUserMessageBox);
-
-        //扩散写
-        List<UserMessageBox> userMessageBoxes = new ArrayList<>();
-        List<String> userIds = getUserIdByDeliveryMethod(messageDTO.getReceiverUserId().toString(), messageDTO.getDeliveryMethod());
-        for (String userId : userIds){
-            if (userId.equals(messageDTO.getSenderUserId().toString())){
-                continue;
-            }
-            UserMessageBox inboxUserMessageBox = UserMessageBox
-                    .builder()
-                    .id(IdGen.genId())
-                    .userId(Long.valueOf(userId))
-                    .sessionId(message.getSessionId())
-                    .msgId(message.getId())
-                    .boxType(MessageBoxType.INBOX)
-                    .build();
-            userMessageBoxes.add(inboxUserMessageBox);
-        }
-        userMessageBoxService.saveBatch(userMessageBoxes);
+//        UserMessageBox outboxUserMessageBox = UserMessageBox
+//                .builder()
+//                .id(IdGen.genId())
+//                .userId(messageDTO.getSenderUserId())
+//                .sessionId(message.getSessionId())
+//                .msgId(message.getId())
+//                .boxType(MessageBoxType.OUTBOX)
+//                .build();
+//        userMessageBoxMapper.insert(outboxUserMessageBox);
+//
+//        //扩散写
+//        List<UserMessageBox> userMessageBoxes = new ArrayList<>();
+//        List<String> userIds = getUserIdByDeliveryMethod(messageDTO.getReceiverUserId().toString(), messageDTO.getDeliveryMethod());
+//        for (String userId : userIds){
+//            if (userId.equals(messageDTO.getSenderUserId().toString())){
+//                continue;
+//            }
+//            UserMessageBox inboxUserMessageBox = UserMessageBox
+//                    .builder()
+//                    .id(IdGen.genId())
+//                    .userId(Long.valueOf(userId))
+//                    .sessionId(message.getSessionId())
+//                    .msgId(message.getId())
+//                    .boxType(MessageBoxType.INBOX)
+//                    .build();
+//            userMessageBoxes.add(inboxUserMessageBox);
+//        }
+//        userMessageBoxService.saveBatch(userMessageBoxes);
         return message.getId();
     }
 
