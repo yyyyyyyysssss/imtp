@@ -5,14 +5,14 @@ import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
-import org.imtp.desktop.Client;
-import org.imtp.desktop.context.ClientContextHolder;
-import org.imtp.desktop.controller.ConsoleController;
-import org.imtp.desktop.enums.ClientType;
 import org.imtp.common.enums.Command;
 import org.imtp.common.packet.*;
 import org.imtp.common.packet.base.Header;
 import org.imtp.common.packet.base.Packet;
+import org.imtp.desktop.Client;
+import org.imtp.desktop.context.ClientContextHolder;
+import org.imtp.desktop.controller.ConsoleController;
+import org.imtp.desktop.enums.ClientType;
 
 /**
  * @Description
@@ -39,18 +39,6 @@ public class ClientCmdHandlerHandler extends AbstractMessageModelHandler<Packet>
         Command cmd = header.getCmd();
         ByteBuf byteBuf = Unpooled.wrappedBuffer(commandPacket.getBytes());
         switch (cmd){
-            case FRIENDSHIP_RES:
-                publishMessage(new FriendshipResponse(byteBuf,header));
-                break;
-            case GROUP_RELATIONSHIP_RES:
-                publishMessage(new GroupRelationshipResponse(byteBuf,header));
-                break;
-            case OFFLINE_MSG_RES:
-                publishMessage(new OfflineMessageResponse(byteBuf,header));
-                break;
-            case USER_SESSION_RES:
-                publishMessage(new UserSessionResponse(byteBuf,header));
-                break;
             case TEXT_MESSAGE:
                 publishMessage(new TextMessage(byteBuf,header));
                 break;

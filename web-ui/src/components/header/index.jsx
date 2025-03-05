@@ -32,10 +32,10 @@ const Header = React.memo(({ panel }) => {
 
     return (
         <Flex flex={1}>
-            <Flex className='search-head-flex' justify='center' align='end' style={{ width: '25%' }}>
+            <Flex className='search-head-flex' justify='center' align='end' style={{ width: '25%',borderRight: '1px solid lightgray' }}>
                 <Input className='chat-search' size="small" placeholder="搜索" prefix={<SearchOutlined />} />
             </Flex>
-            <Flex style={{ width: '75%', borderLeft: '1px solid lightgray' }}>
+            <Flex style={{ width: '75%'}}>
                 <Flex style={{ width: '60%', height: '100%' }} align='center'>
                     <div>
                         <label className='header-right-name'>{panel === 'CHAT_PANEL' ? selectedHeadName : ''}</label>

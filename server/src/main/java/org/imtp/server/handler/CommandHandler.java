@@ -45,18 +45,6 @@ public class CommandHandler extends AbstractHandler<Packet> {
     private VideoCallMessageHandler videoCallMessageHandler;
 
     @Resource
-    private UserFriendshipHandler userFriendshipHandler;
-
-    @Resource
-    private UserGroupRelationshipHandler userGroupRelationshipHandler;
-
-    @Resource
-    private OfflineMessageHandler offlineMessageHandler;
-
-    @Resource
-    private UserSessionHandler userSessionHandler;
-
-    @Resource
     private SignalingOfferHandler signalingOfferHandler;
 
     @Resource
@@ -175,38 +163,6 @@ public class CommandHandler extends AbstractHandler<Packet> {
                             channelHandlerContext.fireChannelRead(packet);
                         }
                         break;
-                    case FRIENDSHIP_REQ:
-                        packet = new FriendshipRequest(byteBuf,header);
-                        if (channelHandlerContext.pipeline().get(UserFriendshipHandler.class) == null){
-                            channelHandlerContext.pipeline().addLast(userFriendshipHandler).fireChannelRead(packet);
-                        }else {
-                            channelHandlerContext.fireChannelRead(packet);
-                        }
-                        break;
-                    case GROUP_RELATIONSHIP_REQ:
-                        packet = new GroupRelationshipRequest(byteBuf,header);
-                        if (channelHandlerContext.pipeline().get(UserGroupRelationshipHandler.class) == null){
-                            channelHandlerContext.pipeline().addLast(userGroupRelationshipHandler).fireChannelRead(packet);
-                        }else {
-                            channelHandlerContext.fireChannelRead(packet);
-                        }
-                        break;
-                    case OFFLINE_MSG_REQ:
-                        packet = new OfflineMessageRequest(byteBuf,header);
-                        if (channelHandlerContext.pipeline().get(OfflineMessageHandler.class) == null){
-                            channelHandlerContext.pipeline().addLast(offlineMessageHandler).fireChannelRead(packet);
-                        }else {
-                            channelHandlerContext.fireChannelRead(packet);
-                        }
-                        break;
-                    case USER_SESSION_REQ:
-                        packet = new UserSessionRequest(byteBuf,header);
-                        if (channelHandlerContext.pipeline().get(UserSessionHandler.class) == null){
-                            channelHandlerContext.pipeline().addLast(userSessionHandler).fireChannelRead(packet);
-                        }else {
-                            channelHandlerContext.fireChannelRead(packet);
-                        }
-                        break;
                     default:
                         throw new UnsupportedOperationException("不支持的操作");
                 }
@@ -221,7 +177,7 @@ public class CommandHandler extends AbstractHandler<Packet> {
     }
 
     @Override
-    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+    public void channelInactive(ChannelHandlerContext ctx) {
         log.warn("im server channelInactive:{}",ctx.channel().id().asLongText());
         Channel channel = ctx.channel();
         channelInactiveHandle(channel);

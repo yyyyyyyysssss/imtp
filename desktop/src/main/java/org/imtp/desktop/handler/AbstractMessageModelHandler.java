@@ -1,17 +1,16 @@
 package org.imtp.desktop.handler;
 
-import io.netty.channel.*;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.SimpleChannelInboundHandler;
 import lombok.extern.slf4j.Slf4j;
+import org.imtp.common.packet.base.Packet;
 import org.imtp.desktop.Client;
 import org.imtp.desktop.constant.SendMessageListener;
 import org.imtp.desktop.context.ClientContextHolder;
-import org.imtp.desktop.model.Observer;
 import org.imtp.desktop.model.MessageModel;
-import org.imtp.common.packet.FriendshipRequest;
-import org.imtp.common.packet.GroupRelationshipRequest;
-import org.imtp.common.packet.OfflineMessageRequest;
-import org.imtp.common.packet.UserSessionRequest;
-import org.imtp.common.packet.base.Packet;
+import org.imtp.desktop.model.Observer;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -127,26 +126,6 @@ public abstract class AbstractMessageModelHandler<T> extends SimpleChannelInboun
         }finally {
             lock.unlock();
         }
-    }
-
-    @Override
-    public void pullFriendship() {
-        ClientContextHolder.clientContext().channel().writeAndFlush(new FriendshipRequest(ClientContextHolder.clientContext().id()));
-    }
-
-    @Override
-    public void pullGroupRelationship() {
-        ClientContextHolder.clientContext().channel().writeAndFlush(new GroupRelationshipRequest(ClientContextHolder.clientContext().id()));
-    }
-
-    @Override
-    public void pullOfflineMessage() {
-        ClientContextHolder.clientContext().channel().writeAndFlush(new OfflineMessageRequest(ClientContextHolder.clientContext().id()));
-    }
-
-    @Override
-    public void pullUserSession() {
-        ClientContextHolder.clientContext().channel().writeAndFlush(new UserSessionRequest(ClientContextHolder.clientContext().id()));
     }
 
     @Override

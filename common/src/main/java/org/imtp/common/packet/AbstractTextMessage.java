@@ -45,9 +45,13 @@ public abstract class AbstractTextMessage extends Packet {
     public AbstractTextMessage(ByteBuf byteBuf, Header header){
         super(header);
         int textLength = byteBuf.readInt();
-        byte[] bytes = new byte[textLength];
-        byteBuf.readBytes(bytes);
-        this.text = new String(bytes, StandardCharsets.UTF_8);
+        if (textLength > 0){
+            byte[] bytes = new byte[textLength];
+            byteBuf.readBytes(bytes);
+            this.text = new String(bytes, StandardCharsets.UTF_8);
+        }else {
+            this.text = null;
+        }
         this.ackId = byteBuf.readLong();
         this.timestamp = byteBuf.readLong();
         this.sessionId = byteBuf.readLong();
@@ -61,8 +65,8 @@ public abstract class AbstractTextMessage extends Packet {
 
     public AbstractTextMessage(String message,MessageMetadata messageMetadata,long sessionId, long sender, long receiver, Command command,Long ackId, boolean groupFlag) {
         super(sender, receiver, command,groupFlag);
-        if(StringUtil.isNullOrEmpty(message) || StringUtil.length(message) > MAX_CHAR_LENGTH){
-            throw new RuntimeException("messages cannot be empty or exceed the maximum length limit");
+        if(StringUtil.isNullOrEmpty(message) && StringUtil.length(message) > MAX_CHAR_LENGTH){
+            throw new RuntimeException("messages cannot be exceed the maximum length limit");
         }
         this.text = message;
         this.ackId = ackId;
@@ -72,11 +76,15 @@ public abstract class AbstractTextMessage extends Packet {
 
     @Override
     public void encodeBodyAsByteBuf(ByteBuf byteBuf) {
-        byte[] bytes = this.text.getBytes(StandardCharsets.UTF_8);
-        //文本消息长度
-        byteBuf.writeInt(bytes.length);
-        //文本消息内容
-        byteBuf.writeBytes(bytes);
+        if (StringUtil.isNullOrEmpty(this.text)){
+            byteBuf.writeInt(0);
+        }else {
+            byte[] bytes = this.text.getBytes(StandardCharsets.UTF_8);
+            //文本消息长度
+            byteBuf.writeInt(bytes.length);
+            //文本消息内容
+            byteBuf.writeBytes(bytes);
+        }
         //确认id
         byteBuf.writeLong(this.ackId);
         //时间戳
@@ -100,11 +108,12 @@ public abstract class AbstractTextMessage extends Packet {
     @JsonIgnore
     @Override
     public int getBodyLength() {
+        int textLength = StringUtil.isNullOrEmpty(this.text) ? 0 : this.text.getBytes(StandardCharsets.UTF_8).length;
         int contentMetadataLength = 0;
         if (this.contentMetadata != null){
             contentMetadataLength = JsonUtil.toJSONString(this.contentMetadata).getBytes(StandardCharsets.UTF_8).length;
         }
-        return this.text.getBytes(StandardCharsets.UTF_8).length + 4 + 8 + 8 + 8 + 4 + contentMetadataLength + getBodyLength0();
+        return textLength + 4 + 8 + 8 + 8 + 4 + contentMetadataLength + getBodyLength0();
     }
 
     @JsonIgnore

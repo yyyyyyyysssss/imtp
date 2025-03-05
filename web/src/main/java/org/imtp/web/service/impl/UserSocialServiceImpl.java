@@ -88,6 +88,7 @@ public class UserSocialServiceImpl implements UserSocialService {
                         p.setLastMsgContent(messageInfo.getContent());
                         p.setLastMsgTime(messageInfo.getSendTime());
                         p.setLastUserName(messageInfo.getName());
+                        p.setLastMessageMetadata(messageInfo.getContentMetadata());
                     }
                 }
             }).toList();

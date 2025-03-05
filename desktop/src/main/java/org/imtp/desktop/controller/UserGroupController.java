@@ -8,14 +8,13 @@ import javafx.scene.control.ListView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import lombok.extern.slf4j.Slf4j;
+import org.imtp.common.packet.body.GroupUserInfo;
+import org.imtp.common.packet.body.UserGroupInfo;
 import org.imtp.desktop.constant.Callback;
 import org.imtp.desktop.constant.FXMLResourceConstant;
 import org.imtp.desktop.entity.GroupEntity;
+import org.imtp.desktop.service.ApiService;
 import org.imtp.desktop.util.Tuple2;
-import org.imtp.common.packet.GroupRelationshipResponse;
-import org.imtp.common.packet.base.Packet;
-import org.imtp.common.packet.body.UserFriendInfo;
-import org.imtp.common.packet.body.UserGroupInfo;
 
 import java.util.HashMap;
 import java.util.List;
@@ -43,7 +42,7 @@ public class UserGroupController extends AbstractController implements Callback<
     private Map<Long, UserGroupInfo> userGroupInfoMap;
 
     //群组关联带用户
-    private Map<String, UserFriendInfo> groupUserInfoMap;
+    private Map<String, GroupUserInfo> groupUserInfoMap;
 
     private final String groupUserSeparator = "-";
 
@@ -90,31 +89,25 @@ public class UserGroupController extends AbstractController implements Callback<
 
     @Override
     protected void init0() {
-        //拉取用户群组关系
-        messageModel.pullGroupRelationship();
+        ApiService.fetchUserGroups().thenAccept(userGroupInfos -> {
+            if (userGroupInfos != null && !userGroupInfos.isEmpty()){
+                for (UserGroupInfo userGroupInfo : userGroupInfos){
+                    setListView(convertFriendEntity(userGroupInfo));
+                    userGroupInfoMap.put(userGroupInfo.getId(), userGroupInfo);
+
+                    List<GroupUserInfo> groupUserInfos = userGroupInfo.getGroupUserInfos();
+                    for (GroupUserInfo groupUserInfo : groupUserInfos){
+                        String key = userGroupInfo.getId() + groupUserSeparator + groupUserInfo.getId();
+                        groupUserInfoMap.put(key,groupUserInfo);
+                    }
+                }
+            }
+        });
     }
 
     @Override
     public void update(Object object) {
-        Packet packet = (Packet)object;
-        switch (packet.getHeader().getCmd()){
-            case GROUP_RELATIONSHIP_RES:
-                GroupRelationshipResponse groupRelationshipResponse = (GroupRelationshipResponse) packet;
-                List<UserGroupInfo> userGroupInfos = groupRelationshipResponse.getUserGroupInfos();
-                if (userGroupInfos != null && !userGroupInfos.isEmpty()){
-                    for (UserGroupInfo userGroupInfo : userGroupInfos){
-                        setListView(convertFriendEntity(userGroupInfo));
-                        userGroupInfoMap.put(userGroupInfo.getId(), userGroupInfo);
 
-                        List<UserFriendInfo> groupUserInfos = userGroupInfo.getGroupUserInfos();
-                        for (UserFriendInfo groupUserInfo : groupUserInfos){
-                            String key = userGroupInfo.getId() + groupUserSeparator + groupUserInfo.getId();
-                            groupUserInfoMap.put(key,groupUserInfo);
-                        }
-                    }
-                }
-                break;
-        }
     }
 
     private void setListView(List<GroupEntity> groupEntities){
@@ -143,7 +136,7 @@ public class UserGroupController extends AbstractController implements Callback<
         return userGroupInfoMap.get(groupId);
     }
 
-    public UserFriendInfo findGroupUserInfo(Long groupId, Long userId){
+    public GroupUserInfo findGroupUserInfo(Long groupId, Long userId){
         String key = groupId + groupUserSeparator + userId;
         return groupUserInfoMap.get(key);
     }

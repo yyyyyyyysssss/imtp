@@ -12,12 +12,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.imtp.common.packet.AuthenticationRequest;
 import org.imtp.common.packet.AuthenticationResponse;
 import org.imtp.common.packet.CommandPacket;
-import org.imtp.common.packet.LoginRequest;
 import org.imtp.common.packet.body.UserInfo;
 import org.imtp.common.response.Result;
 import org.imtp.common.utils.JsonUtil;
 import org.imtp.server.constant.ProjectConstant;
-import org.imtp.server.context.*;
+import org.imtp.server.context.ChannelContextHolder;
+import org.imtp.server.context.ChannelSession;
+import org.imtp.server.context.IMChannelSession;
+import org.imtp.server.context.WebSocketChannelSession;
 import org.imtp.server.feign.WebApi;
 import org.springframework.stereotype.Component;
 

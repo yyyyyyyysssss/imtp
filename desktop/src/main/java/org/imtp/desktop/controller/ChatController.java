@@ -30,6 +30,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.bytedeco.javacv.FFmpegFrameGrabber;
 import org.bytedeco.javacv.Frame;
 import org.bytedeco.javacv.Java2DFrameConverter;
+import org.imtp.common.packet.body.GroupUserInfo;
 import org.imtp.desktop.component.ChunkedUploader;
 import org.imtp.desktop.context.ClientContextHolder;
 import org.imtp.desktop.entity.ChatItemEntity;
@@ -479,7 +480,7 @@ public class ChatController extends AbstractController {
             return;
         }
         if (packet.isGroup()) {
-            UserFriendInfo groupUserInfo = userGroupController.findGroupUserInfo(packet.getReceiver(), packet.getSender());
+            GroupUserInfo groupUserInfo = userGroupController.findGroupUserInfo(packet.getReceiver(), packet.getSender());
             String imageUrl = loadImageUrl(groupUserInfo.getAvatar());
             chatItemEntity.setAvatar(imageUrl);
             chatItemEntity.setName(groupUserInfo.getNickname());

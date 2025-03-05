@@ -1,25 +1,19 @@
 package org.imtp.desktop.view;
 
 import lombok.extern.slf4j.Slf4j;
+import org.imtp.common.packet.TextMessage;
+import org.imtp.common.packet.base.Packet;
+import org.imtp.common.packet.body.UserFriendInfo;
+import org.imtp.common.packet.body.UserGroupInfo;
 import org.imtp.desktop.context.ClientContextHolder;
 import org.imtp.desktop.controller.Controller;
 import org.imtp.desktop.idwork.IdGen;
 import org.imtp.desktop.model.MessageModel;
 import org.imtp.desktop.model.Observer;
-import org.imtp.common.packet.FriendshipResponse;
-import org.imtp.common.packet.GroupRelationshipResponse;
-import org.imtp.common.packet.OfflineMessageResponse;
-import org.imtp.common.packet.TextMessage;
-import org.imtp.common.packet.base.Packet;
-import org.imtp.common.packet.body.OfflineMessageInfo;
-import org.imtp.common.packet.body.UserFriendInfo;
-import org.imtp.common.packet.body.UserGroupInfo;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
-import java.util.stream.Collectors;
 
 /**
  * @Description 控制台聊天框
@@ -43,9 +37,6 @@ public class ConsoleView implements Observer,Runnable {
         this.messageModel = messageModel;
         this.controller = controller;
         messageModel.registerObserver(this);
-        messageModel.pullFriendship();
-        messageModel.pullGroupRelationship();
-        messageModel.pullOfflineMessage();
 
         userFriendInfoMap = new HashMap<>();
         userGroupInfoMap = new HashMap<>();
@@ -55,23 +46,6 @@ public class ConsoleView implements Observer,Runnable {
     public void update(Object object) {
         Packet packet = (Packet)object;
         switch (packet.getHeader().getCmd()){
-            case FRIENDSHIP_RES:
-                FriendshipResponse friendshipResponse = (FriendshipResponse)packet;
-                List<UserFriendInfo> userFriendInfos = friendshipResponse.getUserFriendInfos();
-                userFriendInfoMap = userFriendInfos.stream().collect(Collectors.toMap(UserFriendInfo::getAccount, a->a));
-                log.debug("userFriendInfos:{}",userFriendInfos);
-                break;
-            case GROUP_RELATIONSHIP_RES:
-                GroupRelationshipResponse groupRelationshipResponse = (GroupRelationshipResponse) packet;
-                List<UserGroupInfo> userGroupInfos = groupRelationshipResponse.getUserGroupInfos();
-                userGroupInfoMap = userGroupInfos.stream().collect(Collectors.toMap(k -> k.getId().toString(), a->a));
-                log.debug("userGroupInfos:{}",userGroupInfos);
-                break;
-            case OFFLINE_MSG_RES:
-                OfflineMessageResponse offlineMessageResponse = (OfflineMessageResponse) packet;
-                List<OfflineMessageInfo> offlineMessageInfos = offlineMessageResponse.getOfflineMessageInfos();
-                System.out.println(offlineMessageInfos);
-                break;
             case TEXT_MESSAGE:
                 TextMessage textMessage = (TextMessage) packet;
                 if(textMessage.isGroup()){

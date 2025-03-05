@@ -11,20 +11,19 @@ import javafx.scene.control.ListView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import lombok.extern.slf4j.Slf4j;
+import org.imtp.common.enums.DeliveryMethod;
+import org.imtp.common.packet.AbstractTextMessage;
+import org.imtp.common.packet.base.Packet;
+import org.imtp.common.packet.body.GroupUserInfo;
+import org.imtp.common.packet.body.UserFriendInfo;
+import org.imtp.common.packet.body.UserGroupInfo;
+import org.imtp.common.packet.body.UserSessionInfo;
 import org.imtp.desktop.constant.FXMLResourceConstant;
 import org.imtp.desktop.entity.SessionEntity;
 import org.imtp.desktop.event.UserSessionEvent;
 import org.imtp.desktop.idwork.IdGen;
+import org.imtp.desktop.service.ApiService;
 import org.imtp.desktop.util.Tuple2;
-import org.imtp.common.enums.DeliveryMethod;
-import org.imtp.common.packet.AbstractTextMessage;
-import org.imtp.common.packet.OfflineMessageResponse;
-import org.imtp.common.packet.UserSessionResponse;
-import org.imtp.common.packet.base.Packet;
-import org.imtp.common.packet.body.OfflineMessageInfo;
-import org.imtp.common.packet.body.UserFriendInfo;
-import org.imtp.common.packet.body.UserGroupInfo;
-import org.imtp.common.packet.body.UserSessionInfo;
 
 import java.util.HashMap;
 import java.util.List;
@@ -86,7 +85,12 @@ public class UserSessionController extends AbstractController{
     @Override
     protected void init0() {
         //拉取用户会话
-        messageModel.pullUserSession();
+        ApiService.fetchUserSessions().thenAccept(userSessionInfos -> {
+            if(userSessionInfos != null && !userSessionInfos.isEmpty()){
+                List<SessionEntity> sessionEntities = userSessionInfos.stream().map(this::convertSessionEntity).toList();
+                setListView(sessionEntities);
+            }
+        });
     }
 
     @Override
@@ -94,19 +98,6 @@ public class UserSessionController extends AbstractController{
         Packet packet = (Packet)object;
         SessionEntity sessionEntity = null;
         switch (packet.getHeader().getCmd()){
-            case OFFLINE_MSG_RES:
-                OfflineMessageResponse offlineMessageResponse = (OfflineMessageResponse) packet;
-                List<OfflineMessageInfo> offlineMessageInfos = offlineMessageResponse.getOfflineMessageInfos();
-                log.debug("offlineMessageInfos: {}", offlineMessageInfos);
-                break;
-            case USER_SESSION_RES:
-                UserSessionResponse userSessionResponse = (UserSessionResponse)packet;
-                List<UserSessionInfo> userSessionInfos = userSessionResponse.getUserSessionInfos();
-                if(userSessionInfos != null && !userSessionInfos.isEmpty()){
-                    List<SessionEntity> sessionEntities = userSessionInfos.stream().map(this::convertSessionEntity).toList();
-                    setListView(sessionEntities);
-                }
-                break;
             case TEXT_MESSAGE,IMAGE_MESSAGE:
                 Long sender = packet.realSender();
                 sessionEntity = userSessionEntityMap.get(sender);
@@ -132,7 +123,7 @@ public class UserSessionController extends AbstractController{
                     sessionEntity.setLastMsg(textMessage.getMessage());
 
                     if (packet.isGroup()){
-                        UserFriendInfo groupUserInfo = userGroupController.findGroupUserInfo(packet.getReceiver(), packet.getSender());
+                        GroupUserInfo groupUserInfo = userGroupController.findGroupUserInfo(packet.getReceiver(), packet.getSender());
                         sessionEntity.setLastUserName(groupUserInfo.getNickname());
                     }
                     updateUserSessionNode(sessionEntity);
@@ -329,7 +320,7 @@ public class UserSessionController extends AbstractController{
             sessionEntity.setName(userGroupInfo.getGroupName());
             sessionEntity.setAvatar(loadImageUrl(userGroupInfo.getAvatar()));
             sessionEntity.setDeliveryMethod(DeliveryMethod.GROUP);
-            UserFriendInfo groupUserInfo = userGroupController.findGroupUserInfo(packet.getReceiver(), packet.getSender());
+            GroupUserInfo groupUserInfo = userGroupController.findGroupUserInfo(packet.getReceiver(), packet.getSender());
             sessionEntity.setLastUserAvatar(loadImageUrl(groupUserInfo.getAvatar()));
             sessionEntity.setLastUserName(groupUserInfo.getNickname());
         }else {

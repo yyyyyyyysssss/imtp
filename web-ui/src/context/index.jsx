@@ -33,9 +33,9 @@ export const WebSocketProvider = ({ children }) => {
                 if(header.cmd === AUTHORIZATION_RES){
                     const authenticated = obj.authenticated;
                     if(authenticated){
-                        console.log('Websocket Server 身份认证成功');
+                        console.log('Websocket Server authenticated');
                     }else{
-                        console.log('Websocket Server 身份认证失败');
+                        console.log('Websocket Server unauthenticated');
                     }
                 }
             }

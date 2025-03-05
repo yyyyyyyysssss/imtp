@@ -11,9 +11,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.imtp.desktop.constant.Callback;
 import org.imtp.desktop.constant.FXMLResourceConstant;
 import org.imtp.desktop.entity.FriendEntity;
+import org.imtp.desktop.service.ApiService;
 import org.imtp.desktop.util.Tuple2;
-import org.imtp.common.packet.FriendshipResponse;
-import org.imtp.common.packet.base.Packet;
 import org.imtp.common.packet.body.UserFriendInfo;
 
 import java.util.HashMap;
@@ -84,24 +83,19 @@ public class UserFriendController extends AbstractController implements Callback
     @Override
     protected void init0() {
         //拉取用户好友关系
-        messageModel.pullFriendship();
+        ApiService.fetchUserFriends().thenAccept(userFriendInfos -> {
+            if (!userFriendInfos.isEmpty()){
+                for (UserFriendInfo userFriendInfo : userFriendInfos){
+                    setListView(convertFriendEntity(userFriendInfo));
+                    userFriendInfoMap.put(userFriendInfo.getId(), userFriendInfo);
+                }
+            }
+        });
     }
 
     @Override
     public void update(Object object) {
-        Packet packet = (Packet)object;
-        switch (packet.getHeader().getCmd()){
-            case FRIENDSHIP_RES:
-                FriendshipResponse friendshipResponse = (FriendshipResponse)packet;
-                List<UserFriendInfo> userFriendInfos = friendshipResponse.getUserFriendInfos();
-                if (!userFriendInfos.isEmpty()){
-                    for (UserFriendInfo userFriendInfo : userFriendInfos){
-                        setListView(convertFriendEntity(userFriendInfo));
-                        userFriendInfoMap.put(userFriendInfo.getId(), userFriendInfo);
-                    }
-                }
-                break;
-        }
+
     }
 
     private void setListView(List<FriendEntity> friendEntities){

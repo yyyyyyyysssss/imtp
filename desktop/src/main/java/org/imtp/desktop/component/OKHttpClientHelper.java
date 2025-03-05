@@ -115,6 +115,15 @@ public class OKHttpClientHelper {
         return null;
     }
 
+    public void asyncGet(String url,Callback callback){
+        Request request = new Request
+                .Builder()
+                .url(config.getApiHost() + url)
+                .get()
+                .build();
+        execute(request,callback);
+    }
+
 
     private OkHttpClient okHttpClient() {
         return new OkHttpClient

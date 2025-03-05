@@ -5,8 +5,6 @@ import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import jakarta.annotation.PostConstruct;
-import jakarta.annotation.PreDestroy;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.imtp.common.codec.IMTPDecoder;
@@ -16,6 +14,7 @@ import org.imtp.common.utils.JsonUtil;
 import org.imtp.server.config.ServiceRegister;
 import org.imtp.server.handler.AuthenticationHandler;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.SmartLifecycle;
 import org.springframework.stereotype.Component;
 
 import java.util.UUID;
@@ -27,7 +26,7 @@ import java.util.UUID;
  */
 @Component
 @Slf4j
-public class IMServer{
+public class IMServer implements SmartLifecycle {
 
     @Resource
     private AuthenticationHandler authorizationHandler;
@@ -39,13 +38,15 @@ public class IMServer{
     private EventLoopGroup workEventLoopGroup;
     private ChannelFuture channelFuture;
 
+    private boolean isRunning = false;
+
     private ServiceRegister serviceRegister;
     @Autowired(required = false)
     public void setServiceRegister(ServiceRegister serviceRegister) {
         this.serviceRegister = serviceRegister;
     }
 
-    @PostConstruct
+    @Override
     public void start() {
         bossEventLoopGroup=new NioEventLoopGroup(2);
         workEventLoopGroup=new NioEventLoopGroup(8);
@@ -68,6 +69,7 @@ public class IMServer{
             channelFuture = serverBootstrap.bind(serverProperties.getHost(), serverProperties.getPort()).sync();
             channelFuture.addListener((ChannelFutureListener) channelFuture -> {
                 if (channelFuture.isSuccess()){
+                    isRunning = true;
                     log.info("IMServer started");
                     //集群模式将服务器信息注册
                     if (ServerModel.CLUSTER.equals(serverProperties.getConfiguration().getModel())){
@@ -78,7 +80,8 @@ public class IMServer{
                         }
                         serviceRegister.register(id,JsonUtil.toJSONString(serverProperties));
                     }
-
+                }else {
+                    isRunning = false;
                 }
             });
         }catch (Exception e){
@@ -87,10 +90,10 @@ public class IMServer{
         }
     }
 
-
-    @PreDestroy
+    @Override
     public void stop(){
         log.info("Stopping IMServer");
+        isRunning = false;
         try {
             bossEventLoopGroup.shutdownGracefully().sync();
             workEventLoopGroup.shutdownGracefully().sync();
@@ -98,6 +101,16 @@ public class IMServer{
         } catch (InterruptedException e) {
             log.error("Stop IMServer error: ",e);
         }
+    }
+
+    @Override
+    public boolean isRunning() {
+        return isRunning;
+    }
+
+    @Override
+    public int getPhase() {
+        return 0;
     }
 
 }

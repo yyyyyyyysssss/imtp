@@ -34,7 +34,7 @@
 
 
     <select id="findLatestMessageInfoByIds" parameterType="java.util.List" resultMap="resultMessageInfoMap">
-        SELECT t.id,t.type,t.content,t.send_time,u.nickname as name
+        SELECT t.id,t.type,t.content,t.content_metadata,t.send_time,u.nickname as name
         FROM im_msg t
         LEFT JOIN im_user u on t.sender_user_id = u.id
         WHERE t.id IN

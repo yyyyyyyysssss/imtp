@@ -19,8 +19,6 @@ const CALLING = 3
 
 const VoiceCall = forwardRef(({ sendMessage }, ref) => {
 
-    console.log('VoiceCall')
-
     useImperativeHandle(ref, () => ({
         receiveSignalingOffer: receiveSignalingOffer,
         receiveSignalingAnswer: receiveSignalingAnswer,
@@ -239,6 +237,9 @@ const VoiceCall = forwardRef(({ sendMessage }, ref) => {
 
     //接收close
     const receiveSignalingClose = async () => {
+        if(type === VoiceCallType.INVITE){
+            sendVoiceCallMessage(VoiceCallType.ACCEPT)
+        }
         stopCall()
     }
 
@@ -257,18 +258,20 @@ const VoiceCall = forwardRef(({ sendMessage }, ref) => {
     }
 
     const hangUpPhone = () => {
-        sendVoiceCallMessage()
+        if(type === VoiceCallType.INVITE){
+            sendVoiceCallMessage(type)
+        }
         stopCall()
         //信令消息
         const signalingMsg = signalingMessage(MessageType.SIGNALING_CLOSE, null)
         sendMessage(signalingMsg)
     }
 
-    const sendVoiceCallMessage = () => {
+    const sendVoiceCallMessage = (callType) => {
         //消息
-        let msg = signalingMessage(MessageType.VOICE_CALL_MESSAGE, '#')
+        let msg = signalingMessage(MessageType.VOICE_CALL_MESSAGE, null)
         let callStatus = 'COMPLETED'
-        if (type === VoiceCallType.INVITE) {
+        if (callType === VoiceCallType.INVITE) {
             if (callStatusRef.current === PENDING || callStatusRef.current === CONNECTING) {
                 callStatus = 'CANCELLED'
             }

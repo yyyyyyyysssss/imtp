@@ -14,7 +14,7 @@ const VoiceCallMessage = React.memo(({ callStatus, self, duration, durationDesc 
             content = self ? '已取消' : '对方已取消'
             break
         case CallStatus.REFUSED:
-            content = self ? '已拒接' : '对方已拒接'
+            content = self ? '对方已拒接' : '已拒接'
             break
         case CallStatus.INTERRUPTED:
             content = '通话中断'

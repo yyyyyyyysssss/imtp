@@ -9,11 +9,10 @@ import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler;
 import io.netty.handler.codec.http.websocketx.extensions.compression.WebSocketServerCompressionHandler;
-import jakarta.annotation.PostConstruct;
-import jakarta.annotation.PreDestroy;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.imtp.server.handler.AuthenticationHandler;
+import org.springframework.context.SmartLifecycle;
 import org.springframework.stereotype.Component;
 
 /**
@@ -23,7 +22,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Slf4j
-public class WebSocketServer {
+public class WebSocketServer implements SmartLifecycle {
 
     private EventLoopGroup bossEventLoopGroup;
 
@@ -37,7 +36,9 @@ public class WebSocketServer {
     @Resource
     private AuthenticationHandler authorizationHandler;
 
-    @PostConstruct
+    private boolean isRunning = false;
+
+    @Override
     public void start() {
         bossEventLoopGroup=new NioEventLoopGroup(2);
         workEventLoopGroup=new NioEventLoopGroup(8);
@@ -68,8 +69,10 @@ public class WebSocketServer {
             channelFuture.addListener((ChannelFutureListener) channelFuture -> {
                 if (channelFuture.isSuccess()){
                     log.info("WebSocket Server started");
+                    isRunning = true;
                 }else {
                     log.info("Failed to start WebSocket Server");
+                    isRunning = false;
                 }
             });
         }catch (Exception e){
@@ -78,7 +81,7 @@ public class WebSocketServer {
         }
     }
 
-    @PreDestroy
+    @Override
     public void stop(){
         log.info("Stopping WebSocket Server");
         try {
@@ -88,6 +91,16 @@ public class WebSocketServer {
         } catch (InterruptedException e) {
             log.error("Stop WebSocket Server Error: ",e);
         }
+        isRunning = false;
     }
 
+    @Override
+    public boolean isRunning() {
+        return isRunning;
+    }
+
+    @Override
+    public int getPhase() {
+        return 1;
+    }
 }
