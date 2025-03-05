@@ -41,7 +41,7 @@ export const sendEmailVerificationCode = (email) => {
 
     return new Promise((resolve, reject) => {
         httpWrapper
-            .get('/sendEmailVerificationCode', {
+            .get('/open/sendEmailVerificationCode', {
                 params: {
                     email: email
                 }

@@ -11,7 +11,28 @@ spring:
           max-idle: 8
           max-active: 8
           max-wait: 3000
+  cloud:
+    openfeign:
+      client:
+        config:
+          default:
+            loggerLevel: none
+            connect-timeout: 5000
+            read-timeout: 5000
+      httpclient:
+        hc5:
+          enabled: true
+        max-connections: 500
+        max-connections-per-route: 100
 
+
+logging:
+  level:
+    root: info
+    org.imtp.server: info
+    org.imtp.server.feign: debug
+  pattern:
+    console: "%d{yyyy/MM/dd HH:mm:ss.SSS} %highlight(%-5level) %clr([traceId: %X{traceId}]) [%thread] %cyan(%logger) : %msg %n"
 
 im:
   web:

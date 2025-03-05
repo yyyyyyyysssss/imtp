@@ -83,6 +83,25 @@ mybatis-plus:
 
 auth:
   loginPage: http://localhost:3000/login
+  authorize:
+    permit:
+      - /login
+      - /login/ott
+      - /error
+      - /assets/**
+      - /favicon.ico
+      - /oauth2/client/**
+      - /oauth2/consent
+      - /oauth2/activate
+      - /activated
+      - /open/**
+    authenticated:
+      - /refreshToken
+      - /logout
+      - /file/**
+      - /service/discovery
+      - /social/**
+      - /ott/generate
   # 基于请求头的身份认证
   requestHeadAuthentications:
     - antPath: /api/internal/**

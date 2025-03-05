@@ -106,27 +106,12 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> {
                     //放行的路径
                     authorize.requestMatchers(
-                                    "/login",
-                                    "/login/ott",
-                                    "/refreshToken",
-                                    "/sendEmailVerificationCode",
-                                    "/error",
-                                    "/assets/**",
-                                    "/favicon.ico",
-                                    "/oauth2/client/**",
-                                    "/oauth2/consent",
-                                    "/oauth2/activate",
-                                    "/activated",
-                                    "/open/**"
+                                    authProperties.getAuthorize().getPermit().toArray(new String[0])
                             )
                             .permitAll()
                             //只需要通过身份认证就能访问的路径
                             .requestMatchers(
-                                    "/logout",
-                                    "/file/**",
-                                    "/service/discovery",
-                                    "/social/**",
-                                    "/ott/generate"
+                                    authProperties.getAuthorize().getAuthenticated().toArray(new String[0])
                             ).authenticated()
                             //基于请求头授权
                             .requestMatchers(authProperties.requestHeadAuthenticationPath()).hasAuthority("request_header")

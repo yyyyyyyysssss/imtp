@@ -22,6 +22,8 @@ public class AuthProperties {
 
     private String loginPage;
 
+    private AuthorizeConfig authorize = new AuthorizeConfig();
+
     private Integer coexistToken;
 
     private KeyConfig jwt = new KeyConfig();
@@ -93,6 +95,16 @@ public class AuthProperties {
 
         private String apikey;
 
+
+    }
+
+    @Setter
+    @Getter
+    public static class AuthorizeConfig{
+
+        private List<String> permit;
+
+        private List<String> authenticated;
 
     }
 
