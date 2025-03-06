@@ -29,9 +29,14 @@ export const DeliveryMethod = Object.freeze({
 })
 
 
-export const VoiceCallType = Object.freeze({
+export const CallOperation = Object.freeze({
     INVITE: 'INVITE',
     ACCEPT: 'ACCEPT'
+})
+
+export const CallType = Object.freeze({
+    VOICE: 'VOICE',
+    VIDEO: 'VIDEO'
 })
 
 export const CallStatus = Object.freeze({

@@ -17,7 +17,7 @@ import { useWebSocket } from '../../context';
 import IdGen from '../../utils/IdGen';
 import { useDispatch, useSelector } from 'react-redux';
 import { addMessage, updateMessage, updateMessageStatus, startVoiceCall } from '../../redux/slices/chatSlice';
-import { MessageStatus, MessageType, VoiceCallType } from '../../enum';
+import { MessageStatus, MessageType, CallOperation } from '../../enum';
 import { formatFileSize, getVideoDimensionsOfByFile, dataURLtoFile, createThumbnail } from '../../utils'
 import { v4 as uuidv4 } from 'uuid';
 
@@ -443,7 +443,7 @@ const ChatItemFooter = React.memo(({ session }) => {
         } else {
             dispatch(startVoiceCall({
                 sessionId: session.id,
-                type: VoiceCallType.INVITE
+                type: CallOperation.INVITE
             }))
         }
 
