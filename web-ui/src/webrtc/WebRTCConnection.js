@@ -8,9 +8,13 @@ class WebRTCConnection {
         this.callType = callType
         this.session = session
         this.sendMessage = sendMessage
+        this.isRemoteDescriptionSet = false
+        this.inited = false
+        this.voiceEnabled = true
+        this.cachedCandidates = []
     }
 
-    async init() {
+    async #init() {
         this.rtc = new RTCPeerConnection({
             iceServers: [
                 {
@@ -28,8 +32,11 @@ class WebRTCConnection {
         }
         //本地音频流通道添加到rtc中
         this.localStream = await this.getUserMedia()
-        const tracks = this.localStream.getTracks()
+        const tracks = await this.localStream.getTracks()
         for (const track of tracks) {
+            if(track.kind === 'audio'){
+                track.enabled = this.voiceEnabled
+            }
             //轨道添加到rtc中
             this.rtc.addTrack(track, this.localStream)
         }
@@ -37,6 +44,7 @@ class WebRTCConnection {
         this.rtc.ontrack = (event) => {
             this.ontrack(event)
         }
+        this.inited = true
     }
 
     async getUserMedia() {
@@ -49,41 +57,49 @@ class WebRTCConnection {
         })
     }
 
-    async createOffer() {
+    async sendPreOffer(){
+        //发送preOffer
+        const msg = this.#signalingMessage(MessageType.SIGNALING_PRE_OFFER,this.callType)
+        this.sendMessage(msg)
+    }
+
+    //发送offer
+    async sendOffer() {
+        await this.#init()
+        //创建offer
         const offer = await this.rtc.createOffer()
-        //设置本地提案
-        await this.rtc.setLocalDescription(offer)
-        //发送提案
+        await this.#setLocalDescription(offer)
+        //发送offer
         const msg = this.#signalingMessage(MessageType.SIGNALING_OFFER, offer.sdp)
         this.sendMessage(msg)
         return offer
     }
 
-    async createAnswer(offerSdp) {
-        await this.rtc.setRemoteDescription(new RTCSessionDescription({
-            type: 'offer',
-            sdp: offerSdp
-        }))
+    //接收到offer
+    async receiveOffer(offerSdp) {
+        await this.#init()
+        await this.#setRemoteDescription('offer', offerSdp)
+        //创建answer
         const answer = await this.rtc.createAnswer()
-        await this.rtc.setLocalDescription(answer)
-        //监听服务器返回的新的候选地址
-        this.rtc.onicecandidate = async (e) => {
-            if (e.candidate) {
-                const msg = this.#signalingMessage(MessageType.SIGNALING_CANDIDATE, JSON.stringify(e.candidate))
-                this.sendMessage(msg)
-            }
-        }
-        //发送应答
+        await this.#setLocalDescription(answer)
+        //发送answer
         const msg = this.#signalingMessage(MessageType.SIGNALING_ANSWER, answer.sdp)
         this.sendMessage(msg)
     }
 
-    //接收answer
+    //接收到answer
     async receiveAnswer(sdp) {
-        await this.rtc.setRemoteDescription(new RTCSessionDescription({
-            type: 'answer',
-            sdp: sdp
-        }))
+        await this.#setRemoteDescription('answer', sdp)
+    }
+
+    //接收candidate
+    async receiveCandidate(candidate) {
+        this.#addIceCandidate(candidate)
+    }
+
+    //设置本地description
+    async #setLocalDescription(description) {
+        await this.rtc.setLocalDescription(description)
         //监听服务器返回的新的候选地址
         this.rtc.onicecandidate = async (e) => {
             if (e.candidate) {
@@ -93,13 +109,29 @@ class WebRTCConnection {
         }
     }
 
-    //接收candidate
-    async receiveCandidate(candidate) {
-        this.rtc.addIceCandidate(new RTCIceCandidate(JSON.parse(candidate)))
+    //设置远端description
+    async #setRemoteDescription(type, sdp) {
+        await this.rtc.setRemoteDescription(new RTCSessionDescription({
+            type: type,
+            sdp: sdp
+        }))
+        this.isRemoteDescriptionSet = true
+        this.cachedCandidates.forEach(c => {
+            this.#addIceCandidate(c)
+        })
+    }
+
+    //添加candidate 远端描述未设置时先把candidate缓存起来
+    async #addIceCandidate(candidate) {
+        if (this.isRemoteDescriptionSet) {
+            this.rtc.addIceCandidate(new RTCIceCandidate(JSON.parse(candidate)))
+        } else {
+            this.cachedCandidates.push(candidate)
+        }
     }
 
     //忙线
-    async busy(session) {
+    async sendBusy(session) {
         const msg = this.#signalingMessage(MessageType.SIGNALING_BUSY, null)
         const newMsg = {
             ...msg,
@@ -111,37 +143,59 @@ class WebRTCConnection {
         this.sendMessage(newMsg)
     }
 
+    //接收忙线
     async receiveBusy() {
         this.destroy()
     }
 
+    //接收关闭
     async receiveClose() {
         this.destroy()
     }
 
+    //静音
     async mute() {
-        const audioTracks = this.localStream.getAudioTracks()
-        audioTracks.forEach(track => {
-            track.enabled = false
-        })
+        if(this.inited){
+            this.#muted(false)
+        }else {
+            this.voiceEnabled = false
+        }
+        
     }
 
+    //关闭静音
     async unmute() {
+        if(this.inited){
+            this.#muted(true)
+        } else {
+            this.voiceEnabled = true
+        }
+    }
+
+    async #muted(flag){
         const audioTracks = this.localStream.getAudioTracks()
         audioTracks.forEach(track => {
-            track.enabled = true
+            track.enabled = flag
         })
     }
 
+    //关闭rtc
     async close() {
         const msg = this.#signalingMessage(MessageType.SIGNALING_CLOSE, null)
         this.sendMessage(msg)
         this.destroy()
     }
 
+    //销毁
     async destroy() {
-        this.localStream?.getTracks().forEach(track => track.stop())
-        this.rtc?.close()
+        if (this.localStream) {
+            this.localStream.getTracks().forEach(track => track.stop())
+            this.localStream = null
+        }
+        if (this.rtc) {
+            this.rtc.close()
+            this.rtc = null
+        }
     }
 
     #signalingMessage(signalingMessageType, content) {

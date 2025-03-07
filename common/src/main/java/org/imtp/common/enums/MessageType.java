@@ -19,6 +19,7 @@ public enum MessageType {
     FILE_MESSAGE((int) Command.FILE_MESSAGE.getCmdCode()),
     VOICE_CALL_MESSAGE((int) Command.VOICE_CALL_MESSAGE.getCmdCode()),
     VIDEO_CALL_MESSAGE((int) Command.VIDEO_CALL_MESSAGE.getCmdCode()),
+    SIGNALING_PRE_OFFER((int) Command.SIGNALING_PRE_OFFER.getCmdCode()),
     SIGNALING_OFFER((int) Command.SIGNALING_OFFER.getCmdCode()),
     SIGNALING_ANSWER((int) Command.SIGNALING_ANSWER.getCmdCode()),
     SIGNALING_CANDIDATE((int) Command.SIGNALING_CANDIDATE.getCmdCode()),

@@ -81,7 +81,8 @@ public class WebSocketAdapterHandler extends AbstractHandler<WebSocketFrame> {
 
     private Packet createWebSocketAdapterMessage(WebSocketMessage webSocketMessage) {
         MessageType type = webSocketMessage.getType();
-        if (type.equals(MessageType.SIGNALING_OFFER)
+        if (type.equals(MessageType.SIGNALING_PRE_OFFER)
+                || type.equals(MessageType.SIGNALING_OFFER)
                 || type.equals(MessageType.SIGNALING_ANSWER)
                 || type.equals(MessageType.SIGNALING_CANDIDATE)
                 || type.equals(MessageType.SIGNALING_BUSY)

@@ -45,6 +45,9 @@ public class CommandHandler extends AbstractHandler<Packet> {
     private VideoCallMessageHandler videoCallMessageHandler;
 
     @Resource
+    private SignalingPreOfferHandler signalingPreOfferHandler;
+
+    @Resource
     private SignalingOfferHandler signalingOfferHandler;
 
     @Resource
@@ -119,6 +122,14 @@ public class CommandHandler extends AbstractHandler<Packet> {
                         packet = new VideoCallMessage(byteBuf,header).additionTimestamp();
                         if (channelHandlerContext.pipeline().get(VideoCallMessageHandler.class) == null){
                             channelHandlerContext.pipeline().addLast(videoCallMessageHandler).fireChannelRead(packet);
+                        }else {
+                            channelHandlerContext.fireChannelRead(packet);
+                        }
+                        break;
+                    case SIGNALING_PRE_OFFER:
+                        packet = new SignalingPreOfferMessage(byteBuf,header);
+                        if (channelHandlerContext.pipeline().get(SignalingPreOfferHandler.class) == null){
+                            channelHandlerContext.pipeline().addLast(signalingPreOfferHandler).fireChannelRead(packet);
                         }else {
                             channelHandlerContext.fireChannelRead(packet);
                         }

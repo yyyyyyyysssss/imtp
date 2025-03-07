@@ -11,7 +11,7 @@ import { loadSession, addMessage, addSession, selectSession, updateMessageStatus
 import { useDispatch, useSelector } from 'react-redux';
 import UserSessionItem from "../../components/user-session-item";
 import { DeliveryMethod, MessageType } from "../../enum";
-import VoiceCallWrapper from "../voice-call/VoiceCallWrapper";
+import CallWrapper from "../voice-call/CallWrapper";
 
 const Chat = (props) => {
     const { socket } = useWebSocket()
@@ -110,8 +110,11 @@ const Chat = (props) => {
                     case MessageType.VOICE_CALL_MESSAGE:
                         content = null;
                         break
+                    case MessageType.SIGNALING_PRE_OFFER:
+                        voiceCallRef.current.receiveSignalingPreOffer(session, msg.content)
+                        return
                     case MessageType.SIGNALING_OFFER:
-                        voiceCallRef.current.receiveSignalingOffer(session, msg.content)
+                        voiceCallRef.current.receiveSignalingOffer(msg.content)
                         return
                     case MessageType.SIGNALING_ANSWER:
                         voiceCallRef.current.receiveSignalingAnswer(msg.content)
@@ -212,7 +215,7 @@ const Chat = (props) => {
                     </div>
                 </Flex>
             </Flex>
-            <VoiceCallWrapper ref={voiceCallRef} sendMessage={sendMessage} />
+            <CallWrapper ref={voiceCallRef} sendMessage={sendMessage} />
         </>
     );
 }

@@ -21,6 +21,7 @@ const VoiceCall = forwardRef(({ sendMessage }, ref) => {
 
     useImperativeHandle(ref, () => ({
         busy: busy,
+        receiveSignalingOffer: receiveSignalingOffer,
         receiveSignalingAnswer: receiveSignalingAnswer,
         receiveSignalingCandidate: receiveSignalingCandidate,
         receiveSignalingBusy: receiveSignalingBusy,
@@ -45,7 +46,7 @@ const VoiceCall = forwardRef(({ sendMessage }, ref) => {
     //计时器
     const { timer, toggleTimer } = useTimer()
 
-    const { type, sessionId, offerSdp } = voiceCall
+    const { callOperation, sessionId } = voiceCall
     //用户信息
     const userInfo = useSelector(state => state.chat.userInfo) || {}
     //会话
@@ -55,15 +56,13 @@ const VoiceCall = forwardRef(({ sendMessage }, ref) => {
 
     const localRef = useRef()
     const remoteRef = useRef()
-
     const webrtcRef = useRef()
 
     useEffect(() => {
         const invite = async () => {
-            if (type === CallOperation.INVITE) {
-                //创建offer并发送给对方
-                await webrtcRef.current.init()
-                webrtcRef.current.createOffer()
+            if (callOperation === CallOperation.INVITE) {
+                //创建preOffer并发送给对方
+                webrtcRef.current.sendPreOffer()
             }
         }
         webrtcRef.current = new WebRTCConnection(CallType.VOICE, session, sendMessage)
@@ -87,9 +86,14 @@ const VoiceCall = forwardRef(({ sendMessage }, ref) => {
         }
     }, [])
 
+    //接收到offer
+    const receiveSignalingOffer = async (offerSdp) => {
+        webrtcRef.current.receiveOffer(offerSdp)
+    }
+
     //接收answer
-    const receiveSignalingAnswer = async (sdp) => {
-        webrtcRef.current.receiveAnswer(sdp)
+    const receiveSignalingAnswer = async (answerSdp) => {
+        webrtcRef.current.receiveAnswer(answerSdp)
     }
 
     //接收candidate
@@ -99,7 +103,7 @@ const VoiceCall = forwardRef(({ sendMessage }, ref) => {
 
     //忙线
     const busy = async (session) => {
-        webrtcRef.current?.busy(session)
+        webrtcRef.current?.sendBusy(session)
     }
 
     //接收busy
@@ -111,7 +115,7 @@ const VoiceCall = forwardRef(({ sendMessage }, ref) => {
 
     //接收close
     const receiveSignalingClose = async () => {
-        if (type === CallOperation.INVITE) {
+        if (callOperation === CallOperation.INVITE) {
             sendVoiceCallMessage(CallOperation.ACCEPT)
         }
         stopCall()
@@ -131,8 +135,8 @@ const VoiceCall = forwardRef(({ sendMessage }, ref) => {
 
     //挂断
     const hangUpPhone = () => {
-        if (type === CallOperation.INVITE) {
-            sendVoiceCallMessage(type)
+        if (callOperation === CallOperation.INVITE) {
+            sendVoiceCallMessage(callOperation)
         }
         stopCall()
         webrtcRef.current?.close()
@@ -183,8 +187,7 @@ const VoiceCall = forwardRef(({ sendMessage }, ref) => {
     //接受通话
     const accept = async () => {
         setCallStatus(CONNECTING)
-        await webrtcRef.current.init()
-        webrtcRef.current.createAnswer(offerSdp)
+        webrtcRef.current.sendOffer()
     }
 
 
@@ -244,11 +247,11 @@ const VoiceCall = forwardRef(({ sendMessage }, ref) => {
                                 {name}
                             </div>
                             <div style={{ color: 'white', userSelect: 'none' }}>
-                                {callStatus === CALLING ? timer : type === CallOperation.INVITE ? '正在呼叫...' : '邀请你语音通话'}
+                                {callStatus === CALLING ? timer : callOperation === CallOperation.INVITE ? '正在呼叫...' : '邀请你语音通话'}
                             </div>
                         </Flex>
                     </Flex>
-                    <Flex justify='space-between' gap={20} style={{ paddingLeft: 10, paddingRight: 10, flexDirection: callStatus === CALLING ? 'row-reverse' : type === CallOperation.ACCEPT ? '' : 'row-reverse' }}>
+                    <Flex justify='space-between' gap={20} style={{ paddingLeft: 10, paddingRight: 10, flexDirection: callStatus === CALLING ? 'row-reverse' : callOperation === CallOperation.ACCEPT ? '' : 'row-reverse' }}>
                         <div
                             style={{
                                 padding: 10,
@@ -261,7 +264,7 @@ const VoiceCall = forwardRef(({ sendMessage }, ref) => {
                             <HangUpOutlined />
                         </div>
                         {
-                            callStatus === CALLING || type === CallOperation.INVITE
+                            callStatus === CALLING || callOperation === CallOperation.INVITE
                                 ?
                                 (
                                     <div

@@ -1,4 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit'
+import { message } from 'antd'
 
 
 const initialState = {
@@ -17,9 +18,9 @@ const initialState = {
     uploadProgress: {},  //上传进度
     voiceCall: {
         visible: false,
-        type: null,
-        offerSdp: null,
-        sessionId: null
+        sessionId: null,
+        callOperation: null,
+        callType: null
     }
 }
 
@@ -178,13 +179,17 @@ export const chatSlice = createSlice({
         },
         startVoiceCall: (state, action) => {
             const { payload } = action
-            const { sessionId, type, offerSdp } = payload
+            const { sessionId, callOperation, callType } = payload
+            if(state.voiceCall.visible){
+                message.info('正在通话中...')
+                return
+            }
             state.voiceCall = {
                 ...state.voiceCall,
                 visible: true,
                 sessionId: sessionId,
-                type: type,
-                offerSdp: offerSdp
+                callOperation: callOperation,
+                callType: callType
             }
         },
         stopVoiceCall: (state, action) => {
@@ -192,8 +197,8 @@ export const chatSlice = createSlice({
                 ...state.voiceCall,
                 visible: false,
                 sessionId: null,
-                type: null,
-                offerSdp: null
+                callOperation: null,
+                callType: null
             }
         }
     }

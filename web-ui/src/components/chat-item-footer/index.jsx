@@ -17,7 +17,7 @@ import { useWebSocket } from '../../context';
 import IdGen from '../../utils/IdGen';
 import { useDispatch, useSelector } from 'react-redux';
 import { addMessage, updateMessage, updateMessageStatus, startVoiceCall } from '../../redux/slices/chatSlice';
-import { MessageStatus, MessageType, CallOperation } from '../../enum';
+import { MessageStatus, MessageType, CallOperation, CallType } from '../../enum';
 import { formatFileSize, getVideoDimensionsOfByFile, dataURLtoFile, createThumbnail } from '../../utils'
 import { v4 as uuidv4 } from 'uuid';
 
@@ -32,7 +32,6 @@ const ChatItemFooter = React.memo(({ session }) => {
     }, [socket]);
 
     const dispatch = useDispatch()
-    const voiceCallVisible = useSelector(state => state.chat.voiceCall.visible)
     //用户信息
     const userInfo = useSelector(state => state.chat.userInfo) || {}
     //表情框显示与隐藏
@@ -438,15 +437,19 @@ const ChatItemFooter = React.memo(({ session }) => {
     }
 
     const voiceCall = () => {
-        if (voiceCallVisible) {
-            message.info('正在通话中...')
-        } else {
-            dispatch(startVoiceCall({
-                sessionId: session.id,
-                type: CallOperation.INVITE
-            }))
-        }
+        dispatch(startVoiceCall({
+            sessionId: session.id,
+            callOperation: CallOperation.INVITE,
+            callType: CallType.VOICE
+        }))
+    }
 
+    const videoCall = () => {
+        dispatch(startVoiceCall({
+            sessionId: session.id,
+            callOperation: CallOperation.INVITE,
+            callType: CallType.VIDEO
+        }))
     }
 
     const messageBase = (content, type) => {
@@ -481,7 +484,7 @@ const ChatItemFooter = React.memo(({ session }) => {
                             <img src={emoteImg} title='表情' alt='表情' style={{ width: '20px', height: '20px', cursor: 'pointer' }} onClick={showEmojiFrame} />
                             <Uploader ref={uploaderRef} {...uploadProps} />
                             <img src={voiceCallImg} onClick={voiceCall} title='语音通话' alt='语音通话' style={{ width: '22px', height: '22px', cursor: 'pointer' }} />
-                            <img src={videoCallImg} title='视频通话' alt='视频通话' style={{ width: '24px', height: '24px', cursor: 'pointer' }} />
+                            <img src={videoCallImg} onClick={videoCall} title='视频通话' alt='视频通话' style={{ width: '24px', height: '24px', cursor: 'pointer' }} />
                         </Flex>
                     </Content>
                 </Flex>
