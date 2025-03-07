@@ -24,7 +24,7 @@ const styles = StyleSheet.create({
     chatItemMessageBoxLeft: {
         position: 'relative',
         borderRadius: 6,
-        padding: 7,
+        padding: 10,
         backgroundColor: 'white',
         maxWidth: '80%',
         shadowColor: "black",
@@ -36,7 +36,7 @@ const styles = StyleSheet.create({
     chatItemMessageBoxRight: {
         position: 'relative',
         borderRadius: 6,
-        padding: 7,
+        padding: 10,
         backgroundColor: '#95EC69',
         maxWidth: '80%',
         shadowColor: "black",
@@ -72,7 +72,7 @@ const styles = StyleSheet.create({
         borderLeftColor: '#95EC69'
     },
     chatItemMessageText: {
-        fontSize: 16,
+        fontSize: 18,
     }
 })
 
