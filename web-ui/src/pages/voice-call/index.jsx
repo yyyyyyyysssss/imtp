@@ -20,7 +20,7 @@ const CALLING = 3
 const VoiceCall = forwardRef(({ sendMessage }, ref) => {
 
     useImperativeHandle(ref, () => ({
-        busy: busy,
+        sendBusy: sendBusy,
         receiveSignalingOffer: receiveSignalingOffer,
         receiveSignalingAnswer: receiveSignalingAnswer,
         receiveSignalingCandidate: receiveSignalingCandidate,
@@ -102,7 +102,7 @@ const VoiceCall = forwardRef(({ sendMessage }, ref) => {
     }
 
     //忙线
-    const busy = async (session) => {
+    const sendBusy = async (session) => {
         webrtcRef.current?.sendBusy(session)
     }
 
@@ -261,7 +261,7 @@ const VoiceCall = forwardRef(({ sendMessage }, ref) => {
                             }}
                             onClick={hangUpPhone}
                         >
-                            <HangUpOutlined />
+                            <HangUpOutlined size={25}/>
                         </div>
                         {
                             callStatus === CALLING || callOperation === CallOperation.INVITE

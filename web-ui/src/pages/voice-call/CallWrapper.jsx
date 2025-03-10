@@ -3,6 +3,7 @@ import VoiceCall from '.';
 import { forwardRef, useCallback, useImperativeHandle, useRef } from 'react';
 import { startVoiceCall } from '../../redux/slices/chatSlice';
 import { CallType } from '../../enum';
+import VideoCall from '../video-call';
 
 
 const CallWrapper = forwardRef(({ sendMessage }, ref) => {
@@ -28,7 +29,7 @@ const CallWrapper = forwardRef(({ sendMessage }, ref) => {
     const receiveSignalingPreOffer = useCallback((session, callType) => {
         if (visible) {
             //发送忙线
-            callRef.current.busy(session)
+            callRef.current.sendBusy(session)
         } else {
             dispatch(startVoiceCall({
                 sessionId: session.id,
@@ -69,7 +70,7 @@ const CallWrapper = forwardRef(({ sendMessage }, ref) => {
             case CallType.VOICE:
                 return <VoiceCall ref={callRef} sendMessage={sendMessage} />
             case CallType.VIDEO:
-                return <></>
+                return <VideoCall ref={callRef} sendMessage={sendMessage} />
         }
     },[callType])
 

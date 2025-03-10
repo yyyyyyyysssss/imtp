@@ -41,6 +41,8 @@ export const CallType = Object.freeze({
 })
 
 export const CallStatus = Object.freeze({
+    PENDING: 'PENDING',
+    PROGRESSING: 'PROGRESSING',
     COMPLETED: 'COMPLETED',
     CANCELLED: 'CANCELLED',
     REFUSED: 'REFUSED',
