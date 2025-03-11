@@ -1,9 +1,8 @@
 import { useDispatch, useSelector } from 'react-redux';
-import VoiceCall from '.';
 import { forwardRef, useCallback, useImperativeHandle, useRef } from 'react';
 import { startVoiceCall } from '../../redux/slices/chatSlice';
-import { CallType } from '../../enum';
-import VideoCall from '../video-call';
+import { CallOperation } from '../../enum';
+import Call from '.';
 
 
 const CallWrapper = forwardRef(({ sendMessage }, ref) => {
@@ -24,7 +23,7 @@ const CallWrapper = forwardRef(({ sendMessage }, ref) => {
 
     const voiceCall = useSelector(state => state.chat.voiceCall)
 
-    const { visible, callType } = voiceCall
+    const { visible } = voiceCall
 
     const receiveSignalingPreOffer = useCallback((session, callType) => {
         if (visible) {
@@ -33,7 +32,7 @@ const CallWrapper = forwardRef(({ sendMessage }, ref) => {
         } else {
             dispatch(startVoiceCall({
                 sessionId: session.id,
-                callOperation: CallType.ACCEPT,
+                callOperation: CallOperation.ACCEPT,
                 callType: callType
             }))
         }
@@ -65,18 +64,11 @@ const CallWrapper = forwardRef(({ sendMessage }, ref) => {
     }
 
 
-    const readerItem = useCallback((callType) => {
-        switch(callType){
-            case CallType.VOICE:
-                return <VoiceCall ref={callRef} sendMessage={sendMessage} />
-            case CallType.VIDEO:
-                return <VideoCall ref={callRef} sendMessage={sendMessage} />
-        }
-    },[callType])
-
     return (
         <>
-            {readerItem(callType)}
+            {visible && (
+                <Call ref={callRef} sendMessage={sendMessage} />
+            )}
         </>
     )
 

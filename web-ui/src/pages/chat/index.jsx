@@ -11,7 +11,7 @@ import { loadSession, addMessage, addSession, selectSession, updateMessageStatus
 import { useDispatch, useSelector } from 'react-redux';
 import UserSessionItem from "../../components/user-session-item";
 import { DeliveryMethod, MessageType } from "../../enum";
-import CallWrapper from "../voice-call/CallWrapper";
+import CallWrapper from "../call/CallWrapper";
 
 const Chat = (props) => {
     const { socket } = useWebSocket()
@@ -108,6 +108,9 @@ const Chat = (props) => {
                         content = msg.url;
                         break
                     case MessageType.VOICE_CALL_MESSAGE:
+                        content = null;
+                        break
+                    case MessageType.VIDEO_CALL_MESSAGE:
                         content = null;
                         break
                     case MessageType.SIGNALING_PRE_OFFER:

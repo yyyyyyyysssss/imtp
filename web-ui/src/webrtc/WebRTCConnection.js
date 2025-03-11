@@ -18,7 +18,7 @@ class WebRTCConnection {
         this.rtc = new RTCPeerConnection({
             iceServers: [
                 {
-                    urls: 'turn:222.65.207.186:23478',
+                    urls: 'turn:116.237.179.131:23478',
                     username: 'ys',
                     credential: 'Yan@136156'
                 }

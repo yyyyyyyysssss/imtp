@@ -12,6 +12,7 @@ import VoiceMessage from './voice-message';
 import { useSelector } from 'react-redux';
 import ProgressOverlayBox from '../ProgressOverlayBox';
 import VoiceCallMessage from './voice-call-message';
+import VideoCallMessage from './video-call-message';
 
 
 const Message = React.memo(({ messageId }) => {
@@ -79,6 +80,10 @@ const Message = React.memo(({ messageId }) => {
             case MessageType.VOICE_CALL_MESSAGE:
                 return (
                     <VoiceCallMessage callStatus={contentMetadata.callStatus} duration={contentMetadata.duration} durationDesc={contentMetadata.durationDesc} self={self}/>
+                )
+            case MessageType.VIDEO_CALL_MESSAGE:
+                return (
+                    <VideoCallMessage callStatus={contentMetadata.callStatus} duration={contentMetadata.duration} durationDesc={contentMetadata.durationDesc} self={self}/>
                 )
             default:
         }
