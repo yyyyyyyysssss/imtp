@@ -3,18 +3,18 @@ package org.imtp.web.service;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.imtp.common.enums.ClientType;
 import org.imtp.web.config.AuthProperties;
 import org.imtp.web.config.RedisSecurityContextRepository;
-import org.imtp.web.config.RefreshAuthenticationToken;
 import org.imtp.web.domain.entity.TokenInfo;
 import org.imtp.web.domain.entity.User;
-import org.imtp.common.enums.ClientType;
 import org.imtp.web.utils.EncryptUtil;
-import org.springframework.security.authentication.*;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.RememberMeAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.rememberme.TokenBasedRememberMeServices;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestAttributes;
@@ -31,9 +31,6 @@ public class LoginService {
 
     @Resource
     private AuthenticationManager authenticationManager;
-
-    @Resource
-    private UserService userService;
 
     @Resource
     private TokenService tokenService;
@@ -80,9 +77,6 @@ public class LoginService {
         SecurityContext securityContext = SecurityContextHolder.getContext();
         securityContext.setAuthentication(authenticate);
         RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
-        if (requestAttributes == null){
-            throw new NullPointerException("Servlet is null");
-        }
         HttpServletRequest request = ((ServletRequestAttributes) requestAttributes).getRequest();
         HttpServletResponse response = ((ServletRequestAttributes) requestAttributes).getResponse();
         request.setAttribute(RedisSecurityContextRepository.DEFAULT_REQUEST_ATTR_NAME,userId.toString());
