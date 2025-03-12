@@ -18,8 +18,6 @@ public class WebSocketMessage {
 
     private Long ackId;
 
-    private Long sessionId;
-
     private MessageType type;
 
     private Long sender;
@@ -36,7 +34,6 @@ public class WebSocketMessage {
     public String toString() {
         return "WebSocketMessage{" +
                 "ackId=" + ackId +
-                "sessionId=" + sessionId +
                 ", type=" + type +
                 ", sender=" + sender +
                 ", receiver=" + receiver +

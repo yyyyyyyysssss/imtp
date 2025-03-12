@@ -1,5 +1,7 @@
 package org.imtp.server.context;
 
+import io.netty.channel.Channel;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +30,11 @@ public abstract class AbstractChannelContext implements ChannelContext {
     @Override
     public ChannelSession getChannel(String id) {
         return channelMap.get(id);
+    }
+
+    @Override
+    public ChannelSession getChannel(Channel channel) {
+        return channelMap.get(channel.id().asLongText());
     }
 
     @Override

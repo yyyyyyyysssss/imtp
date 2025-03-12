@@ -61,6 +61,10 @@ const Chat = (props) => {
                 const msg = JSON.parse(event.data);
                 const { header } = msg;
                 const { cmd, sender, receiver, reserved } = header
+                //心跳包不处理 由websocket hooks处理
+                if(cmd === MessageType.HEARTBEAT_PING || cmd === MessageType.HEARTBEAT_PONG){
+                    return
+                }
                 //通用消息响应
                 if (cmd === MessageType.COMMON_RESPONSE) {
                     const { ackId, state } = msg

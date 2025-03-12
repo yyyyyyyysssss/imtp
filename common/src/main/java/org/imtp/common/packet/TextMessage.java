@@ -16,11 +16,11 @@ public class TextMessage extends AbstractTextMessage {
     }
 
     public TextMessage(String message, long sender, long receiver, Long ackId, boolean groupFlag) {
-        super(message,null,0, sender, receiver, Command.TEXT_MESSAGE, ackId, groupFlag);
+        super(message,null, sender, receiver, Command.TEXT_MESSAGE, ackId, groupFlag);
     }
 
     public TextMessage(String message, long sender, long receiver, Long ackId) {
-        super(message,null,0, sender, receiver, Command.TEXT_MESSAGE, ackId, false);
+        super(message,null, sender, receiver, Command.TEXT_MESSAGE, ackId, false);
     }
 
     @Override

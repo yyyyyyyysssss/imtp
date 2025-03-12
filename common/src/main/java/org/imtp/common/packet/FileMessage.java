@@ -21,7 +21,7 @@ public class FileMessage extends AbstractTextMessage{
     }
 
     public FileMessage(String url,MessageMetadata messageMetadata, long sender, long receiver, Long ackId, boolean groupFlag) {
-        super(url,messageMetadata,0, sender, receiver, Command.FILE_MESSAGE, ackId, groupFlag);
+        super(url,messageMetadata, sender, receiver, Command.FILE_MESSAGE, ackId, groupFlag);
     }
 
     @Override

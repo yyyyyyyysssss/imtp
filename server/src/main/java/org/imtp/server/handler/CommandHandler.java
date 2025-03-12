@@ -62,6 +62,12 @@ public class CommandHandler extends AbstractHandler<Packet> {
     @Resource
     private SignalingBusyHandler signalingBusyHandler;
 
+    @Resource
+    private HeartbeatPingHandler heartbeatPingHandler;
+
+    @Resource
+    private HeartbeatPongHandler heartbeatPongHandler;
+
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, Packet packet) {
         if(packet instanceof CommandPacket commandPacket){
@@ -174,6 +180,22 @@ public class CommandHandler extends AbstractHandler<Packet> {
                             channelHandlerContext.fireChannelRead(packet);
                         }
                         break;
+                    case HEARTBEAT_PING:
+                        packet = new HeartbeatPingMessage(byteBuf,header);
+                        if (channelHandlerContext.pipeline().get(HeartbeatPingHandler.class) == null){
+                            channelHandlerContext.pipeline().addLast(heartbeatPingHandler).fireChannelRead(packet);
+                        }else {
+                            channelHandlerContext.fireChannelRead(packet);
+                        }
+                        break;
+                    case HEARTBEAT_PONG:
+                        packet = new HeartbeatPongMessage(byteBuf,header);
+                        if (channelHandlerContext.pipeline().get(HeartbeatPongHandler.class) == null){
+                            channelHandlerContext.pipeline().addLast(heartbeatPongHandler).fireChannelRead(packet);
+                        }else {
+                            channelHandlerContext.fireChannelRead(packet);
+                        }
+                        break;
                     default:
                         throw new UnsupportedOperationException("不支持的操作");
                 }
@@ -185,20 +207,5 @@ public class CommandHandler extends AbstractHandler<Packet> {
             channelHandlerContext.fireChannelRead(packet);
         }
 
-    }
-
-    @Override
-    public void channelInactive(ChannelHandlerContext ctx) {
-        log.warn("im server channelInactive:{}",ctx.channel().id().asLongText());
-        Channel channel = ctx.channel();
-        channelInactiveHandle(channel);
-    }
-
-    @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        Channel channel = ctx.channel();
-        channelInactiveHandle(channel);
-        log.error("exception message",cause);
-        ctx.close();
     }
 }

@@ -33,7 +33,7 @@ const useTimer = () => {
     }, [isRunning])
 
     const toggleTimer = () => {
-        setIsRunning((prev) => !prev)
+        setIsRunning(true)
     }
 
     const resetTimer = () => {

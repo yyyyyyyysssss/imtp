@@ -166,7 +166,7 @@ const Call = forwardRef(({ sendMessage }, ref) => {
             webrtcRef.current.mute()
         }
         setMicrophoneMuteFlag((prev) => !prev)
-    },[microphoneMuteFlag])
+    }, [microphoneMuteFlag])
 
     const speakerMute = async () => {
         setSpeakerMuteFlag((prev) => !prev)
@@ -269,6 +269,7 @@ const Call = forwardRef(({ sendMessage }, ref) => {
                             <>
                                 <video
                                     ref={remoteRef}
+                                    autoPlay
                                     className={`video ${isVideoALarge ? 'large' : 'small'}`}
                                     onClick={switchScreen}
                                     style={{
@@ -277,6 +278,8 @@ const Call = forwardRef(({ sendMessage }, ref) => {
                                 />
                                 <video
                                     ref={localRef}
+                                    autoPlay
+                                    muted
                                     className={`video ${isVideoALarge ? 'small' : 'large'}`}
                                     onClick={switchScreen}
                                     style={{
@@ -334,7 +337,7 @@ const Call = forwardRef(({ sendMessage }, ref) => {
                         }}
                         vertical
                     >
-                        <Avatar style={{ userSelect: 'none' }} shape='square' size={60} src={avatar} />
+                        <Avatar style={{ userSelect: 'none' }} shape='square' size={80} src={avatar} />
                         <div
                             style={{
                                 color: 'white',
@@ -357,7 +360,13 @@ const Call = forwardRef(({ sendMessage }, ref) => {
                     <Flex
                         flex={2}
                         justify='space-between'
-                        align={callStatus === CallStatus.PROGRESSING ? 'center' : callOperation === CallOperation.ACCEPT || callType === CallType.VIDEO ? 'flex-end' : 'center'}
+                        align={callStatus === CallStatus.PROGRESSING && callType === CallType.VIDEO
+                            ? 'flex-end'
+                            : callStatus === CallStatus.PROGRESSING
+                                ? 'center'
+                                : callOperation === CallOperation.ACCEPT || callType === CallType.VIDEO
+                                    ? 'flex-end'
+                                    : 'center'}
                         style={{
                             paddingLeft: 40,
                             paddingRight: 40
@@ -394,7 +403,7 @@ const Call = forwardRef(({ sendMessage }, ref) => {
                     </Flex>
                     <Flex
                         flex={2}
-                        justify={callOperation === CallOperation.INVITE ? 'center' : callType === CallType.VIDEO ? 'space-between' : 'center'}
+                        justify={callStatus === CallStatus.PROGRESSING ? 'center' : callOperation === CallOperation.INVITE ? 'center' : callType === CallType.VIDEO ? 'space-between' : 'center'}
                         align='center'
                         style={{
                             paddingLeft: 40,

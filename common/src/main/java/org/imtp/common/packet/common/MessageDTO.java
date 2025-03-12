@@ -28,14 +28,11 @@ public class MessageDTO {
             this.deliveryMethod = DeliveryMethod.SINGLE;
         }
         if (packet instanceof AbstractTextMessage abstractTextMessage){
-            this.sessionId = abstractTextMessage.getSessionId();
             this.contentMetadata = abstractTextMessage.getContentMetadata();
         }
     }
 
     private Long id;
-
-    private Long sessionId;
 
     private Long senderUserId;
 

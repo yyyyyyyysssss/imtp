@@ -9,6 +9,7 @@ import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler;
 import io.netty.handler.codec.http.websocketx.extensions.compression.WebSocketServerCompressionHandler;
+import io.netty.handler.timeout.IdleStateHandler;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.imtp.server.handler.AuthenticationHandler;
@@ -34,7 +35,7 @@ public class WebSocketServer implements SmartLifecycle {
     private ServerProperties serverProperties;
 
     @Resource
-    private AuthenticationHandler authorizationHandler;
+    private AuthenticationHandler authenticationHandler;
 
     private boolean isRunning = false;
 
@@ -61,8 +62,10 @@ public class WebSocketServer implements SmartLifecycle {
                             pipeline.addLast(new WebSocketServerCompressionHandler());
                             //协议升级
                             pipeline.addLast(new WebSocketServerProtocolHandler("/im",null,true));
-                            //业务处理
-                            pipeline.addLast(authorizationHandler);
+                            //身份认证
+                            pipeline.addLast(authenticationHandler);
+                            //心跳检测
+                            pipeline.addLast(new IdleStateHandler(60,60,120));
                         }
                     });
             channelFuture = serverBootstrap.bind(serverProperties.getWebsocket().getHost(), serverProperties.getWebsocket().getPort()).sync();

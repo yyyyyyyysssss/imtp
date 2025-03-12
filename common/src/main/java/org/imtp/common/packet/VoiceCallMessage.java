@@ -20,7 +20,7 @@ public class VoiceCallMessage extends AbstractTextMessage{
     }
 
     public VoiceCallMessage(String url, MessageMetadata messageMetadata, long sender, long receiver, Long ackId, boolean groupFlag) {
-        super(url,messageMetadata,0, sender, receiver, Command.VOICE_CALL_MESSAGE, ackId, groupFlag);
+        super(url,messageMetadata, sender, receiver, Command.VOICE_CALL_MESSAGE, ackId, groupFlag);
     }
 
     @Override

@@ -33,8 +33,6 @@ public abstract class AbstractTextMessage extends Packet {
 
     protected long timestamp;
 
-    protected Long sessionId;
-
     //消息元信息
     private MessageMetadata contentMetadata;
 
@@ -54,7 +52,6 @@ public abstract class AbstractTextMessage extends Packet {
         }
         this.ackId = byteBuf.readLong();
         this.timestamp = byteBuf.readLong();
-        this.sessionId = byteBuf.readLong();
         int messageMetadataLength = byteBuf.readInt();
         if (messageMetadataLength > 0){
             byte[] messageMetadataBytes = new byte[messageMetadataLength];
@@ -63,7 +60,7 @@ public abstract class AbstractTextMessage extends Packet {
         }
     }
 
-    public AbstractTextMessage(String message,MessageMetadata messageMetadata,long sessionId, long sender, long receiver, Command command,Long ackId, boolean groupFlag) {
+    public AbstractTextMessage(String message,MessageMetadata messageMetadata, long sender, long receiver, Command command,Long ackId, boolean groupFlag) {
         super(sender, receiver, command,groupFlag);
         if(StringUtil.isNullOrEmpty(message) && StringUtil.length(message) > MAX_CHAR_LENGTH){
             throw new RuntimeException("messages cannot be exceed the maximum length limit");
@@ -71,7 +68,6 @@ public abstract class AbstractTextMessage extends Packet {
         this.text = message;
         this.ackId = ackId;
         this.contentMetadata = messageMetadata;
-        this.sessionId = sessionId;
     }
 
     @Override
@@ -89,8 +85,6 @@ public abstract class AbstractTextMessage extends Packet {
         byteBuf.writeLong(this.ackId);
         //时间戳
         byteBuf.writeLong(timestamp);
-        //会话id
-        byteBuf.writeLong(sessionId);
         //消息元信息长度
         if (this.contentMetadata == null){
             byteBuf.writeInt(0);
@@ -104,7 +98,7 @@ public abstract class AbstractTextMessage extends Packet {
 
     public abstract void encodeBodyAsByteBuf0(ByteBuf byteBuf);
 
-    //20 = 4字节内容长度+8字节应答id+8字节服务器时间戳 + 8字节会话id +4字节消息元信息长度
+    //16 = 4字节内容长度+8字节应答id+8字节服务器时间戳 +4字节消息元信息长度
     @JsonIgnore
     @Override
     public int getBodyLength() {
@@ -113,7 +107,7 @@ public abstract class AbstractTextMessage extends Packet {
         if (this.contentMetadata != null){
             contentMetadataLength = JsonUtil.toJSONString(this.contentMetadata).getBytes(StandardCharsets.UTF_8).length;
         }
-        return textLength + 4 + 8 + 8 + 8 + 4 + contentMetadataLength + getBodyLength0();
+        return textLength + 4 + 8 + 8 + 4 + contentMetadataLength + getBodyLength0();
     }
 
     @JsonIgnore
@@ -147,10 +141,6 @@ public abstract class AbstractTextMessage extends Packet {
 
     public MessageMetadata getContentMetadata() {
         return contentMetadata;
-    }
-
-    public Long getSessionId() {
-        return sessionId;
     }
 
     @JsonIgnore

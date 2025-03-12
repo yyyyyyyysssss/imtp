@@ -27,8 +27,8 @@ public enum Command {
 
     MSG_RES((byte) -1, "通用消息响应"),
 
-    HEARTBEAT_REQ((byte) 127, "心跳请求"),
-    HEARTBEAT_RES((byte) -127, "心跳响应"),
+    HEARTBEAT_PING((byte) 127, "心跳请求"),
+    HEARTBEAT_PONG((byte) -127, "心跳响应"),
 
     ;
     private byte cmdCode;

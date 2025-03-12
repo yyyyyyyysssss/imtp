@@ -25,6 +25,8 @@ public enum MessageType {
     SIGNALING_CANDIDATE((int) Command.SIGNALING_CANDIDATE.getCmdCode()),
     SIGNALING_BUSY((int) Command.SIGNALING_BUSY.getCmdCode()),
     SIGNALING_CLOSE((int) Command.SIGNALING_CLOSE.getCmdCode()),
+    HEARTBEAT_PING((int) Command.HEARTBEAT_PING.getCmdCode()),
+    HEARTBEAT_PONG((int) Command.HEARTBEAT_PONG.getCmdCode()),
 
     ;
     private final Integer value;

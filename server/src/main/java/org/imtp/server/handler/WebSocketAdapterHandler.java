@@ -2,7 +2,6 @@ package org.imtp.server.handler;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.websocketx.*;
@@ -62,21 +61,6 @@ public class WebSocketAdapterHandler extends AbstractHandler<WebSocketFrame> {
         } else if (msg instanceof CloseWebSocketFrame) {
             ctx.close();
         }
-    }
-
-    @Override
-    public void channelInactive(ChannelHandlerContext ctx) {
-        log.warn("websocket server channelInactive: {}", ctx.channel().id().asLongText());
-        Channel channel = ctx.channel();
-        channelInactiveHandle(channel);
-    }
-
-    @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        Channel channel = ctx.channel();
-        channelInactiveHandle(channel);
-        log.error("exception message", cause);
-        ctx.close();
     }
 
     private Packet createWebSocketAdapterMessage(WebSocketMessage webSocketMessage) {

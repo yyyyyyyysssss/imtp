@@ -2,11 +2,9 @@ package org.imtp.server.handler;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
-import io.netty.util.AttributeKey;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.imtp.common.packet.AuthenticationRequest;
@@ -15,8 +13,6 @@ import org.imtp.common.packet.CommandPacket;
 import org.imtp.common.packet.body.UserInfo;
 import org.imtp.common.response.Result;
 import org.imtp.common.utils.JsonUtil;
-import org.imtp.server.constant.ProjectConstant;
-import org.imtp.server.context.ChannelContextHolder;
 import org.imtp.server.context.ChannelSession;
 import org.imtp.server.context.IMChannelSession;
 import org.imtp.server.context.WebSocketChannelSession;
@@ -77,14 +73,7 @@ public class AuthenticationHandler extends AbstractHandler<Object>{
 
 
     private void authenticationSuccess(ChannelSession channelSession){
-        Channel channel = channelSession.channel();
-        String userId = channelSession.userId();
-        //保存channel
-        ChannelContextHolder.channelContext().addChannel(channelSession.id(),channelSession);
-        //建立channel与用户之间的关系
-        channel.attr(AttributeKey.valueOf(ProjectConstant.CHANNEL_ATTR_LOGIN_USER)).set(userId);
-        log.info("用户:{} 已上线",userId);
-        chatService.userOnline(userId, channelSession.id());
+        bind(channelSession);
     }
 
 }

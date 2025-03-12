@@ -21,7 +21,7 @@ public class VideoMessage extends AbstractTextMessage{
     }
 
     public VideoMessage(String path,MessageMetadata messageMetadata, long sender, long receiver, Long ackId,boolean groupFlag) {
-        super(path,messageMetadata,0, sender, receiver, Command.VIDEO_MESSAGE, ackId, groupFlag);
+        super(path,messageMetadata, sender, receiver, Command.VIDEO_MESSAGE, ackId, groupFlag);
     }
 
     @Override

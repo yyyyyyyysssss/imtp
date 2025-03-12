@@ -21,7 +21,7 @@ public class ImageMessage extends AbstractTextMessage{
     }
 
     public ImageMessage(String url,MessageMetadata messageMetadata, long sender, long receiver, Long ackId, boolean groupFlag) {
-        super(url,messageMetadata,0, sender, receiver, Command.IMAGE_MESSAGE, ackId, groupFlag);
+        super(url,messageMetadata, sender, receiver, Command.IMAGE_MESSAGE, ackId, groupFlag);
     }
 
     @Override

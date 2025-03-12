@@ -5,6 +5,7 @@ import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.timeout.IdleStateHandler;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.imtp.common.codec.IMTPDecoder;
@@ -29,7 +30,7 @@ import java.util.UUID;
 public class IMServer implements SmartLifecycle {
 
     @Resource
-    private AuthenticationHandler authorizationHandler;
+    private AuthenticationHandler authenticationHandler;
 
     @Resource
     private ServerProperties serverProperties;
@@ -61,9 +62,14 @@ public class IMServer implements SmartLifecycle {
                         @Override
                         protected void initChannel(SocketChannel socketChannel) {
                             ChannelPipeline pipeline = socketChannel.pipeline();
+                            //解码
                             pipeline.addLast(new IMTPDecoder());
+                            //编码
                             pipeline.addLast(new IMTPEncoder());
-                            pipeline.addLast(authorizationHandler);
+                            //身份认证
+                            pipeline.addLast(authenticationHandler);
+                            //心跳检测
+                            pipeline.addLast(new IdleStateHandler(60,60,120));
                         }
                     });
             channelFuture = serverBootstrap.bind(serverProperties.getHost(), serverProperties.getPort()).sync();

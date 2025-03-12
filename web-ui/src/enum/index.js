@@ -13,7 +13,9 @@ export const MessageType = Object.freeze({
     SIGNALING_CANDIDATE: 43,
     SIGNALING_BUSY: 44,
     SIGNALING_CLOSE: 49,
-    AUTHORIZATION_RES: -120
+    AUTHORIZATION_RES: -120,
+    HEARTBEAT_PING: 127,
+    HEARTBEAT_PONG: -127
 })
 
 

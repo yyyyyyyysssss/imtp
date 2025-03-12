@@ -44,9 +44,13 @@ export const WebSocketProvider = ({ children }) => {
         ws.onerror = (error) => {
             console.log('WebSocket error: ',error);
         }
+        let timeoutId;
         ws.onclose = () => {
             console.log('WebSocket connection closed');
-            setTimeout(() => {
+            if(timeoutId){
+                clearTimeout(timeoutId)
+            }
+            timeoutId = setTimeout(() => {
                 console.log('WebSocket reconnecting');
                 start();
             },3000);
