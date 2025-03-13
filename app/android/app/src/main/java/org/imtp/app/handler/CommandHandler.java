@@ -7,6 +7,7 @@ import org.imtp.app.model.MessageModel;
 import org.imtp.common.enums.Command;
 import org.imtp.common.packet.CommandPacket;
 import org.imtp.common.packet.FileMessage;
+import org.imtp.common.packet.HeartbeatPingMessage;
 import org.imtp.common.packet.ImageMessage;
 import org.imtp.common.packet.MessageStateResponse;
 import org.imtp.common.packet.TextMessage;
@@ -48,6 +49,9 @@ public class CommandHandler extends AbstractModelHandler<Packet> {
                 break;
             case FILE_MESSAGE:
                 this.model.publishMessage(new FileMessage(byteBuf, header));
+                break;
+            case HEARTBEAT_PING:
+                this.model.publishMessage(new HeartbeatPingMessage(byteBuf, header));
                 break;
             case MSG_RES:
                 this.model.publishMessage(new MessageStateResponse(byteBuf, header));

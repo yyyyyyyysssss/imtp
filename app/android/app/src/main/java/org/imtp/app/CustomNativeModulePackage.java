@@ -7,8 +7,10 @@ import com.facebook.react.bridge.NativeModule;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.uimanager.ViewManager;
 
+import org.imtp.app.module.CallModule;
 import org.imtp.app.module.MessageModule;
 import org.imtp.app.module.UploadModule;
+import org.imtp.app.view.CallViewManager;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -23,12 +25,16 @@ public class CustomNativeModulePackage implements ReactPackage {
         nativeModules.add(new MessageModule(reactApplicationContext));
         //注册文件上传模块
         nativeModules.add(new UploadModule(reactApplicationContext));
+        //音视频通话
+        nativeModules.add(new CallModule(reactApplicationContext));
         return nativeModules;
     }
 
     @NonNull
     @Override
     public List<ViewManager> createViewManagers(@NonNull ReactApplicationContext reactApplicationContext) {
-        return Collections.emptyList();
+        List<ViewManager> viewManagers = new ArrayList<>();
+        viewManagers.add(new CallViewManager(reactApplicationContext));
+        return viewManagers;
     }
 }

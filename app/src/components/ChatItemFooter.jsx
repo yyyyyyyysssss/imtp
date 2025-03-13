@@ -7,8 +7,14 @@ import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import { MessageType } from '../enum';
 import DocumentPicker, { types } from 'react-native-document-picker'
 import RecordVoice from './RecordVoice';
+import { NativeModules } from 'react-native';
+import { useNavigation, } from '@react-navigation/native';
+
+const { CallModule } = NativeModules
 
 const ChatItemFooter = React.memo(({ sendMessage }) => {
+
+    const navigation = useNavigation();
 
     const [isOpen, setIsOpen] = useState(false)
 
@@ -210,16 +216,28 @@ const ChatItemFooter = React.memo(({ sendMessage }) => {
         )
     }
 
+    const voiceCall = () => {
+        // CallModule.call('VOICE')
+        navigation.navigate('Call', {
+            
+        })
+    }
+
+    const videoCall = () => {
+        // CallModule.call('VIDEO')
+        navigation.navigate('Call', {
+            
+        })
+    }
+
     //文件选择
     const filePicker = () => {
-        const s = performance.now()
         DocumentPicker.pick({
             mode: 'open',
             type: types.allFiles
         })
             .then(
                 (res) => {
-                    console.log('took', performance.now() - s)
                     res.forEach(file => {
                         const { name, uri, type, size } = file
                         const media = {
@@ -372,7 +390,7 @@ const ChatItemFooter = React.memo(({ sendMessage }) => {
                             </VStack>
 
                             <VStack alignItems='center' space={2}>
-                                <Pressable>
+                                <Pressable onPress={voiceCall}>
                                     <Box style={styles.chatOpsIcon}>
                                         <MaterialIcon name="phone" size={40} />
                                     </Box>
@@ -381,7 +399,7 @@ const ChatItemFooter = React.memo(({ sendMessage }) => {
                             </VStack>
 
                             <VStack alignItems='center' justifyContent='flex-start' space={2}>
-                                <Pressable>
+                                <Pressable onPress={videoCall}>
                                     <Box style={styles.chatOpsIcon}>
                                         <MaterialIcon name="videocam" size={40} />
                                     </Box>

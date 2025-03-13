@@ -11,7 +11,6 @@ public class ReactNativeAdapterMessage extends AbstractTextMessage {
     public ReactNativeAdapterMessage(ReactNativeMessage reactNativeMessage){
         super(reactNativeMessage.getContent(),
                 reactNativeMessage.getContentMetadata(),
-                reactNativeMessage.getSessionId(),
                 reactNativeMessage.getSender(),
                 reactNativeMessage.getReceiver(),
                 Command.find(reactNativeMessage.getType().getValue().byteValue()),

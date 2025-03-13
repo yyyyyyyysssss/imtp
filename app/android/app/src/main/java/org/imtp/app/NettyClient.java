@@ -89,7 +89,7 @@ public class NettyClient implements Runnable {
                     future.channel().eventLoop().schedule(() -> {
                         Log.w(TAG, "server reconnecting...");
                         connect();
-                    }, 2L, TimeUnit.SECONDS);
+                    }, 3L, TimeUnit.SECONDS);
                 }
 
             });

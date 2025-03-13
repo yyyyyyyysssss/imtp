@@ -12,8 +12,6 @@ public class ReactNativeMessage {
 
     private Long ackId;
 
-    private Long sessionId;
-
     private MessageType type;
 
     private Long sender;
@@ -32,14 +30,6 @@ public class ReactNativeMessage {
 
     public void setAckId(Long ackId) {
         this.ackId = ackId;
-    }
-
-    public Long getSessionId() {
-        return sessionId;
-    }
-
-    public void setSessionId(Long sessionId) {
-        this.sessionId = sessionId;
     }
 
     public MessageType getType() {

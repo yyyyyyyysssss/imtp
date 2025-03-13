@@ -6,6 +6,7 @@ import Login from './pages/login';
 import ChatItem from './pages/chat/chat-item';
 import FriendItem from './pages/friend/friend-item';
 import Group from './pages/group';
+import Call from './pages/call';
 import Feather from 'react-native-vector-icons/Feather';
 import { AuthContext, SignInContext, useIsSignedIn, useIsSignedOut, UserInfoContext } from './context';
 import Storage from './storage/storage';
@@ -71,6 +72,12 @@ const RootStack = createNativeStackNavigator({
             headerRight: () => (
               <Feather name='more-horizontal' size={28} />
             )
+          }
+        },
+        Call: {
+          screen: Call,
+          options: {
+            title: ''
           }
         },
         VideoPlay: {

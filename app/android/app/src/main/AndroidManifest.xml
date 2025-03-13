@@ -45,5 +45,10 @@
                 <data android:host="ychat.com" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".activity.CallActivity"
+            android:label="CallActivity">
+
+        </activity>
     </application>
 </manifest>

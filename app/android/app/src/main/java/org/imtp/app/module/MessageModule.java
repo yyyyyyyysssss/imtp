@@ -18,6 +18,8 @@ import org.imtp.app.model.MessageListenerListener;
 import org.imtp.app.model.MessageModel;
 import org.imtp.app.model.Observer;
 import org.imtp.common.packet.AuthenticationRequest;
+import org.imtp.common.packet.HeartbeatPingMessage;
+import org.imtp.common.packet.HeartbeatPongMessage;
 import org.imtp.common.packet.base.Packet;
 import org.imtp.common.packet.body.TokenInfo;
 import org.imtp.common.utils.JsonUtil;
@@ -110,6 +112,10 @@ public class MessageModule extends ReactContextBaseJavaModule implements Observe
 
     }
     public void receiveMessage(Packet packet){
+        if(packet instanceof HeartbeatPingMessage){
+            messageModel.sendMessage(new HeartbeatPongMessage());
+            return;
+        }
         DeviceEventManagerModule.RCTDeviceEventEmitter rctDeviceEventEmitter = reactApplicationContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class);
         rctDeviceEventEmitter.emit("RECEIVE_MESSAGE",JsonUtil.toJSONString(packet));
     }
