@@ -220,7 +220,6 @@ public class UserSocialServiceImpl implements UserSocialService {
     public Long saveMessage(MessageDTO messageDTO) {
         Message message = new Message();
         message.setId(IdGen.genId());
-        message.setSessionId(messageDTO.getSessionId());
         message.setSenderUserId(messageDTO.getSenderUserId());
         message.setReceiverUserId(messageDTO.getReceiverUserId());
         message.setType(messageDTO.getType());

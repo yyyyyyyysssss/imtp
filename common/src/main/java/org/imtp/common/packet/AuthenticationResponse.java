@@ -13,7 +13,7 @@ import org.imtp.common.utils.JsonUtil;
  * @Author ys
  * @Date 2024/9/11 13:24
  */
-public class AuthenticationResponse extends SystemTextMessage{
+public class AuthenticationResponse extends AbstractSystemMessage {
 
     private boolean authenticated;
 

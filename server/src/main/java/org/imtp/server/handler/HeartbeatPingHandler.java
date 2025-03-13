@@ -23,6 +23,6 @@ public class HeartbeatPingHandler extends AbstractHandler<HeartbeatPingMessage> 
     protected void channelRead0(ChannelHandlerContext ctx, HeartbeatPingMessage heartbeatPingMessage) {
         ChannelSession channelSession = ChannelContextHolder.channelContext().getChannel(ctx.channel());
         channelSession.sendMessage(new HeartbeatPongMessage());
-        log.debug("channelId:{} ping",channelSession.id());
+        log.debug("ping channelId: {}",channelSession.id());
     }
 }

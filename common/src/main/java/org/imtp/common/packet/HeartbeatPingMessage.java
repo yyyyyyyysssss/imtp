@@ -9,7 +9,7 @@ import org.imtp.common.packet.base.Header;
  * @Author ys
  * @Date 2025/3/12 16:34
  */
-public class HeartbeatPingMessage extends SystemTextMessage{
+public class HeartbeatPingMessage extends AbstractSystemMessage {
 
     public HeartbeatPingMessage() {
         super(0, 0, Command.HEARTBEAT_PING);

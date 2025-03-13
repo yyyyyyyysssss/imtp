@@ -1,6 +1,7 @@
 import { createContext,useState,useEffect,useContext } from 'react'
 import Cookies from 'js-cookie'
 import env from '../env';
+import { MessageType } from '../enum';
 
 export const HomeContext = createContext();
 
@@ -30,13 +31,20 @@ export const WebSocketProvider = ({ children }) => {
             const obj = JSON.parse(event.data);
             const {header} = obj;
             if(header){
-                if(header.cmd === AUTHORIZATION_RES){
+                if(header.cmd === MessageType.AUTHORIZATION_RES){
                     const authenticated = obj.authenticated;
                     if(authenticated){
                         console.log('Websocket Server authenticated');
                     }else{
                         console.log('Websocket Server unauthenticated');
                     }
+                } else if(header.cmd === MessageType.HEARTBEAT_PING){
+                    const pongMsg = {
+                        type: MessageType.HEARTBEAT_PONG,
+                        sender: 0,
+                        receiver: 0
+                    }
+                    ws.send(JSON.stringify(pongMsg))
                 }
             }
             

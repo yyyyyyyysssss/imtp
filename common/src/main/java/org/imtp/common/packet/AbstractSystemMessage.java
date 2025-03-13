@@ -13,15 +13,15 @@ import java.nio.charset.StandardCharsets;
  * @Author ys
  * @Date 2024/4/29 16:23
  */
-public abstract class SystemTextMessage extends Packet {
+public abstract class AbstractSystemMessage extends Packet {
 
     protected String text;
 
-    public SystemTextMessage(long sender, long receiver, Command command) {
+    public AbstractSystemMessage(long sender, long receiver, Command command) {
         super(sender, receiver, command);
     }
 
-    public SystemTextMessage(ByteBuf byteBuf, Header header) {
+    public AbstractSystemMessage(ByteBuf byteBuf, Header header) {
         super(header);
         if(header.getLength() == 0){
             return;

@@ -4,14 +4,13 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.http.websocketx.*;
+import io.netty.handler.codec.http.websocketx.CloseWebSocketFrame;
+import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
+import io.netty.handler.codec.http.websocketx.WebSocketFrame;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.imtp.common.enums.MessageType;
-import org.imtp.common.packet.CommandPacket;
-import org.imtp.common.packet.WebSocketAdapterMessage;
-import org.imtp.common.packet.WebSocketMessage;
-import org.imtp.common.packet.WebSocketSignalingAdapterMessage;
+import org.imtp.common.packet.*;
 import org.imtp.common.packet.base.Header;
 import org.imtp.common.packet.base.Packet;
 import org.imtp.common.utils.CRC16Util;
@@ -56,8 +55,6 @@ public class WebSocketAdapterHandler extends AbstractHandler<WebSocketFrame> {
             } else {
                 ctx.fireChannelRead(packet);
             }
-        } else if (msg instanceof PingWebSocketFrame) {
-            ctx.channel().writeAndFlush(new PongWebSocketFrame());
         } else if (msg instanceof CloseWebSocketFrame) {
             ctx.close();
         }
@@ -71,7 +68,10 @@ public class WebSocketAdapterHandler extends AbstractHandler<WebSocketFrame> {
                 || type.equals(MessageType.SIGNALING_CANDIDATE)
                 || type.equals(MessageType.SIGNALING_BUSY)
                 || type.equals(MessageType.SIGNALING_CLOSE)) {
-            return new WebSocketSignalingAdapterMessage(webSocketMessage);
+            return new WebSocketAdapterSignalingMessage(webSocketMessage);
+        }
+        if (type.equals(MessageType.HEARTBEAT_PING)|| type.equals(MessageType.HEARTBEAT_PONG)) {
+            return new WebSocketAdapterSystemMessage(webSocketMessage);
         }
         return new WebSocketAdapterMessage(webSocketMessage);
     }

@@ -76,17 +76,13 @@ public abstract class AbstractHandler<I> extends SimpleChannelInboundHandler<I> 
         if (evt instanceof IdleStateEvent event){
             ChannelSession channelSession = ChannelContextHolder.channelContext().getChannel(ctx.channel());
             switch (event.state()){
-                //读空闲 长时间没有收到客户端数据 说明客户端可能已经断开连接
+                //读空闲 长时间没有收到客户端数据
                 case READER_IDLE:
-                    //TODO 关闭客户端连接
+                    ctx.channel().close();
                     break;
                 //写空闲 长时间没有向客户端发送数据 发送PING消息
                 case WRITER_IDLE:
                     channelSession.sendMessage(new HeartbeatPingMessage());
-                    break;
-                //读写空闲
-                case ALL_IDLE:
-                    //TODO 关闭客户端连接
                     break;
             }
         }

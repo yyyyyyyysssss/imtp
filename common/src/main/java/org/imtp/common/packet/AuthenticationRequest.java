@@ -10,7 +10,7 @@ import org.imtp.common.packet.base.Header;
  * @Author ys
  * @Date 2024/9/11 11:48
  */
-public class AuthenticationRequest extends SystemTextMessage {
+public class AuthenticationRequest extends AbstractSystemMessage {
 
     private String token;
 

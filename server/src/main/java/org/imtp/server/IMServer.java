@@ -69,7 +69,7 @@ public class IMServer implements SmartLifecycle {
                             //身份认证
                             pipeline.addLast(authenticationHandler);
                             //心跳检测
-                            pipeline.addLast(new IdleStateHandler(60,60,120));
+                            pipeline.addLast(new IdleStateHandler(120,60,0));
                         }
                     });
             channelFuture = serverBootstrap.bind(serverProperties.getHost(), serverProperties.getPort()).sync();

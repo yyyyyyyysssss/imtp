@@ -9,9 +9,9 @@ import org.imtp.common.enums.DeliveryMethod;
  * @Author ys
  * @Date 2024/9/22 21:06
  */
-public class WebSocketSignalingAdapterMessage extends AbstractSignalingMessage{
+public class WebSocketAdapterSignalingMessage extends AbstractSignalingMessage{
 
-    public WebSocketSignalingAdapterMessage(WebSocketMessage webSocketMessage){
+    public WebSocketAdapterSignalingMessage(WebSocketMessage webSocketMessage){
         super(webSocketMessage.getContent(),
                 webSocketMessage.getSender(),
                 webSocketMessage.getReceiver(),
