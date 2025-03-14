@@ -2,13 +2,15 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Box, HStack, Text, VStack, Input, Pressable, Flex, View } from 'native-base';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons';
-import { PermissionsAndroid, StyleSheet } from 'react-native';
+import { PermissionsAndroid, StyleSheet,Platform } from 'react-native';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import { MessageType } from '../enum';
 import DocumentPicker, { types } from 'react-native-document-picker'
 import RecordVoice from './RecordVoice';
 import { NativeModules } from 'react-native';
 import { useNavigation, } from '@react-navigation/native';
+import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions';
+import { requestCameraPermission } from '../utils/PermissionRequest';
 
 const { CallModule } = NativeModules
 
@@ -172,7 +174,11 @@ const ChatItemFooter = React.memo(({ sendMessage }) => {
     }
 
     //拍照
-    const takePicture = () => {
+    const takePicture = async () => {
+        const p = await requestCameraPermission()
+        if(!p){
+            return
+        }
         launchCamera(
             {
                 mediaType: 'photo',
@@ -193,7 +199,11 @@ const ChatItemFooter = React.memo(({ sendMessage }) => {
     }
 
     //摄像
-    const cameraShoot = () => {
+    const cameraShoot = async () => {
+        const p = await requestCameraPermission()
+        if(!p){
+            return
+        }
         launchCamera(
             {
                 mediaType: 'video',
@@ -217,10 +227,10 @@ const ChatItemFooter = React.memo(({ sendMessage }) => {
     }
 
     const voiceCall = () => {
-        // CallModule.call('VOICE')
-        navigation.navigate('Call', {
+        CallModule.call('VOICE')
+        // navigation.navigate('Call', {
             
-        })
+        // })
     }
 
     const videoCall = () => {
