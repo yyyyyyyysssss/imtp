@@ -14,7 +14,7 @@ import { requestCameraPermission } from '../utils/PermissionRequest';
 
 const { CallModule } = NativeModules
 
-const ChatItemFooter = React.memo(({ sendMessage }) => {
+const ChatItemFooter = React.memo(({ sendMessage,sessionId }) => {
 
     const navigation = useNavigation();
 
@@ -228,15 +228,11 @@ const ChatItemFooter = React.memo(({ sendMessage }) => {
 
     const voiceCall = () => {
         CallModule.call('VOICE')
-        // navigation.navigate('Call', {
-            
-        // })
     }
 
     const videoCall = () => {
-        // CallModule.call('VIDEO')
         navigation.navigate('Call', {
-            
+            sessionId: sessionId
         })
     }
 

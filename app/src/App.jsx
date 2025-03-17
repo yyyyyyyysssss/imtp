@@ -77,7 +77,8 @@ const RootStack = createNativeStackNavigator({
         Call: {
           screen: Call,
           options: {
-            title: ''
+            title: '',
+            headerShown: false
           }
         },
         VideoPlay: {

@@ -289,6 +289,7 @@ const ChatItem = ({ route }) => {
                 </HStack>
                 <ChatItemFooter
                     sendMessage={sendMessage}
+                    sessionId = {sessionId}
                 />
             </KeyboardAvoidingView>
         </VStack>
