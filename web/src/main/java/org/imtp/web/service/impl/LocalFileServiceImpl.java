@@ -1,18 +1,11 @@
 package org.imtp.web.service.impl;
 
 import groovy.lang.Tuple2;
-import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.imtp.web.config.exception.BusinessException;
-import org.imtp.web.config.idwork.IdGen;
-import org.imtp.web.domain.entity.FileUpload;
 import org.imtp.web.enums.FileStorageType;
-import org.imtp.web.enums.FileUploadStatus;
-import org.imtp.web.mapper.FileUploadMapper;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
-import javax.naming.OperationNotSupportedException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,7 +14,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.Date;
 import java.util.UUID;
 
 /**
@@ -36,9 +28,6 @@ public class LocalFileServiceImpl extends AbstractFileService {
     private final String tmpdir = System.getProperty("java.io.tmpdir");
 
     private final int bufferSize = 4096;
-
-    @Resource
-    private FileUploadMapper fileUploadMapper;
 
 
     @Override

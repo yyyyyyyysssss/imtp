@@ -253,6 +253,7 @@
     </dependencies>
 
     <build>
+        <finalName>imtp-web</finalName>
         <plugins>
 
             <plugin>

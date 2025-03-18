@@ -6,7 +6,6 @@ import groovy.lang.Tuple2;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.shardingsphere.infra.hint.HintManager;
 import org.imtp.web.config.exception.BusinessException;
 import org.imtp.web.config.exception.DatabaseException;
 import org.imtp.web.config.idwork.IdGen;
@@ -193,20 +192,17 @@ public abstract class AbstractFileService implements FileService {
         if (accessUrl != null && !accessUrl.isEmpty()){
             return accessUrl;
         }
-        try (HintManager hintManager = HintManager.getInstance()){
-            hintManager.setWriteRouteOnly();
-            QueryWrapper<FileUpload> fileUploadQueryWrapper = new QueryWrapper<>();
-            fileUploadQueryWrapper.select("access_url","status");
-            fileUploadQueryWrapper.eq("upload_id",uploadId);
-            FileUpload fileUpload = fileUploadMapper.selectOne(fileUploadQueryWrapper);
-            if (fileUpload == null){
-                throw new BusinessException("该上传任务不存在: " + uploadId);
-            }
-            if (!fileUpload.getStatus().equals(FileUploadStatus.COMPLETED)){
-                throw new BusinessException("该上传任务未完成: " + uploadId);
-            }
-            return fileUpload.getAccessUrl();
+        QueryWrapper<FileUpload> fileUploadQueryWrapper = new QueryWrapper<>();
+        fileUploadQueryWrapper.select("access_url","status");
+        fileUploadQueryWrapper.eq("upload_id",uploadId);
+        FileUpload fileUpload = fileUploadMapper.selectOne(fileUploadQueryWrapper);
+        if (fileUpload == null){
+            throw new BusinessException("该上传任务不存在: " + uploadId);
         }
+        if (!fileUpload.getStatus().equals(FileUploadStatus.COMPLETED)){
+            throw new BusinessException("该上传任务未完成: " + uploadId);
+        }
+        return fileUpload.getAccessUrl();
     }
 
     public abstract Tuple2<String, String> simpleUpload(InputStream inputStream,String filename,String contentType,Long size);
