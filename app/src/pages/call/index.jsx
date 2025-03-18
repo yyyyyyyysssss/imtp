@@ -1,10 +1,12 @@
-import { Avatar, Box, Button, HStack, Pressable, Text, VStack } from "native-base"
+import { Avatar, Box, Button, HStack, Pressable, Spinner, Text, VStack } from "native-base"
 import { useCallback, useRef, useState } from "react";
 import { UIManager, findNodeHandle, View, requireNativeComponent, PermissionsAndroid, StyleSheet } from 'react-native';
 import { requestCameraPermission } from "../../utils/PermissionRequest";
 import { useDispatch, useSelector } from 'react-redux';
-import { AudioMuteOutlined, AudioOutlined, HangUpOutlined, VideoOffLined, VideoOnLined, VolumeMuteUpLined, VolumeUpLined } from "../../components/CustomIcon";
+import { AudioMuteOutlined, AudioOutlined, HangUpOutlined, PhoneOutlined, VideoOffLined, VideoOnLined, VolumeMuteUpLined, VolumeUpLined } from "../../components/CustomIcon";
 import { useNavigation } from '@react-navigation/native';
+import { CallOperation, CallStatus, CallType } from "../../enum";
+import useTimer from "../../hooks/useTimer";
 
 // const CallView = requireNativeComponent('CallView');
 
@@ -16,7 +18,7 @@ const Call = ({ route }) => {
 
     const navigation = useNavigation();
 
-    const { sessionId } = route.params;
+    const { sessionId, callType, callOperation } = route.params;
 
     const session = useSelector(state => state.chat.entities.sessions[sessionId])
 
@@ -24,6 +26,11 @@ const Call = ({ route }) => {
 
     const [lensFacing, setLensFacing] = useState(BACK_CAMERA)
 
+    //计时器
+    const { timer, toggleTimer } = useTimer()
+
+    //通话状态
+    const [callStatus, setCallStatus] = useState(CallStatus.PENDING)
     //麦克风是否标识
     const [microphoneMuteFlag, setMicrophoneMuteFlag] = useState(false)
     //扬声器静音标识
@@ -89,6 +96,14 @@ const Call = ({ route }) => {
         navigation.goBack()
     }
 
+    const accept = () => {
+        setCallStatus(CallStatus.CONNECTING)
+        setTimeout(() => {
+            setCallStatus(CallStatus.PROGRESSING)
+            toggleTimer()
+        }, 3000);
+    }
+
     return (
         <VStack>
             <Box
@@ -102,6 +117,32 @@ const Call = ({ route }) => {
                 style={styles.callControl}
 
             >
+                <HStack
+                    style={{
+                        padding: 8
+                    }}
+                    justifyContent='space-between'
+                >
+                    <HStack
+                        flex={1}
+                    >
+                        <View />
+                    </HStack>
+                    <HStack
+                        flex={1}
+                        justifyContent='center'
+                        style={{
+                            opacity: callStatus === CallStatus.PROGRESSING ? 1 : 0
+                        }}
+                    >
+                        <Text style={{ color: 'white', fontSize: 16 }}>{timer}</Text>
+                    </HStack>
+                    <HStack
+                        flex={1}
+                    >
+                        <View />
+                    </HStack>
+                </HStack>
                 <VStack
                     flex={5}
                     justifyContent='flex-start'
@@ -130,7 +171,7 @@ const Call = ({ route }) => {
                         fontSize: 14,
                     }}
                     >
-                        等待对方接受邀请
+                        {callStatus === CallStatus.PROGRESSING ? '' : callOperation === CallOperation.INVITE ? '等待对方接受邀请' : callType === CallType.VOICE ? '邀请你进行语音通话' : '邀请你进行视频通话'}
                     </Text>
                 </VStack>
                 <VStack flex={2} space={10} style={{ marginBottom: 50 }}>
@@ -139,7 +180,7 @@ const Call = ({ route }) => {
                         alignItems='center'
                         style={{
                             paddingLeft: 40,
-                            paddingRight: 40
+                            paddingRight: 40,
                         }}
                     >
 
@@ -153,6 +194,18 @@ const Call = ({ route }) => {
                             </Box>
                         </Pressable>
 
+                        {callType === CallType.VOICE && (
+                            <Pressable
+                                onPress={hangUp}
+                            >
+                                <Box
+                                    style={styles.controlIconRed}
+                                >
+                                    <HangUpOutlined size={35} />
+                                </Box>
+                            </Pressable>
+                        )}
+
                         <Pressable
                             onPress={speakerMute}
                         >
@@ -163,35 +216,78 @@ const Call = ({ route }) => {
                             </Box>
                         </Pressable>
 
-                        <Pressable
-                            onPress={cameraOff}
-                        >
-                            <Box
-                                style={styles.controlIconWhite}
+                        {callType === CallType.VIDEO && (
+                            <Pressable
+                                onPress={cameraOff}
                             >
-                                {cameraOffFlag ? <VideoOffLined size={35} /> : <VideoOnLined size={35} />}
-                            </Box>
-                        </Pressable>
-
+                                <Box
+                                    style={styles.controlIconWhite}
+                                >
+                                    {cameraOffFlag ? <VideoOffLined size={35} /> : <VideoOnLined size={35} />}
+                                </Box>
+                            </Pressable>
+                        )}
                     </HStack>
                     <HStack
-                        justifyContent='center'
+                        justifyContent={callStatus === CallStatus.PROGRESSING ? 'center' : callOperation === CallOperation.INVITE ? 'center' : callType === CallType.VIDEO ? 'space-between' : 'center'}
                         alignItems='center'
                         style={{
                             paddingLeft: 40,
                             paddingRight: 40
                         }}
                     >
-                        <Pressable
-                            onPress={hangUp}
-                        >
-                            <Box
-                                style={styles.controlIconRed}
-                            >
-                                <HangUpOutlined size={35} />
-                            </Box>
-                        </Pressable>
+                        {callType === CallType.VIDEO && (
 
+                            <Pressable
+                                onPress={hangUp}
+                            >
+                                <Box
+                                    style={styles.controlIconRed}
+                                >
+                                    <HangUpOutlined size={35} />
+                                </Box>
+                            </Pressable>
+                        )}
+                        {
+                            callStatus === CallStatus.PROGRESSING
+                                ?
+                                (
+                                    <></>
+                                )
+                                :
+                                callOperation === CallOperation.ACCEPT
+                                    ?
+                                    (
+                                        <View>
+                                            {
+                                                callStatus === CallStatus.CONNECTING
+                                                    ?
+                                                    (
+                                                        <Spinner size={60} color='white' />
+
+                                                    )
+                                                    :
+                                                    (
+                                                        <Pressable
+                                                            onPress={accept}
+                                                        >
+                                                            <Box
+                                                                style={styles.controlIconGreen}
+                                                            >
+                                                                <PhoneOutlined size={35} />
+                                                            </Box>
+                                                        </Pressable>
+                                                    )
+                                            }
+                                        </View>
+
+
+                                    )
+                                    :
+                                    (
+                                        <></>
+                                    )
+                        }
                     </HStack>
                 </VStack>
 

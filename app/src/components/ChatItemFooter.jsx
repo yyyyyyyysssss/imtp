@@ -4,7 +4,7 @@ import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons';
 import { PermissionsAndroid, StyleSheet,Platform } from 'react-native';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
-import { MessageType } from '../enum';
+import { CallOperation, CallType, MessageType } from '../enum';
 import DocumentPicker, { types } from 'react-native-document-picker'
 import RecordVoice from './RecordVoice';
 import { NativeModules } from 'react-native';
@@ -227,12 +227,19 @@ const ChatItemFooter = React.memo(({ sendMessage,sessionId }) => {
     }
 
     const voiceCall = () => {
-        CallModule.call('VOICE')
+        // CallModule.call('VOICE')
+        navigation.navigate('Call', {
+            sessionId: sessionId,
+            callType: CallType.VOICE,
+            callOperation: CallOperation.INVITE
+        })
     }
 
     const videoCall = () => {
         navigation.navigate('Call', {
-            sessionId: sessionId
+            sessionId: sessionId,
+            callType: CallType.VIDEO,
+            callOperation: CallOperation.ACCEPT
         })
     }
 
