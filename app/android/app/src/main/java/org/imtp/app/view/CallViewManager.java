@@ -2,6 +2,7 @@ package org.imtp.app.view;
 
 import android.util.Log;
 import android.view.Choreographer;
+import android.view.MotionEvent;
 import android.view.View;
 
 import androidx.annotation.NonNull;
@@ -133,8 +134,6 @@ public class CallViewManager extends SimpleViewManager<ConstraintLayout> {
                 Choreographer.getInstance().postFrameCallback(this);
             }
         });
-
-
         return constraintLayout;
     }
 

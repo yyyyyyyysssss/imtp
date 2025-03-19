@@ -35,7 +35,7 @@ public class CustomNativeModulePackage implements ReactPackage {
     public List<ViewManager> createViewManagers(@NonNull ReactApplicationContext reactApplicationContext) {
         List<ViewManager> viewManagers = new ArrayList<>();
         CallViewManager callViewManager = new CallViewManager(reactApplicationContext);
-//        viewManagers.add(callViewManager);
+        viewManagers.add(callViewManager);
         return viewManagers;
     }
 }

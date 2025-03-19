@@ -1,5 +1,5 @@
 import { Avatar, Box, Button, HStack, Pressable, Spinner, Text, VStack } from "native-base"
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { UIManager, findNodeHandle, View, requireNativeComponent, PermissionsAndroid, StyleSheet } from 'react-native';
 import { requestCameraPermission } from "../../utils/PermissionRequest";
 import { useDispatch, useSelector } from 'react-redux';
@@ -8,7 +8,7 @@ import { useNavigation } from '@react-navigation/native';
 import { CallOperation, CallStatus, CallType } from "../../enum";
 import useTimer from "../../hooks/useTimer";
 
-// const CallView = requireNativeComponent('CallView');
+const CallView = requireNativeComponent('CallView');
 
 
 const FRONT_CAMERA = '0'
@@ -29,6 +29,8 @@ const Call = ({ route }) => {
     //计时器
     const { timer, toggleTimer } = useTimer()
 
+    //管理哪个video为大屏展示
+    const [isVideoALarge, setIsVideoALarge] = useState(true)
     //通话状态
     const [callStatus, setCallStatus] = useState(CallStatus.PENDING)
     //麦克风是否标识
@@ -37,6 +39,12 @@ const Call = ({ route }) => {
     const [speakerMuteFlag, setSpeakerMuteFlag] = useState(false)
     //摄像头标识
     const [cameraOffFlag, setCameraOffFlag] = useState(false)
+
+    useEffect(() => {
+        if(callType === CallType.VIDEO){
+            startCamere()
+        }
+    },[])
 
     const startCamere = async () => {
         const permissionChecked = await requestCameraPermission()
@@ -104,18 +112,56 @@ const Call = ({ route }) => {
         }, 3000);
     }
 
+    const switchScreen = () => {
+        setIsVideoALarge(!isVideoALarge)
+    }
+
     return (
-        <VStack>
-            <Box
-                width='100%'
-                height='100%'
-                style={styles.callBox}
-            >
-                {/* <CallView ref={callRef} style={styles.callView} /> */}
-            </Box>
+        <VStack style={styles.callBox}>
+
+            {
+                callType === CallType.VOICE
+                    ?
+                    (
+                        <>
+                        </>
+                    )
+                    :
+                    (
+                        <>
+                            <Pressable onPress={switchScreen}
+                                style={isVideoALarge ? styles.videoLarge : styles.videoSmall}
+                            >
+                                {/* <Box
+                                    flex={1}
+                                    style={{ backgroundColor: 'blue' }}
+                                >
+                                </Box> */}
+                                <CallView ref={callRef} style={styles.fullView} />
+                                <Box
+                                    style={{
+                                        position: 'absolute',
+                                        width: '100%',
+                                        height: '100%',
+                                        backgroundColor: 'rgba(0,0,0,0)'
+                                    }}
+                                >
+                                </Box>
+                            </Pressable>
+                            <Pressable onPress={switchScreen}
+                                style={isVideoALarge ? styles.videoSmall : styles.videoLarge}
+                            >
+                                <Box
+                                    flex={1}
+                                    style={{ backgroundColor: 'red' }}
+                                >
+                                </Box>
+                            </Pressable>
+                        </>
+                    )
+            }
             <VStack
                 style={styles.callControl}
-
             >
                 <HStack
                     style={{
@@ -292,7 +338,6 @@ const Call = ({ route }) => {
                 </VStack>
 
             </VStack>
-
         </VStack>
     )
 }
@@ -305,11 +350,13 @@ const styles = StyleSheet.create({
         left: 0,
         right: 0,
         bottom: 0,
+        width: '100%',
+        height: '100%',
         backgroundColor: 'black'
     },
-    callView: {
+    fullView: {
         width: '100%',
-        height: '100%'
+        height: '100%',
     },
     callControl: {
         position: 'absolute',
@@ -317,6 +364,7 @@ const styles = StyleSheet.create({
         left: 0,
         width: '100%',
         height: '100%',
+        zIndex: 999
     },
     controlIconWhite: {
         backgroundColor: 'white',
@@ -333,6 +381,17 @@ const styles = StyleSheet.create({
         borderRadius: 100,
         padding: 20
     },
+    videoLarge: {
+        width: '100%',
+        height: '100%',
+        objectFit: 'cover'
+    },
+    videoSmall: {
+        width: '40%',
+        height: 250,
+        position: 'absolute',
+        zIndex: 1000,
+    }
 })
 
 export default Call
