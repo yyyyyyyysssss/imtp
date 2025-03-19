@@ -63,7 +63,7 @@ public class MinioFileServiceImpl extends AbstractFileService {
         }
         String accessUrl = fileUpload.getAccessUrl();
         String objectName = accessUrl.substring(accessUrl.lastIndexOf("/") + 1);
-        return minioHelper.temporaryUrl(objectName);
+        return minioHelper.getTemporaryAccessUrl(objectName);
     }
 
     @Override

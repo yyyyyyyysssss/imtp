@@ -4,6 +4,7 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import groovy.lang.Tuple2;
 import io.minio.*;
+import io.minio.errors.*;
 import io.minio.http.Method;
 import io.minio.messages.Part;
 import jakarta.annotation.Resource;
@@ -13,7 +14,10 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
@@ -35,6 +39,9 @@ public class MinioHelper extends MinioAsyncClient {
 
     @Resource
     private MinioConfig minioConfig;
+
+    //去除首尾的双引号
+    private String etagRegex = "^\"|\"$";
 
     public MinioHelper(MinioAsyncClient minioAsyncClient) {
         super(minioAsyncClient);
@@ -72,8 +79,10 @@ public class MinioHelper extends MinioAsyncClient {
                     null
             );
             UploadPartResponse uploadPartResponse = completableFuture.get();
-            return uploadPartResponse.etag();
+            return uploadPartResponse.etag().replaceAll(etagRegex, "");
         } catch (Exception e) {
+            //取消上传
+            abortUpload(uploadId,filename);
             throw new MinioException("minio分片上传异常:" + e.getMessage());
         }
     }
@@ -92,8 +101,11 @@ public class MinioHelper extends MinioAsyncClient {
             );
             ObjectWriteResponse objectWriteResponse = completableFuture.get();
             String accessUrl = getAccessUrl(filename);
-            return new Tuple2<>(objectWriteResponse.etag(), accessUrl);
+            String etag = objectWriteResponse.etag().replaceAll(etagRegex, "");
+            return new Tuple2<>(etag, accessUrl);
         } catch (Exception e) {
+            //取消上传
+            abortUpload(uploadId,filename);
             throw new MinioException("minio分片合并异常:" + e.getMessage());
         }
     }
@@ -128,7 +140,8 @@ public class MinioHelper extends MinioAsyncClient {
                     .build();
             ObjectWriteResponse objectWriteResponse = minioClient.uploadObject(uploadObjectArgs);
             String accessUrl = getAccessUrl(filename);
-            return new Tuple2<>(objectWriteResponse.etag(), accessUrl);
+            String etag = objectWriteResponse.etag().replaceAll(etagRegex, "");
+            return new Tuple2<>(etag, accessUrl);
         } catch (Exception e) {
             log.error("uploadMinio error: ", e);
             throw new MinioException("minio根据路径上传异常: " + filepath);
@@ -146,19 +159,34 @@ public class MinioHelper extends MinioAsyncClient {
                     .build();
             ObjectWriteResponse objectWriteResponse = minioClient.putObject(putObjectArgs);
             String accessUrl = getAccessUrl(filename);
-            return new Tuple2<>(objectWriteResponse.etag(), accessUrl);
+            String etag = objectWriteResponse.etag().replaceAll(etagRegex, "");
+            return new Tuple2<>(etag, accessUrl);
         } catch (Exception e) {
             log.error("uploadMinio error: ", e);
             throw new MinioException("minio根据MultipartFile上传异常: " + filename);
         }
     }
 
-    public String temporaryUrl(String name) throws MinioException{
-
-        return temporaryUrl(name, Duration.ofDays(3));
+    public InputStream download(String filename){
+        GetObjectArgs getObjectArgs = GetObjectArgs
+                .builder()
+                .bucket(minioConfig.getBucketName())
+                .object(filename)
+                .build();
+        try {
+            return minioClient.getObject(getObjectArgs);
+        } catch (Exception e) {
+            log.error("download error: ", e);
+            throw new MinioException(e.getMessage());
+        }
     }
 
-    public String temporaryUrl(String name, Duration duration) throws MinioException{
+    public String getTemporaryAccessUrl(String name) throws MinioException{
+
+        return getTemporaryAccessUrl(name, Duration.ofDays(3));
+    }
+
+    public String getTemporaryAccessUrl(String name, Duration duration) throws MinioException{
         try {
             GetPresignedObjectUrlArgs args = GetPresignedObjectUrlArgs
                     .builder()
@@ -169,12 +197,12 @@ public class MinioHelper extends MinioAsyncClient {
                     .build();
             return minioClient.getPresignedObjectUrl(args);
         } catch (Exception e) {
-            log.error("timedPreviewUrl error: ", e);
+            log.error("getTemporaryAccessUrl error: ", e);
             throw new MinioException(e.getMessage());
         }
     }
 
-    public String timedDownloadUrl(String name) throws MinioException{
+    public String getTemporaryDownloadUrl(String name) throws MinioException{
         try {
             Map<String, String> map = new HashMap<>();
             map.put("response-content-type", MediaType.APPLICATION_OCTET_STREAM_VALUE);
@@ -187,7 +215,7 @@ public class MinioHelper extends MinioAsyncClient {
                     .build();
             return minioClient.getPresignedObjectUrl(args);
         } catch (Exception e) {
-            log.error("timedDownloadUrl error: ", e);
+            log.error("getTemporaryDownloadUrl error: ", e);
             throw new MinioException("获取限时文件访问url异常: " + name);
         }
     }
@@ -195,6 +223,21 @@ public class MinioHelper extends MinioAsyncClient {
 
     private String getAccessUrl(String filename) {
         return minioConfig.getEndpoint() + "/" + minioConfig.getBucketName() + "/" + filename;
+    }
+
+    private void abortUpload(String uploadId,String objectName){
+        try {
+            this.abortMultipartUploadAsync(
+                    minioConfig.getBucketName(),
+                    null,
+                    objectName,
+                    uploadId,
+                    null,
+                    null
+            );
+        } catch (Exception e) {
+            throw new MinioException("minio分片取消上传异常:" + e.getMessage());
+        }
     }
 
 }

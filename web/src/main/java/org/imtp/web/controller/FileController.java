@@ -45,13 +45,14 @@ public class FileController {
         return ResultGenerator.ok(fileUploadProgressVO);
     }
 
-    //根据上传id获取访问文件的路径
+    //根据上传id获取访问文件访问路径
     @GetMapping("/accessUrl")
     public Result<String> accessUrl(@RequestParam("uploadId") String uploadId){
         String accessUrl = fileService.accessUrl(uploadId);
         return ResultGenerator.ok(accessUrl);
     }
 
+    //根据上传id获取访问文件临时访问路径
     @GetMapping("/temporaryUrl")
     public Result<?> temporaryUrl(@RequestParam("uploadId") String uploadId){
         String temporaryUrl = fileService.temporaryUrl(uploadId);
