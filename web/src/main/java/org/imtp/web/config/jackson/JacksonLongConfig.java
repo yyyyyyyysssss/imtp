@@ -1,4 +1,4 @@
-package org.imtp.web.config;
+package org.imtp.web.config.jackson;
 
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer;
