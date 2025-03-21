@@ -41,41 +41,41 @@ public class SnowflakeIdWorker {
 
     private Lock lock = new ReentrantLock();
 
-    public SnowflakeIdWorker(WorkIdService workIdService){
+    public SnowflakeIdWorker(WorkIdService workIdService) {
         this.workerId = workIdService.getWorkId();
         if (workerId > maxWorkerId || workerId < 0) {
             throw new IllegalArgumentException(String.format("workerId can't be greater than %d or less than 0", maxWorkerId));
         }
     }
 
-    public synchronized long nextId(){
-        try {
-            lock.lock();
-            long currentTimestamp = currentTimestamp();
-            //如果当前时间小于上一次ID生成的时间戳，说明系统时钟回退过这个时候应当抛出异常
-            if (currentTimestamp < lastTimestamp) {
-                throw new RuntimeException(
-                        String.format("Clock moved backwards.  Refusing to generate id for %d milliseconds", lastTimestamp - currentTimestamp));
-            }
-            //同一时间生成，进行序列递增,否则毫秒内序列重置
-            if (currentTimestamp == lastTimestamp){
+    public long nextId() {
+        long currentTimestamp = currentTimestamp();
+        //如果当前时间小于上一次ID生成的时间戳，说明系统时钟回退过这个时候应当抛出异常
+        if (currentTimestamp < lastTimestamp) {
+            throw new RuntimeException(
+                    String.format("Clock moved backwards.  Refusing to generate id for %d milliseconds", lastTimestamp - currentTimestamp));
+        }
+        //同一时间生成，进行序列递增,否则毫秒内序列重置
+        if (currentTimestamp == lastTimestamp) {
+            try {
+                lock.lock();
                 //如果毫秒相同，则从0递增生成序列号
                 sequence = (sequence + 1) & sequenceMask;
                 //如果毫秒内序列溢出，则阻塞到下一毫秒，获取新的时间戳
-                if (sequence == 0){
+                if (sequence == 0) {
                     currentTimestamp = getNextMill();
                 }
-            }else {
-                sequence = 0;
+            } finally {
+                lock.unlock();
             }
 
-            lastTimestamp = currentTimestamp;
-
-            return (currentTimestamp  - this.epoch) << this.timestampLeftShift | this.workerId << this.workerIdShift | this.sequence;
-        }finally {
-            lock.unlock();
+        } else {
+            sequence = 0;
         }
 
+        lastTimestamp = currentTimestamp;
+
+        return (currentTimestamp - this.epoch) << this.timestampLeftShift | this.workerId << this.workerIdShift | this.sequence;
     }
 
 
