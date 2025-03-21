@@ -112,11 +112,8 @@ public class MessageModule extends ReactContextBaseJavaModule implements Observe
 
     }
     public void receiveMessage(Packet packet){
-        if(packet instanceof HeartbeatPingMessage){
-            messageModel.sendMessage(new HeartbeatPongMessage());
-            return;
-        }
         DeviceEventManagerModule.RCTDeviceEventEmitter rctDeviceEventEmitter = reactApplicationContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class);
+        Log.i(TAG,JsonUtil.toJSONString(packet));
         rctDeviceEventEmitter.emit("RECEIVE_MESSAGE",JsonUtil.toJSONString(packet));
     }
 

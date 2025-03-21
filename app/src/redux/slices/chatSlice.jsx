@@ -22,7 +22,11 @@ export const chatSlice = createSlice({
                 groupUserInfos: {}
             }
         },
-        unreadCount: 0 //未读消息合计
+        unreadCount: 0, //未读消息合计
+        call: {
+            flag: false,
+            callType: null
+        }
     },
     reducers: {
         loadSession: (state, action) => {
@@ -137,10 +141,20 @@ export const chatSlice = createSlice({
             const { entities, result } = payload
             state.userGroups.entities = entities
             state.userGroups.result = result
+        },
+        callBegin: (state, action) => {
+            const { payload } = action
+            const { callType } = payload
+            state.call.flag = true
+            state.call.callType = callType
+        },
+        callEnd: (state, action) => {
+            state.call.flag = false
+            state.call.callType = null
         }
     }
 })
 
-export const { loadSession, addSession, selectSession, removeSession, loadMessage, addMessage, updateMessage, updateMessageStatus, deleteMessage, loadUserFriend, loadUserGroup } = chatSlice.actions
+export const { loadSession, addSession, selectSession, removeSession, loadMessage, addMessage, updateMessage, updateMessageStatus, deleteMessage, loadUserFriend, loadUserGroup, callBegin, callEnd } = chatSlice.actions
 
 export default chatSlice.reducer

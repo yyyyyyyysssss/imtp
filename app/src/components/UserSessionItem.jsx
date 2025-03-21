@@ -28,6 +28,12 @@ const UserSessionItem = React.memo(({ sessionId }) => {
         case MessageType.VOICE_MESSAGE:
             messageContent = '[语音]'
             break
+        case MessageType.VOICE_CALL_MESSAGE:
+            messageContent = '[语音通话]'
+            break
+        case MessageType.VIDEO_CALL_MESSAGE:
+            messageContent = '[视频通话]'
+            break
     }
     if (messageContent && deliveryMethod === DeliveryMethod.GROUP) {
         messageContent = lastUserName + ': ' + messageContent

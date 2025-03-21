@@ -11,6 +11,8 @@ import { useSelector } from 'react-redux';
 import { NativeModules, NativeEventEmitter } from 'react-native';
 import ProgressOverlayBox from './ProgressOverlayBox';
 import VoiceMessage from './VoiceMessage';
+import VideoCallMessage from './VideoCallMessage';
+import VoiceCallMessage from './VoiceCallMessage';
 
 const { UploadModule } = NativeModules
 const UploadModuleNativeEventEmitter = new NativeEventEmitter(UploadModule);
@@ -99,6 +101,14 @@ const Message = React.memo(({ style, messageId }) => {
                     >
                         <FileMessage filename={contentMetadata.name} fileSize={contentMetadata.sizeDesc} />
                     </ProgressOverlayBox>
+                )
+            case MessageType.VOICE_CALL_MESSAGE:
+                return (
+                    <VoiceCallMessage callStatus={contentMetadata.callStatus} duration={contentMetadata.duration} durationDesc={contentMetadata.durationDesc} self={self}/>
+                )
+            case MessageType.VIDEO_CALL_MESSAGE:
+                return (
+                    <VideoCallMessage callStatus={contentMetadata.callStatus} duration={contentMetadata.duration} durationDesc={contentMetadata.durationDesc} self={self}/>
                 )
         }
     }, [])

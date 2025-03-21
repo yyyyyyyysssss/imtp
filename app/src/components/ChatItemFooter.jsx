@@ -7,16 +7,18 @@ import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import { CallOperation, CallType, MessageType } from '../enum';
 import DocumentPicker, { types } from 'react-native-document-picker'
 import RecordVoice from './RecordVoice';
-import { NativeModules } from 'react-native';
 import { useNavigation, } from '@react-navigation/native';
-import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions';
 import { requestCameraPermission } from '../utils/PermissionRequest';
-
-const { CallModule } = NativeModules
+import { useSelector } from 'react-redux';
+import { showToast } from './Utils';
 
 const ChatItemFooter = React.memo(({ sendMessage,sessionId }) => {
 
-    const navigation = useNavigation();
+    const navigation = useNavigation()
+
+    const call = useSelector(state => state.chat.call)
+
+    const {flag : callFlag, callType} = call
 
     const [isOpen, setIsOpen] = useState(false)
 
@@ -27,6 +29,8 @@ const ChatItemFooter = React.memo(({ sendMessage,sessionId }) => {
     const [overlayVisible, setOverlayVisible] = useState(false)
 
     const inputRef = useRef()
+
+
 
     const handleSubmit = (event) => {
         const text = event.nativeEvent.text
@@ -128,6 +132,10 @@ const ChatItemFooter = React.memo(({ sendMessage,sessionId }) => {
     }
 
     const handleViocePressIn = async () => {
+        if(callFlag === true){
+            showToast('正在通话中')
+            return
+        }
         const permissionChecked = await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.RECORD_AUDIO)
         if(permissionChecked){
             setOverlayVisible(true)
@@ -175,6 +183,10 @@ const ChatItemFooter = React.memo(({ sendMessage,sessionId }) => {
 
     //拍照
     const takePicture = async () => {
+        if(callFlag === true && callType === CallType.VIDEO){
+            showToast('正在通话中')
+            return
+        }
         const p = await requestCameraPermission()
         if(!p){
             return
@@ -200,6 +212,10 @@ const ChatItemFooter = React.memo(({ sendMessage,sessionId }) => {
 
     //摄像
     const cameraShoot = async () => {
+        if(callFlag === true && callType === CallType.VIDEO){
+            showToast('正在通话中')
+            return
+        }
         const p = await requestCameraPermission()
         if(!p){
             return
@@ -227,7 +243,10 @@ const ChatItemFooter = React.memo(({ sendMessage,sessionId }) => {
     }
 
     const voiceCall = () => {
-        // CallModule.call('VOICE')
+        if(callFlag === true){
+            showToast('正在通话中')
+            return
+        }
         navigation.navigate('Call', {
             sessionId: sessionId,
             callType: CallType.VOICE,
@@ -236,10 +255,14 @@ const ChatItemFooter = React.memo(({ sendMessage,sessionId }) => {
     }
 
     const videoCall = () => {
+        if(callFlag === true){
+            showToast('正在通话中')
+            return
+        }
         navigation.navigate('Call', {
             sessionId: sessionId,
             callType: CallType.VIDEO,
-            callOperation: CallOperation.ACCEPT
+            callOperation: CallOperation.INVITE
         })
     }
 

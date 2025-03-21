@@ -3,16 +3,17 @@ import React, { useCallback, useContext, useEffect, useRef, useState } from 'rea
 import { useNavigation, } from '@react-navigation/native';
 import { InteractionManager, StyleSheet, NativeModules, NativeEventEmitter } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
-import { loadSession, removeSession, updateMessageStatus, addMessage, selectSession, addSession } from '../../redux/slices/chatSlice';
+import { loadSession, removeSession, updateMessageStatus, addMessage, selectSession, addSession, callBegin } from '../../redux/slices/chatSlice';
 import { SwipeListView } from 'react-native-swipe-list-view';
 import { showToast } from '../../components/Utils';
 import Search from '../../components/Search';
 import UserSessionItem from '../../components/UserSessionItem';
 import { normalize, schema } from 'normalizr';
-import { DeliveryMethod, MessageType } from '../../enum';
+import { CallOperation, DeliveryMethod, MessageType } from '../../enum';
 import { fetchUserSessions, deleteUserSessionById, createUserSession } from '../../api/ApiService';
 import { getBitAtPosition } from '../../utils/BitUtil';
 import IdGen from '../../utils/IdGen';
+import WebRTCWrapper from '../../rtc/WebRTCWrapper';
 
 const { MessageModule } = NativeModules
 const MessageModuleNativeEventEmitter = new NativeEventEmitter(MessageModule);
@@ -22,6 +23,13 @@ const Chat = (props) => {
 
     const navigation = useNavigation()
     const dispatch = useDispatch()
+
+    const callFlag = useSelector(state => state.chat.call.flag)
+    const callFlageRef = useRef()
+
+    useEffect(() => {
+        callFlageRef.current = callFlag
+    },[callFlag])
 
     const result = useSelector(state => state.chat.result)
 
@@ -63,7 +71,7 @@ const Chat = (props) => {
 
     useEffect(() => {
         sessionMapRef.current = new Map()
-        if(!sessions){
+        if (!sessions) {
             return
         }
         for (const session of Object.values(sessions)) {
@@ -86,24 +94,6 @@ const Chat = (props) => {
         const isGroup = groupBit === 1
         const deliveryMethod = isGroup ? DeliveryMethod.GROUP : DeliveryMethod.SINGLE
         const realSender = isGroup ? receiver : sender;
-        let content;
-        switch (cmd) {
-            case MessageType.TEXT_MESSAGE:
-                content = msg.text;
-                break;
-            case MessageType.IMAGE_MESSAGE:
-                content = msg.url;
-                break;
-            case MessageType.VIDEO_MESSAGE:
-                content = msg.url;
-                break;
-            case MessageType.FILE_MESSAGE:
-                content = msg.url;
-                break;
-            default:
-                console.log('unsupported message type:', cmd)
-                return
-        }
         // 会话是否存在 不存在则先新增会话
         let session = sessionMapRef.current.get(realSender)
         const friendInfo = findFriendInfo(sender, realSender, deliveryMethod)
@@ -111,7 +101,6 @@ const Chat = (props) => {
             session = {
                 ...session,
                 lastMsgType: cmd,
-                lastMsgContent: content,
                 lastMsgTime: timestamp,
                 lastUserName: friendInfo.note
             }
@@ -126,11 +115,45 @@ const Chat = (props) => {
                 receiverUserId: realSender,
                 deliveryMethod: deliveryMethod,
                 lastMsgType: cmd,
-                lastMsgContent: content,
                 lastMsgTime: timestamp,
                 lastUserName: friendInfo.note
             }
             dispatch(addSession({ session: session }))
+        }
+        let content;
+        switch (cmd) {
+            case MessageType.TEXT_MESSAGE:
+                content = msg.text;
+                break;
+            case MessageType.IMAGE_MESSAGE:
+                content = msg.url;
+                break;
+            case MessageType.VIDEO_MESSAGE:
+                content = msg.url;
+                break;
+            case MessageType.FILE_MESSAGE:
+                content = msg.url;
+                break;
+            case MessageType.VOICE_CALL_MESSAGE:
+                content = null;
+                break;
+            case MessageType.VIDEO_CALL_MESSAGE:
+                content = null;
+                break;
+            case MessageType.SIGNALING_PRE_OFFER:
+                if (callFlageRef.current === false) {
+                    navigation.navigate('Call', {
+                        sessionId: session.id,
+                        callType: msg.content,
+                        callOperation: CallOperation.ACCEPT
+                    })
+                } else {
+                    //发送忙线
+                    WebRTCWrapper.sendBusy(session)
+                }
+                return
+            default:
+                return
         }
         //添加消息
         const receiveMessage = messageBase(content, contentMetadata, cmd, timestamp, friendInfo, session)

@@ -1,28 +1,41 @@
 import { Avatar, Box, Button, HStack, Pressable, Spinner, Text, VStack } from "native-base"
 import { useCallback, useEffect, useRef, useState } from "react";
-import { UIManager, findNodeHandle, View, requireNativeComponent, PermissionsAndroid, StyleSheet } from 'react-native';
-import { requestCameraPermission } from "../../utils/PermissionRequest";
+import { View, PermissionsAndroid, StyleSheet,NativeModules } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { AudioMuteOutlined, AudioOutlined, HangUpOutlined, PhoneOutlined, VideoOffLined, VideoOnLined, VolumeMuteUpLined, VolumeUpLined } from "../../components/CustomIcon";
 import { useNavigation } from '@react-navigation/native';
-import { CallOperation, CallStatus, CallType } from "../../enum";
+import { CallOperation, CallStatus, CallType, MessageType } from "../../enum";
 import useTimer from "../../hooks/useTimer";
+import { RTCView } from 'react-native-webrtc';
+import { SafeAreaView } from "react-native-safe-area-context";
+import { showToast } from "../../components/Utils";
+import WebRTCWrapper from "../../rtc/WebRTCWrapper";
+import { addMessage, callBegin, callEnd } from "../../redux/slices/chatSlice";
+import IdGen from "../../utils/IdGen";
 
-const CallView = requireNativeComponent('CallView');
+const BACK_CAMERA = 'environment'
+const FRONT_CAMERA = 'user'
 
-
-const FRONT_CAMERA = '0'
-const BACK_CAMERA = '1'
+const { MessageModule } = NativeModules
 
 const Call = ({ route }) => {
 
-    const navigation = useNavigation();
+    const navigation = useNavigation()
+
+    const dispatch = useDispatch()
 
     const { sessionId, callType, callOperation } = route.params;
-
+    //会话
     const session = useSelector(state => state.chat.entities.sessions[sessionId])
+    //用户信息
+    const userInfo = useSelector(state => state.auth.userInfo)
 
-    const callRef = useRef(null)
+    const sessionRef = useRef()
+    const userInfoRef = useRef()
+
+    const webrtcRef = useRef(null)
+    const remoteRef = useRef(null)
+    const localRef = useRef(null)
 
     const [lensFacing, setLensFacing] = useState(BACK_CAMERA)
 
@@ -33,55 +46,76 @@ const Call = ({ route }) => {
     const [isVideoALarge, setIsVideoALarge] = useState(true)
     //通话状态
     const [callStatus, setCallStatus] = useState(CallStatus.PENDING)
+    const callStatusRef = useRef()
     //麦克风是否标识
     const [microphoneMuteFlag, setMicrophoneMuteFlag] = useState(false)
     //扬声器静音标识
     const [speakerMuteFlag, setSpeakerMuteFlag] = useState(false)
     //摄像头标识
     const [cameraOffFlag, setCameraOffFlag] = useState(false)
+    //本地流
+    const [localStream, setLocalStream] = useState(null);
+    //远程流
+    const [remoteStream, setRemoteStream] = useState(null);
 
     useEffect(() => {
-        if(callType === CallType.VIDEO){
-            startCamere()
+        const onReceiveClose = () => {
+            if (callOperation === CallOperation.INVITE) {
+                sendCallMessage(CallOperation.ACCEPT)
+            }
+            stopCall()
         }
-    },[])
-
-    const startCamere = async () => {
-        const permissionChecked = await requestCameraPermission()
-        if (permissionChecked) {
-            startCameraCommand(lensFacing)
+        webrtcRef.current = new WebRTCWrapper(callType, session, onReceiveClose)
+        webrtcRef.current.ontrack = (event) => {
+            //本地流
+            setLocalStream(webrtcRef.current.localStream)
+            //远程流
+            setRemoteStream(event.streams[0])
+            //开始通话
+            startCall()
         }
+
+        if (callOperation === CallOperation.INVITE) {
+            webrtcRef.current.sendPreOffer()
+        }
+        dispatch(callBegin({callType: callType}))
+        return () => {
+            webrtcRef.current.destroy()
+        }
+    }, [])
+
+    useEffect(() => {
+        callStatusRef.current = callStatus
+        sessionRef.current = session
+        userInfoRef.current = userInfo
+    }, [callStatus,session,userInfo])
+
+
+
+    //开始通话
+    const startCall = async () => {
+        toggleTimer()
+        setCallStatus(CallStatus.PROGRESSING)
     }
 
-    const switchCamera = () => {
-        setLensFacing((prev) => {
-            const newLensFacing = prev === FRONT_CAMERA ? BACK_CAMERA : FRONT_CAMERA;
-            switchCameraCommand(newLensFacing)
-            return newLensFacing
-        })
-    }
-
-    const startCameraCommand = (lf) => {
-        const viewId = findNodeHandle(callRef.current)
-        UIManager.dispatchViewManagerCommand(
-            viewId,
-            'START_CAMERA',
-            [lf]
-        )
-    }
-
-    const switchCameraCommand = (lf) => {
-        const viewId = findNodeHandle(callRef.current)
-        UIManager.dispatchViewManagerCommand(
-            viewId,
-            'SWITCH_CAMERA',
-            [lf]
-        )
+    //关闭通话
+    const stopCall = () => {
+        dispatch(callEnd())
+        navigation.goBack()
     }
 
     const microphoneMute = () => {
         setMicrophoneMuteFlag((prev) => {
-            const m = prev ? false : true
+            let m;
+            if (prev) {
+                //开启声音
+                webrtcRef.current.unmute()
+                m = false
+            } else {
+                //关闭声音
+                webrtcRef.current.mute()
+                m = true
+            }
             return m
         })
     }
@@ -100,20 +134,87 @@ const Call = ({ route }) => {
         })
     }
 
+    //挂断
     const hangUp = () => {
-        navigation.goBack()
+        if (callOperation === CallOperation.INVITE) {
+            sendCallMessage(callOperation)
+        }
+        stopCall()
+        webrtcRef.current.close()
     }
 
+    //接听
     const accept = () => {
         setCallStatus(CallStatus.CONNECTING)
-        setTimeout(() => {
-            setCallStatus(CallStatus.PROGRESSING)
-            toggleTimer()
-        }, 3000);
+        webrtcRef.current.sendOffer()
     }
 
+    //切换屏幕
     const switchScreen = () => {
         setIsVideoALarge(!isVideoALarge)
+    }
+
+    //发送通话消息
+    const sendCallMessage = (operation) => {
+        const type = callType === CallType.VIDEO ? MessageType.VIDEO_CALL_MESSAGE : MessageType.VOICE_CALL_MESSAGE
+        //消息
+        let msg = messageBase(type, null)
+        let callStatus = 'COMPLETED'
+        if (operation === CallOperation.INVITE) {
+            if (callStatusRef.current === CallStatus.PENDING || callStatusRef.current === CallStatus.CONNECTING) {
+                callStatus = 'CANCELLED'
+            }
+
+        } else {
+            if (callStatusRef.current === CallStatus.PENDING || callStatusRef.current === CallStatus.CONNECTING) {
+                callStatus = 'REFUSED'
+            }
+        }
+        if (msg) {
+            msg = {
+                ...msg,
+                contentMetadata: {
+                    callStatus: callStatus,
+                    duration: timeToSeconds(timer),
+                    durationDesc: formatTimeString(timer)
+                }
+            }
+            //添加消息
+            dispatch(addMessage({ sessionId: sessionId, message: msg }))
+            MessageModule.sendMessage(JSON.stringify(msg))
+        }
+    }
+
+    const messageBase = (type, content) => {
+        const id = IdGen.nextId()
+        return {
+            id: id,
+            ackId: id,
+            type: type,
+            content: content,
+            sessionId: sessionRef.current.id,
+            sender: userInfoRef.current.id,
+            receiver: sessionRef.current.receiverUserId,
+            deliveryMethod: sessionRef.current.deliveryMethod,
+            self: true,
+            timestamp: new Date().getTime(),
+            name: userInfoRef.current.nickname,
+            avatar: userInfoRef.current.avatar
+        }
+    }
+
+    const timeToSeconds = (time) => {
+        const [hours, minutes, seconds] = time.split(':').map(Number)
+        return hours * 3600 + minutes * 60 + seconds
+    }
+
+    const formatTimeString = (time) => {
+        const [hours, minutes, seconds] = time.split(':').map(Number)
+        if(hours === 0){
+            return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
+        } else {
+            return time
+        }
     }
 
     return (
@@ -132,30 +233,26 @@ const Call = ({ route }) => {
                             <Pressable onPress={switchScreen}
                                 style={isVideoALarge ? styles.videoLarge : styles.videoSmall}
                             >
-                                {/* <Box
-                                    flex={1}
-                                    style={{ backgroundColor: 'blue' }}
-                                >
-                                </Box> */}
-                                <CallView ref={callRef} style={styles.fullView} />
-                                <Box
-                                    style={{
-                                        position: 'absolute',
-                                        width: '100%',
-                                        height: '100%',
-                                        backgroundColor: 'rgba(0,0,0,0)'
-                                    }}
-                                >
-                                </Box>
+                                <SafeAreaView style={styles.fullView}>
+                                    <RTCView
+                                        ref={remoteRef}
+                                        style={{ flex: 1 }}
+                                        objectFit="cover"
+                                        streamURL={remoteStream?.toURL()}
+                                    />
+                                </SafeAreaView>
                             </Pressable>
                             <Pressable onPress={switchScreen}
                                 style={isVideoALarge ? styles.videoSmall : styles.videoLarge}
                             >
-                                <Box
-                                    flex={1}
-                                    style={{ backgroundColor: 'red' }}
-                                >
-                                </Box>
+                                <SafeAreaView style={styles.fullView}>
+                                    <RTCView
+                                        ref={localRef}
+                                        style={{ flex: 1 }}
+                                        objectFit="cover"
+                                        streamURL={localStream?.toURL()}
+                                    />
+                                </SafeAreaView>
                             </Pressable>
                         </>
                     )

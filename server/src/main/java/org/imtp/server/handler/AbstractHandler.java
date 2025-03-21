@@ -42,6 +42,7 @@ public abstract class AbstractHandler<I> extends SimpleChannelInboundHandler<I> 
     protected RedisWrapper redisWrapper;
 
     protected void forwardMessage(ChannelHandlerContext ctx, Packet msg){
+        log.debug("forward message from:[{}] to:[{}] message type:[{}]",msg.getSender(),msg.getReceiver(),msg.messageType());
         //转发
         List<String> forwardChannelIds = new ArrayList<>();
         List<String> receiverUserIds = fetchReceiverUserIdByPacket(msg);

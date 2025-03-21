@@ -79,4 +79,17 @@ public class ReactNativeMessage {
     public void setContentMetadata(MessageMetadata contentMetadata) {
         this.contentMetadata = contentMetadata;
     }
+
+    @Override
+    public String toString() {
+        return "ReactNativeMessage{" +
+                "ackId=" + ackId +
+                ", type=" + type +
+                ", sender=" + sender +
+                ", receiver=" + receiver +
+                ", deliveryMethod=" + deliveryMethod +
+                ", content='" + content + '\'' +
+                ", contentMetadata=" + contentMetadata +
+                '}';
+    }
 }
