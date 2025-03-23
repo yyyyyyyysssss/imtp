@@ -111,6 +111,9 @@ const Chat = (props) => {
                     case MessageType.FILE_MESSAGE:
                         content = msg.url;
                         break
+                    case MessageType.VOICE_MESSAGE:
+                        content = msg.url;
+                        break
                     case MessageType.VOICE_CALL_MESSAGE:
                         content = null;
                         break
