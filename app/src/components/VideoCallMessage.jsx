@@ -31,7 +31,7 @@ const VideoCallMessage = React.memo(({ callStatus, self, duration, durationDesc 
                     {content}
                 </Text>
                 {callStatus === CallStatus.COMPLETED && (
-                    <Text>
+                    <Text style={styles.chatItemMessageText}>
                         {durationDesc}
                     </Text>
                 )}

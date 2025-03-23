@@ -231,25 +231,27 @@ const Call = ({ route }) => {
                     (
                         <>
                             <Pressable onPress={switchScreen}
-                                style={isVideoALarge ? styles.videoLarge : styles.videoSmall}
+                                style={[isVideoALarge ? styles.videoLarge : styles.videoSmall,{zIndex: isVideoALarge ? 1 : 1000}]}
                             >
-                                <SafeAreaView style={styles.fullView}>
+                                <SafeAreaView flex={1}>
                                     <RTCView
                                         ref={remoteRef}
                                         style={{ flex: 1 }}
-                                        objectFit="cover"
+                                        // objectFit="cover"
+                                        zOrder={isVideoALarge ? 0 : 1}
                                         streamURL={remoteStream?.toURL()}
                                     />
                                 </SafeAreaView>
                             </Pressable>
                             <Pressable onPress={switchScreen}
-                                style={isVideoALarge ? styles.videoSmall : styles.videoLarge}
+                                style={[isVideoALarge ? styles.videoSmall : styles.videoLarge,{zIndex: isVideoALarge ? 1000 : 1}]}
                             >
-                                <SafeAreaView style={styles.fullView}>
+                                <SafeAreaView flex={1}>
                                     <RTCView
                                         ref={localRef}
                                         style={{ flex: 1 }}
-                                        objectFit="cover"
+                                        // objectFit="cover"
+                                        zOrder={isVideoALarge ? 1 : 0}
                                         streamURL={localStream?.toURL()}
                                     />
                                 </SafeAreaView>
@@ -480,14 +482,12 @@ const styles = StyleSheet.create({
     },
     videoLarge: {
         width: '100%',
-        height: '100%',
-        objectFit: 'cover'
+        height: '100%'
     },
     videoSmall: {
+        position: 'absolute',
         width: '40%',
         height: 250,
-        position: 'absolute',
-        zIndex: 1000,
     }
 })
 
