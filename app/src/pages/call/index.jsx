@@ -237,7 +237,6 @@ const Call = ({ route }) => {
                                     <RTCView
                                         ref={remoteRef}
                                         style={{ flex: 1 }}
-                                        // objectFit="cover"
                                         zOrder={isVideoALarge ? 0 : 1}
                                         streamURL={remoteStream?.toURL()}
                                     />
@@ -250,7 +249,6 @@ const Call = ({ route }) => {
                                     <RTCView
                                         ref={localRef}
                                         style={{ flex: 1 }}
-                                        // objectFit="cover"
                                         zOrder={isVideoALarge ? 1 : 0}
                                         streamURL={localStream?.toURL()}
                                     />
