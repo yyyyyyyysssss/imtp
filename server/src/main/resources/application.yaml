@@ -30,6 +30,7 @@ logging:
   level:
     root: info
     org.imtp.server: info
+    org.imtp.server.handler: debug
     org.imtp.server.feign: debug
   pattern:
     console: "%d{yyyy/MM/dd HH:mm:ss.SSS} %highlight(%-5level) %clr([traceId: %X{traceId}]) [%thread] %cyan(%logger) : %msg %n"
