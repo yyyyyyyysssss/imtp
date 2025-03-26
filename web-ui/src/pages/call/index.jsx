@@ -64,12 +64,15 @@ const Call = forwardRef(({ sendMessage }, ref) => {
     useEffect(() => {
         webrtcRef.current = new WebRTCConnection(callType, session, sendMessage)
         webrtcRef.current.ontrack = (event) => {
+            console.log('ontrack')
             //本地流
             localRef.current.srcObject = webrtcRef.current.localStream
             //远程流
             remoteRef.current.srcObject = event.streams[0]
-            //开始通话
-            startCall()
+            if(callStatusRef.current !== CallStatus.PROGRESSING){
+                //开始通话
+                startCall()
+            }
         }
         if (callOperation === CallOperation.INVITE) {
             //创建preOffer并发送给对方

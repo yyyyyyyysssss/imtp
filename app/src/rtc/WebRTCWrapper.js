@@ -1,4 +1,4 @@
-import { RTCPeerConnection, RTCSessionDescription, RTCIceCandidate, mediaDevices } from 'react-native-webrtc';
+import { RTCPeerConnection, RTCSessionDescription, RTCIceCandidate, mediaDevices, MediaStream } from 'react-native-webrtc';
 import { NativeModules, NativeEventEmitter } from 'react-native';
 import { showToast } from '../components/Utils';
 import { CallType, MessageType } from '../enum';
@@ -59,8 +59,8 @@ class WebRTCWrapper {
         //创建数据通道 后续可能会使用
         this.channel = this.rtc.createDataChannel('channel')
         //本地媒体流添加到rtc轨道中
-        this.localStream = await this.getMediaStream()
-        const tracks = await this.localStream.getTracks()
+        this.localStream = await this.getMediaStream(this.facingMode)
+        const tracks = this.localStream.getTracks()
         for (const track of tracks) {
             if (track.kind === 'audio') {
                 track.enabled = this.voiceEnabled
@@ -75,17 +75,14 @@ class WebRTCWrapper {
         this.inited = true
     }
 
-    async getMediaStream() {
-        if (this.localStream) {
-            return this.localStream
-        }
+    async getMediaStream(facingMode) {
         try {
             return await mediaDevices.getUserMedia({
                 audio: true,
                 video: this.callType === CallType.VIDEO ?
                     {
                         facingMode: {
-                            exact: this.facingMode
+                            exact: facingMode
                         }
                     }
                     :
@@ -94,6 +91,12 @@ class WebRTCWrapper {
         } catch (e) {
             showToast('获取本地音视频流失败')
         }
+    }
+
+    async switchCamera(){
+        this.localStream.getVideoTracks().forEach((track) => {
+            track._switchCamera()
+        })
     }
 
     //发送预请求

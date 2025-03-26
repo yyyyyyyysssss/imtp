@@ -37,8 +37,6 @@ const Call = ({ route }) => {
     const remoteRef = useRef(null)
     const localRef = useRef(null)
 
-    const [lensFacing, setLensFacing] = useState(BACK_CAMERA)
-
     //计时器
     const { timer, toggleTimer } = useTimer()
 
@@ -67,12 +65,15 @@ const Call = ({ route }) => {
         }
         webrtcRef.current = new WebRTCWrapper(callType, session, onReceiveClose)
         webrtcRef.current.ontrack = (event) => {
+            console.log('ontrack')
             //本地流
             setLocalStream(webrtcRef.current.localStream)
             //远程流
             setRemoteStream(event.streams[0])
-            //开始通话
-            startCall()
+            if(callStatusRef.current !== CallStatus.PROGRESSING){
+                //开始通话
+                startCall()
+            }
         }
 
         if (callOperation === CallOperation.INVITE) {
@@ -154,6 +155,11 @@ const Call = ({ route }) => {
         setIsVideoALarge(!isVideoALarge)
     }
 
+    //切换摄像头
+    const switchCamera = () => {
+        webrtcRef.current.switchCamera()
+    }
+
     //发送通话消息
     const sendCallMessage = (operation) => {
         const type = callType === CallType.VIDEO ? MessageType.VIDEO_CALL_MESSAGE : MessageType.VOICE_CALL_MESSAGE
@@ -229,7 +235,7 @@ const Call = ({ route }) => {
                     )
                     :
                     (
-                        <>
+                        <View>
                             <Pressable onPress={switchScreen}
                                 style={[isVideoALarge ? styles.videoLarge : styles.videoSmall,{zIndex: isVideoALarge ? 1 : 1000}]}
                             >
@@ -254,7 +260,7 @@ const Call = ({ route }) => {
                                     />
                                 </SafeAreaView>
                             </Pressable>
-                        </>
+                        </View>
                     )
             }
             <VStack
@@ -361,7 +367,7 @@ const Call = ({ route }) => {
 
                         {callType === CallType.VIDEO && (
                             <Pressable
-                                onPress={cameraOff}
+                                onPress={switchCamera}
                             >
                                 <Box
                                     style={styles.controlIconWhite}
@@ -484,6 +490,8 @@ const styles = StyleSheet.create({
     },
     videoSmall: {
         position: 'absolute',
+        top: 0,
+        right: 0,
         width: '40%',
         height: 250,
     }
