@@ -1,8 +1,8 @@
 import { Avatar, Box, Button, HStack, Pressable, Spinner, Text, VStack } from "native-base"
 import { useCallback, useEffect, useRef, useState } from "react";
-import { View, PermissionsAndroid, StyleSheet,NativeModules } from 'react-native';
+import { View, PermissionsAndroid, StyleSheet, NativeModules } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
-import { AudioMuteOutlined, AudioOutlined, HangUpOutlined, PhoneOutlined, VideoOffLined, VideoOnLined, VolumeMuteUpLined, VolumeUpLined } from "../../components/CustomIcon";
+import { AudioMuteOutlined, AudioOutlined, HangUpOutlined, PhoneOutlined, SwitchCameraIcon, VideoOffLined, VideoOnLined, VolumeMuteUpLined, VolumeUpLined } from "../../components/CustomIcon";
 import { useNavigation } from '@react-navigation/native';
 import { CallOperation, CallStatus, CallType, MessageType } from "../../enum";
 import useTimer from "../../hooks/useTimer";
@@ -70,7 +70,7 @@ const Call = ({ route }) => {
             setLocalStream(webrtcRef.current.localStream)
             //远程流
             setRemoteStream(event.streams[0])
-            if(callStatusRef.current !== CallStatus.PROGRESSING){
+            if (callStatusRef.current !== CallStatus.PROGRESSING) {
                 //开始通话
                 startCall()
             }
@@ -79,7 +79,7 @@ const Call = ({ route }) => {
         if (callOperation === CallOperation.INVITE) {
             webrtcRef.current.sendPreOffer()
         }
-        dispatch(callBegin({callType: callType}))
+        dispatch(callBegin({ callType: callType }))
         return () => {
             webrtcRef.current.destroy()
         }
@@ -89,7 +89,7 @@ const Call = ({ route }) => {
         callStatusRef.current = callStatus
         sessionRef.current = session
         userInfoRef.current = userInfo
-    }, [callStatus,session,userInfo])
+    }, [callStatus, session, userInfo])
 
 
 
@@ -216,7 +216,7 @@ const Call = ({ route }) => {
 
     const formatTimeString = (time) => {
         const [hours, minutes, seconds] = time.split(':').map(Number)
-        if(hours === 0){
+        if (hours === 0) {
             return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
         } else {
             return time
@@ -237,7 +237,7 @@ const Call = ({ route }) => {
                     (
                         <View>
                             <Pressable onPress={switchScreen}
-                                style={[isVideoALarge ? styles.videoLarge : styles.videoSmall,{zIndex: isVideoALarge ? 1 : 1000}]}
+                                style={[isVideoALarge ? styles.videoLarge : styles.videoSmall, { zIndex: isVideoALarge ? 1 : 1000 }]}
                             >
                                 <SafeAreaView flex={1}>
                                     <RTCView
@@ -249,7 +249,7 @@ const Call = ({ route }) => {
                                 </SafeAreaView>
                             </Pressable>
                             <Pressable onPress={switchScreen}
-                                style={[isVideoALarge ? styles.videoSmall : styles.videoLarge,{zIndex: isVideoALarge ? 1000 : 1}]}
+                                style={[isVideoALarge ? styles.videoSmall : styles.videoLarge, { zIndex: isVideoALarge ? 1000 : 1 }]}
                             >
                                 <SafeAreaView flex={1}>
                                     <RTCView
@@ -301,20 +301,24 @@ const Call = ({ route }) => {
                         marginTop: 80
                     }}
                 >
-                    <Avatar
-                        size='80px'
-                        _image={{
+                    {callStatus !== CallStatus.PROGRESSING && (
+                        <Avatar
+                            size='80px'
+                            _image={{
 
+                            }}
+                            source={{ uri: session.avatar }}
+                        />
+                    )}
+                    {callStatus !== CallStatus.PROGRESSING && (
+                        <Text style={{
+                            color: 'white',
+                            fontSize: 18,
                         }}
-                        source={{ uri: session.avatar }}
-                    />
-                    <Text style={{
-                        color: 'white',
-                        fontSize: 18,
-                    }}
-                    >
-                        {session.name}
-                    </Text>
+                        >
+                            {session.name}
+                        </Text>
+                    )}
                     <Text style={{
                         color: 'white',
                         fontSize: 14,
@@ -367,7 +371,7 @@ const Call = ({ route }) => {
 
                         {callType === CallType.VIDEO && (
                             <Pressable
-                                onPress={switchCamera}
+                                onPress={cameraOff}
                             >
                                 <Box
                                     style={styles.controlIconWhite}
@@ -378,13 +382,24 @@ const Call = ({ route }) => {
                         )}
                     </HStack>
                     <HStack
-                        justifyContent={callStatus === CallStatus.PROGRESSING ? 'center' : callOperation === CallOperation.INVITE ? 'center' : callType === CallType.VIDEO ? 'space-between' : 'center'}
+                        justifyContent={callStatus === CallStatus.PROGRESSING ? 'space-between' : callOperation === CallOperation.INVITE ? 'center' : callType === CallType.VIDEO ? 'space-between' : 'center'}
                         alignItems='center'
                         style={{
                             paddingLeft: 40,
                             paddingRight: 40
                         }}
                     >
+                        {callStatus === CallStatus.PROGRESSING && callType === CallType.VIDEO && (
+                            <Pressable
+                                onPress={switchCamera}
+                            >
+                                <Box
+                                    style={styles.controlIconHide}
+                                >
+                                    <SwitchCameraIcon size={35} />
+                                </Box>
+                            </Pressable>
+                        )}
                         {callType === CallType.VIDEO && (
 
                             <Pressable
@@ -437,6 +452,18 @@ const Call = ({ route }) => {
                                         <></>
                                     )
                         }
+                        {callStatus === CallStatus.PROGRESSING && callType === CallType.VIDEO && (
+                            <Box
+                                style={styles.controlIconHide}
+                            >
+                                <Box
+                                    width={35}
+                                    height={35}
+                                >
+
+                                </Box>
+                            </Box>
+                        )}
                     </HStack>
                 </VStack>
 
@@ -479,6 +506,9 @@ const styles = StyleSheet.create({
         borderRadius: 100,
         padding: 20
     },
+    controlIconHide: {
+        padding: 20
+    },
     controlIconGreen: {
         backgroundColor: '#00B853',
         borderRadius: 100,
@@ -493,7 +523,7 @@ const styles = StyleSheet.create({
         top: 0,
         right: 0,
         width: '40%',
-        height: 250,
+        height: 200,
     }
 })
 

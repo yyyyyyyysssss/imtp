@@ -64,12 +64,11 @@ const Call = forwardRef(({ sendMessage }, ref) => {
     useEffect(() => {
         webrtcRef.current = new WebRTCConnection(callType, session, sendMessage)
         webrtcRef.current.ontrack = (event) => {
-            console.log('ontrack')
             //本地流
             localRef.current.srcObject = webrtcRef.current.localStream
             //远程流
             remoteRef.current.srcObject = event.streams[0]
-            if(callStatusRef.current !== CallStatus.PROGRESSING){
+            if (callStatusRef.current !== CallStatus.PROGRESSING) {
                 //开始通话
                 startCall()
             }
@@ -246,7 +245,7 @@ const Call = forwardRef(({ sendMessage }, ref) => {
                 style={{
                     backgroundColor: callType === CallType.VOICE ? '#494746' : 'black',
                     width: 350,
-                    height: 600,
+                    height: 620,
                     position: 'fixed',
                     zIndex: 1000,
                     borderRadius: 10,
@@ -299,9 +298,9 @@ const Call = forwardRef(({ sendMessage }, ref) => {
                         left: 0,
                         width: '100%',
                         height: '100%',
-                        opacity: callType === CallType.VIDEO ? isControlShow ? 1 : 0 : 1,
-                        transition: 'opacity 0.3s ease',
-                        transitionDelay: isControlShow ? '0s' : '2s',
+                        // opacity: callType === CallType.VIDEO ? isControlShow ? 1 : 0 : 1,
+                        // transition: 'opacity 0.3s ease',
+                        // transitionDelay: isControlShow ? '0s' : '2s',
                         zIndex: 999
                     }}
                     onMouseEnter={controlBtnShow}
@@ -340,16 +339,20 @@ const Call = forwardRef(({ sendMessage }, ref) => {
                         }}
                         vertical
                     >
-                        <Avatar style={{ userSelect: 'none' }} shape='square' size={80} src={avatar} />
-                        <div
-                            style={{
-                                color: 'white',
-                                fontSize: 18,
-                                userSelect: 'none'
-                            }}
-                        >
-                            {name}
-                        </div>
+                        {callStatus !== CallStatus.PROGRESSING && (
+                            <Avatar style={{ userSelect: 'none' }} shape='square' size={80} src={avatar} />
+                        )}
+                        {callStatus !== CallStatus.PROGRESSING && (
+                            <div
+                                style={{
+                                    color: 'white',
+                                    fontSize: 18,
+                                    userSelect: 'none'
+                                }}
+                            >
+                                {name}
+                            </div>
+                        )}
                         <div
                             style={{
                                 color: 'white',
