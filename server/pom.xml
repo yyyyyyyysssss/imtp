@@ -126,7 +126,6 @@
                     <target>${java.version}</target> <!-- depending on your project -->
                 </configuration>
             </plugin>
-
         </plugins>
 
     </build>
@@ -136,6 +135,32 @@
             <id>native</id>
             <build>
                 <plugins>
+
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-resources-plugin</artifactId>
+                        <version>3.3.1</version>
+                        <executions>
+                            <execution>
+                                <phase>process-resources</phase>
+                                <goals>
+                                    <goal>copy-resources</goal>
+                                </goals>
+                                <configuration>
+                                    <outputDirectory>${project.build.directory}/config</outputDirectory>
+                                    <resources>
+                                        <resource>
+                                            <directory>src/main/resources</directory>
+                                            <includes>
+                                                <include>application.yaml</include>
+                                            </includes>
+                                        </resource>
+                                    </resources>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+
                     <plugin>
                         <groupId>org.graalvm.buildtools</groupId>
                         <artifactId>native-maven-plugin</artifactId>
@@ -156,6 +181,8 @@
                                 <buildArg>-H:+BuildReport</buildArg>
                                 <!-- jfr分析 -->
                                 <buildArg>--enable-monitoring=jfr,jmxserver,jvmstat</buildArg>
+                                <!-- 本地镜像配置文件 -->
+                                <buildArg>-Dspring.config.additional-location=file:config/application.yaml</buildArg>
                             </buildArgs>
                         </configuration>
                         <executions>
@@ -169,7 +196,6 @@
                             </execution>
                         </executions>
                     </plugin>
-
                 </plugins>
             </build>
         </profile>
