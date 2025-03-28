@@ -40,5 +40,7 @@ public class ChatServerRuntimeHintsConfig implements RuntimeHintsRegistrar {
         hints.reflection().registerType(SignalingOfferHandler.class, MemberCategory.values());
         hints.reflection().registerType(SignalingPreOfferHandler.class, MemberCategory.values());
         hints.reflection().registerType(WebSocketAdapterHandler.class, MemberCategory.values());
+        //资源
+        hints.resources().registerPattern("config/application.yaml");
     }
 }
