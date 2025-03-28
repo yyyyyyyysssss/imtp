@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public interface ChatService {
+public interface UserStatusService {
 
     //用户上线
     void userOnline(String userId,String channelId);

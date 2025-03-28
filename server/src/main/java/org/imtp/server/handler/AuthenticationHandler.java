@@ -16,7 +16,7 @@ import org.imtp.common.utils.JsonUtil;
 import org.imtp.server.context.ChannelSession;
 import org.imtp.server.context.IMChannelSession;
 import org.imtp.server.context.WebSocketChannelSession;
-import org.imtp.server.feign.WebApi;
+import org.imtp.server.restclient.ChatApi;
 import org.springframework.stereotype.Component;
 
 /**
@@ -30,7 +30,7 @@ import org.springframework.stereotype.Component;
 public class AuthenticationHandler extends AbstractHandler<Object>{
 
     @Resource
-    private WebApi webApi;
+    private ChatApi chatApi;
 
     @Resource
     private CommandHandler commandHandler;
@@ -44,7 +44,7 @@ public class AuthenticationHandler extends AbstractHandler<Object>{
     protected void channelRead0(ChannelHandlerContext ctx, Object msg) {
         if (msg instanceof TextWebSocketFrame textWebSocketFrame){
             String token = textWebSocketFrame.text();
-            Result<UserInfo> result = webApi.tokenValid(token);
+            Result<UserInfo> result = chatApi.tokenValid(token);
             if(result.isSucceed()){
                 UserInfo userInfo = result.getData();
                 ctx.channel().writeAndFlush(new TextWebSocketFrame(JsonUtil.toJSONString(new AuthenticationResponse(true,userInfo))));
@@ -57,7 +57,7 @@ public class AuthenticationHandler extends AbstractHandler<Object>{
             ByteBuf byteBuf = Unpooled.wrappedBuffer(commandPacket.getBytes());
             AuthenticationRequest authenticationRequest = new AuthenticationRequest(byteBuf,commandPacket.getHeader());
             String token = authenticationRequest.getToken();
-            Result<UserInfo> result = webApi.tokenValid(token);
+            Result<UserInfo> result = chatApi.tokenValid(token);
             if(result.isSucceed()){
                 UserInfo userInfo = result.getData();
                 ctx.channel().writeAndFlush(new AuthenticationResponse(true,userInfo));

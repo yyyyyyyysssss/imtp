@@ -8,7 +8,7 @@ import org.imtp.server.config.RedisWrapper;
 import org.imtp.server.constant.ProjectConstant;
 import org.imtp.server.context.ChannelContextHolder;
 import org.imtp.server.context.ChannelSession;
-import org.imtp.server.service.ChatService;
+import org.imtp.server.service.UserStatusService;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -20,7 +20,7 @@ import java.util.*;
  */
 @Slf4j
 @Service
-public class DefaultChatService implements ChatService {
+public class UserStatusServiceImpl implements UserStatusService {
 
     @Resource
     private RedisWrapper redisWrapper;
@@ -37,6 +37,7 @@ public class DefaultChatService implements ChatService {
         redisWrapper.removeSet(k,channelId);
     }
 
+    @Override
     public void allUserOffline(){
         Collection<ChannelSession> allChannel = ChannelContextHolder.channelContext().getAllChannel();
         if (allChannel == null || allChannel.isEmpty()){

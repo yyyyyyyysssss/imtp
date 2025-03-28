@@ -3,21 +3,21 @@ package org.imtp.server.handler;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
-import io.netty.handler.timeout.IdleState;
 import io.netty.handler.timeout.IdleStateEvent;
 import io.netty.util.AttributeKey;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.imtp.common.packet.HeartbeatPingMessage;
 import org.imtp.common.packet.base.Packet;
+import org.imtp.common.packet.common.MessageDTO;
 import org.imtp.common.response.Result;
 import org.imtp.server.config.RedisWrapper;
 import org.imtp.server.constant.ProjectConstant;
 import org.imtp.server.context.ChannelContextHolder;
 import org.imtp.server.context.ChannelSession;
-import org.imtp.server.feign.WebApi;
+import org.imtp.server.restclient.ChatApi;
 import org.imtp.server.mq.ForwardMessage;
-import org.imtp.server.service.ChatService;
+import org.imtp.server.service.UserStatusService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,10 +33,10 @@ import java.util.Set;
 public abstract class AbstractHandler<I> extends SimpleChannelInboundHandler<I> {
 
     @Resource
-    protected ChatService chatService;
+    protected UserStatusService userStatusService;
 
     @Resource
-    protected WebApi webApi;
+    protected ChatApi chatApi;
 
     @Resource
     protected RedisWrapper redisWrapper;
@@ -47,7 +47,7 @@ public abstract class AbstractHandler<I> extends SimpleChannelInboundHandler<I> 
         List<String> forwardChannelIds = new ArrayList<>();
         List<String> receiverUserIds = fetchReceiverUserIdByPacket(msg);
         //根据用户id获取关联的channel
-        Map<String, Set<String>> map = chatService.fetchActiveChannelIdByUserIds(receiverUserIds);
+        Map<String, Set<String>> map = userStatusService.fetchActiveChannelIdByUserIds(receiverUserIds);
         for (String userId : map.keySet()){
             Set<String> channelIds = map.get(userId);
             //null表示用户未上线
@@ -69,6 +69,20 @@ public abstract class AbstractHandler<I> extends SimpleChannelInboundHandler<I> 
         if(!forwardChannelIds.isEmpty()){
             ForwardMessage forwardMessage = new ForwardMessage(forwardChannelIds, msg);
             redisWrapper.publishMsg(forwardMessage);
+        }
+    }
+
+    //消息落库
+    protected Long saveMessage(Packet packet,String content){
+        MessageDTO messageDTO = new MessageDTO(packet);
+        messageDTO.setContent(content);
+        Result<Long> result = chatApi.message(messageDTO);
+        if (result.isSucceed()){
+            log.debug("save message succeed : {}",result.getMessage());
+            return result.getData();
+        }else {
+            log.error("save message error : {}",result.getMessage());
+            return null;
         }
     }
 
@@ -113,7 +127,7 @@ public abstract class AbstractHandler<I> extends SimpleChannelInboundHandler<I> 
         //建立channel与用户之间的关系
         channel.attr(AttributeKey.valueOf(ProjectConstant.CHANNEL_ATTR_LOGIN_USER)).set(userId);
         log.info("用户:{} 已上线",userId);
-        chatService.userOnline(userId, channelSession.id());
+        userStatusService.userOnline(userId, channelSession.id());
     }
 
     //channel与用户解绑
@@ -123,13 +137,13 @@ public abstract class AbstractHandler<I> extends SimpleChannelInboundHandler<I> 
         //移除channel
         ChannelContextHolder.channelContext().removeChannel(channel.id().asLongText());
         log.warn("用户[{}]已断开连接",userId);
-        chatService.userOffline(userId, channel.id().asLongText());
+        userStatusService.userOffline(userId, channel.id().asLongText());
     }
 
     protected List<String> fetchReceiverUserIdByPacket(Packet packet){
         List<String> receivers;
         if(packet.isGroup()){
-            Result<List<String>> result = webApi.userIds(packet.getReceiver().toString());
+            Result<List<String>> result = chatApi.userIds(packet.getReceiver().toString());
             if (result.isSucceed()){
                 receivers = result.getData();
             }else {

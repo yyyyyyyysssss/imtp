@@ -11,19 +11,6 @@ spring:
           max-idle: 8
           max-active: 8
           max-wait: 3000
-  cloud:
-    openfeign:
-      client:
-        config:
-          default:
-            loggerLevel: none
-            connect-timeout: 5000
-            read-timeout: 5000
-      httpclient:
-        hc5:
-          enabled: true
-        max-connections: 500
-        max-connections-per-route: 100
 
 
 logging:
@@ -31,12 +18,12 @@ logging:
     root: info
     org.imtp.server: info
     org.imtp.server.handler: debug
-    org.imtp.server.feign: debug
+    org.imtp.server.restclient: debug
   pattern:
     console: "%d{yyyy/MM/dd HH:mm:ss.SSS} %highlight(%-5level) %clr([traceId: %X{traceId}]) [%thread] %cyan(%logger) : %msg %n"
 
 im:
-  web:
+  chat:
     url: http://localhost:9090
     apikey: 26662f07703c41d2a4994b8b30b101a9
   server:
@@ -50,3 +37,10 @@ im:
     websocket:
       host: 0.0.0.0
       port: 8080
+
+
+http:
+  config:
+    # 单位：秒
+    connectionRequestTimeout: 5
+    responseTimeout: 60

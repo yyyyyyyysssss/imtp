@@ -1,7 +1,7 @@
 package org.imtp.server;
 
 import jakarta.annotation.Resource;
-import org.imtp.server.service.ChatService;
+import org.imtp.server.service.UserStatusService;
 import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
@@ -15,11 +15,11 @@ import org.springframework.stereotype.Component;
 public class ContextClosedEventListener {
 
     @Resource
-    private ChatService chatService;
+    private UserStatusService userStatusService;
 
     @EventListener(ContextClosedEvent.class)
     public void onContextClosedEvent(ContextClosedEvent contextClosedEvent) {
-        chatService.allUserOffline();
+        userStatusService.allUserOffline();
     }
 
 }
