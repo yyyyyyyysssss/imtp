@@ -30,15 +30,15 @@ import org.springframework.stereotype.Component;
 public class AuthenticationHandler extends AbstractHandler<Object>{
 
     @Resource
-    private ChatApi chatApi;
+    public ChatApi chatApi;
 
     @Resource
-    private CommandHandler commandHandler;
+    public CommandHandler commandHandler;
 
     @Resource
-    private WebSocketAdapterHandler webSocketAdapterHandler;
+    public WebSocketAdapterHandler webSocketAdapterHandler;
 
-    private static final AuthenticationResponse DENY = new AuthenticationResponse(false);
+    public static final AuthenticationResponse DENY = new AuthenticationResponse(false);
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, Object msg) {
