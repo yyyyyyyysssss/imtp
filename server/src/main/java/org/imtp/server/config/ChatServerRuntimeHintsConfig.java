@@ -19,6 +19,7 @@ import org.springframework.context.annotation.ImportRuntimeHints;
 public class ChatServerRuntimeHintsConfig implements RuntimeHintsRegistrar {
     @Override
     public void registerHints(RuntimeHints hints, ClassLoader classLoader) {
+        //反射
         hints.reflection().registerType(ChatApi.class, MemberCategory.values());
         hints.reflection().registerType(UserStatusServiceImpl.class, MemberCategory.values());
         hints.reflection().registerType(AuthenticationHandler.class, MemberCategory.values());

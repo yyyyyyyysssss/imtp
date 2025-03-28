@@ -71,7 +71,7 @@ public class WebSocketServer implements SmartLifecycle {
             channelFuture = serverBootstrap.bind(serverProperties.getWebsocket().getHost(), serverProperties.getWebsocket().getPort()).sync();
             channelFuture.addListener((ChannelFutureListener) channelFuture -> {
                 if (channelFuture.isSuccess()){
-                    log.info("WebSocket Server started");
+                    log.info("WebSocket Server started on port {}",serverProperties.getWebsocket().getPort());
                     isRunning = true;
                 }else {
                     log.info("Failed to start WebSocket Server");
