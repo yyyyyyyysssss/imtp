@@ -173,6 +173,7 @@
                             <!-- 开启快速构建模式  -->
                             <quickBuild>true</quickBuild>
                             <buildArgs>
+                                <buildArg>--initialize-at-run-time=io.netty</buildArg>
                                 <!-- 开启G1垃圾收集器  目前只有linux平台支持 -->
                                 <buildArg>--gc=G1</buildArg>
                                 <!-- 在映像构建过程中显示异常堆栈跟踪 -->
