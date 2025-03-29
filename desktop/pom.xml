@@ -11,7 +11,7 @@
     <artifactId>desktop</artifactId>
     <description>客户端</description>
 
-    <name>client</name>
+    <name>desktop</name>
     <url>http://maven.apache.org</url>
 
     <properties>
