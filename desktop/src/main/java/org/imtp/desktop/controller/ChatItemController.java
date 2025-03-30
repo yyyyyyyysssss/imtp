@@ -8,6 +8,7 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
+import javafx.geometry.NodeOrientation;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
@@ -104,6 +105,9 @@ public class ChatItemController extends AbstractController {
                 chatItemTextFlow.setMaxWidth(maxWidth * d);
             }
         });
+
+        chatItemHBox.setRotate(180);
+        chatItemHBox.setNodeOrientation(NodeOrientation.LEFT_TO_RIGHT);
 
     }
 

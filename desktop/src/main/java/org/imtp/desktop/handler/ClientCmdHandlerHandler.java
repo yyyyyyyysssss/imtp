@@ -51,6 +51,9 @@ public class ClientCmdHandlerHandler extends AbstractMessageModelHandler<Packet>
             case FILE_MESSAGE:
                 publishMessage(new FileMessage(byteBuf,header));
                 break;
+            case HEARTBEAT_PING:
+                channelHandlerContext.channel().writeAndFlush(new HeartbeatPongMessage());
+                break;
             case MSG_RES:
                 publishMessage(new MessageStateResponse(byteBuf,header));
                 break;

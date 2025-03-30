@@ -6,26 +6,32 @@ import com.gluonhq.emoji.EmojiData;
 import com.gluonhq.emoji.util.EmojiImageUtils;
 import com.gluonhq.richtextarea.RichTextArea;
 import io.netty.channel.EventLoop;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
+import javafx.collections.WeakListChangeListener;
+import javafx.event.*;
 import javafx.fxml.FXML;
+import javafx.geometry.NodeOrientation;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import javafx.stage.FileChooser;
 import javafx.stage.Window;
+import javafx.util.Duration;
 import lombok.extern.slf4j.Slf4j;
 import org.bytedeco.javacv.FFmpegFrameGrabber;
 import org.bytedeco.javacv.Frame;
@@ -127,6 +133,9 @@ public class ChatController extends AbstractController {
         });
         chatListView.setCellFactory(c -> new ChatItemListCell());
         chatListView.setFocusTraversable(false);
+        chatListView.setRotate(180);
+        chatListView.setNodeOrientation(NodeOrientation.RIGHT_TO_LEFT);
+
         chatEmoteIcon.setOnMouseClicked(mouseEvent -> {
             if (dialog == null) {
                 dialog = new ChatEmojiDialog();
@@ -146,7 +155,6 @@ public class ChatController extends AbstractController {
             }
             dialog.showEmojiPane(chatEmoteIcon);
         });
-
         chatVbox.heightProperty().addListener(new ChangeListener<Number>() {
             @Override
             public void changed(ObservableValue<? extends Number> observableValue, Number number, Number t1) {
@@ -519,11 +527,10 @@ public class ChatController extends AbstractController {
 
     private void addChatItem(ChatItemEntity chatItemEntity) {
         ObservableList<ChatItemEntity> items = chatListView.getItems();
-        int index = items.size();
-        items.addLast(chatItemEntity);
-        Platform.runLater(() -> {
-            chatListView.scrollTo(index);
-        });
+//        int index = items.size();
+        items.addFirst(chatItemEntity);
+//        items.addLast(chatItemEntity);
+//        Platform.runLater(() -> chatListView.scrollTo(index));
     }
 
 
