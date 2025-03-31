@@ -131,6 +131,11 @@ const Call = ({ route }) => {
     const cameraOff = () => {
         setCameraOffFlag((prev) => {
             const m = prev ? false : true
+            if(m){
+                webrtcRef.current.closeCamera()
+            }else {
+                webrtcRef.current.openCamera()
+            }
             return m
         })
     }

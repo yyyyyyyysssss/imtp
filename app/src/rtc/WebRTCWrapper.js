@@ -16,6 +16,7 @@ class WebRTCWrapper {
         this.isRemoteDescriptionSet = false
         this.inited = false
         this.voiceEnabled = true
+        this.cameraEnabled = true
         this.cachedCandidates = []
         this.onReceiveClose = onReceiveClose
         //接收消息监听
@@ -64,6 +65,9 @@ class WebRTCWrapper {
         for (const track of tracks) {
             if (track.kind === 'audio') {
                 track.enabled = this.voiceEnabled
+            }
+            if(track.kind === 'video'){
+                track.enabled = this.cameraEnabled
             }
             //轨道添加到rtc中
             this.rtc.addTrack(track, this.localStream)
@@ -178,6 +182,30 @@ class WebRTCWrapper {
     async #muted(flag) {
         const audioTracks = this.localStream.getAudioTracks()
         audioTracks.forEach(track => {
+            track.enabled = flag
+        })
+    }
+
+
+    openCamera(){
+        if (this.inited) {
+            this.#toggleCamera(true)
+        } else {
+            this.cameraEnabled = true
+        }
+    }
+
+    closeCamera(){
+        if (this.inited) {
+            this.#toggleCamera(false)
+        } else {
+            this.cameraEnabled = false
+        }
+    }
+
+    #toggleCamera(flag){
+        const videoTracks = this.localStream.getVideoTracks();
+        videoTracks.forEach(track => {
             track.enabled = flag
         })
     }
