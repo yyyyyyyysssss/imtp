@@ -126,7 +126,7 @@ public class UserSocialController {
 
     public Result<?> userSocialFallbackMethod(String userId, Exception exception) {
         log.error("用户:[{}]社交关系查询接口异常: ", userId, exception);
-        return ResultGenerator.failed();
+        return ResultGenerator.failed("social service is unavailable");
     }
 
 }

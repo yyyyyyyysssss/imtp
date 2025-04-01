@@ -44,3 +44,35 @@ http:
     # 单位：秒
     connectionRequestTimeout: 5
     responseTimeout: 60
+
+
+
+resilience4j:
+  # 断路器
+  circuitbreaker:
+    configs:
+      default:
+        failureRateThreshold: 50 #以百分⽐配置失败率阈值。当失败率等于或⼤于阈值时，断路器状态并关闭变为开启，并进⾏服务降级
+        slidingWindowSize: 10 #滑动窗⼝的⼤⼩ 配置COUNT_BASED,表示n个请求，配置TIME_BASED表示n秒
+        minimumNumberOfCalls: 8 #断路器计算失败率或慢调⽤率之前所需的最⼩调⽤数（每个滑动窗⼝周期）
+        slidingWindowType: TIME_BASED #滑动窗⼝类型是COUNT_BASED，将会统计记录最近slidingWindowSize次调⽤的结果。如果是TIME_BASED，将会统计记录最近 slidingWindowSize秒的调⽤结果
+        permittedNumberOfCallsInHalfOpenState: 10 #断路器在半开状态下允许通过的调⽤次数。
+        waitDurationInOpenState: 2s # 断路器从开启过渡到半开应等待的时间
+        registerHealthIndicator: true # 健康监测
+        automaticTransitionFromOpenToHalfOpenEnabled: false # 是否自动从打开到半开，不需要触发 设置为false，则只有在发出调⽤时才会转换到半开
+        recordExceptions: #记录为失败并因此增加失败率的异常列表。除⾮通过ignoreExceptions显式忽略，否则与列表中某个匹配或继承的异常都将被视为失败。 如果指定异常列表，则所有其他异常均视为成功，除⾮它们被ignoreExceptions显式忽略
+          - java.lang.Exception
+    instances:
+      # 公共断路器: 单位窗口时间10秒内最低8个请求有百分之50的请求都是异常的时 触发该断路器
+      commonBreaker:
+        base-config: default #继承默认配置default
+      # 慢调用断路器: 单位窗口时间10秒内最低8个请求有百分之30调用时间都是超过3秒时 触发该断路器
+      slowCallBreaker:
+        failureRateThreshold: 50
+        slowCallDurationThreshold: 3s #慢调⽤时间阈值，⾼于这个阈值的呼叫视为慢调⽤，并增加慢调⽤⽐例。
+        slowCallRateThreshold: 30 #以百分⽐的⽅式配置，断路器把调⽤时间⼤于slowCallDurationThreshold的调⽤视为慢调⽤，当慢调⽤⽐例⼤于等于阈值时，断路器开启，并进⾏服务降级
+        minimumNumberOfCalls: 8
+        slidingWindowSize: 10
+        slidingWindowType: TIME_BASED
+        permittedNumberOfCallsInHalfOpenState: 10
+        waitDurationInOpenState: 2s #从OPEN到HALF_OPEN状态需要等待的时间

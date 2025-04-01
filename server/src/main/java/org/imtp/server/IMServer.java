@@ -99,7 +99,6 @@ public class IMServer implements SmartLifecycle {
     @Override
     public void stop(){
         log.info("Stopping IMServer");
-        isRunning = false;
         try {
             bossEventLoopGroup.shutdownGracefully().sync();
             workEventLoopGroup.shutdownGracefully().sync();
@@ -107,6 +106,8 @@ public class IMServer implements SmartLifecycle {
         } catch (InterruptedException e) {
             log.error("Stop IMServer error: ",e);
         }
+        isRunning = false;
+        log.info("Stopped IMServer");
     }
 
     @Override

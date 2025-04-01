@@ -95,6 +95,7 @@ public class WebSocketServer implements SmartLifecycle {
             log.error("Stop WebSocket Server Error: ",e);
         }
         isRunning = false;
+        log.info("Stopped WebSocket Server");
     }
 
     @Override

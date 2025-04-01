@@ -211,12 +211,15 @@ resilience4j:
   ratelimiter:
     configs:
       default:
-        timeoutDuration: 10ms
+        # 如果没有令牌，最多等待时间
+        timeoutDuration: 500ms
+        # 限流刷新周期
         limitRefreshPeriod: 1s
+        # 限流周期内允许的请求数
         limitForPeriod: 2000
     instances:
       # 公共限流: 1秒允许2000个请求，触发限流时客户端等待10ms响应
-      commonRatelimiter:
+      commonRateLimiter:
         base-config: default
 # 重试器
   retry:
