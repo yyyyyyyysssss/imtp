@@ -22,20 +22,20 @@ public class DateToLongTypeHandler extends BaseTypeHandler<Long> {
 
     @Override
     public Long getNullableResult(ResultSet rs, String columnName) throws SQLException {
-        Date date = rs.getDate(columnName);
-        return date != null ? date.getTime() : null;
+        Timestamp timestamp = rs.getTimestamp(columnName);
+        return timestamp != null ? timestamp.getTime() : null;
     }
 
     @Override
     public Long getNullableResult(ResultSet rs, int columnIndex) throws SQLException {
-        Date date = rs.getDate(columnIndex);
-        return date != null ? date.getTime() : null;
+        Timestamp timestamp = rs.getTimestamp(columnIndex);
+        return timestamp != null ? timestamp.getTime() : null;
     }
 
     @Override
     public Long getNullableResult(CallableStatement cs, int columnIndex) throws SQLException {
-        Date date = cs.getDate(columnIndex);
-        return date != null ? date.getTime() : null;
+        Timestamp timestamp = cs.getTimestamp(columnIndex);
+        return timestamp != null ? timestamp.getTime() : null;
     }
 
 }

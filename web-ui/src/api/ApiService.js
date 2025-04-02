@@ -136,12 +136,13 @@ export const deleteUserSessionById = (id) => {
 }
 
 // 分页获取用户会话关联的消息
-export const fetchMessageByUserSessionId = (sessionId, pageNum = 1, pageSize = 20) => {
+export const fetchMessageByUserSessionId = (sessionId,prevMsgId = null, pageNum = 1, pageSize = 20) => {
 
     return new Promise((resolve, reject) => {
         httpWrapper.get('/social/userMessage/{userId}', {
             params: {
                 sessionId: sessionId,
+                prevMsgId: prevMsgId,
                 pageNum: pageNum,
                 pageSize: pageSize
             }

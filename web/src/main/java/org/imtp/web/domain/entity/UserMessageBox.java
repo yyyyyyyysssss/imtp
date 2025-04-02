@@ -35,8 +35,4 @@ public class UserMessageBox {
 
     @TableField("box_type")
     private MessageBoxType boxType;
-
-    @TableField("time")
-    private Date time;
-
 }

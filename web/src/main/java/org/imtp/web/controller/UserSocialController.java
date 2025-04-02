@@ -93,10 +93,11 @@ public class UserSocialController {
     @GetMapping("/userMessage/{userId}")
     public Result<PageInfo<MessageInfo>> message(@PathVariable(name = "userId") String userId,
                              @RequestParam(name = "sessionId") String sessionId,
+                             @RequestParam(name = "prevMsgId",required = false) String prevMsgId,
                              @RequestParam(name = "pageNum", required = false,defaultValue = "1") Integer pageNum,
                              @RequestParam(name = "pageSize", required = false,defaultValue = "20") Integer pageSize) {
         checkUserId(userId);
-        PageInfo<MessageInfo> messageInfoPageInfo = userSocialService.findMessages(userId,sessionId,pageNum,pageSize);
+        PageInfo<MessageInfo> messageInfoPageInfo = userSocialService.findMessages(userId,sessionId,prevMsgId,pageNum,pageSize);
         return ResultGenerator.ok(messageInfoPageInfo);
     }
 

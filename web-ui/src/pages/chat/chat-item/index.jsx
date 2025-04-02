@@ -1,13 +1,13 @@
-import React, { useRef, useEffect, useCallback } from 'react'
-import './index.less'
-import { Layout } from "antd"
-import { List as VirtualizedList, AutoSizer, CellMeasurer, CellMeasurerCache } from 'react-virtualized'
-import { useWebSocket } from '../../../context';
-import Message from '../../../components/message';
+import { Layout } from "antd";
+import React, { useCallback, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { AutoSizer, CellMeasurer, CellMeasurerCache, List as VirtualizedList } from 'react-virtualized';
 import { fetchMessageByUserSessionId } from '../../../api/ApiService';
+import ChatItemFooter from '../../../components/chat-item-footer';
+import Message from '../../../components/message';
+import { useWebSocket } from '../../../context';
 import { loadMessage } from '../../../redux/slices/chatSlice';
-import ChatItemFooter from '../../../components/chat-item-footer'
+import './index.less';
 
 const { Content } = Layout;
 
@@ -23,9 +23,10 @@ const ChatItem = React.memo(({ sessionId }) => {
     //当前会话
     const session = useSelector(state => state.chat.entities.sessions[sessionId])
     //会话关联的消息
-    const { messages } = session
+    const { prevMsgId, messages } = session
 
     const dispatch = useDispatch()
+
     //初始加载数据
     useEffect(() => {
         const fetchData = async () => {
@@ -84,6 +85,21 @@ const ChatItem = React.memo(({ sessionId }) => {
     const handleRowsRendered = ({ startIndex, stopIndex }) => {
 
     }
+
+    const isRowLoaded = ({ index }) => {
+        return !!messages[index]; // 如果数据已加载，返回 true
+    }
+
+    const loadMoreRows = ({ startIndex, stopIndex }) => {
+        console.log('loadMoreRows', startIndex, stopIndex)
+    }
+
+    const handleOnScroll = ( { scrollTop } ) => {
+        if(scrollTop === 0){
+            console.log('loadMoreRows')
+        }
+    }
+
     return (
         <>
             <div style={{ width: '100%', height: '100%' }}>
@@ -92,28 +108,57 @@ const ChatItem = React.memo(({ sessionId }) => {
                         {/* 聊天内容展示 */}
                         <Content className='content-chat' style={{ height: '62%' }}>
                             <AutoSizer>
-                                {({ height, width }) => {
-                                    return (
-                                        <div>
-                                            <VirtualizedList
-                                                ref={chatContentRef}
-                                                className='content-chat-list'
-                                                width={width}
-                                                height={height}
-                                                rowCount={messages?.length || 0}
-                                                rowHeight={cache.current.rowHeight}
-                                                deferredMeasurementCache={cache.current}
-                                                rowRenderer={rowRenderer}
-                                                onRowsRendered={handleRowsRendered}
-                                                scrollToIndex={messages?.length - 1}
-                                            />
-                                        </div>
-                                    );
-                                }}
+                                {({ height, width }) =>
+                                (
+
+                                    <VirtualizedList
+                                        ref={chatContentRef}
+                                        className='content-chat-list'
+                                        width={width}
+                                        height={height}
+                                        rowCount={messages?.length || 0}
+                                        rowHeight={cache.current.rowHeight}
+                                        deferredMeasurementCache={cache.current}
+                                        rowRenderer={rowRenderer}
+                                        onRowsRendered={handleRowsRendered}
+                                        scrollToIndex={messages?.length - 1}
+                                        onScroll={handleOnScroll}
+                                    />
+
+                                )
+                                }
                             </AutoSizer>
+                            {/* <InfiniteLoader
+                                isRowLoaded={isRowLoaded}
+                                loadMoreRows={loadMoreRows}
+                                rowCount={messages?.length}
+                            >
+                                {({ onRowsRendered, registerChild }) => (
+                                    <AutoSizer>
+                                        {({ height, width }) => 
+                                            (
+
+                                                <VirtualizedList
+                                                    ref={registerChild}
+                                                    className='content-chat-list'
+                                                    width={width}
+                                                    height={height}
+                                                    rowCount={messages?.length || 0}
+                                                    rowHeight={cache.current.rowHeight}
+                                                    deferredMeasurementCache={cache.current}
+                                                    rowRenderer={rowRenderer}
+                                                    onRowsRendered={onRowsRendered}
+                                                    scrollToIndex={messages?.length - 1}
+                                                />
+
+                                            )
+                                        }
+                                    </AutoSizer>
+                               )}
+                             </InfiniteLoader> */}
                         </Content>
                         <Content style={{ height: '38%' }}>
-                            <ChatItemFooter session={session}/>
+                            <ChatItemFooter session={session} />
                         </Content>
                     </Layout>
                 </Content>

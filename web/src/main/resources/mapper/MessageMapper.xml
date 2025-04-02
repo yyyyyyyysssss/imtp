@@ -4,7 +4,6 @@
 
     <resultMap id="resultMessageInfoMap" type="org.imtp.common.packet.body.MessageInfo">
         <result property="id" column="id"/>
-        <result property="sessionId" column="session_id"/>
         <result property="senderUserId" column="sender_user_id"/>
         <result property="receiverUserId" column="receiver_user_id"/>
         <result property="type" column="type"/>

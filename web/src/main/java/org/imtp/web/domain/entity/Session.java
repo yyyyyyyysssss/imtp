@@ -33,4 +33,7 @@ public class Session {
     @EnumValue
     private DeliveryMethod deliveryMethod;
 
+    @TableField("is_deleted")
+    private Boolean isDeleted;
+
 }

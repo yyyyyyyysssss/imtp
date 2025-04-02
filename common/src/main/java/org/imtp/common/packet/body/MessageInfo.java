@@ -16,8 +16,6 @@ public class MessageInfo {
 
     private Long id;
 
-    private Long sessionId;
-
     private Long senderUserId;
 
     private Long receiverUserId;

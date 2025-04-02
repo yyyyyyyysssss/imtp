@@ -26,7 +26,7 @@ public interface UserSocialService {
 
     Long saveMessage(MessageDTO messageDTO);
 
-    PageInfo<MessageInfo> findMessages(String userId,String sessionId,Integer pageNum,Integer pageSize);
+    PageInfo<MessageInfo> findMessages(String userId,String sessionId,String prevMsgId,Integer pageNum,Integer pageSize);
 
     //保存离线消息
     Boolean saveOfflineMessage(List<OfflineMessageDTO> offlineMessageList);

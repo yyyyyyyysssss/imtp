@@ -15,6 +15,6 @@ import java.util.List;
 @Mapper
 public interface UserMessageBoxMapper extends BaseMapper<UserMessageBox> {
 
-    List<UserMessageBox> findLatestMessageIdsBySessionIds(@Param("sessionIds") List<Long> sessionIds);
+    List<UserMessageBox> findLatestMessage(@Param("sessionIds") List<Long> sessionIds);
 
 }

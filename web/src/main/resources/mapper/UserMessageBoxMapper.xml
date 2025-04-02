@@ -3,10 +3,10 @@
 <mapper namespace="org.imtp.web.mapper.UserMessageBoxMapper">
 
 
-    <select id="findLatestMessageIdsBySessionIds" parameterType="java.util.List" resultType="org.imtp.web.domain.entity.UserMessageBox">
+    <select id="findLatestMessage" parameterType="java.util.List" resultType="org.imtp.web.domain.entity.UserMessageBox">
         SELECT t.session_id,t.msg_id
         FROM im_user_msg_box t
-        INNER JOIN (SELECT session_id, max( time ) time FROM im_user_msg_box GROUP BY session_id) as l on t.session_id = l.session_id AND t.time = l.time
+        INNER JOIN (SELECT session_id, max( id ) id FROM im_user_msg_box GROUP BY session_id) as l on t.session_id = l.session_id AND t.id = l.id
         WHERE t.session_id IN
         <foreach collection="sessionIds" item="item" index="index" separator="," open="(" close=")">
             #{item}

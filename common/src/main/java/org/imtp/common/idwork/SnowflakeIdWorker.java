@@ -55,26 +55,24 @@ public class SnowflakeIdWorker {
             throw new RuntimeException(
                     String.format("Clock moved backwards.  Refusing to generate id for %d milliseconds", lastTimestamp - currentTimestamp));
         }
-        //同一时间生成，进行序列递增,否则毫秒内序列重置
-        if (currentTimestamp == lastTimestamp) {
-            try {
-                lock.lock();
+        try {
+            lock.lock();
+            //同一时间生成，进行序列递增,否则毫秒内序列重置
+            if (currentTimestamp == lastTimestamp) {
+
                 //如果毫秒相同，则从0递增生成序列号
                 sequence = (sequence + 1) & sequenceMask;
                 //如果毫秒内序列溢出，则阻塞到下一毫秒，获取新的时间戳
                 if (sequence == 0) {
                     currentTimestamp = getNextMill();
                 }
-            } finally {
-                lock.unlock();
+            } else {
+                sequence = 0;
             }
-
-        } else {
-            sequence = 0;
+            lastTimestamp = currentTimestamp;
+        } finally {
+            lock.unlock();
         }
-
-        lastTimestamp = currentTimestamp;
-
         return (currentTimestamp - this.epoch) << this.timestampLeftShift | this.workerId << this.workerIdShift | this.sequence;
     }
 

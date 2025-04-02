@@ -92,6 +92,8 @@ export const chatSlice = createSlice({
             const { payload } = action
             const { sessionId, messages } = payload
             const messageInit = state.entities.sessions[sessionId].messageInit
+            let lastMessage;
+            let firstMessage;
             messages.forEach(message => {
                 if (!state.entities.messages) {
                     state.entities.messages = {}
@@ -105,9 +107,19 @@ export const chatSlice = createSlice({
                 } else {
                     state.entities.sessions[sessionId].messages.push(message.id)
                 }
-
+                firstMessage = message
+                if(!lastMessage){
+                    lastMessage = message
+                }
             });
             state.entities.sessions[sessionId].messageInit = true
+            state.entities.sessions[sessionId].prevMsgId = firstMessage?.id
+            if(!state.entities.sessions[sessionId].lastMsgContent && lastMessage){
+                state.entities.sessions[sessionId].lastMsgType = lastMessage.type
+                state.entities.sessions[sessionId].lastMsgContent = lastMessage.content
+                state.entities.sessions[sessionId].lastMsgTime = lastMessage.timestamp
+                state.entities.sessions[sessionId].lastUserName = lastMessage.name
+            }
         },
         addMessage: (state, action) => {
             const { payload } = action
