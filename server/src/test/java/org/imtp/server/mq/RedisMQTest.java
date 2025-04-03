@@ -30,4 +30,13 @@ public class RedisMQTest {
         redisWrapper.addStreamRecord(forwardMessage);
     }
 
+
+    @Test
+    void testMessageDelegate() {
+        ForwardMessage forwardMessage = new ForwardMessage();
+        forwardMessage.setChannelIds(List.of("1234567890"));
+        forwardMessage.setMessage(new TextMessage("hello world",1,2,12345678L));
+        redisWrapper.publishMsg(forwardMessage);
+    }
+
 }

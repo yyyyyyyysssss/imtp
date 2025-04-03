@@ -36,8 +36,8 @@ public class RedisWrapper {
         return redisTemplate.convertAndSend(topic,message);
     }
 
-    public RecordId addStreamRecord(ForwardMessage forwardMessage){
-        ObjectRecord<String, ForwardMessage> objectObjectRecord = StreamRecords.newRecord().in(Topic.MESSAGE_FORWARD).ofObject(forwardMessage);
+    public <T> RecordId addStreamRecord(T t){
+        ObjectRecord<String, T> objectObjectRecord = StreamRecords.newRecord().in(Topic.MESSAGE_FORWARD_STREAM).ofObject(t);
         return redisTemplate.opsForStream().add(objectObjectRecord);
     }
 

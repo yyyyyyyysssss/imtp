@@ -22,7 +22,7 @@ public class RedisStreamLifecycle implements SmartLifecycle {
     @Override
     public void start() {
         if (!isRunning){
-//            streamMessageListenerContainer.start();
+            streamMessageListenerContainer.start();
             isRunning = true;
         }
     }
@@ -30,7 +30,7 @@ public class RedisStreamLifecycle implements SmartLifecycle {
     @Override
     public void stop() {
         if (isRunning){
-//            streamMessageListenerContainer.stop();
+            streamMessageListenerContainer.stop();
             isRunning = false;
         }
     }

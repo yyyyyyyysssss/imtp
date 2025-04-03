@@ -1,5 +1,6 @@
 package org.imtp.server.mq;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -9,6 +10,7 @@ import org.springframework.data.redis.connection.stream.ReadOffset;
 import org.springframework.data.redis.connection.stream.StreamOffset;
 import org.springframework.data.redis.core.convert.MappingRedisConverter;
 import org.springframework.data.redis.core.mapping.RedisMappingContext;
+import org.springframework.data.redis.hash.Jackson2HashMapper;
 import org.springframework.data.redis.hash.ObjectHashMapper;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
@@ -41,12 +43,13 @@ public class RedisMQConfig {
         StreamMessageListenerContainer.StreamMessageListenerContainerOptions<String, ObjectRecord<String,ForwardMessage>> containerOptions = StreamMessageListenerContainer
                 .StreamMessageListenerContainerOptions
                 .builder()
+//                .serializer(new GenericJackson2JsonRedisSerializer())
+                .objectMapper(new Jackson2HashMapper(new ObjectMapper(), true))
                 .pollTimeout(Duration.ofMillis(100))
                 .targetType(ForwardMessage.class)
                 .build();
         //创建消除监听容器
-        return StreamMessageListenerContainer
-                .create(redisConnectionFactory, containerOptions);
+        return StreamMessageListenerContainer.create(redisConnectionFactory, containerOptions);
     }
 
     //基于流的轻量级消息队列
