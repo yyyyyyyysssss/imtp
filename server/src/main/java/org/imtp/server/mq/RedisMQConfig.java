@@ -54,7 +54,7 @@ public class RedisMQConfig {
     public Subscription subscription(StreamMessageListenerContainer<String, ObjectRecord<String,ForwardMessage>> streamMessageListenerContainer) {
 
         //主题消息消费配置
-        StreamOffset<String> streamOffset = StreamOffset.create("message_forward2", ReadOffset.lastConsumed());
+        StreamOffset<String> streamOffset = StreamOffset.create(Topic.MESSAGE_FORWARD_STREAM, ReadOffset.lastConsumed());
 
         StreamMessageListenerContainer.StreamReadRequest<String> readRequest = StreamMessageListenerContainer.StreamReadRequest.builder(streamOffset)
                 .cancelOnError((err) -> false)  // 异常后不停止消费
