@@ -90,7 +90,7 @@ export const chatSlice = createSlice({
         },
         loadMessage: (state, action) => {
             const { payload } = action
-            const { sessionId, messages } = payload
+            const { sessionId, messages, more } = payload
             const messageInit = state.entities.sessions[sessionId].messageInit
             let lastMessage;
             let firstMessage;
@@ -102,7 +102,7 @@ export const chatSlice = createSlice({
                 if (!state.entities.sessions[sessionId].messages) {
                     state.entities.sessions[sessionId].messages = []
                 }
-                if (messageInit === undefined || messageInit === false) {
+                if (messageInit === undefined || messageInit === false || more === true) {
                     state.entities.sessions[sessionId].messages.unshift(message.id)
                 } else {
                     state.entities.sessions[sessionId].messages.push(message.id)
@@ -112,13 +112,18 @@ export const chatSlice = createSlice({
                     lastMessage = message
                 }
             });
-            state.entities.sessions[sessionId].messageInit = true
-            state.entities.sessions[sessionId].prevMsgId = firstMessage?.id
-            if(!state.entities.sessions[sessionId].lastMsgContent && lastMessage){
-                state.entities.sessions[sessionId].lastMsgType = lastMessage.type
-                state.entities.sessions[sessionId].lastMsgContent = lastMessage.content
-                state.entities.sessions[sessionId].lastMsgTime = lastMessage.timestamp
-                state.entities.sessions[sessionId].lastUserName = lastMessage.name
+            if(firstMessage){
+                state.entities.sessions[sessionId].prevMsgId = firstMessage.id
+            }
+            if(messageInit === undefined || messageInit === false){
+                if(!state.entities.sessions[sessionId].lastMsgContent && lastMessage){
+                    state.entities.sessions[sessionId].lastMsgType = lastMessage.type
+                    state.entities.sessions[sessionId].lastMsgContent = lastMessage.content
+                    state.entities.sessions[sessionId].lastMsgTime = lastMessage.timestamp
+                    state.entities.sessions[sessionId].lastUserName = lastMessage.name
+                }
+                state.entities.sessions[sessionId].scrollToIndex = messages.length
+                state.entities.sessions[sessionId].messageInit = true
             }
         },
         addMessage: (state, action) => {
@@ -135,6 +140,8 @@ export const chatSlice = createSlice({
             state.entities.sessions[sessionId].lastMsgContent = message.content
             state.entities.sessions[sessionId].lastMsgTime = message.timestamp
             state.entities.sessions[sessionId].lastUserName = message.name
+            //更新滚动索引
+            state.entities.sessions[sessionId].scrollToIndex = state.entities.sessions[sessionId].messages.length - 1
             //将会话移动到最前
             state.result = [sessionId, ...state.result.filter(item => item !== sessionId)]
             //未读消息

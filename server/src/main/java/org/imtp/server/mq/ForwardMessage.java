@@ -1,8 +1,6 @@
 package org.imtp.server.mq;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.imtp.common.packet.base.Packet;
 
@@ -17,12 +15,18 @@ import java.util.List;
  */
 @Getter
 @Setter
-@AllArgsConstructor
-@NoArgsConstructor
 public class ForwardMessage implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
+
+    public ForwardMessage() {
+    }
+
+    public ForwardMessage(List<String> channelIds,Packet message) {
+        this.channelIds = channelIds;
+        this.message = message;
+    }
 
     private List<String> channelIds;
 

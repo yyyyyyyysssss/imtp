@@ -30,43 +30,39 @@ import java.util.Collections;
 public class RedisMQConfig {
 
 
-//    @Bean
-//    public StreamListener<String, ObjectRecord<String,ForwardMessage>> streamListener(){
-//
-//        return new DefaultStreamListener();
-//    }
-//
-//    //基于流的轻量级消息队列
-//    @Bean
-//    public Subscription subscription(RedisConnectionFactory redisConnectionFactory) {
-//        StreamMessageListenerContainer.StreamMessageListenerContainerOptions<String, ObjectRecord<String,ForwardMessage>> containerOptions = StreamMessageListenerContainer
-//                .StreamMessageListenerContainerOptions
-//                .builder()
-//                .pollTimeout(Duration.ofMillis(100))
-//                .targetType(ForwardMessage.class)
-//                .build();
-//        //创建消除监听容器
-//        StreamMessageListenerContainer<String, ObjectRecord<String,ForwardMessage>> container = StreamMessageListenerContainer
-//                .create(redisConnectionFactory, containerOptions);
-//        //主题消息消费配置
-//        StreamOffset<String> streamOffset = StreamOffset.create("message_forward2", ReadOffset.lastConsumed());
-//
-//        StreamMessageListenerContainer.StreamReadRequest<String> readRequest = StreamMessageListenerContainer.StreamReadRequest.builder(streamOffset)
-//                .cancelOnError((err) -> false)  // 异常后不停止消费
-//                .errorHandler((err) -> log.error(err.getMessage())) //输出异常信息
-//                .build();
-//        //消息订阅
-//        Subscription subscription = container.register(readRequest, streamListener());
-//        container.start();
-//        return subscription;
-//    }
-//
-//    @Bean
-//    public ObjectHashMapper objectHashMapper(){
-//        RedisMappingContext redisMappingContext = new RedisMappingContext();
-//        redisMappingContext.setInitialEntitySet(Collections.singleton(ForwardMessage.class));
-//        return new ObjectHashMapper(new MappingRedisConverter(redisMappingContext));
-//    }
+    @Bean
+    public StreamListener<String, ObjectRecord<String,ForwardMessage>> streamListener(){
+
+        return new ChatMessageStreamListener();
+    }
+
+    @Bean
+    public StreamMessageListenerContainer<String, ObjectRecord<String,ForwardMessage>> streamMessageListenerContainer(RedisConnectionFactory redisConnectionFactory){
+        StreamMessageListenerContainer.StreamMessageListenerContainerOptions<String, ObjectRecord<String,ForwardMessage>> containerOptions = StreamMessageListenerContainer
+                .StreamMessageListenerContainerOptions
+                .builder()
+                .pollTimeout(Duration.ofMillis(100))
+                .targetType(ForwardMessage.class)
+                .build();
+        //创建消除监听容器
+        return StreamMessageListenerContainer
+                .create(redisConnectionFactory, containerOptions);
+    }
+
+    //基于流的轻量级消息队列
+    @Bean
+    public Subscription subscription(StreamMessageListenerContainer<String, ObjectRecord<String,ForwardMessage>> streamMessageListenerContainer) {
+
+        //主题消息消费配置
+        StreamOffset<String> streamOffset = StreamOffset.create("message_forward2", ReadOffset.lastConsumed());
+
+        StreamMessageListenerContainer.StreamReadRequest<String> readRequest = StreamMessageListenerContainer.StreamReadRequest.builder(streamOffset)
+                .cancelOnError((err) -> false)  // 异常后不停止消费
+                .errorHandler((err) -> log.error(err.getMessage())) //输出异常信息
+                .build();
+        //消息订阅
+        return streamMessageListenerContainer.register(readRequest, streamListener());
+    }
 
     //基于发布订阅的轻量级消息队列
     @Bean

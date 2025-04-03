@@ -23,7 +23,7 @@ const ChatItem = React.memo(({ sessionId }) => {
     //当前会话
     const session = useSelector(state => state.chat.entities.sessions[sessionId])
     //会话关联的消息
-    const { prevMsgId, messages } = session
+    const { prevMsgId, scrollToIndex, messages } = session
 
     const dispatch = useDispatch()
 
@@ -36,7 +36,7 @@ const ChatItem = React.memo(({ sessionId }) => {
                 item.self = userInfo.id === item.senderUserId
                 return item
             })
-            dispatch(loadMessage({ sessionId: sessionId, messages: newMessageList }))
+            dispatch(loadMessage({ sessionId: sessionId, messages: newMessageList, more: false }))
         }
         if (session.messageInit === undefined || session.messageInit === false) {
             fetchData()
@@ -91,12 +91,27 @@ const ChatItem = React.memo(({ sessionId }) => {
     }
 
     const loadMoreRows = ({ startIndex, stopIndex }) => {
-        console.log('loadMoreRows', startIndex, stopIndex)
+
     }
 
-    const handleOnScroll = ( { scrollTop } ) => {
-        if(scrollTop === 0){
-            console.log('loadMoreRows')
+    // 加载更多数据
+    const loadMoreData = () => {
+        fetchMessageByUserSessionId(sessionId, prevMsgId)
+            .then(
+                data => {
+                    const messageList = data.list
+                    const newMessageList = messageList.map(item => {
+                        item.self = userInfo.id === item.senderUserId
+                        return item
+                    })
+                    dispatch(loadMessage({ sessionId: sessionId, messages: newMessageList, more: true }))
+                }
+            )
+    }
+
+    const handleOnScroll = ({ scrollTop }) => {
+        if (scrollTop === 0 && session.messageInit && session.messageInit === true) {
+            loadMoreData()
         }
     }
 
@@ -121,7 +136,7 @@ const ChatItem = React.memo(({ sessionId }) => {
                                         deferredMeasurementCache={cache.current}
                                         rowRenderer={rowRenderer}
                                         onRowsRendered={handleRowsRendered}
-                                        scrollToIndex={messages?.length - 1}
+                                        scrollToIndex={scrollToIndex}
                                         onScroll={handleOnScroll}
                                     />
 

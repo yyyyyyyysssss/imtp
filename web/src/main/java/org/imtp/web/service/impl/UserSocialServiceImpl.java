@@ -12,20 +12,22 @@ import org.imtp.common.enums.DeliveryMethod;
 import org.imtp.common.enums.MessageType;
 import org.imtp.common.packet.body.*;
 import org.imtp.common.packet.common.MessageDTO;
-import org.imtp.common.packet.common.OfflineMessageDTO;
 import org.imtp.web.config.exception.BusinessException;
+import org.imtp.web.config.exception.DatabaseException;
 import org.imtp.web.config.idwork.IdGen;
 import org.imtp.web.domain.dto.UserSessionDTO;
 import org.imtp.web.domain.entity.*;
 import org.imtp.web.enums.MessageBoxType;
 import org.imtp.web.mapper.*;
-import org.imtp.web.service.OfflineMessageService;
 import org.imtp.web.service.UserMessageBoxService;
 import org.imtp.web.service.UserSocialService;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -57,12 +59,6 @@ public class UserSocialServiceImpl implements UserSocialService {
 
     @Resource
     private UserMessageBoxService userMessageBoxService;
-
-    @Resource
-    private OfflineMessageMapper offlineMessageMapper;
-
-    @Resource
-    private OfflineMessageService offlineMessageService;
 
     @Override
     public List<UserSessionInfo> findSessionByUserId(String userId) {
@@ -186,38 +182,6 @@ public class UserSocialServiceImpl implements UserSocialService {
     }
 
     @Override
-    public List<OfflineMessageInfo> findOfflineMessageByUserId(String userId) {
-        Wrapper<OfflineMessage> offlineMessageQueryWrapper = new QueryWrapper<OfflineMessage>()
-                .eq("state", false)
-                .eq("user_id", userId);
-        List<OfflineMessage> offlineMessages = offlineMessageMapper.selectList(offlineMessageQueryWrapper);
-        if (offlineMessages.isEmpty()) {
-            return List.of();
-        }
-        List<Long> msgIds = offlineMessages.stream().map(OfflineMessage::getMsgId).toList();
-        Wrapper<Message> messageQueryWrapper = new QueryWrapper<Message>().in("id", msgIds);
-        List<Message> messages = messageMapper.selectList(messageQueryWrapper);
-        if (messages.isEmpty()) {
-            return List.of();
-        }
-        List<OfflineMessageInfo> offlineMessageInfos = new ArrayList<>();
-        for (Message message : messages) {
-            OfflineMessageInfo offlineMessageInfo = OfflineMessageInfo
-                    .builder()
-                    .id(message.getId())
-                    .sender(message.getSenderUserId())
-                    .receiver(message.getReceiverUserId())
-                    .type(message.getType())
-                    .content(message.getContent())
-                    .sendTime(message.getSendTime().getTime())
-                    .deliveryMethod(message.getDeliveryMethod())
-                    .build();
-            offlineMessageInfos.add(offlineMessageInfo);
-        }
-        return offlineMessageInfos;
-    }
-
-    @Override
     public List<String> findUserIdByGroupId(String groupId) {
         Wrapper<GroupUser> groupQueryWrapper = new QueryWrapper<GroupUser>()
                 .select("user_id").eq("group_id", groupId);
@@ -230,6 +194,7 @@ public class UserSocialServiceImpl implements UserSocialService {
 
     @Override
     public Long saveMessage(MessageDTO messageDTO) {
+        //消息保存
         Message message = new Message();
         message.setId(IdGen.genId());
         message.setSenderUserId(messageDTO.getSenderUserId());
@@ -241,8 +206,9 @@ public class UserSocialServiceImpl implements UserSocialService {
         message.setDeliveryMethod(messageDTO.getDeliveryMethod());
         int insert = messageMapper.insert(message);
         if (insert == 0) {
-            throw new RuntimeException("insert error");
+            throw new BusinessException("saveMessage error");
         }
+        //获取会话id
         Map<Long, Long> map;
         QueryWrapper<Session> sessionQueryWrapper = new QueryWrapper<>();
         sessionQueryWrapper.select("id","user_id");
@@ -253,13 +219,12 @@ public class UserSocialServiceImpl implements UserSocialService {
                     .or()
                     .eq("user_id", messageDTO.getReceiverUserId())
                     .eq("receiver_user_id", messageDTO.getSenderUserId());
-            List<Session> sessions = sessionMapper.selectList(sessionQueryWrapper);
-            map = sessions.stream().collect(Collectors.toMap(Session::getUserId, Session::getId));
         } else {
             sessionQueryWrapper.eq("receiver_user_id", messageDTO.getReceiverUserId());
-            List<Session> sessions = sessionMapper.selectList(sessionQueryWrapper);
-            map = sessions.stream().collect(Collectors.toMap(Session::getUserId, Session::getId));
         }
+        List<Session> sessions = sessionMapper.selectList(sessionQueryWrapper);
+        map = sessions.stream().collect(Collectors.toMap(Session::getUserId, Session::getId));
+
         List<UserMessageBox> userMessageBoxes = new ArrayList<>();
         //发件箱
         UserMessageBox outboxUserMessageBox = UserMessageBox
@@ -271,7 +236,6 @@ public class UserSocialServiceImpl implements UserSocialService {
                 .boxType(MessageBoxType.OUTBOX)
                 .build();
         userMessageBoxes.add(outboxUserMessageBox);
-
         //收件箱
         List<String> userIds = getUserIdByDeliveryMethod(messageDTO.getReceiverUserId().toString(), messageDTO.getDeliveryMethod());
         for (String userId : userIds) {
@@ -301,6 +265,7 @@ public class UserSocialServiceImpl implements UserSocialService {
         }
     }
 
+    @Override
     public PageInfo<MessageInfo> findMessages(String userId, String sessionId,String prevMsgId, Integer pageNum, Integer pageSize) {
         PageHelper.startPage(pageNum, pageSize);
         QueryWrapper<UserMessageBox> userMessageBoxQueryWrapper = new QueryWrapper<>();
@@ -330,12 +295,6 @@ public class UserSocialServiceImpl implements UserSocialService {
         messageInfoPageInfo.setPageSize(pageSize);
         messageInfoPageInfo.setTotal(userMessageBoxPageInfo.getTotal());
         return messageInfoPageInfo;
-    }
-
-    @Override
-    public Boolean saveOfflineMessage(List<OfflineMessageDTO> offlineMessageList) {
-        List<OfflineMessage> offlineMessages = offlineMessageList.stream().map(OfflineMessage::new).toList();
-        return offlineMessageService.saveBatch(offlineMessages);
     }
 
 }

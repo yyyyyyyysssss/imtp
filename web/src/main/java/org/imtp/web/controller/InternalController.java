@@ -70,12 +70,6 @@ public class InternalController {
         return ResultGenerator.ok(groupInfos);
     }
 
-    @GetMapping("/offlineMessage")
-    public Result<?> offlineMessage(@RequestParam(name = "userId") String userId){
-        List<OfflineMessageInfo> offlineMessageInfos = userSocialService.findOfflineMessageByUserId(userId);
-        return ResultGenerator.ok(offlineMessageInfos);
-    }
-
     @GetMapping("/userIds")
     public Result<?> userIds(@RequestParam(name = "groupId") String groupId){
         List<String> userIds = userSocialService.findUserIdByGroupId(groupId);
@@ -86,12 +80,6 @@ public class InternalController {
     public Result<?> message(@RequestBody MessageDTO messageDTO){
         Long messageId = userSocialService.saveMessage(messageDTO);
         return ResultGenerator.ok(messageId);
-    }
-
-    @PostMapping("/offlineMessage")
-    public Result<?> offlineMessage(@RequestBody List<OfflineMessageDTO> offlineMessageList){
-        Boolean b = userSocialService.saveOfflineMessage(offlineMessageList);
-        return ResultGenerator.ok(b);
     }
 
 }

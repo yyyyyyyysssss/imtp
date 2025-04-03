@@ -10,7 +10,7 @@ import org.springframework.data.redis.stream.StreamListener;
  * @Date 2024/7/8 17:48
  */
 @Slf4j
-public class DefaultStreamListener implements StreamListener<String, ObjectRecord<String,ForwardMessage>> {
+public class ChatMessageStreamListener implements StreamListener<String, ObjectRecord<String,ForwardMessage>> {
 
     @Override
     public void onMessage(ObjectRecord<String, ForwardMessage> message) {

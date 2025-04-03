@@ -45,9 +45,8 @@ public class UserSocialController {
     @GetMapping("/userInfo/{userId}")
     @CircuitBreaker(name = "commonBreaker", fallbackMethod = "userSocialFallbackMethod")
     public Result<User> userInfo(@PathVariable(name = "userId") String userId) throws AccessDeniedException {
-        User user = currentLoginUser();
-        checkUserId(user, userId);
-        return ResultGenerator.ok(user);
+        checkUserId(userId);
+        return ResultGenerator.ok(currentLoginUser());
     }
 
     @GetMapping("/userSession/{userId}")
@@ -99,14 +98,6 @@ public class UserSocialController {
         checkUserId(userId);
         PageInfo<MessageInfo> messageInfoPageInfo = userSocialService.findMessages(userId,sessionId,prevMsgId,pageNum,pageSize);
         return ResultGenerator.ok(messageInfoPageInfo);
-    }
-
-    @GetMapping("/offlineMessage/{userId}")
-    @CircuitBreaker(name = "commonBreaker", fallbackMethod = "userSocialFallbackMethod")
-    public Result<List<OfflineMessageInfo>> offlineMessage(@PathVariable(name = "userId") String userId) throws AccessDeniedException {
-        checkUserId(userId);
-        List<OfflineMessageInfo> offlineMessageInfos = userSocialService.findOfflineMessageByUserId(userId);
-        return ResultGenerator.ok(offlineMessageInfos);
     }
 
     private void checkUserId(String userId) throws AccessDeniedException {
