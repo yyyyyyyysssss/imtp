@@ -43,8 +43,6 @@ public class RedisMQConfig {
         StreamMessageListenerContainer.StreamMessageListenerContainerOptions<String, ObjectRecord<String,ForwardMessage>> containerOptions = StreamMessageListenerContainer
                 .StreamMessageListenerContainerOptions
                 .builder()
-//                .serializer(new GenericJackson2JsonRedisSerializer())
-                .objectMapper(new Jackson2HashMapper(new ObjectMapper(), true))
                 .pollTimeout(Duration.ofMillis(100))
                 .targetType(ForwardMessage.class)
                 .build();

@@ -1,5 +1,6 @@
 package org.imtp.server.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.Resource;
 import org.imtp.server.mq.ForwardMessage;
 import org.imtp.server.mq.Topic;
@@ -8,6 +9,8 @@ import org.springframework.data.redis.connection.stream.RecordId;
 import org.springframework.data.redis.connection.stream.StreamRecords;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.hash.Jackson2HashMapper;
+import org.springframework.data.redis.hash.ObjectHashMapper;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.stereotype.Component;
 
