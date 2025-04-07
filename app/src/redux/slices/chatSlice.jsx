@@ -71,8 +71,10 @@ export const chatSlice = createSlice({
         },
         loadMessage: (state, action) => {
             const { payload } = action
-            const { sessionId, messages } = payload
+            const { sessionId, messages, more } = payload
             const messageInit = state.entities.sessions[sessionId].messageInit
+            let lastMessage;
+            let firstMessage;
             messages.forEach(message => {
                 if (!state.entities.messages) {
                     state.entities.messages = {}
@@ -81,13 +83,27 @@ export const chatSlice = createSlice({
                 if (!state.entities.sessions[sessionId].messages) {
                     state.entities.sessions[sessionId].messages = []
                 }
-                if (messageInit === undefined || messageInit === false) {
+                if (messageInit === undefined || messageInit === false || more === true) {
                     state.entities.sessions[sessionId].messages.push(message.id)
                 } else {
                     state.entities.sessions[sessionId].messages.unshift(message.id)
                 }
-
+                firstMessage = message
+                if(!lastMessage){
+                    lastMessage = message
+                }
             });
+            if(firstMessage){
+                state.entities.sessions[sessionId].prevMsgId = firstMessage.id
+            }
+            if(messageInit === undefined || messageInit === false){
+                if(!state.entities.sessions[sessionId].lastMsgContent && lastMessage){
+                    state.entities.sessions[sessionId].lastMsgType = lastMessage.type
+                    state.entities.sessions[sessionId].lastMsgContent = lastMessage.content
+                    state.entities.sessions[sessionId].lastMsgTime = lastMessage.timestamp
+                    state.entities.sessions[sessionId].lastUserName = lastMessage.name
+                }
+            }
             state.entities.sessions[sessionId].messageInit = true
         },
         addMessage: (state, action) => {

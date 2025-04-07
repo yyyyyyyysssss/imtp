@@ -29,7 +29,9 @@ const ChatItem = ({ route }) => {
     const [messageIds, setMessageIds] = useState([])
 
     const session = useSelector(state => state.chat.entities.sessions[sessionId])
-    const { messages } = session
+    const { messages, prevMsgId } = session
+
+    const [endReachedCalledDuringMomentum, setEndReachedCalledDuringMomentum] = useState(true)
 
     const dispatch = useDispatch()
     useEffect(() => {
@@ -40,7 +42,7 @@ const ChatItem = ({ route }) => {
                 item.self = userInfo.id === item.senderUserId
                 return item
             })
-            dispatch(loadMessage({ sessionId: sessionId, messages: newMessageList }))
+            dispatch(loadMessage({ sessionId: sessionId, messages: newMessageList, more: false }))
         }
         //未初始化的数据进行初始化
         InteractionManager.runAfterInteractions(() => {
@@ -198,7 +200,7 @@ const ChatItem = ({ route }) => {
                             realSendMessage(newMsg)
                         },
                         (error) => {
-                            console.log('error',error)
+                            console.log('error', error)
                             const newMsg = { ...msg, status: MessageStatus.FAILED }
                             dispatch(updateMessage({ message: newMsg }))
                         }
@@ -232,7 +234,7 @@ const ChatItem = ({ route }) => {
             default:
                 showToast("Unsupported message type")
         }
-    },[])
+    }, [])
 
     const realSendMessage = (msg) => {
         MessageModule.sendMessage(JSON.stringify(msg))
@@ -242,6 +244,20 @@ const ChatItem = ({ route }) => {
                 },
                 (error) => {
                     console.log('send failed', error)
+                }
+            )
+    }
+
+    const loadMoreData = () => {
+        fetchMessageByUserSessionId(sessionId, prevMsgId)
+            .then(
+                data => {
+                    const messageList = data.list
+                    const newMessageList = messageList.map(item => {
+                        item.self = userInfo.id === item.senderUserId
+                        return item
+                    })
+                    dispatch(loadMessage({ sessionId: sessionId, messages: newMessageList, more: true }))
                 }
             )
     }
@@ -281,6 +297,14 @@ const ChatItem = ({ route }) => {
                         renderItem={renderItem}
                         scrollEnabled={true}
                         inverted={true}
+                        onEndReached={() => {
+                            if (!endReachedCalledDuringMomentum) {
+                                loadMoreData()
+                                setEndReachedCalledDuringMomentum(true)
+                            }
+                        }}
+                        onEndReachedThreshold={0.01}
+                        onMomentumScrollBegin={() => setEndReachedCalledDuringMomentum(false)}
                         contentContainerStyle={{
                             flexGrow: 1,
                             justifyContent: 'flex-end'
@@ -289,7 +313,7 @@ const ChatItem = ({ route }) => {
                 </HStack>
                 <ChatItemFooter
                     sendMessage={sendMessage}
-                    sessionId = {sessionId}
+                    sessionId={sessionId}
                 />
             </KeyboardAvoidingView>
         </VStack>
