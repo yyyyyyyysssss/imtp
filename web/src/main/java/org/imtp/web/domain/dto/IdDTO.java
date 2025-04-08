@@ -7,11 +7,11 @@ import lombok.Setter;
 /**
  * @Description
  * @Author ys
- * @Date 2025/1/8 11:06
+ * @Date 2025/4/8 14:08
  */
 @Getter
 @Setter
-public class DeleteSessionDTO {
+public class IdDTO {
 
     @NotNull(message = "id not null")
     private String id;

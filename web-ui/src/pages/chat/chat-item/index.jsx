@@ -1,5 +1,5 @@
 import { Layout } from "antd";
-import React, { useCallback, useEffect, useRef } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AutoSizer, CellMeasurer, CellMeasurerCache, List as VirtualizedList } from 'react-virtualized';
 import { fetchMessageByUserSessionId } from '../../../api/ApiService';
@@ -8,6 +8,7 @@ import Message from '../../../components/message';
 import { useWebSocket } from '../../../context';
 import { loadMessage } from '../../../redux/slices/chatSlice';
 import './index.less';
+import ChatItemRightClickMenu from "../../../components/chat-item-right-click-menu";
 
 const { Content } = Layout;
 
@@ -27,6 +28,8 @@ const ChatItem = React.memo(({ sessionId }) => {
 
     const dispatch = useDispatch()
 
+    const listRef = useRef()
+
     //初始加载数据
     useEffect(() => {
         const fetchData = async () => {
@@ -42,9 +45,6 @@ const ChatItem = React.memo(({ sessionId }) => {
             fetchData()
         }
     }, [])
-
-    //聊天列表ref
-    const chatContentRef = useRef(null);
 
     const cache = React.useRef(
         new CellMeasurerCache({
@@ -78,20 +78,41 @@ const ChatItem = React.memo(({ sessionId }) => {
             return (<></>);
         }
         return (
-            <Message key={item} messageId={item} />
+            <Message onContextMenu={(event) => handleContextMenu(event, item)} key={item} messageId={item} />
         )
-    };
-    //列表项渲染回调函数
-    const handleRowsRendered = ({ startIndex, stopIndex }) => {
-
     }
 
-    const isRowLoaded = ({ index }) => {
-        return !!messages[index]; // 如果数据已加载，返回 true
+    // 右键菜单
+    const [rightMenu, setRightMenu] = useState({
+        visible: false,
+        x: 0,
+        y: 0,
+        messageId: null
+    })
+    const handleContextMenu = (event, messageId) => {
+        // 阻止默认的右键菜单
+        event.preventDefault()
+        const { clientX, clientY } = event
+        setRightMenu({
+            visible: true,
+            x: clientX,
+            y: clientY,
+            messageId: messageId
+        })
     }
 
-    const loadMoreRows = ({ startIndex, stopIndex }) => {
-
+    const rightMenuClose = (cleared = false) => {
+        setRightMenu({
+            visible: false,
+            x: 0,
+            y: 0,
+            messageId: null
+        })
+        if (cleared) {
+            //清除高度缓存避免列表项位置错乱
+            cache.current.clearAll()
+            // listRef.current.forceUpdateGrid()
+        }
     }
 
     // 加载更多数据
@@ -121,13 +142,12 @@ const ChatItem = React.memo(({ sessionId }) => {
                 <Content style={{ height: '100%' }}>
                     <Layout style={{ height: '100%' }}>
                         {/* 聊天内容展示 */}
-                        <Content className='content-chat' style={{ height: '62%' }}>
+                        <Content onContextMenu={(event) => event.preventDefault()} className='content-chat' style={{ height: '62%' }}>
                             <AutoSizer>
                                 {({ height, width }) =>
                                 (
-
                                     <VirtualizedList
-                                        ref={chatContentRef}
+                                        ref={listRef}
                                         className='content-chat-list'
                                         width={width}
                                         height={height}
@@ -135,7 +155,6 @@ const ChatItem = React.memo(({ sessionId }) => {
                                         rowHeight={cache.current.rowHeight}
                                         deferredMeasurementCache={cache.current}
                                         rowRenderer={rowRenderer}
-                                        onRowsRendered={handleRowsRendered}
                                         scrollToIndex={scrollToIndex}
                                         onScroll={handleOnScroll}
                                     />
@@ -143,40 +162,15 @@ const ChatItem = React.memo(({ sessionId }) => {
                                 )
                                 }
                             </AutoSizer>
-                            {/* <InfiniteLoader
-                                isRowLoaded={isRowLoaded}
-                                loadMoreRows={loadMoreRows}
-                                rowCount={messages?.length}
-                            >
-                                {({ onRowsRendered, registerChild }) => (
-                                    <AutoSizer>
-                                        {({ height, width }) => 
-                                            (
-
-                                                <VirtualizedList
-                                                    ref={registerChild}
-                                                    className='content-chat-list'
-                                                    width={width}
-                                                    height={height}
-                                                    rowCount={messages?.length || 0}
-                                                    rowHeight={cache.current.rowHeight}
-                                                    deferredMeasurementCache={cache.current}
-                                                    rowRenderer={rowRenderer}
-                                                    onRowsRendered={onRowsRendered}
-                                                    scrollToIndex={messages?.length - 1}
-                                                />
-
-                                            )
-                                        }
-                                    </AutoSizer>
-                               )}
-                             </InfiniteLoader> */}
                         </Content>
                         <Content style={{ height: '38%' }}>
                             <ChatItemFooter session={session} />
                         </Content>
                     </Layout>
                 </Content>
+                {rightMenu.visible && (
+                    <ChatItemRightClickMenu messageId={rightMenu.messageId} sessionId={sessionId} x={rightMenu.x} y={rightMenu.y} close={rightMenuClose} />
+                )}
             </div>
         </>
     );

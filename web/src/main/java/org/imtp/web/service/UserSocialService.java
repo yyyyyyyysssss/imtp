@@ -28,4 +28,6 @@ public interface UserSocialService {
 
     PageInfo<MessageInfo> findMessages(String userId,String sessionId,String prevMsgId,Integer pageNum,Integer pageSize);
 
+    Boolean deleteMessage(String messageId);
+
 }

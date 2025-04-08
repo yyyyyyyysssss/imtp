@@ -4,7 +4,7 @@ import { Flex } from 'antd'
 import { VoiceCallOutlined } from '../../customIcon'
 import { CallStatus } from '../../../enum'
 
-const VoiceCallMessage = React.memo(({ callStatus, self, duration, durationDesc }) => {
+const VoiceCallMessage = React.memo(({ onContextMenu, callStatus, self, duration, durationDesc }) => {
     let content
     switch (callStatus) {
         case CallStatus.COMPLETED:
@@ -22,7 +22,7 @@ const VoiceCallMessage = React.memo(({ callStatus, self, duration, durationDesc 
     }
 
     return (
-        <div className={`voice-call-message ${self ? 'voice-call-message-right' : 'voice-call-message-left'}`}>
+        <div onContextMenu={onContextMenu} className={`voice-call-message ${self ? 'voice-call-message-right' : 'voice-call-message-left'}`}>
             <Flex gap={6} justify='center'>
                 <VoiceCallOutlined />
                 <div

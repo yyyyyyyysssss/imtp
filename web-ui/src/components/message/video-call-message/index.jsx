@@ -5,7 +5,7 @@ import { CallStatus } from '../../../enum'
 import { VideoMessageIcon } from '../../customIcon'
 
 
-const VideoCallMessage = React.memo(({ callStatus, self, duration, durationDesc }) => {
+const VideoCallMessage = React.memo(({ onContextMenu, callStatus, self, duration, durationDesc }) => {
 
     let content
         switch (callStatus) {
@@ -24,7 +24,7 @@ const VideoCallMessage = React.memo(({ callStatus, self, duration, durationDesc 
         }
     
         return (
-            <div className={`video-call-message ${self ? 'video-call-message-right' : 'video-call-message-left'}`}>
+            <div onContextMenu={onContextMenu} className={`video-call-message ${self ? 'video-call-message-right' : 'video-call-message-left'}`}>
                 <Flex gap={6} justify='center'>
                     <VideoMessageIcon size={25} />
                     <div

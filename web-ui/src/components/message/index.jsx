@@ -15,7 +15,8 @@ import VoiceCallMessage from './voice-call-message';
 import VideoCallMessage from './video-call-message';
 
 
-const Message = React.memo(({ messageId }) => {
+const Message = React.memo(({ messageId,onContextMenu }) => {
+
     const message = useSelector(state => state.chat.entities.messages[messageId])
 
     const { type, name, avatar, deliveryMethod, self, status, content, contentMetadata, progressId } = message || {}
@@ -44,14 +45,14 @@ const Message = React.memo(({ messageId }) => {
     const renderItem = (type, self, status, content, contentMetadata, progress) => {
         switch (type) {
             case MessageType.TEXT_MESSAGE:
-                return <TextMessage content={content} direction={self ? 'RIGHT' : 'LEFT'} />
+                return <TextMessage onContextMenu={onContextMenu} content={content} direction={self ? 'RIGHT' : 'LEFT'} />
             case MessageType.IMAGE_MESSAGE:
                 return (
                     <ProgressOverlayBox
                         enabled={status && status === MessageStatus.PENDING}
                         progress={progress}
                     >
-                        <ImageMessage content={content} contentMetadata={contentMetadata} status={status} />
+                        <ImageMessage onContextMenu={onContextMenu} content={content} contentMetadata={contentMetadata} status={status} />
                     </ProgressOverlayBox>
                 )
             case MessageType.VIDEO_MESSAGE:
@@ -60,13 +61,13 @@ const Message = React.memo(({ messageId }) => {
                         enabled={status && status === MessageStatus.PENDING}
                         progress={progress}
                     >
-                        <VideoMessage content={content} contentMetadata={contentMetadata} status={status} />
+                        <VideoMessage onContextMenu={onContextMenu} content={content} contentMetadata={contentMetadata} status={status} />
                     </ProgressOverlayBox>
 
                 )
             case MessageType.VOICE_MESSAGE:
                 return (
-                    <VoiceMessage content={content} status={status} duration={contentMetadata.duration} direction={self ? 'RIGHT' : 'LEFT'} />
+                    <VoiceMessage onContextMenu={onContextMenu} content={content} status={status} duration={contentMetadata.duration} direction={self ? 'RIGHT' : 'LEFT'} />
                 )
             case MessageType.FILE_MESSAGE:
                 return (
@@ -74,23 +75,23 @@ const Message = React.memo(({ messageId }) => {
                         enabled={status && status === MessageStatus.PENDING}
                         progress={progress}
                     >
-                        <FileMessage content={content} status={status} filename={contentMetadata.name} fileSize={contentMetadata.sizeDesc} direction={self ? 'RIGHT' : 'LEFT'} />
+                        <FileMessage onContextMenu={onContextMenu} content={content} status={status} filename={contentMetadata.name} fileSize={contentMetadata.sizeDesc} direction={self ? 'RIGHT' : 'LEFT'} />
                     </ProgressOverlayBox>
                 )
             case MessageType.VOICE_CALL_MESSAGE:
                 return (
-                    <VoiceCallMessage callStatus={contentMetadata.callStatus} duration={contentMetadata.duration} durationDesc={contentMetadata.durationDesc} self={self}/>
+                    <VoiceCallMessage onContextMenu={onContextMenu} callStatus={contentMetadata.callStatus} duration={contentMetadata.duration} durationDesc={contentMetadata.durationDesc} self={self}/>
                 )
             case MessageType.VIDEO_CALL_MESSAGE:
                 return (
-                    <VideoCallMessage callStatus={contentMetadata.callStatus} duration={contentMetadata.duration} durationDesc={contentMetadata.durationDesc} self={self}/>
+                    <VideoCallMessage onContextMenu={onContextMenu} callStatus={contentMetadata.callStatus} duration={contentMetadata.duration} durationDesc={contentMetadata.durationDesc} self={self}/>
                 )
             default:
         }
     }
 
     return (
-        <Flex gap="small" style={{ flexDirection: self ? 'row-reverse' : '' }}>
+        <Flex gap="small" style={{ flexDirection: self ? 'row-reverse' : ''}}>
             <Avatar size={45} shape="square" src={avatar} />
             <Flex flex={1} gap="small" justify='center' align={self ? 'end' : 'start'} vertical>
                 {!self && deliveryMethod === 'GROUP' && (

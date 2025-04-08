@@ -136,7 +136,7 @@ export const deleteUserSessionById = (id) => {
 }
 
 // 分页获取用户会话关联的消息
-export const fetchMessageByUserSessionId = (sessionId,prevMsgId = null, pageNum = 1, pageSize = 10) => {
+export const fetchMessageByUserSessionId = (sessionId, prevMsgId = null, pageNum = 1, pageSize = 10) => {
 
     return new Promise((resolve, reject) => {
         httpWrapper.get('/social/userMessage/{userId}', {
@@ -147,6 +147,17 @@ export const fetchMessageByUserSessionId = (sessionId,prevMsgId = null, pageNum 
                 pageSize: pageSize
             }
         })
+            .then(res => resolve(res.data))
+            .catch(error => handleError)
+    })
+}
+
+export const deleteUserMessageById = (messageId) => {
+    const deleteUserMessageReq = {
+        id: messageId
+    }
+    return new Promise((resolve, reject) => {
+        httpWrapper.delete('/social/userMessage/{userId}', { data: deleteUserMessageReq })
             .then(res => resolve(res.data))
             .catch(error => handleError)
     })
@@ -172,6 +183,7 @@ export const fetchUserGroups = () => {
     })
 }
 
+// 获取上传任务id
 export const fetchUploadId = (fileInfo) => {
 
     return new Promise((resolve, reject) => {

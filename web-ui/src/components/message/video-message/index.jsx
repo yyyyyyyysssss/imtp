@@ -6,7 +6,7 @@ import VideoPlay from '../../../components/VideoPlay';
 import videoPlayIcon from '../../../assets/img/video-play-48.png'
 
 
-const VideoMessage = React.memo(({ content, status, contentMetadata }) => {
+const VideoMessage = React.memo(({ onContextMenu, content, status, contentMetadata }) => {
     const { width, height, mediaType, thumbnailUrl, durationDesc } = contentMetadata
     //视频弹出框
     const [videoOpen, setVideoOpen] = useState(false);
@@ -46,6 +46,7 @@ const VideoMessage = React.memo(({ content, status, contentMetadata }) => {
                     width: '120px',
                     height: mediaHeight
                 }}
+                onContextMenu={onContextMenu}
                 onClick={videoPlay}
             >
                 {thumbnailUrl && (

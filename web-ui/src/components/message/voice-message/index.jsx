@@ -7,7 +7,7 @@ import voicePlayPng from '../../../assets/img/voice-play.png'
 const minPercentage = 0.25
 const maxWidth = 300
 
-const VoiceMessage = React.memo(({ content, status, duration, direction }) => {
+const VoiceMessage = React.memo(({ onContextMenu, content, status, duration, direction }) => {
 
     const [playing, setPlaying] = useState(false)
 
@@ -40,7 +40,7 @@ const VoiceMessage = React.memo(({ content, status, duration, direction }) => {
     }
 
     return (
-        <div onClick={playVoice} className={`voice-message ${direction === 'RIGHT' ? 'voice-message-right' : 'voice-message-left'}`}>
+        <div onContextMenu={onContextMenu} onClick={playVoice} className={`voice-message ${direction === 'RIGHT' ? 'voice-message-right' : 'voice-message-left'}`}>
             <Flex style={{ width: calcWidthByDuration, flexDirection: direction === 'LEFT' ? 'row-reverse' : '' }} justify='space-between'>
                 <audio autoPlay={false} onEnded={playCompleted} ref={audioRef} src={content} preload='metadata' />
                 <div style={{ fontSize: 18,paddingLeft: 5 }}>{durationDesc}</div>

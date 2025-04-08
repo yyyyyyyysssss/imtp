@@ -297,4 +297,8 @@ public class UserSocialServiceImpl implements UserSocialService {
         return messageInfoPageInfo;
     }
 
+    @Override
+    public Boolean deleteMessage(String messageId) {
+        return userMessageBoxMapper.deleteById(messageId) > 0;
+    }
 }

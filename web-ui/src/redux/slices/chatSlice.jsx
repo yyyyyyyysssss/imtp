@@ -108,15 +108,15 @@ export const chatSlice = createSlice({
                     state.entities.sessions[sessionId].messages.push(message.id)
                 }
                 firstMessage = message
-                if(!lastMessage){
+                if (!lastMessage) {
                     lastMessage = message
                 }
             });
-            if(firstMessage){
+            if (firstMessage) {
                 state.entities.sessions[sessionId].prevMsgId = firstMessage.id
             }
-            if(messageInit === undefined || messageInit === false){
-                if(!state.entities.sessions[sessionId].lastMsgContent && lastMessage){
+            if (messageInit === undefined || messageInit === false) {
+                if (!state.entities.sessions[sessionId].lastMsgContent && lastMessage) {
                     state.entities.sessions[sessionId].lastMsgType = lastMessage.type
                     state.entities.sessions[sessionId].lastMsgContent = lastMessage.content
                     state.entities.sessions[sessionId].lastMsgTime = lastMessage.timestamp
@@ -166,6 +166,17 @@ export const chatSlice = createSlice({
             state.entities.messages[id] = { ...message, status: newStatus }
         },
         deleteMessage: (state, action) => {
+            const { payload } = action
+            const { id, sessionId } = payload
+            //删除对应消息
+            delete state.entities.messages[message.id]
+            const messages = state.entities.sessions[sessionId].messages
+            const index = messages.indexOf(id)
+            //移除会话消息id数组中的元素
+            const newMessages = messages.filter(item => item !== id)
+            state.entities.sessions[sessionId].messages = newMessages
+            //更新滚动索引
+            state.entities.sessions[sessionId].scrollToIndex = index
 
         },
         loadUserFriend: (state, action) => {
@@ -199,7 +210,7 @@ export const chatSlice = createSlice({
         startVoiceCall: (state, action) => {
             const { payload } = action
             const { sessionId, callOperation, callType } = payload
-            if(state.voiceCall.visible){
+            if (state.voiceCall.visible) {
                 message.info('正在通话中...')
                 return
             }

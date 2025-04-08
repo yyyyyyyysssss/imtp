@@ -4,10 +4,13 @@ import com.github.pagehelper.PageInfo;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.imtp.common.packet.body.*;
+import org.imtp.common.packet.body.MessageInfo;
+import org.imtp.common.packet.body.UserFriendInfo;
+import org.imtp.common.packet.body.UserGroupInfo;
+import org.imtp.common.packet.body.UserSessionInfo;
 import org.imtp.common.response.Result;
 import org.imtp.common.response.ResultGenerator;
-import org.imtp.web.domain.dto.DeleteSessionDTO;
+import org.imtp.web.domain.dto.IdDTO;
 import org.imtp.web.domain.dto.UserSessionDTO;
 import org.imtp.web.domain.entity.User;
 import org.imtp.web.service.UserSocialService;
@@ -67,9 +70,9 @@ public class UserSocialController {
 
     @DeleteMapping("/userSession/{userId}")
     @CircuitBreaker(name = "slowCallBreaker")
-    public Result<Boolean> userSession(@PathVariable(name = "userId") String userId, @RequestBody @Validated DeleteSessionDTO deleteSessionDTO) {
+    public Result<Boolean> userSession(@PathVariable(name = "userId") String userId, @RequestBody @Validated IdDTO idDTO) {
         checkUserId(userId);
-        Boolean deleted = userSocialService.deleteSessionById(deleteSessionDTO.getId());
+        Boolean deleted = userSocialService.deleteSessionById(idDTO.getId());
         return deleted ? ResultGenerator.ok() : ResultGenerator.failed();
     }
 
@@ -90,7 +93,7 @@ public class UserSocialController {
     }
 
     @GetMapping("/userMessage/{userId}")
-    public Result<PageInfo<MessageInfo>> message(@PathVariable(name = "userId") String userId,
+    public Result<PageInfo<MessageInfo>> userMessage(@PathVariable(name = "userId") String userId,
                              @RequestParam(name = "sessionId") String sessionId,
                              @RequestParam(name = "prevMsgId",required = false) String prevMsgId,
                              @RequestParam(name = "pageNum", required = false,defaultValue = "1") Integer pageNum,
@@ -98,6 +101,13 @@ public class UserSocialController {
         checkUserId(userId);
         PageInfo<MessageInfo> messageInfoPageInfo = userSocialService.findMessages(userId,sessionId,prevMsgId,pageNum,pageSize);
         return ResultGenerator.ok(messageInfoPageInfo);
+    }
+
+    @DeleteMapping("/userMessage/{userId}")
+    public Result<Boolean> userMessage(@PathVariable(name = "userId") String userId,@RequestBody @Validated IdDTO idDTO){
+        checkUserId(userId);
+        Boolean deleted = userSocialService.deleteMessage(idDTO.getId());
+        return ResultGenerator.ok(deleted);
     }
 
     private void checkUserId(String userId) throws AccessDeniedException {
