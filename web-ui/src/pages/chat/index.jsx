@@ -211,7 +211,7 @@ const Chat = (props) => {
                     <div className='chat-panel-tabs' style={style}>
                         <Tabs
                             activeKey={selectedSessionId}
-                            destroyInactiveTabPane={false}
+                            destroyInactiveTabPane={true}
                             onMouseDown={handleMouseDown}
                             onTabClick={handleTabClick}
                             key="chat-tabs"

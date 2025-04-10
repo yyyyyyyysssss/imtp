@@ -179,6 +179,11 @@ export const chatSlice = createSlice({
             state.entities.sessions[sessionId].scrollToIndex = index
 
         },
+        scrollToBottom: (state, action) => {
+            const { payload } = action
+            const { sessionId } = payload
+            state.entities.sessions[sessionId].scrollToIndex = state.entities.sessions[sessionId].messages.length - 1
+        },
         loadUserFriend: (state, action) => {
             const { payload } = action
             state.userFriends = payload
@@ -234,6 +239,6 @@ export const chatSlice = createSlice({
     }
 })
 
-export const { reset, switchPanel, setUserInfo, loadSession, addSession, selectSession, removeSession, loadMessage, addMessage, updateMessage, updateMessageStatus, deleteMessage, loadUserFriend, loadUserGroup, addUploadProgress, updateUploadProgress, startVoiceCall, stopVoiceCall } = chatSlice.actions
+export const { reset, switchPanel, setUserInfo, loadSession, addSession, selectSession, removeSession, loadMessage, addMessage, updateMessage, updateMessageStatus, deleteMessage, scrollToBottom, loadUserFriend, loadUserGroup, addUploadProgress, updateUploadProgress, startVoiceCall, stopVoiceCall } = chatSlice.actions
 
 export default chatSlice.reducer

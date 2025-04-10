@@ -47,9 +47,6 @@ public class RequestHeaderAuthenticationProvider implements AuthenticationProvid
             throw new BadCredentialsException("Bad Request Header Principal");
         }
         ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-        if (requestAttributes == null){
-            throw new BadCredentialsException("Bad Request Header Not http request");
-        }
         HttpServletRequest request = requestAttributes.getRequest();
         String requestUrl = request.getRequestURI();
         boolean valid = false;

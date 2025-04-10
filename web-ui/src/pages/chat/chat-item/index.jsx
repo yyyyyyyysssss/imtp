@@ -1,4 +1,4 @@
-import { Layout } from "antd";
+import { Flex, Layout } from "antd";
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AutoSizer, CellMeasurer, CellMeasurerCache, List as VirtualizedList } from 'react-virtualized';
@@ -6,7 +6,7 @@ import { fetchMessageByUserSessionId } from '../../../api/ApiService';
 import ChatItemFooter from '../../../components/chat-item-footer';
 import Message from '../../../components/message';
 import { useWebSocket } from '../../../context';
-import { loadMessage } from '../../../redux/slices/chatSlice';
+import { loadMessage, scrollToBottom } from '../../../redux/slices/chatSlice';
 import './index.less';
 import ChatItemRightClickMenu from "../../../components/chat-item-right-click-menu";
 
@@ -30,6 +30,11 @@ const ChatItem = React.memo(({ sessionId }) => {
 
     const listRef = useRef()
 
+    // 无限滚动开关
+    const [infiniteRollSwitch,setInfIniteRollSwitch] = useState(false)
+
+    const [footerHeight, setFooterHeight] = useState(0)
+
     //初始加载数据
     useEffect(() => {
         const fetchData = async () => {
@@ -40,9 +45,13 @@ const ChatItem = React.memo(({ sessionId }) => {
                 return item
             })
             dispatch(loadMessage({ sessionId: sessionId, messages: newMessageList, more: false }))
+            setInfIniteRollSwitch(true)
         }
         if (session.messageInit === undefined || session.messageInit === false) {
             fetchData()
+        }else {
+            dispatch(scrollToBottom({sessionId: sessionId}))
+            setInfIniteRollSwitch(true)
         }
     }, [])
 
@@ -78,7 +87,7 @@ const ChatItem = React.memo(({ sessionId }) => {
             return (<></>);
         }
         return (
-            <Message onContextMenu={(event) => handleContextMenu(event, item)} key={item} messageId={item} />
+            <Message onContextMenu={(event) => handleContextMenu(event, item, index)} key={item} messageId={item} />
         )
     }
 
@@ -89,7 +98,7 @@ const ChatItem = React.memo(({ sessionId }) => {
         y: 0,
         messageId: null
     })
-    const handleContextMenu = (event, messageId) => {
+    const handleContextMenu = (event, messageId, index) => {
         // 阻止默认的右键菜单
         event.preventDefault()
         const { clientX, clientY } = event
@@ -97,21 +106,24 @@ const ChatItem = React.memo(({ sessionId }) => {
             visible: true,
             x: clientX,
             y: clientY,
-            messageId: messageId
+            messageId: messageId,
+            index: index
         })
     }
 
-    const rightMenuClose = (cleared = false) => {
+    const rightMenuClose = (cleared = false, index) => {
         setRightMenu({
             visible: false,
             x: 0,
             y: 0,
-            messageId: null
+            messageId: null,
+            index: null
         })
         if (cleared) {
             //清除高度缓存避免列表项位置错乱
-            cache.current.clearAll()
-            // listRef.current.forceUpdateGrid()
+            cache.current.clear(index - 1)
+            cache.current.clear(index)
+            cache.current.clear(index + 1)
         }
     }
 
@@ -131,9 +143,13 @@ const ChatItem = React.memo(({ sessionId }) => {
     }
 
     const handleOnScroll = ({ scrollTop }) => {
-        if (scrollTop === 0 && session.messageInit && session.messageInit === true) {
+        if (scrollTop === 0 && infiniteRollSwitch === true) {
             loadMoreData()
         }
+    }
+
+    const messageQuote = (messageId) => {
+        setFooterHeight(48)
     }
 
     return (
@@ -143,25 +159,39 @@ const ChatItem = React.memo(({ sessionId }) => {
                     <Layout style={{ height: '100%' }}>
                         {/* 聊天内容展示 */}
                         <Content onContextMenu={(event) => event.preventDefault()} className='content-chat' style={{ height: '62%' }}>
-                            <AutoSizer>
-                                {({ height, width }) =>
-                                (
-                                    <VirtualizedList
-                                        ref={listRef}
-                                        className='content-chat-list'
-                                        width={width}
-                                        height={height}
-                                        rowCount={messages?.length || 0}
-                                        rowHeight={cache.current.rowHeight}
-                                        deferredMeasurementCache={cache.current}
-                                        rowRenderer={rowRenderer}
-                                        scrollToIndex={scrollToIndex}
-                                        onScroll={handleOnScroll}
-                                    />
+                            <Flex flex={1} style={{ height: '100%' }} vertical>
+                                <AutoSizer>
+                                    {({ height, width }) =>
+                                    (
+                                        <VirtualizedList
+                                            ref={listRef}
+                                            className='content-chat-list'
+                                            width={width}
+                                            height={height - footerHeight}
+                                            rowCount={messages?.length || 0}
+                                            rowHeight={cache.current.rowHeight}
+                                            deferredMeasurementCache={cache.current}
+                                            rowRenderer={rowRenderer}
+                                            scrollToIndex={scrollToIndex}
+                                            onScroll={handleOnScroll}
+                                        />
 
-                                )
-                                }
-                            </AutoSizer>
+                                    )
+                                    }
+                                </AutoSizer>
+                                {footerHeight > 0 && (
+                                    <Flex
+                                        style={{ 
+                                            height: '48px', 
+                                            backgroundColor: 'red', 
+                                            textAlign: 'center', 
+                                            marginTop: 'auto',
+                                         }}
+                                    >
+                                        <strong>Footer Content</strong>
+                                    </Flex>
+                                )}
+                            </Flex>
                         </Content>
                         <Content style={{ height: '38%' }}>
                             <ChatItemFooter session={session} />
@@ -169,7 +199,15 @@ const ChatItem = React.memo(({ sessionId }) => {
                     </Layout>
                 </Content>
                 {rightMenu.visible && (
-                    <ChatItemRightClickMenu messageId={rightMenu.messageId} sessionId={sessionId} x={rightMenu.x} y={rightMenu.y} close={rightMenuClose} />
+                    <ChatItemRightClickMenu
+                        messageId={rightMenu.messageId}
+                        index={rightMenu.index}
+                        sessionId={sessionId}
+                        x={rightMenu.x}
+                        y={rightMenu.y}
+                        messageQuote={messageQuote}
+                        close={rightMenuClose}
+                    />
                 )}
             </div>
         </>

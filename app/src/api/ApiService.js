@@ -53,7 +53,7 @@ export const loginByGoogle = (code) => {
 export const fetchUserInfo = (token) => {
 
     return new Promise((resolve, reject) => {
-        api.get('/social/userInfo', {
+        api.get('/social/userInfo/{userId}', {
             headers: {
                 Authorization: `Bearer ${token}`
             }

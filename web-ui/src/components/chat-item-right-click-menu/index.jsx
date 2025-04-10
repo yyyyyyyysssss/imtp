@@ -6,7 +6,7 @@ import { deleteUserMessageById } from '../../api/ApiService';
 import { deleteMessage } from '../../redux/slices/chatSlice';
 
 
-const ChatItemRightClickMenu = ({ messageId, sessionId, x, y, close }) => {
+const ChatItemRightClickMenu = ({ messageId, index, sessionId, x, y, messageQuote, close }) => {
 
     const menuRef = useRef()
 
@@ -34,13 +34,14 @@ const ChatItemRightClickMenu = ({ messageId, sessionId, x, y, close }) => {
     }
 
     const quote = () => {
+        messageQuote(messageId)
         close()
     }
 
     const del = () => {
-        dispatch(deleteMessage({id: message.id, sessionId: sessionId}))
+        dispatch(deleteMessage({ id: message.id, sessionId: sessionId }))
         // deleteUserMessageById(message.id)
-        close(true)
+        close(true, index)
     }
 
     return (

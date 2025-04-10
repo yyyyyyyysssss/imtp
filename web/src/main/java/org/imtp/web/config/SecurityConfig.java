@@ -1,9 +1,6 @@
 package org.imtp.web.config;
 
 import jakarta.annotation.Resource;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import org.imtp.web.config.oauth2.OAuthClientAuthenticationProvider;
 import org.imtp.web.filter.RefreshTokenAuthenticationFilter;
 import org.imtp.web.filter.TokenAuthenticationFilter;
@@ -21,20 +18,19 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.authentication.ott.JdbcOneTimeTokenService;
 import org.springframework.security.authentication.ott.OneTimeTokenAuthenticationProvider;
 import org.springframework.security.authentication.ott.OneTimeTokenService;
+import org.springframework.security.authorization.AuthorizationDecision;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.server.resource.web.BearerTokenResolver;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.intercept.AuthorizationFilter;
-import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
@@ -47,7 +43,6 @@ import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.security.web.header.HeaderWriterFilter;
 import org.springframework.web.cors.CorsConfiguration;
 
-import java.io.IOException;
 import java.util.List;
 
 /**
@@ -80,6 +75,9 @@ public class SecurityConfig {
     @Resource
     private JdbcTemplate jdbcTemplate;
 
+    @Resource
+    private WebSecurity webSecurity;
+
     @Bean
     @Order(Ordered.HIGHEST_PRECEDENCE + 1)
     public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
@@ -105,19 +103,20 @@ public class SecurityConfig {
                 })
                 .authorizeHttpRequests(authorize -> {
                     //放行的路径
-                    authorize.requestMatchers(
-                                    authProperties.getAuthorize().getPermit().toArray(new String[0])
-                            )
-                            .permitAll()
+                    authorize
+                            //允许所有人访问的路径
+                            .requestMatchers(authProperties.getAuthorize().getPermit().toArray(new String[0])).permitAll()
                             //只需要通过身份认证就能访问的路径
-                            .requestMatchers(
-                                    authProperties.getAuthorize().getAuthenticated().toArray(new String[0])
-                            ).authenticated()
-                            //基于请求头授权
+                            .requestMatchers(authProperties.getAuthorize().getAuthenticated().toArray(new String[0])).authenticated()
+                            //基于请求头apikey授权
                             .requestMatchers(authProperties.requestHeadAuthenticationPath()).hasAuthority("request_header")
+                            //基于用户id路径参数的授权
+                            .requestMatchers("/social/*/{userId}")
+                            .access((authentication, context) -> new AuthorizationDecision(
+                                    webSecurity.checkUserId(authentication.get(),context.getVariables().get("userId"))
+                            ))
                             //必须校验权限的路径
-                            .anyRequest()
-                            .access(requestPathAuthorizationManager());
+                            .anyRequest().access(requestPathAuthorizationManager());
                 })
                 //记住我
                 .rememberMe(rememberMe -> rememberMe.rememberMeServices(rememberMeServices()))
@@ -136,10 +135,13 @@ public class SecurityConfig {
                 })
                 //该过滤器解析token并校验通过后由SecurityContextHolderFilter过滤器加载SecurityContext
                 .addFilterBefore(tokenAuthenticationFilter(), SecurityContextHolderFilter.class)
+                //记住我过滤器
                 .addFilterBefore(rememberMeFilter(), UsernamePasswordAuthenticationFilter.class)
+                //刷新token过滤器
                 .addFilterAfter(refreshTokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
                 //基于请求头的认证
                 .addFilterBefore(requestHeaderAuthenticationFilter(), HeaderWriterFilter.class)
+                //登出过滤器
                 .addFilterAfter(logoutFilter(), AuthorizationFilter.class)
                 .logout(AbstractHttpConfigurer::disable);
         return http.build();

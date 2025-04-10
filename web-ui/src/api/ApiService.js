@@ -80,7 +80,7 @@ export const fetchOAuth2ClientConfig = () => {
 export const fetchUserInfo = () => {
 
     return new Promise((resolve, reject) => {
-        httpWrapper.get('/social/userInfo')
+        httpWrapper.get('/social/userInfo/{userId}')
             .then(res => resolve(res.data))
             .catch(error => handleError)
     })

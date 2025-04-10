@@ -35,27 +35,15 @@ public class UserSocialController {
     @Resource
     private UserSocialService userSocialService;
 
-
-    @GetMapping("/userInfo")
-    public Result<User> userInfo() throws AccessDeniedException {
-        User user = currentLoginUser();
-        if (user == null) {
-            throw new AccessDeniedException("Access Denied");
-        }
-        return ResultGenerator.ok(user);
-    }
-
     @GetMapping("/userInfo/{userId}")
     @CircuitBreaker(name = "commonBreaker", fallbackMethod = "userSocialFallbackMethod")
     public Result<User> userInfo(@PathVariable(name = "userId") String userId) throws AccessDeniedException {
-        checkUserId(userId);
         return ResultGenerator.ok(currentLoginUser());
     }
 
     @GetMapping("/userSession/{userId}")
     @CircuitBreaker(name = "commonBreaker", fallbackMethod = "userSocialFallbackMethod")
     public Result<List<UserSessionInfo>> userSession(@PathVariable(name = "userId") String userId) throws AccessDeniedException {
-        checkUserId(userId);
         List<UserSessionInfo> userSessionInfos = userSocialService.findSessionByUserId(userId);
         return ResultGenerator.ok(userSessionInfos);
     }
@@ -63,7 +51,6 @@ public class UserSocialController {
     @PostMapping("/userSession/{userId}")
     @CircuitBreaker(name = "slowCallBreaker")
     public Result<Long> userSession(@PathVariable(name = "userId") String userId,@RequestBody @Validated UserSessionDTO userSessionDTO) {
-        checkUserId(userId);
         Long id = userSocialService.createUserSessionByUserId(userId,userSessionDTO);
         return ResultGenerator.ok(id);
     }
@@ -71,7 +58,6 @@ public class UserSocialController {
     @DeleteMapping("/userSession/{userId}")
     @CircuitBreaker(name = "slowCallBreaker")
     public Result<Boolean> userSession(@PathVariable(name = "userId") String userId, @RequestBody @Validated IdDTO idDTO) {
-        checkUserId(userId);
         Boolean deleted = userSocialService.deleteSessionById(idDTO.getId());
         return deleted ? ResultGenerator.ok() : ResultGenerator.failed();
     }
@@ -79,7 +65,6 @@ public class UserSocialController {
     @GetMapping("/userFriend/{userId}")
     @CircuitBreaker(name = "commonBreaker", fallbackMethod = "userSocialFallbackMethod")
     public Result<List<UserFriendInfo>> userFriend(@PathVariable(name = "userId") String userId) throws AccessDeniedException {
-        checkUserId(userId);
         List<UserFriendInfo> userFriendInfos = userSocialService.findUserFriendByUserId(userId);
         return ResultGenerator.ok(userFriendInfos);
     }
@@ -87,7 +72,6 @@ public class UserSocialController {
     @GetMapping("/userGroup/{userId}")
     @CircuitBreaker(name = "commonBreaker", fallbackMethod = "userSocialFallbackMethod")
     public Result<List<UserGroupInfo>> userGroup(@PathVariable(name = "userId") String userId) throws AccessDeniedException {
-        checkUserId(userId);
         List<UserGroupInfo> groupInfos = userSocialService.findUserGroupByUserId(userId);
         return ResultGenerator.ok(groupInfos);
     }
@@ -98,27 +82,14 @@ public class UserSocialController {
                              @RequestParam(name = "prevMsgId",required = false) String prevMsgId,
                              @RequestParam(name = "pageNum", required = false,defaultValue = "1") Integer pageNum,
                              @RequestParam(name = "pageSize", required = false,defaultValue = "20") Integer pageSize) {
-        checkUserId(userId);
         PageInfo<MessageInfo> messageInfoPageInfo = userSocialService.findMessages(userId,sessionId,prevMsgId,pageNum,pageSize);
         return ResultGenerator.ok(messageInfoPageInfo);
     }
 
     @DeleteMapping("/userMessage/{userId}")
     public Result<Boolean> userMessage(@PathVariable(name = "userId") String userId,@RequestBody @Validated IdDTO idDTO){
-        checkUserId(userId);
         Boolean deleted = userSocialService.deleteMessage(idDTO.getId());
         return ResultGenerator.ok(deleted);
-    }
-
-    private void checkUserId(String userId) throws AccessDeniedException {
-        User user = currentLoginUser();
-        checkUserId(user, userId);
-    }
-
-    private void checkUserId(User user, String userId) throws AccessDeniedException {
-        if (!userId.equals(user.getId().toString())) {
-            throw new AccessDeniedException("Access Denied");
-        }
     }
 
     private User currentLoginUser() {

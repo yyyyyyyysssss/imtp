@@ -100,7 +100,6 @@ auth:
       - /logout
       - /file/**
       - /service/discovery
-      - /social/**
       - /ott/generate
   # 基于请求头的身份认证
   requestHeadAuthentications:
