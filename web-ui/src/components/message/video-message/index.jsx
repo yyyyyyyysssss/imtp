@@ -1,12 +1,15 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import './index.less'
 import { Modal, Image as AntdImage } from "antd"
 import { MessageStatus } from '../../../enum'
 import VideoPlay from '../../../components/VideoPlay';
 import videoPlayIcon from '../../../assets/img/video-play-48.png'
 
+const defaultMaxHeight = 200
 
-const VideoMessage = React.memo(({ onContextMenu, content, status, contentMetadata }) => {
+const defaultPlayIconMaxHeight = 48
+
+const VideoMessage = React.memo(({ content, status, contentMetadata, maxHeight = defaultMaxHeight }) => {
     const { width, height, mediaType, thumbnailUrl, durationDesc } = contentMetadata
     //视频弹出框
     const [videoOpen, setVideoOpen] = useState(false);
@@ -27,7 +30,24 @@ const VideoMessage = React.memo(({ onContextMenu, content, status, contentMetada
         setVideoOption(videoJsOptions)
     }, [content, mediaType])
 
-    const mediaHeight = 120 / width * height;
+    const media = useMemo(() => {
+        let maxWidth
+        if (width > height) {
+            maxWidth = maxHeight * 1.618
+        } else {
+            maxWidth = maxHeight * 0.618
+        }
+        const scaleW = maxWidth / width
+        const scaleH = maxHeight / height
+        const scale = Math.min(scaleW, scaleH)
+        const playIconMaxHeight = defaultPlayIconMaxHeight / (defaultMaxHeight / maxHeight)
+        return {
+            width: width * scale,
+            height: height * scale,
+            playIconMaxHeight: playIconMaxHeight
+        }
+    }, [maxHeight, width, height])
+
     //视频播放
     const videoPlay = () => {
         setVideoOpen(true);
@@ -43,20 +63,19 @@ const VideoMessage = React.memo(({ onContextMenu, content, status, contentMetada
                 className='video-div'
                 style={{
                     backgroundColor: status && status === MessageStatus.PENDING ? 'black' : '',
-                    width: '120px',
-                    height: mediaHeight
+                    width: media.width,
+                    height: media.height,
+                    borderRadius: maxHeight >= defaultMaxHeight ? '6px' : '1px'
                 }}
-                onContextMenu={onContextMenu}
                 onClick={videoPlay}
             >
                 {thumbnailUrl && (
                     <AntdImage
                         className='video-message'
                         style={{
-                            width: '120px',
-                            height: mediaHeight
+                            height: media.height
                         }}
-                        height={mediaHeight}
+                        height={media.height}
                         preview={false}
                         src={thumbnailUrl}
                     />
@@ -64,12 +83,14 @@ const VideoMessage = React.memo(({ onContextMenu, content, status, contentMetada
                 <div className='video-gradient' />
                 {((status && status !== MessageStatus.PENDING) || !status) && (
                     <div className='video-icon'>
-                        <img src={videoPlayIcon} alt='icon' />
+                        <img height={media.playIconMaxHeight} src={videoPlayIcon} alt='icon' />
                     </div>
                 )}
-                <div className='video-duration'>
-                    <label>{durationDesc}</label>
-                </div>
+                {maxHeight >= defaultMaxHeight && (
+                    <div className='video-duration'>
+                        <label>{durationDesc}</label>
+                    </div>
+                )}
             </div>
             <Modal
                 centered

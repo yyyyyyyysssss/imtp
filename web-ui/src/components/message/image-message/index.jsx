@@ -1,10 +1,10 @@
 import React from 'react';
 import './index.less'
-import { Flex, Layout, Avatar, Button, Image as AntdImage } from "antd"
+import { Image as AntdImage } from "antd"
 import { MessageStatus } from '../../../enum';
 
-const ImageMessage = React.memo(({ onContextMenu, content, contentMetadata, status }) => {
-    const mediaHeight = 200 / contentMetadata.width * contentMetadata.height;
+const ImageMessage = React.memo(({ content, contentMetadata, status, maxHeight = 200 }) => {
+    const mediaHeight = maxHeight / contentMetadata.width * contentMetadata.height;
     let preview;
     let blur;
     if (status === MessageStatus.PENDING) {
@@ -15,7 +15,7 @@ const ImageMessage = React.memo(({ onContextMenu, content, contentMetadata, stat
         blur = 'blur(0px)';
     }
     return (
-        <div onContextMenu={onContextMenu}>
+        <div>
             <AntdImage
                 className='image-message'
                 height={mediaHeight}

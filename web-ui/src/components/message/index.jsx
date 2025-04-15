@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import './index.less'
 import { MessageType, MessageStatus } from '../../enum';
 import sendFailIcon from '../../assets/img/send_fail.png'
@@ -42,53 +42,53 @@ const Message = React.memo(({ messageId,onContextMenu }) => {
             break
     }
 
-    const renderItem = (type, self, status, content, contentMetadata, progress) => {
+    const renderItem = useCallback((type, self, status, content, contentMetadata) => {
         switch (type) {
             case MessageType.TEXT_MESSAGE:
-                return <TextMessage onContextMenu={onContextMenu} content={content} direction={self ? 'RIGHT' : 'LEFT'} />
+                return <TextMessage content={content} direction={self ? 'RIGHT' : 'LEFT'} />
             case MessageType.IMAGE_MESSAGE:
                 return (
                     <ProgressOverlayBox
                         enabled={status && status === MessageStatus.PENDING}
-                        progress={progress}
+                        progress={progressInfo?.percentage}
                     >
-                        <ImageMessage onContextMenu={onContextMenu} content={content} contentMetadata={contentMetadata} status={status} />
+                        <ImageMessage content={content} contentMetadata={contentMetadata} status={status} />
                     </ProgressOverlayBox>
                 )
             case MessageType.VIDEO_MESSAGE:
                 return (
                     <ProgressOverlayBox
                         enabled={status && status === MessageStatus.PENDING}
-                        progress={progress}
+                        progress={progressInfo?.percentage}
                     >
-                        <VideoMessage onContextMenu={onContextMenu} content={content} contentMetadata={contentMetadata} status={status} />
+                        <VideoMessage content={content} contentMetadata={contentMetadata} status={status} />
                     </ProgressOverlayBox>
 
                 )
             case MessageType.VOICE_MESSAGE:
                 return (
-                    <VoiceMessage onContextMenu={onContextMenu} content={content} status={status} duration={contentMetadata.duration} direction={self ? 'RIGHT' : 'LEFT'} />
+                    <VoiceMessage content={content} status={status} duration={contentMetadata.duration} direction={self ? 'RIGHT' : 'LEFT'} />
                 )
             case MessageType.FILE_MESSAGE:
                 return (
                     <ProgressOverlayBox
                         enabled={status && status === MessageStatus.PENDING}
-                        progress={progress}
+                        progress={progressInfo?.percentage}
                     >
-                        <FileMessage onContextMenu={onContextMenu} content={content} status={status} filename={contentMetadata.name} fileSize={contentMetadata.sizeDesc} direction={self ? 'RIGHT' : 'LEFT'} />
+                        <FileMessage content={content} status={status} filename={contentMetadata.name} fileSize={contentMetadata.sizeDesc} direction={self ? 'RIGHT' : 'LEFT'} />
                     </ProgressOverlayBox>
                 )
             case MessageType.VOICE_CALL_MESSAGE:
                 return (
-                    <VoiceCallMessage onContextMenu={onContextMenu} callStatus={contentMetadata.callStatus} duration={contentMetadata.duration} durationDesc={contentMetadata.durationDesc} self={self}/>
+                    <VoiceCallMessage callStatus={contentMetadata.callStatus} duration={contentMetadata.duration} durationDesc={contentMetadata.durationDesc} self={self}/>
                 )
             case MessageType.VIDEO_CALL_MESSAGE:
                 return (
-                    <VideoCallMessage onContextMenu={onContextMenu} callStatus={contentMetadata.callStatus} duration={contentMetadata.duration} durationDesc={contentMetadata.durationDesc} self={self}/>
+                    <VideoCallMessage callStatus={contentMetadata.callStatus} duration={contentMetadata.duration} durationDesc={contentMetadata.durationDesc} self={self}/>
                 )
             default:
         }
-    }
+    },[progressInfo])
 
     return (
         <Flex gap="small" style={{ flexDirection: self ? 'row-reverse' : ''}}>
@@ -100,7 +100,9 @@ const Message = React.memo(({ messageId,onContextMenu }) => {
                     </Flex>
                 )}
                 <Flex gap="small" style={{ flexDirection: self ? 'row-reverse' : '', width: '100%' }} align='center'>
-                    {renderItem(type, self, status, content, contentMetadata, progressInfo?.percentage)}
+                    <Flex onContextMenu={onContextMenu} style={{maxWidth: '60%'}}>
+                        {renderItem(type, self, status, content, contentMetadata)}
+                    </Flex>
                     {messageStatusIcon}
                 </Flex>
             </Flex>

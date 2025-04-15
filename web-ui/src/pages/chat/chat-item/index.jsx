@@ -9,6 +9,7 @@ import { useWebSocket } from '../../../context';
 import { loadMessage, scrollToBottom } from '../../../redux/slices/chatSlice';
 import './index.less';
 import ChatItemRightClickMenu from "../../../components/chat-item-right-click-menu";
+import MessageQuote from "../../../components/message-quote";
 
 const { Content } = Layout;
 
@@ -31,9 +32,12 @@ const ChatItem = React.memo(({ sessionId }) => {
     const listRef = useRef()
 
     // 无限滚动开关
-    const [infiniteRollSwitch,setInfIniteRollSwitch] = useState(false)
+    const [infiniteRollSwitch, setInfIniteRollSwitch] = useState(false)
 
-    const [footerHeight, setFooterHeight] = useState(0)
+    const [contentFooter, setContentFooter] = useState({
+        height: 0,
+        attr: null
+    })
 
     //初始加载数据
     useEffect(() => {
@@ -49,8 +53,8 @@ const ChatItem = React.memo(({ sessionId }) => {
         }
         if (session.messageInit === undefined || session.messageInit === false) {
             fetchData()
-        }else {
-            dispatch(scrollToBottom({sessionId: sessionId}))
+        } else {
+            dispatch(scrollToBottom({ sessionId: sessionId }))
             setInfIniteRollSwitch(true)
         }
     }, [])
@@ -111,7 +115,7 @@ const ChatItem = React.memo(({ sessionId }) => {
         })
     }
 
-    const rightMenuClose = (cleared = false, index) => {
+    const rightMenuClose = useCallback((cleared = false, index) => {
         setRightMenu({
             visible: false,
             x: 0,
@@ -121,11 +125,12 @@ const ChatItem = React.memo(({ sessionId }) => {
         })
         if (cleared) {
             //清除高度缓存避免列表项位置错乱
-            cache.current.clear(index - 1)
-            cache.current.clear(index)
-            cache.current.clear(index + 1)
+            cache.current.clearAll()
+            // cache.current.clear(index - 1)
+            // cache.current.clear(index)
+            // cache.current.clear(index + 1)
         }
-    }
+    }, [])
 
     // 加载更多数据
     const loadMoreData = () => {
@@ -148,9 +153,19 @@ const ChatItem = React.memo(({ sessionId }) => {
         }
     }
 
-    const messageQuote = (messageId) => {
-        setFooterHeight(48)
-    }
+    const openContentFooter = useCallback((attr, footerHeight = 64) => {
+        setContentFooter({
+            height: footerHeight,
+            attr: attr
+        })
+    }, [])
+
+    const closeContentFooter = useCallback(() => {
+        setContentFooter({
+            height: 0,
+            attr: null
+        })
+    }, [])
 
     return (
         <>
@@ -167,7 +182,7 @@ const ChatItem = React.memo(({ sessionId }) => {
                                             ref={listRef}
                                             className='content-chat-list'
                                             width={width}
-                                            height={height - footerHeight}
+                                            height={height - contentFooter.height}
                                             rowCount={messages?.length || 0}
                                             rowHeight={cache.current.rowHeight}
                                             deferredMeasurementCache={cache.current}
@@ -179,17 +194,20 @@ const ChatItem = React.memo(({ sessionId }) => {
                                     )
                                     }
                                 </AutoSizer>
-                                {footerHeight > 0 && (
-                                    <Flex
-                                        style={{ 
-                                            height: '48px', 
-                                            backgroundColor: 'red', 
-                                            textAlign: 'center', 
+                                {contentFooter.height > 0 && (
+                                    <div
+                                        style={{
+                                            height: contentFooter.height,
+                                            boxShadow: '0 -5px 10px rgba(0, 0, 0, 0.06)',
+                                            textAlign: 'center',
                                             marginTop: 'auto',
-                                         }}
+                                        }}
                                     >
-                                        <strong>Footer Content</strong>
-                                    </Flex>
+                                        <MessageQuote
+                                            messageId={contentFooter.attr}
+                                            closeContentFooter = {closeContentFooter}
+                                        />
+                                    </div>
                                 )}
                             </Flex>
                         </Content>
@@ -205,7 +223,7 @@ const ChatItem = React.memo(({ sessionId }) => {
                         sessionId={sessionId}
                         x={rightMenu.x}
                         y={rightMenu.y}
-                        messageQuote={messageQuote}
+                        openContentFooter={openContentFooter}
                         close={rightMenuClose}
                     />
                 )}
