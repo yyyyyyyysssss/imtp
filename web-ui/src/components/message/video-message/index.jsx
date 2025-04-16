@@ -30,7 +30,7 @@ const VideoMessage = React.memo(({ content, status, contentMetadata, maxHeight =
         setVideoOption(videoJsOptions)
     }, [content, mediaType])
 
-    const media = useMemo(() => {
+    const measure = useMemo(() => {
         let maxWidth
         if (width > height) {
             maxWidth = maxHeight * 1.618
@@ -63,8 +63,8 @@ const VideoMessage = React.memo(({ content, status, contentMetadata, maxHeight =
                 className='video-div'
                 style={{
                     backgroundColor: status && status === MessageStatus.PENDING ? 'black' : '',
-                    width: media.width,
-                    height: media.height,
+                    width: measure.width,
+                    height: measure.height,
                     borderRadius: maxHeight >= defaultMaxHeight ? '6px' : '1px'
                 }}
                 onClick={videoPlay}
@@ -73,9 +73,9 @@ const VideoMessage = React.memo(({ content, status, contentMetadata, maxHeight =
                     <AntdImage
                         className='video-message'
                         style={{
-                            height: media.height
+                            height: measure.height
                         }}
-                        height={media.height}
+                        height={measure.height}
                         preview={false}
                         src={thumbnailUrl}
                     />
@@ -83,7 +83,7 @@ const VideoMessage = React.memo(({ content, status, contentMetadata, maxHeight =
                 <div className='video-gradient' />
                 {((status && status !== MessageStatus.PENDING) || !status) && (
                     <div className='video-icon'>
-                        <img height={media.playIconMaxHeight} src={videoPlayIcon} alt='icon' />
+                        <img height={measure.playIconMaxHeight} src={videoPlayIcon} alt='icon' />
                     </div>
                 )}
                 {maxHeight >= defaultMaxHeight && (

@@ -1,27 +1,30 @@
-import { Divider, Flex } from 'antd';
+import { Flex, Tooltip } from 'antd';
 import React from 'react';
-import { useSelector } from 'react-redux';
-import { CloseCircleOutlined } from '@ant-design/icons';
 import './index.less'
-import { MessageType } from '../../enum';
+import { CallStatus, MessageType } from '../../enum';
 import ImageMessage from '../message/image-message';
 import VideoMessage from '../message/video-message';
-import voicePlayPng from '../../assets/img/voice-play.png'
+import { VoiceCallOutlined, VideoMessageIcon, VoiceOutlined } from '../customIcon'
 import Icon, { FileOutlined } from '@ant-design/icons';
+import { download } from '../../utils';
 
-const MessageQuote = React.memo(({ messageId, closeContentFooter }) => {
+const MessageQuote = React.memo(({ style, message, vertical = true }) => {
 
-    const message = useSelector(state => state.chat.entities.messages[messageId])
+    const { type, name, content, contentMetadata, self } = message || {}
 
-    const { type, name, content, contentMetadata } = message || {}
+    const handlerFileMessageClick = (url, fileName) => {
+        download(url, fileName)
+    }
 
-    const renderItem = (type, content, contentMetadata) => {
+    const renderItem = (type, content, contentMetadata, self) => {
         switch (type) {
             case MessageType.TEXT_MESSAGE:
                 return (
-                    <div className='quote-content-div-content'>
-                        {content}
-                    </div>
+                    <Tooltip placement="top" title={content} color='white' overlayInnerStyle={{ color: 'gray' }} >
+                        <div className='quote-content-div-content'>
+                            {content}
+                        </div>
+                    </Tooltip>
                 )
             case MessageType.IMAGE_MESSAGE:
                 return (
@@ -34,60 +37,70 @@ const MessageQuote = React.memo(({ messageId, closeContentFooter }) => {
             case MessageType.VOICE_MESSAGE:
                 const durationDesc = Math.floor(contentMetadata.duration / 1000) + '\'\''
                 return (
-                    <Flex style={{ width: '20px' }} justify='space-between'>
-                        <img
+                    <Flex gap={6} justify='center' align='center'>
+                        <VoiceOutlined
                             style={{
-                                transform: 'rotate(90deg)'
+                                transform: 'rotate(90deg)',
                             }}
-                            src={voicePlayPng}
-                            alt=''
+                            size={20}
+                            color='gray'
                         />
-                        <div style={{ fontSize: 18, paddingLeft: 5 }}>{durationDesc}</div>
+                        <div className='quote-content-div-content'>{durationDesc}</div>
                     </Flex >
                 )
             case MessageType.FILE_MESSAGE:
-                return
+                return (
+                    <Flex style={{ cursor: 'pointer' }} onClick={() => handlerFileMessageClick(content, contentMetadata.name)}>
+                        <Icon component={FileOutlined} style={{ color: 'gray', fontSize: 20 }} />
+                        <div className='quote-content-div-content'>
+                            {contentMetadata.name}
+                        </div>
+                    </Flex>
+                )
             case MessageType.VOICE_CALL_MESSAGE:
-                return
             case MessageType.VIDEO_CALL_MESSAGE:
-                return
+                let icon = type === MessageType.VOICE_CALL_MESSAGE ? <VoiceCallOutlined size={23} color='gray' /> : <VideoMessageIcon color='gray' size={25} />
+                let text
+                switch (contentMetadata.callStatus) {
+                    case CallStatus.COMPLETED:
+                        text = '通话时长'
+                        break
+                    case CallStatus.CANCELLED:
+                        text = self ? '已取消' : '对方已取消'
+                        break
+                    case CallStatus.REFUSED:
+                        text = self ? '对方已拒接' : '已拒接'
+                        break
+                    case CallStatus.INTERRUPTED:
+                        text = '通话中断'
+                        break
+                }
+                return (
+                    <Flex gap={6} justify='center' align='center'>
+                        {icon}
+                        <div className='quote-content-div-content'>
+                            {text}
+                        </div>
+                        {contentMetadata.callStatus === CallStatus.COMPLETED && (
+                            <div className='quote-content-div-content'>
+                                {contentMetadata.durationDesc}
+                            </div>
+                        )}
+                    </Flex >
+                )
             default:
+                return (
+                    <></>
+                )
         }
     }
 
     return (
-        <Flex
-            flex={1}
-            justify='space-between'
-            style={{
-                paddingTop: 5,
-                paddingLeft: 10,
-                paddingRight: 10,
-                height: '100%',
-            }}
-        >
-            <Flex gap={5} flex={1} justify='flex-start' align='center' style={{ padding: 10 }}>
-                <Divider style={{ height: '100%', borderWidth: '3px', borderColor: 'lightgray' }} type='vertical' />
-                <Flex justify='space-between' align='flex-start' vertical>
-                    <div className='quote-content-div-name'>
-                        {name}：
-                    </div>
-                    {renderItem(type, content, contentMetadata)}
-                </Flex>
-            </Flex>
-            <Flex
-                flex={1}
-                justify='flex-end'
-                align='flex-start'
-            >
-                <div className='close-div' onClick={closeContentFooter}>
-                    <CloseCircleOutlined
-                        style={{
-                            fontSize: 16,
-                        }}
-                    />
-                </div>
-            </Flex>
+        <Flex justify='center' align='flex-start' vertical={vertical}>
+            <div className='quote-content-div-name'>
+                {name}：
+            </div>
+            {renderItem(type, content, contentMetadata, self)}
         </Flex>
     )
 })

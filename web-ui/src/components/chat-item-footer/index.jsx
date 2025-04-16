@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import './index.less'
-import { Flex, Layout, Button, message } from "antd"
+import { Flex, Layout, Button } from "antd"
 import { EditorContent, useEditor } from '@tiptap/react'
 import HardBreak from '@tiptap/extension-hard-break'
 import { StarterKit } from '@tiptap/starter-kit';
@@ -20,10 +20,11 @@ import { addMessage, updateMessage, updateMessageStatus, startVoiceCall } from '
 import { MessageStatus, MessageType, CallOperation, CallType } from '../../enum';
 import { formatFileSize, getVideoDimensionsOfByFile, dataURLtoFile, createThumbnail } from '../../utils'
 import { v4 as uuidv4 } from 'uuid';
+import reduxStore from '../../redux/store';
 
 const { Content } = Layout;
 
-const ChatItemFooter = React.memo(({ session }) => {
+const ChatItemFooter = React.memo(({ session, messageId, closeContentFooter }) => {
 
     const { socket } = useWebSocket();
     const socketRef = useRef();
@@ -245,6 +246,14 @@ const ChatItemFooter = React.memo(({ session }) => {
         content: '',
     });
 
+    const quoteMessageIdRef = useRef();
+    useEffect(() => {
+        if(messageId){
+            quoteMessageIdRef.current = messageId
+            editor.commands.focus()
+        }
+    }, [messageId,editor]);
+
     //发送消息
     const sendMessage = (message) => {
         let editorFlag = false;
@@ -277,6 +286,7 @@ const ChatItemFooter = React.memo(({ session }) => {
                     msg = {
                         ...imageMsg,
                         contentMetadata: {
+                            ...imageMsg.contentMetadata,
                             name: imageName,
                             width: imageWidth,
                             height: imageHeight,
@@ -310,6 +320,7 @@ const ChatItemFooter = React.memo(({ session }) => {
                     msg = {
                         ...fileMsg,
                         contentMetadata: {
+                            ...fileMsg.contentMetadata,
                             name: fileName,
                             mediaType: fileType,
                             size: fileSize,
@@ -349,6 +360,7 @@ const ChatItemFooter = React.memo(({ session }) => {
                     msg = {
                         ...videoMsg,
                         contentMetadata: {
+                            ...videoMsg.contentMetadata,
                             name: videoName,
                             width: videoWidth,
                             height: videoHeight,
@@ -425,6 +437,8 @@ const ChatItemFooter = React.memo(({ session }) => {
         if (editorFlag) {
             editor.commands.clearContent();
         }
+        //关闭内容展示页脚
+        closeContentFooter()
     }
     //服务器发送消息
     const realSendMessage = (msg) => {
@@ -454,7 +468,7 @@ const ChatItemFooter = React.memo(({ session }) => {
 
     const messageBase = (content, type) => {
         const id = IdGen.nextId()
-        return {
+        const message = {
             id: id,
             ackId: id,
             type: type,
@@ -469,6 +483,22 @@ const ChatItemFooter = React.memo(({ session }) => {
             name: userInfo.nickname,
             avatar: userInfo.avatar
         }
+        //消息引用
+        if(quoteMessageIdRef.current){
+            const quoteMessage = reduxStore.getState().chat.entities.messages[quoteMessageIdRef.current]
+            if(quoteMessage){
+                message.contentMetadata = {
+                    quoteMessage: {
+                        type: quoteMessage.type,
+                        name: quoteMessage.name,
+                        content: quoteMessage.content,
+                        self: quoteMessage.self,
+                        contentMetadata: {...quoteMessage.contentMetadata, quoteMessage: null}
+                    }
+                }
+            }
+        }
+        return message
     }
 
     return (

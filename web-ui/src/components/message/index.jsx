@@ -13,9 +13,10 @@ import { useSelector } from 'react-redux';
 import ProgressOverlayBox from '../ProgressOverlayBox';
 import VoiceCallMessage from './voice-call-message';
 import VideoCallMessage from './video-call-message';
+import MessageQuote from '../message-quote';
 
 
-const Message = React.memo(({ messageId,onContextMenu }) => {
+const Message = React.memo(({ messageId, onContextMenu }) => {
 
     const message = useSelector(state => state.chat.entities.messages[messageId])
 
@@ -80,18 +81,18 @@ const Message = React.memo(({ messageId,onContextMenu }) => {
                 )
             case MessageType.VOICE_CALL_MESSAGE:
                 return (
-                    <VoiceCallMessage callStatus={contentMetadata.callStatus} duration={contentMetadata.duration} durationDesc={contentMetadata.durationDesc} self={self}/>
+                    <VoiceCallMessage callStatus={contentMetadata.callStatus} duration={contentMetadata.duration} durationDesc={contentMetadata.durationDesc} self={self} />
                 )
             case MessageType.VIDEO_CALL_MESSAGE:
                 return (
-                    <VideoCallMessage callStatus={contentMetadata.callStatus} duration={contentMetadata.duration} durationDesc={contentMetadata.durationDesc} self={self}/>
+                    <VideoCallMessage callStatus={contentMetadata.callStatus} duration={contentMetadata.duration} durationDesc={contentMetadata.durationDesc} self={self} />
                 )
             default:
         }
-    },[progressInfo])
+    }, [progressInfo])
 
     return (
-        <Flex gap="small" style={{ flexDirection: self ? 'row-reverse' : ''}}>
+        <Flex gap="small" style={{ flexDirection: self ? 'row-reverse' : '' }}>
             <Avatar size={45} shape="square" src={avatar} />
             <Flex flex={1} gap="small" justify='center' align={self ? 'end' : 'start'} vertical>
                 {!self && deliveryMethod === 'GROUP' && (
@@ -100,11 +101,27 @@ const Message = React.memo(({ messageId,onContextMenu }) => {
                     </Flex>
                 )}
                 <Flex gap="small" style={{ flexDirection: self ? 'row-reverse' : '', width: '100%' }} align='center'>
-                    <Flex onContextMenu={onContextMenu} style={{maxWidth: '60%'}}>
+                    <Flex onContextMenu={onContextMenu} style={{ maxWidth: '60%' }} vertical>
                         {renderItem(type, self, status, content, contentMetadata)}
                     </Flex>
                     {messageStatusIcon}
                 </Flex>
+                {contentMetadata?.quoteMessage && (
+                    <Flex
+                        justify='center'
+                        align='center'
+                        style={{
+                            backgroundColor: '#E8E8E8',
+                            padding: 5,
+                        }}
+                    >
+                        <MessageQuote
+                            message={contentMetadata.quoteMessage}
+                            vertical={false}
+                        />
+                    </Flex>
+
+                )}
             </Flex>
         </Flex>
     )

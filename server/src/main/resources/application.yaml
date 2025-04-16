@@ -28,7 +28,7 @@ im:
     apikey: 26662f07703c41d2a4994b8b30b101a9
   server:
     configuration:
-      model: cluster
+      model: host
       zookeeper:
         servers: 127.0.0.1:2181
         sessionTimeout: 3000

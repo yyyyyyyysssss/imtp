@@ -34,7 +34,7 @@ const ChatItemRightClickMenu = ({ messageId, index, sessionId, x, y, openContent
     }
 
     const quote = () => {
-        openContentFooter(messageId)
+        openContentFooter(messageId,70)
         close()
     }
 

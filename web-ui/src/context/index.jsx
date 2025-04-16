@@ -11,9 +11,6 @@ export const FriendPanelContext  = createContext();
 
 export const GroupPanelContext  = createContext();
 
-
-const AUTHORIZATION_RES = -120;
-
 // websocket
 const WebSocketContext = createContext();
 export const WebSocketProvider = ({ children }) => {

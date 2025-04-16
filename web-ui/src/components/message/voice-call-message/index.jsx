@@ -24,7 +24,7 @@ const VoiceCallMessage = React.memo(({ callStatus, self, duration, durationDesc 
     return (
         <div className={`voice-call-message ${self ? 'voice-call-message-right' : 'voice-call-message-left'}`}>
             <Flex gap={6} justify='center'>
-                <VoiceCallOutlined />
+                <VoiceCallOutlined size={23}/>
                 <div
                     style={{
                         whiteSpace: 'nowrap'

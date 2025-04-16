@@ -9,7 +9,7 @@ import { useWebSocket } from '../../../context';
 import { loadMessage, scrollToBottom } from '../../../redux/slices/chatSlice';
 import './index.less';
 import ChatItemRightClickMenu from "../../../components/chat-item-right-click-menu";
-import MessageQuote from "../../../components/message-quote";
+import ChatItemContentFooter from "../../../components/chat-item-content-footer";
 
 const { Content } = Layout;
 
@@ -203,16 +203,20 @@ const ChatItem = React.memo(({ sessionId }) => {
                                             marginTop: 'auto',
                                         }}
                                     >
-                                        <MessageQuote
+                                        <ChatItemContentFooter
                                             messageId={contentFooter.attr}
-                                            closeContentFooter = {closeContentFooter}
+                                            closeContentFooter={closeContentFooter}
                                         />
                                     </div>
                                 )}
                             </Flex>
                         </Content>
                         <Content style={{ height: '38%' }}>
-                            <ChatItemFooter session={session} />
+                            <ChatItemFooter
+                                session={session}
+                                messageId={contentFooter.attr}
+                                closeContentFooter={closeContentFooter}
+                            />
                         </Content>
                     </Layout>
                 </Content>
