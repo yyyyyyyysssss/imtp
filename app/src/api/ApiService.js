@@ -50,10 +50,10 @@ export const loginByGoogle = (code) => {
 }
 
 // 获取当前登录用户的信息
-export const fetchUserInfo = (token) => {
+export const fetchUserInfo = (token,userId) => {
 
     return new Promise((resolve, reject) => {
-        api.get('/social/userInfo/{userId}', {
+        api.get(`/social/userInfo/${userId}`, {
             headers: {
                 Authorization: `Bearer ${token}`
             }

@@ -284,39 +284,42 @@ const ChatItem = ({ route }) => {
     return (
 
         <VStack flex={1} justifyContent="space-between">
-            <ChatItemHeader title={session.name} />
-            <KeyboardAvoidingView
-                flex={1}
-                behavior={Platform.OS == "ios" ? "padding" : null}
-                keyboardVerticalOffset={Platform.OS === "ios" ? 64 : 0}
-            >
-                <HStack flex={9} style={styles.contentHstack}>
-                    <FlatList
-                        style={styles.messageList}
-                        data={messageIds}
-                        renderItem={renderItem}
-                        scrollEnabled={true}
-                        inverted={true}
-                        onEndReached={() => {
-                            if (!endReachedCalledDuringMomentum) {
-                                loadMoreData()
-                                setEndReachedCalledDuringMomentum(true)
-                            }
-                        }}
-                        onEndReachedThreshold={0.01}
-                        onMomentumScrollBegin={() => setEndReachedCalledDuringMomentum(false)}
-                        contentContainerStyle={{
-                            flexGrow: 1,
-                            justifyContent: 'flex-end'
-                        }}
+            {/* <Pressable onPressIn={handleChatItemFooterOutside} flex={1}> */}
+                <ChatItemHeader title={session.name} />
+                <KeyboardAvoidingView
+                    flex={1}
+                    behavior={Platform.OS == "ios" ? "padding" : null}
+                    keyboardVerticalOffset={Platform.OS === "ios" ? 64 : 0}
+                >
+                    <HStack flex={9} style={styles.contentHstack}>
+                        <FlatList
+                            style={styles.messageList}
+                            data={messageIds}
+                            renderItem={renderItem}
+                            scrollEnabled={true}
+                            inverted={true}
+                            onEndReached={() => {
+                                if (!endReachedCalledDuringMomentum) {
+                                    loadMoreData()
+                                    setEndReachedCalledDuringMomentum(true)
+                                }
+                            }}
+                            onEndReachedThreshold={0.01}
+                            onMomentumScrollBegin={() => setEndReachedCalledDuringMomentum(false)}
+                            contentContainerStyle={{
+                                flexGrow: 1,
+                                justifyContent: 'flex-end'
+                            }}
+                        />
+                    </HStack>
+                    <ChatItemFooter
+                        sendMessage={sendMessage}
+                        sessionId={sessionId}
                     />
-                </HStack>
-                <ChatItemFooter
-                    sendMessage={sendMessage}
-                    sessionId={sessionId}
-                />
-            </KeyboardAvoidingView>
+                </KeyboardAvoidingView>
+            {/* </Pressable> */}
         </VStack>
+
     )
 }
 

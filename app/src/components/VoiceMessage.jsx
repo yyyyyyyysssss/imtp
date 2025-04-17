@@ -6,7 +6,8 @@ import { MessageStatus } from '../enum';
 import { Player } from '@react-native-community/audio-toolkit';
 import FastImage from 'react-native-fast-image'
 
-const minWidth = 0.25
+const minPercentage = 0.25
+const maxWidth = 300
 
 const VoiceMessage = React.memo(({ content, status, duration, direction }) => {
 
@@ -41,8 +42,9 @@ const VoiceMessage = React.memo(({ content, status, duration, direction }) => {
 
     const calcWidthByDuration = useMemo(() => {
         let s = Math.floor(duration / 1000) / 60
-        s = s < minWidth ? minWidth + s : s
-        return s > 1 ? '100%' : `${s * 100}%`
+        s = s < minPercentage ? minPercentage + s : s
+        const d = s > 1 ? 1 : s
+        return d * maxWidth
     }, [duration])
 
     const playVoice = () => {
@@ -100,7 +102,6 @@ const VoiceMessage = React.memo(({ content, status, duration, direction }) => {
 const styles = StyleSheet.create({
     chatItemMessageBoxLeft: {
         position: 'relative',
-        maxWidth: '80%',
         borderRadius: 6,
         padding: 7,
         backgroundColor: 'white',
@@ -112,7 +113,6 @@ const styles = StyleSheet.create({
     },
     chatItemMessageBoxRight: {
         position: 'relative',
-        maxWidth: '80%',
         borderRadius: 6,
         padding: 7,
         backgroundColor: '#95EC69',

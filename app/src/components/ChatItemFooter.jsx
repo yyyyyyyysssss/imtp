@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Box, HStack, Text, VStack, Input, Pressable, Flex, View } from 'native-base';
+import { Box, HStack, Text, VStack, Input, Pressable, Flex } from 'native-base';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons';
-import { PermissionsAndroid, StyleSheet,Platform } from 'react-native';
+import { PermissionsAndroid, StyleSheet, Platform, Modal } from 'react-native';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import { CallOperation, CallType, MessageType } from '../enum';
 import DocumentPicker, { types } from 'react-native-document-picker'
@@ -12,13 +12,13 @@ import { requestCameraPermission } from '../utils/PermissionRequest';
 import { useSelector } from 'react-redux';
 import { showToast } from './Utils';
 
-const ChatItemFooter = React.memo(({ sendMessage,sessionId }) => {
+const ChatItemFooter = React.memo(({ sendMessage, sessionId }) => {
 
     const navigation = useNavigation()
 
     const call = useSelector(state => state.chat.call)
 
-    const {flag : callFlag, callType} = call
+    const { flag: callFlag, callType } = call
 
     const [isOpen, setIsOpen] = useState(false)
 
@@ -78,7 +78,7 @@ const ChatItemFooter = React.memo(({ sendMessage,sessionId }) => {
                 fileSize: fileSize,
                 duration: duration,
             }
-        }else {
+        } else {
             message = {
                 type: MessageType.FILE_MESSAGE,
                 fileName: fileName,
@@ -132,17 +132,17 @@ const ChatItemFooter = React.memo(({ sendMessage,sessionId }) => {
     }
 
     const handleViocePressIn = async () => {
-        if(callFlag === true){
+        if (callFlag === true) {
             showToast('正在通话中')
             return
         }
         const permissionChecked = await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.RECORD_AUDIO)
-        if(permissionChecked){
+        if (permissionChecked) {
             setOverlayVisible(true)
-        }else {
+        } else {
             await checkAndRequestRecorderPermission()
         }
-        
+
     }
 
     const handleViocePressOut = () => {
@@ -183,12 +183,12 @@ const ChatItemFooter = React.memo(({ sendMessage,sessionId }) => {
 
     //拍照
     const takePicture = async () => {
-        if(callFlag === true && callType === CallType.VIDEO){
+        if (callFlag === true && callType === CallType.VIDEO) {
             showToast('正在通话中')
             return
         }
         const p = await requestCameraPermission()
-        if(!p){
+        if (!p) {
             return
         }
         launchCamera(
@@ -212,12 +212,12 @@ const ChatItemFooter = React.memo(({ sendMessage,sessionId }) => {
 
     //摄像
     const cameraShoot = async () => {
-        if(callFlag === true && callType === CallType.VIDEO){
+        if (callFlag === true && callType === CallType.VIDEO) {
             showToast('正在通话中')
             return
         }
         const p = await requestCameraPermission()
-        if(!p){
+        if (!p) {
             return
         }
         launchCamera(
@@ -243,7 +243,7 @@ const ChatItemFooter = React.memo(({ sendMessage,sessionId }) => {
     }
 
     const voiceCall = () => {
-        if(callFlag === true){
+        if (callFlag === true) {
             showToast('正在通话中')
             return
         }
@@ -255,7 +255,7 @@ const ChatItemFooter = React.memo(({ sendMessage,sessionId }) => {
     }
 
     const videoCall = () => {
-        if(callFlag === true){
+        if (callFlag === true) {
             showToast('正在通话中')
             return
         }
@@ -375,6 +375,95 @@ const ChatItemFooter = React.memo(({ sendMessage,sessionId }) => {
 
                     </HStack>
                 </HStack>
+                {/* <Modal
+                    transparent={true}
+                    visible={isOpen}
+                    animationType="fade"
+                    onRequestClose={() => setIsOpen(false)}
+                >
+                    <Flex
+                        direction="column"
+                        justifyContent='flex-end'
+                        alignItems='center'
+
+                        style={{
+                            position: 'absolute',
+                            left: 0,
+                            bottom: 0,
+                            width: '100%',
+                            height: 235,
+                            borderTopWidth: 1,
+                            borderTopColor: '#D3D3D3',
+                            // backgroundColor: 'red'
+                        }}
+                    >
+                        <Flex
+                            direction="row"
+                            wrap="wrap"
+                            style={{
+                                width: '85%',
+                                height: '100%',
+                                padding: 10
+                            }}
+                        >
+
+                            <VStack alignItems='center' space={2}>
+                                <Pressable onPress={selectPhoto}>
+                                    <Box style={styles.chatOpsIcon}>
+                                        <MaterialIcon name="photo" size={40} />
+                                    </Box>
+                                </Pressable>
+                                <Text>照片</Text>
+                            </VStack>
+
+                            <VStack alignItems='center' space={2}>
+                                <Pressable onPress={takePicture}>
+                                    <Box style={styles.chatOpsIcon}>
+                                        <MaterialIcon name="camera-alt" size={40} />
+                                    </Box>
+                                </Pressable>
+                                <Text>拍照</Text>
+                            </VStack>
+
+                            <VStack alignItems='center' space={2}>
+                                <Pressable onPress={cameraShoot}>
+                                    <Box style={styles.chatOpsIcon}>
+                                        <MaterialIcon name="video-camera-back" size={40} />
+                                    </Box>
+                                </Pressable>
+                                <Text>拍摄</Text>
+                            </VStack>
+
+                            <VStack alignItems='center' space={2}>
+                                <Pressable onPress={voiceCall}>
+                                    <Box style={styles.chatOpsIcon}>
+                                        <MaterialIcon name="phone" size={40} />
+                                    </Box>
+                                </Pressable>
+                                <Text>语音通话</Text>
+                            </VStack>
+
+                            <VStack alignItems='center' justifyContent='flex-start' space={2}>
+                                <Pressable onPress={videoCall}>
+                                    <Box style={styles.chatOpsIcon}>
+                                        <MaterialIcon name="videocam" size={40} />
+                                    </Box>
+                                </Pressable>
+                                <Text>视频通话</Text>
+                            </VStack>
+
+                            <VStack alignItems='center' justifyContent='flex-start' space={2}>
+                                <Pressable onPress={filePicker}>
+                                    <Box style={styles.chatOpsIcon}>
+                                        <MaterialIcon name="folder-open" size={40} />
+                                    </Box>
+                                </Pressable>
+                                <Text>文件</Text>
+                            </VStack>
+
+                        </Flex>
+                    </Flex>
+                </Modal> */}
                 {isOpen && (
                     <Flex
                         direction="column"

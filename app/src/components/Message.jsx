@@ -1,4 +1,4 @@
-import { Avatar, HStack, Pressable, VStack, Text, Box, Spinner, Flex } from 'native-base';
+import { Avatar, HStack, Pressable, VStack, Text, Box, Spinner, Flex, Popover, Button } from 'native-base';
 import React, { useCallback, useEffect, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import AntDesignIcon from 'react-native-vector-icons/AntDesign';
@@ -24,6 +24,24 @@ const Message = React.memo(({ style, messageId }) => {
     const [progress, setProgress] = useState(0.01)
 
     const { type, name, avatar, deliveryMethod, self, status, content, contentMetadata, progressId } = message || {}
+
+    const [messageMenu, setMessageMenu] = useState({
+        isOpen: false
+    })
+
+    const openContextMenu = (event) => {
+        const { pageX, pageY } = event.nativeEvent
+        console.log('openContextMenu', { pageX, pageY })
+        setMessageMenu({
+            isOpen: true
+        })
+    }
+
+    const closeContextMenu = () => {
+        setMessageMenu({
+            isOpen: false
+        })
+    }
 
     useEffect(() => {
         let progressEventEmitter;
@@ -104,11 +122,11 @@ const Message = React.memo(({ style, messageId }) => {
                 )
             case MessageType.VOICE_CALL_MESSAGE:
                 return (
-                    <VoiceCallMessage callStatus={contentMetadata.callStatus} duration={contentMetadata.duration} durationDesc={contentMetadata.durationDesc} self={self}/>
+                    <VoiceCallMessage callStatus={contentMetadata.callStatus} duration={contentMetadata.duration} durationDesc={contentMetadata.durationDesc} self={self} />
                 )
             case MessageType.VIDEO_CALL_MESSAGE:
                 return (
-                    <VideoCallMessage callStatus={contentMetadata.callStatus} duration={contentMetadata.duration} durationDesc={contentMetadata.durationDesc} self={self}/>
+                    <VideoCallMessage callStatus={contentMetadata.callStatus} duration={contentMetadata.duration} durationDesc={contentMetadata.durationDesc} self={self} />
                 )
         }
     }, [])
@@ -129,13 +147,17 @@ const Message = React.memo(({ style, messageId }) => {
                     </HStack>
                 )}
                 <HStack space={2} reversed={self ? true : false} alignItems='center'>
-                    {renderItem(type, self, status, content, contentMetadata, progress)}
+                    <Pressable onLongPress={openContextMenu} onStartShouldSetResponder={() => true} style={{ maxWidth: '80%' }}>
+                        <VStack>
+                            {renderItem(type, self, status, content, contentMetadata, progress)}
+                        </VStack>
+                    </Pressable>
                     {messageStatusIcon}
                 </HStack>
             </VStack>
         </HStack>
     )
-},(prevProps,nextProps) => prevProps.messageId === nextProps.messageId)
+}, (prevProps, nextProps) => prevProps.messageId === nextProps.messageId)
 
 const styles = StyleSheet.create({
     chatItemUserName: {

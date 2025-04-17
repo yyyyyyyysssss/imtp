@@ -161,7 +161,7 @@ const App = () => {
 
   const login = async (userToken) => {
     //登录之后获取用户信息
-    const userInfo = await fetchUserInfo(userToken.accessToken)
+    const userInfo = await fetchUserInfo(userToken.accessToken,userToken.userId)
     dispatch(signIn({ token: userToken, userInfo: userInfo }))
   }
 
