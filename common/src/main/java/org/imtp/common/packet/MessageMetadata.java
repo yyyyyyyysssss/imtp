@@ -36,4 +36,6 @@ public class MessageMetadata {
     private String thumbnailUrl;
 
     private CallStatus callStatus;
+
+    private MessageQuote quoteMessage;
 }

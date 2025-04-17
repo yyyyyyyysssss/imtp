@@ -1,12 +1,12 @@
 import React, { useEffect, useRef } from 'react';
 import './index.less'
-import { Divider, Flex } from 'antd';
+import { Divider, Flex, Modal } from 'antd';
 import { useSelector, useDispatch } from 'react-redux';
 import { deleteUserMessageById } from '../../api/ApiService';
 import { deleteMessage } from '../../redux/slices/chatSlice';
 
 
-const ChatItemRightClickMenu = ({ messageId, index, sessionId, x, y, openContentFooter, close }) => {
+const ChatItemRightClickMenu = ({ messageId, index, sessionId, x, y, openContentFooter, onBefore, onAfter, close }) => {
 
     const menuRef = useRef()
 
@@ -29,19 +29,36 @@ const ChatItemRightClickMenu = ({ messageId, index, sessionId, x, y, openContent
     }, [])
 
     const copy = () => {
+        onBefore()
         navigator.clipboard.writeText(message.content)
-        close()
+        onAfter()
     }
 
     const quote = () => {
-        openContentFooter(messageId,70)
-        close()
+        onBefore()
+        openContentFooter(messageId, 70)
+        onAfter()
     }
 
     const del = () => {
-        dispatch(deleteMessage({ id: message.id, sessionId: sessionId }))
-        // deleteUserMessageById(message.id)
-        close(true, index)
+        onBefore()
+        Modal.confirm({
+            title: '删除消息',
+            content: '删除该条消息？',
+            closable: true,
+            centered: true,
+            okText: '确认',
+            cancelText: '取消',
+            onOk: () => {
+                
+                dispatch(deleteMessage({ id: message.id, sessionId: sessionId }))
+                // deleteUserMessageById(message.id)
+                onAfter(true)
+            },
+            onCancel: () => {
+                onAfter()
+            }
+        })
     }
 
     return (

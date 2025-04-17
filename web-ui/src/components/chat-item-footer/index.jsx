@@ -248,8 +248,8 @@ const ChatItemFooter = React.memo(({ session, messageId, closeContentFooter }) =
 
     const quoteMessageIdRef = useRef();
     useEffect(() => {
+        quoteMessageIdRef.current = messageId
         if(messageId){
-            quoteMessageIdRef.current = messageId
             editor.commands.focus()
         }
     }, [messageId,editor]);

@@ -18,9 +18,13 @@ export const WebSocketProvider = ({ children }) => {
     const [socket,setSocket] = useState(null);
 
     const start = () => {
+        let timeoutId
         const ws = new WebSocket(env.wobsocketUrl);
         ws.onopen = () => {
             console.log('WebSocket connection opened');
+            if(timeoutId){
+                clearTimeout(timeoutId)
+            }
             const token = Cookies.get("accessToken");
             ws.send(token);
         }
@@ -48,8 +52,10 @@ export const WebSocketProvider = ({ children }) => {
         }
         ws.onerror = (error) => {
             console.log('WebSocket error: ',error);
+            if(timeoutId){
+                clearTimeout(timeoutId)
+            }
         }
-        let timeoutId;
         ws.onclose = () => {
             console.log('WebSocket connection closed');
             if(timeoutId){

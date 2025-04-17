@@ -115,7 +115,7 @@ const ChatItem = React.memo(({ sessionId }) => {
         })
     }
 
-    const rightMenuClose = useCallback((cleared = false, index) => {
+    const handleRightMenuClose = () => {
         setRightMenu({
             visible: false,
             x: 0,
@@ -123,14 +123,30 @@ const ChatItem = React.memo(({ sessionId }) => {
             messageId: null,
             index: null
         })
+    }
+
+    const handleBeforeRightMenu = () => {
+        setInfIniteRollSwitch(false)
+        setRightMenu({
+            visible: false,
+            x: 0,
+            y: 0,
+            messageId: null,
+            index: null
+        })
+    }
+
+    const handleAfterRightMenu = (cleared = false) => {
         if (cleared) {
-            //清除高度缓存避免列表项位置错乱
             cache.current.clearAll()
-            // cache.current.clear(index - 1)
-            // cache.current.clear(index)
-            // cache.current.clear(index + 1)
         }
-    }, [])
+        requestAnimationFrame(() => {
+            setTimeout(() => {
+                setInfIniteRollSwitch(true)
+            }, 500)
+        })
+        
+    }
 
     // 加载更多数据
     const loadMoreData = () => {
@@ -228,7 +244,9 @@ const ChatItem = React.memo(({ sessionId }) => {
                         x={rightMenu.x}
                         y={rightMenu.y}
                         openContentFooter={openContentFooter}
-                        close={rightMenuClose}
+                        onBefore={handleBeforeRightMenu}
+                        onAfter={handleAfterRightMenu}
+                        close={handleRightMenuClose}
                     />
                 )}
             </div>
