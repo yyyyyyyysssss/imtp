@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { Box, HStack, Text, VStack, Input, Pressable, Flex } from 'native-base';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons';
@@ -12,7 +12,7 @@ import { requestCameraPermission } from '../utils/PermissionRequest';
 import { useSelector } from 'react-redux';
 import { showToast } from './Utils';
 
-const ChatItemFooter = React.memo(({ sendMessage, sessionId }) => {
+const ChatItemFooter = forwardRef(({ sendMessage, sessionId },ref) => {
 
     const navigation = useNavigation()
 
@@ -30,7 +30,11 @@ const ChatItemFooter = React.memo(({ sendMessage, sessionId }) => {
 
     const inputRef = useRef()
 
-
+    useImperativeHandle(ref,() => ({
+        closeMoreOps: () => {
+            setIsOpen(false)
+        }
+    }))
 
     const handleSubmit = (event) => {
         const text = event.nativeEvent.text
@@ -568,4 +572,4 @@ const styles = StyleSheet.create({
     }
 })
 
-export default ChatItemFooter
+export default React.memo(ChatItemFooter)

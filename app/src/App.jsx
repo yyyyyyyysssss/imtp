@@ -16,6 +16,7 @@ import Home from './pages/home';
 import VideoPlay from './components/VideoPlay';
 import { fetchUserInfo, tokenValid } from './api/ApiService';
 import { navigate, navigationRef } from './RootNavigation';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 
 const RootStack = createNativeStackNavigator({
@@ -112,7 +113,7 @@ const RootStack = createNativeStackNavigator({
     }
   },
   screens: {
-    
+
   }
 })
 
@@ -161,7 +162,7 @@ const App = () => {
 
   const login = async (userToken) => {
     //登录之后获取用户信息
-    const userInfo = await fetchUserInfo(userToken.accessToken,userToken.userId)
+    const userInfo = await fetchUserInfo(userToken.accessToken, userToken.userId)
     dispatch(signIn({ token: userToken, userInfo: userInfo }))
   }
 
@@ -186,7 +187,9 @@ const App = () => {
   return (
     <AuthContext.Provider value={authContext}>
       <SignInContext.Provider value={isSignedIn}>
-        <Navigation linking={linking} ref={navigationRef}/>
+        <GestureHandlerRootView>
+          <Navigation linking={linking} ref={navigationRef} />
+        </GestureHandlerRootView>
       </SignInContext.Provider>
     </AuthContext.Provider>
   )

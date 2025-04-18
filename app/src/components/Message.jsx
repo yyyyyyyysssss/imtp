@@ -1,5 +1,5 @@
-import { Avatar, HStack, Pressable, VStack, Text, Box, Spinner, Flex, Popover, Button } from 'native-base';
-import React, { useCallback, useEffect, useState } from 'react';
+import { Avatar, HStack, Pressable, VStack, Text, Spinner, Divider } from 'native-base';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import AntDesignIcon from 'react-native-vector-icons/AntDesign';
 import TextMessage from './TextMessage';
@@ -13,6 +13,14 @@ import ProgressOverlayBox from './ProgressOverlayBox';
 import VoiceMessage from './VoiceMessage';
 import VideoCallMessage from './VideoCallMessage';
 import VoiceCallMessage from './VoiceCallMessage';
+import ContextMenu from "react-native-context-menu-view";
+import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import {
+    Menu,
+    MenuOptions,
+    MenuOption,
+    MenuTrigger,
+} from 'react-native-popup-menu';
 
 const { UploadModule } = NativeModules
 const UploadModuleNativeEventEmitter = new NativeEventEmitter(UploadModule);
@@ -26,7 +34,9 @@ const Message = React.memo(({ style, messageId }) => {
     const { type, name, avatar, deliveryMethod, self, status, content, contentMetadata, progressId } = message || {}
 
     const [messageMenu, setMessageMenu] = useState({
-        isOpen: false
+        isOpen: false,
+        x: 0,
+        y: 0
     })
 
     const openContextMenu = (event) => {
@@ -131,6 +141,39 @@ const Message = React.memo(({ style, messageId }) => {
         }
     }, [])
 
+    const menuRef = useRef()
+
+    const hanleMenuLongPress = (e) => {
+        console.log('hanleMenuLongPress')
+        onTriggerPress()
+    }
+
+    const longPressGesture = Gesture.LongPress().onStart((e) => {
+        const { absoluteX, absoluteY } = e
+        onTriggerPress(absoluteX, absoluteY)
+    })
+
+    const onTriggerPress = (x = 0, y = 0) => {
+        setMessageMenu({
+            isOpen: true,
+            x: x,
+            y: y
+        })
+    }
+
+    const onBackdropPress = () => {
+        setMessageMenu({
+            isOpen: false,
+            x: 0,
+            y: 0
+        })
+    }
+
+    const onOptionSelect = (value) => {
+        console.log(`Selected number: ${value}`)
+        onBackdropPress()
+    }
+
     return (
         <HStack space={3} reversed={self ? true : false} style={[style]}>
             <Avatar
@@ -147,15 +190,78 @@ const Message = React.memo(({ style, messageId }) => {
                     </HStack>
                 )}
                 <HStack space={2} reversed={self ? true : false} alignItems='center'>
-                    <Pressable onLongPress={openContextMenu} onStartShouldSetResponder={() => true} style={{ maxWidth: '80%' }}>
-                        <VStack>
+                    {/* <ContextMenu
+                        style={styles.contextMenuBox}
+                        actions={
+                            [
+                                {
+                                    title: "复制",
+                                },
+                                {
+                                    title: "引用",
+                                },
+                                {
+                                    title: "删除",
+                                }
+                            ]
+                        }
+                        onPress={hanleMenuLongPress}
+                    >
+                        <VStack
+                        >
                             {renderItem(type, self, status, content, contentMetadata, progress)}
                         </VStack>
-                    </Pressable>
+                    </ContextMenu> */}
+                    <GestureDetector
+                        gesture={Gesture.Exclusive(longPressGesture)}
+                    >
+                        <VStack style={styles.contextMenuBox}>
+                            {renderItem(type, self, status, content, contentMetadata, progress)}
+                        </VStack>
+                    </GestureDetector>
                     {messageStatusIcon}
                 </HStack>
-            </VStack>
-        </HStack>
+                <Menu
+                        opened={messageMenu.isOpen}
+                        onBackdropPress={onBackdropPress}
+                        onSelect={onOptionSelect}
+                    >
+                        <MenuTrigger />
+                        <MenuOptions
+                            optionsContainerStyle={{
+                                backgroundColor: '#4C4C4C',
+                                alignItems: 'center',
+                                borderRadius: 10,
+                                position: 'absolute',
+                                top: messageMenu.y,
+                                left: messageMenu.x
+                            }}
+                        >
+                            <MenuOption
+                                customStyles={{
+                                    optionText: styles.menuText
+                                }}
+                                value='copy'
+                                text='复制'
+                            />
+                            <MenuOption
+                                customStyles={{
+                                    optionText: styles.menuText
+                                }}
+                                value='quote'
+                                text='引用'
+                            />
+                            <MenuOption
+                                customStyles={{
+                                    optionText: styles.menuText
+                                }}
+                                value='delete'
+                                text='删除'
+                            />
+                        </MenuOptions>
+                    </Menu>
+            </VStack >
+        </HStack >
     )
 }, (prevProps, nextProps) => prevProps.messageId === nextProps.messageId)
 
@@ -163,6 +269,13 @@ const styles = StyleSheet.create({
     chatItemUserName: {
         color: 'grey',
         fontSize: 12,
+    },
+    contextMenuBox: {
+        maxWidth: '80%',
+    },
+    menuText: {
+        color: 'white',
+        fontSize: 18
     }
 })
 

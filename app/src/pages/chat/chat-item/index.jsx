@@ -15,6 +15,8 @@ import { createThumbnail } from "react-native-create-thumbnail";
 import { NativeModules } from 'react-native';
 import { fetchMessageByUserSessionId } from '../../../api/ApiService';
 import { useNavigation, } from '@react-navigation/native';
+import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import { MenuProvider } from 'react-native-popup-menu';
 
 const { MessageModule } = NativeModules
 
@@ -32,6 +34,8 @@ const ChatItem = ({ route }) => {
     const { messages, prevMsgId } = session
 
     const [endReachedCalledDuringMomentum, setEndReachedCalledDuringMomentum] = useState(true)
+
+    const chatItemFooterRef = useRef()
 
     const dispatch = useDispatch()
     useEffect(() => {
@@ -281,45 +285,61 @@ const ChatItem = ({ route }) => {
         }
     }
 
-    return (
+    const singleTap = Gesture.Tap()
+        .maxDuration(250)
+        .onStart(() => {
+            chatItemFooterRef.current?.closeMoreOps()
+        })
 
-        <VStack flex={1} justifyContent="space-between">
-            {/* <Pressable onPressIn={handleChatItemFooterOutside} flex={1}> */}
+    const longPressGesture = Gesture.LongPress().onEnd((e, success) => {
+        if (success) {
+
+        }
+    })
+
+    return (
+        <MenuProvider>
+            <VStack flex={1} justifyContent="space-between">
                 <ChatItemHeader title={session.name} />
                 <KeyboardAvoidingView
                     flex={1}
                     behavior={Platform.OS == "ios" ? "padding" : null}
                     keyboardVerticalOffset={Platform.OS === "ios" ? 64 : 0}
                 >
-                    <HStack flex={9} style={styles.contentHstack}>
-                        <FlatList
-                            style={styles.messageList}
-                            data={messageIds}
-                            renderItem={renderItem}
-                            scrollEnabled={true}
-                            inverted={true}
-                            onEndReached={() => {
-                                if (!endReachedCalledDuringMomentum) {
-                                    loadMoreData()
-                                    setEndReachedCalledDuringMomentum(true)
-                                }
-                            }}
-                            onEndReachedThreshold={0.01}
-                            onMomentumScrollBegin={() => setEndReachedCalledDuringMomentum(false)}
-                            contentContainerStyle={{
-                                flexGrow: 1,
-                                justifyContent: 'flex-end'
-                            }}
-                        />
-                    </HStack>
+                    <GestureDetector
+                        gesture={Gesture.Exclusive(singleTap)}
+                    >
+                        <HStack flex={9} style={styles.contentHstack}>
+                            <FlatList
+                                style={styles.messageList}
+                                data={messageIds}
+                                renderItem={renderItem}
+                                scrollEnabled={true}
+                                inverted={true}
+                                onEndReached={() => {
+                                    if (!endReachedCalledDuringMomentum) {
+                                        loadMoreData()
+                                        setEndReachedCalledDuringMomentum(true)
+                                    }
+                                }}
+                                onEndReachedThreshold={0.01}
+                                onMomentumScrollBegin={() => setEndReachedCalledDuringMomentum(false)}
+                                contentContainerStyle={{
+                                    flexGrow: 1,
+                                    justifyContent: 'flex-end'
+                                }}
+                            />
+                        </HStack>
+                    </GestureDetector>
                     <ChatItemFooter
+                        ref={chatItemFooterRef}
                         sendMessage={sendMessage}
                         sessionId={sessionId}
                     />
                 </KeyboardAvoidingView>
-            {/* </Pressable> */}
-        </VStack>
 
+            </VStack >
+        </MenuProvider>
     )
 }
 
