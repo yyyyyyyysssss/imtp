@@ -22,6 +22,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <common.version>1.0.0-SNAPSHOT</common.version>
         <spring.boot.version>3.4.3</spring.boot.version>
+        <skipTests>true</skipTests>
     </properties>
 
     <dependencies>

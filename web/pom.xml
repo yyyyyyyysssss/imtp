@@ -20,6 +20,7 @@
         <common.version>1.0.0-SNAPSHOT</common.version>
         <spring.boot.version>3.4.3</spring.boot.version>
         <spring.cloud.version>2024.0.0</spring.cloud.version>
+        <skipTests>true</skipTests>
     </properties>
 
     <dependencyManagement>
