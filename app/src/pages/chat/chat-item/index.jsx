@@ -337,7 +337,6 @@ const ChatItem = ({ route }) => {
                         sessionId={sessionId}
                     />
                 </KeyboardAvoidingView>
-
             </VStack >
         </MenuProvider>
     )

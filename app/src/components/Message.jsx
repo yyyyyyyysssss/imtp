@@ -1,4 +1,4 @@
-import { Avatar, HStack, Pressable, VStack, Text, Spinner, Divider } from 'native-base';
+import { Avatar, HStack, Pressable, VStack, Text, Spinner, Divider, Box } from 'native-base';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import AntDesignIcon from 'react-native-vector-icons/AntDesign';
@@ -20,7 +20,9 @@ import {
     MenuOptions,
     MenuOption,
     MenuTrigger,
+    renderers
 } from 'react-native-popup-menu';
+import Clipboard from '@react-native-clipboard/clipboard';
 
 const { UploadModule } = NativeModules
 const UploadModuleNativeEventEmitter = new NativeEventEmitter(UploadModule);
@@ -169,10 +171,20 @@ const Message = React.memo(({ style, messageId }) => {
         })
     }
 
-    const onOptionSelect = (value) => {
-        console.log(`Selected number: ${value}`)
+    const messageCopy = useCallback(() => {
+        Clipboard.setString(message.content)
         onBackdropPress()
-    }
+    },[message])
+
+    const messageQuote = useCallback(() => {
+        console.log('messageQuote')
+        onBackdropPress()
+    },[message])
+
+    const messageDelete = useCallback(() => {
+        console.log('messageDelete')
+        onBackdropPress()
+    },[])
 
     return (
         <HStack space={3} reversed={self ? true : false} style={[style]}>
@@ -190,28 +202,6 @@ const Message = React.memo(({ style, messageId }) => {
                     </HStack>
                 )}
                 <HStack space={2} reversed={self ? true : false} alignItems='center'>
-                    {/* <ContextMenu
-                        style={styles.contextMenuBox}
-                        actions={
-                            [
-                                {
-                                    title: "复制",
-                                },
-                                {
-                                    title: "引用",
-                                },
-                                {
-                                    title: "删除",
-                                }
-                            ]
-                        }
-                        onPress={hanleMenuLongPress}
-                    >
-                        <VStack
-                        >
-                            {renderItem(type, self, status, content, contentMetadata, progress)}
-                        </VStack>
-                    </ContextMenu> */}
                     <GestureDetector
                         gesture={Gesture.Exclusive(longPressGesture)}
                     >
@@ -222,44 +212,47 @@ const Message = React.memo(({ style, messageId }) => {
                     {messageStatusIcon}
                 </HStack>
                 <Menu
-                        opened={messageMenu.isOpen}
-                        onBackdropPress={onBackdropPress}
-                        onSelect={onOptionSelect}
+                    opened={messageMenu.isOpen}
+                    onBackdropPress={onBackdropPress}
+                >
+                    <MenuTrigger />
+                    <MenuOptions
+                        optionsContainerStyle={{
+                            backgroundColor: '#4C4C4C',
+                            alignItems: 'center',
+                            borderRadius: 10,
+                            width: 135,
+                            // position: 'absolute',
+                            // top: messageMenu.y,
+                            // left: messageMenu.x
+                        }}
                     >
-                        <MenuTrigger />
-                        <MenuOptions
-                            optionsContainerStyle={{
-                                backgroundColor: '#4C4C4C',
-                                alignItems: 'center',
-                                borderRadius: 10,
-                                position: 'absolute',
-                                top: messageMenu.y,
-                                left: messageMenu.x
+                        <MenuOption
+                            customStyles={{
+                                optionText: styles.menuText
                             }}
-                        >
-                            <MenuOption
-                                customStyles={{
-                                    optionText: styles.menuText
-                                }}
-                                value='copy'
-                                text='复制'
-                            />
-                            <MenuOption
-                                customStyles={{
-                                    optionText: styles.menuText
-                                }}
-                                value='quote'
-                                text='引用'
-                            />
-                            <MenuOption
-                                customStyles={{
-                                    optionText: styles.menuText
-                                }}
-                                value='delete'
-                                text='删除'
-                            />
-                        </MenuOptions>
-                    </Menu>
+                            onSelect={messageCopy}
+                            value='copy'
+                            text='复制'
+                        />
+                        <MenuOption
+                            customStyles={{
+                                optionText: styles.menuText
+                            }}
+                            onSelect={messageQuote}
+                            value='quote'
+                            text='引用'
+                        />
+                        <MenuOption
+                            customStyles={{
+                                optionText: styles.menuText
+                            }}
+                            onSelect={messageDelete}
+                            value='delete'
+                            text='删除'
+                        />
+                    </MenuOptions>
+                </Menu>
             </VStack >
         </HStack >
     )
