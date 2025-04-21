@@ -1,4 +1,4 @@
-import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
+import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
 import { Box, HStack, Text, VStack, Input, Pressable, Flex } from 'native-base';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons';
@@ -11,8 +11,10 @@ import { useNavigation, } from '@react-navigation/native';
 import { requestCameraPermission } from '../utils/PermissionRequest';
 import { useSelector } from 'react-redux';
 import { showToast } from './Utils';
+import QuoteMessage from './QuoteMessage';
+import reduxStore from '../redux/store';
 
-const ChatItemFooter = forwardRef(({ sendMessage, sessionId },ref) => {
+const ChatItemFooter = forwardRef(({ sendMessage, sessionId, quoteMessageId, setQuoteMessageId }, ref) => {
 
     const navigation = useNavigation()
 
@@ -30,11 +32,19 @@ const ChatItemFooter = forwardRef(({ sendMessage, sessionId },ref) => {
 
     const inputRef = useRef()
 
-    useImperativeHandle(ref,() => ({
+    useImperativeHandle(ref, () => ({
         closeMoreOps: () => {
             setIsOpen(false)
         }
     }))
+
+    useEffect(() => {
+        if(isVoice === null || isVoice === false ){
+            if(quoteMessageId){
+                inputRef.current.focus()
+            }
+        }
+    },[quoteMessageId,isVoice])
 
     const handleSubmit = (event) => {
         const text = event.nativeEvent.text
@@ -44,7 +54,7 @@ const ChatItemFooter = forwardRef(({ sendMessage, sessionId },ref) => {
         }
     }
 
-    const messageProvider = (media) => {
+    const messageProvider = useCallback((media) => {
         const { content, uri, type, fileName, fileSize, width, height, duration } = media
         let message = null
         if (type.startsWith('image')) {
@@ -91,8 +101,12 @@ const ChatItemFooter = forwardRef(({ sendMessage, sessionId },ref) => {
                 fileType: type
             }
         }
+        if(quoteMessageId){
+            const quoteMessage = reduxStore.getState().chat.entities.messages[quoteMessageId]
+            console.log('quoteMessage',quoteMessage)
+        }
         sendMessage(message)
-    }
+    },[quoteMessageId])
 
     const handleInputFocus = () => {
         setIsOpen(false)
@@ -296,12 +310,30 @@ const ChatItemFooter = forwardRef(({ sendMessage, sessionId },ref) => {
             })
     }
 
+    const calcHeight = useMemo(() => {
+        let height;
+        if (isOpen) {
+            if (quoteMessageId) {
+                height = 330
+            } else {
+                height = 300
+            }
+        } else {
+            if (quoteMessageId) {
+                height = 95
+            } else {
+                height = 65
+            }
+        }
+        return height
+    }, [isOpen, quoteMessageId])
+
     return (
         <>
             <VStack style={{
                 overflow: 'hidden',
+                height: calcHeight,
                 paddingTop: 5,
-                height: isOpen ? 300 : 65,
                 backgroundColor: '#F5F5F5',
                 shadowColor: '#000',
                 shadowOffset: { width: 1, height: 1 },
@@ -309,7 +341,7 @@ const ChatItemFooter = forwardRef(({ sendMessage, sessionId },ref) => {
                 shadowRadius: 3,
                 elevation: 5,
                 borderTopColor: 'blank',
-                borderTopWidth: 0.1
+                borderTopWidth: 0.1,
             }}>
                 <HStack
                     flex={1}
@@ -379,6 +411,15 @@ const ChatItemFooter = forwardRef(({ sendMessage, sessionId },ref) => {
 
                     </HStack>
                 </HStack>
+                {quoteMessageId && (
+                    <HStack>
+                        <HStack flex={1} />
+                        <HStack flex={5.5} marginBottom={2}>
+                            <QuoteMessage messageId={quoteMessageId} close={() => setQuoteMessageId(null)} />
+                        </HStack>
+                        <HStack flex={2.5} />
+                    </HStack>
+                )}
                 {isOpen && (
                     <Flex
                         direction="column"

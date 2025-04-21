@@ -30,6 +30,8 @@ const ChatItem = ({ route }) => {
 
     const [messageIds, setMessageIds] = useState([])
 
+    const [quoteMessageId, setQuoteMessageId] = useState()
+
     const session = useSelector(state => state.chat.entities.sessions[sessionId])
     const { messages, prevMsgId } = session
 
@@ -38,6 +40,8 @@ const ChatItem = ({ route }) => {
     const chatItemFooterRef = useRef()
 
     const dispatch = useDispatch()
+
+
     useEffect(() => {
         const fetchData = async () => {
             const data = await fetchMessageByUserSessionId(sessionId)
@@ -81,9 +85,13 @@ const ChatItem = ({ route }) => {
 
     const renderItem = ({ item, index }) => {
         return (
-            <Message style={{ marginTop: 30 }} messageId={item} />
+            <Message style={{ marginTop: 30, padding: 10 }} sessionId={sessionId} messageId={item} quote={quote} />
         )
     }
+
+    const quote = useCallback((messageId) => {
+        setQuoteMessageId(messageId)
+    },[quoteMessageId])
 
     const sendMessage = useCallback((message) => {
         const { content, type, width, height, duration, filePath, fileName, fileType, fileSize } = message
@@ -238,6 +246,7 @@ const ChatItem = ({ route }) => {
             default:
                 showToast("Unsupported message type")
         }
+        setQuoteMessageId(null)
     }, [])
 
     const realSendMessage = (msg) => {
@@ -291,12 +300,6 @@ const ChatItem = ({ route }) => {
             chatItemFooterRef.current?.closeMoreOps()
         })
 
-    const longPressGesture = Gesture.LongPress().onEnd((e, success) => {
-        if (success) {
-
-        }
-    })
-
     return (
         <MenuProvider>
             <VStack flex={1} justifyContent="space-between">
@@ -335,6 +338,8 @@ const ChatItem = ({ route }) => {
                         ref={chatItemFooterRef}
                         sendMessage={sendMessage}
                         sessionId={sessionId}
+                        quoteMessageId={quoteMessageId}
+                        setQuoteMessageId={setQuoteMessageId}
                     />
                 </KeyboardAvoidingView>
             </VStack >
@@ -350,7 +355,7 @@ const styles = StyleSheet.create({
 
     },
     messageList: {
-        padding: 10
+
     },
     footerHstack: {
 

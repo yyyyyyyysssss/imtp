@@ -144,7 +144,11 @@ export const chatSlice = createSlice({
             state.entities.messages[id] = { ...message, status: newStatus }
         },
         deleteMessage: (state, action) => {
-
+            const { payload } = action
+            const { id, sessionId } = payload
+            const messages = state.entities.sessions[sessionId].messages
+            const newMessages = messages.filter(item => item !== id)
+            state.entities.sessions[sessionId].messages = newMessages
         },
         loadUserFriend: (state, action) => {
             const { payload } = action

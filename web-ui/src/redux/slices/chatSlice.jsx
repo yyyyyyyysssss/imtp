@@ -168,16 +168,12 @@ export const chatSlice = createSlice({
         deleteMessage: (state, action) => {
             const { payload } = action
             const { id, sessionId } = payload
-            //删除对应消息
-            delete state.entities.messages[message.id]
             const messages = state.entities.sessions[sessionId].messages
-            const index = messages.indexOf(id)
-            console.log('index',index)
             //移除会话消息id数组中的元素
             const newMessages = messages.filter(item => item !== id)
             state.entities.sessions[sessionId].messages = newMessages
-            //更新滚动索引
-            // state.entities.sessions[sessionId].scrollToIndex = index
+            //删除对应消息
+            delete state.entities.messages[id]
 
         },
         scrollToBottom: (state, action) => {

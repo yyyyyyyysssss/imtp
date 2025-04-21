@@ -1,59 +1,46 @@
-import { Avatar, HStack, Pressable, VStack, Text, Spinner, Divider, Box } from 'native-base';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { Avatar, HStack, VStack, Text, Spinner, Divider, Box, Actionsheet } from 'native-base';
+import React, { useCallback, useEffect, useState } from 'react';
+import { StyleSheet } from 'react-native';
 import AntDesignIcon from 'react-native-vector-icons/AntDesign';
 import TextMessage from './TextMessage';
 import ImageMessage from './ImageMessage';
 import FileMessage from './FileMessage';
 import VideoMessage from './VideoMessage';
 import { MessageType, MessageStatus } from '../enum';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { NativeModules, NativeEventEmitter } from 'react-native';
 import ProgressOverlayBox from './ProgressOverlayBox';
 import VoiceMessage from './VoiceMessage';
 import VideoCallMessage from './VideoCallMessage';
 import VoiceCallMessage from './VoiceCallMessage';
-import ContextMenu from "react-native-context-menu-view";
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import {
     Menu,
     MenuOptions,
     MenuOption,
-    MenuTrigger,
-    renderers
+    MenuTrigger
 } from 'react-native-popup-menu';
 import Clipboard from '@react-native-clipboard/clipboard';
+import { deleteMessage } from '../redux/slices/chatSlice';
 
 const { UploadModule } = NativeModules
 const UploadModuleNativeEventEmitter = new NativeEventEmitter(UploadModule);
 
-const Message = React.memo(({ style, messageId }) => {
+const Message = React.memo(({ style, sessionId, messageId, quote }) => {
 
     const message = useSelector(state => state.chat.entities.messages[messageId])
+
+    const dispatch = useDispatch()
 
     const [progress, setProgress] = useState(0.01)
 
     const { type, name, avatar, deliveryMethod, self, status, content, contentMetadata, progressId } = message || {}
 
     const [messageMenu, setMessageMenu] = useState({
-        isOpen: false,
-        x: 0,
-        y: 0
+        isOpen: false
     })
 
-    const openContextMenu = (event) => {
-        const { pageX, pageY } = event.nativeEvent
-        console.log('openContextMenu', { pageX, pageY })
-        setMessageMenu({
-            isOpen: true
-        })
-    }
-
-    const closeContextMenu = () => {
-        setMessageMenu({
-            isOpen: false
-        })
-    }
+    const [isDelete, setIsDelete] = useState(false)
 
     useEffect(() => {
         let progressEventEmitter;
@@ -143,13 +130,6 @@ const Message = React.memo(({ style, messageId }) => {
         }
     }, [])
 
-    const menuRef = useRef()
-
-    const hanleMenuLongPress = (e) => {
-        console.log('hanleMenuLongPress')
-        onTriggerPress()
-    }
-
     const longPressGesture = Gesture.LongPress().onStart((e) => {
         const { absoluteX, absoluteY } = e
         onTriggerPress(absoluteX, absoluteY)
@@ -158,33 +138,38 @@ const Message = React.memo(({ style, messageId }) => {
     const onTriggerPress = (x = 0, y = 0) => {
         setMessageMenu({
             isOpen: true,
-            x: x,
-            y: y
         })
     }
 
     const onBackdropPress = () => {
         setMessageMenu({
             isOpen: false,
-            x: 0,
-            y: 0
         })
     }
 
     const messageCopy = useCallback(() => {
         Clipboard.setString(message.content)
         onBackdropPress()
-    },[message])
+    }, [message])
 
     const messageQuote = useCallback(() => {
-        console.log('messageQuote')
+        quote(messageId)
         onBackdropPress()
-    },[message])
+    }, [messageId])
 
     const messageDelete = useCallback(() => {
-        console.log('messageDelete')
+        setIsDelete(true)
         onBackdropPress()
-    },[])
+    }, [isDelete])
+
+    const confirmDelete = () => {
+        setIsDelete(false)
+        dispatch(deleteMessage({ id: messageId, sessionId: sessionId }))
+    }
+
+    const cancelDelete = () => {
+        setIsDelete(false)
+    }
 
     return (
         <HStack space={3} reversed={self ? true : false} style={[style]}>
@@ -222,9 +207,6 @@ const Message = React.memo(({ style, messageId }) => {
                             alignItems: 'center',
                             borderRadius: 10,
                             width: 135,
-                            // position: 'absolute',
-                            // top: messageMenu.y,
-                            // left: messageMenu.x
                         }}
                     >
                         <MenuOption
@@ -253,6 +235,17 @@ const Message = React.memo(({ style, messageId }) => {
                         />
                     </MenuOptions>
                 </Menu>
+                <Actionsheet isOpen={isDelete} onClose={() => setIsDelete(false)}>
+                    <Actionsheet.Content>
+                        <Box padding={5}>
+                            <Text textAlign='center' style={{ color: 'gray', fontSize: 14 }}>是否删除该条消息？</Text>
+                        </Box>
+                        <Divider />
+                        <Actionsheet.Item onPress={confirmDelete} alignItems='center'><Text style={{ color: 'red', fontSize: 18 }}>确定</Text></Actionsheet.Item>
+                        <Divider />
+                        <Actionsheet.Item onPress={cancelDelete} alignItems='center'><Text style={{ color: 'black', fontSize: 18 }}>取消</Text></Actionsheet.Item>
+                    </Actionsheet.Content>
+                </Actionsheet>
             </VStack >
         </HStack >
     )

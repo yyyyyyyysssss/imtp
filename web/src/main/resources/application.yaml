@@ -72,8 +72,8 @@ zookeeper:
 minio:
   endpoint: http://localhost:9000
   bucketName: y-chat-bucket
-  accessKey: xxx
-  secretKey: xxx
+  accessKey: e8VEFNP1QADzIYqCyrkS
+  secretKey: Cw7X1UMZc5Z6cnTxaqLOhndpD1d9rVphmzeI7fut
 
 mybatis-plus:
   mapper-locations: classpath:mapper/*xml
