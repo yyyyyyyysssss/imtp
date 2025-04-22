@@ -12,7 +12,7 @@
     <modules>
         <module>desktop</module>
         <module>server</module>
-        <module>web</module>
+        <module>api</module>
         <module>common</module>
     </modules>
 
