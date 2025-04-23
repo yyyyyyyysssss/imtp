@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Avatar, VStack, HStack, Text, Pressable } from 'native-base';
 import { StyleSheet } from 'react-native';
 import { formatChatDate } from '../utils/FormatUtil';
 import { useSelector } from 'react-redux';
-import { DeliveryMethod, MessageType } from '../enum';
+import { DeliveryMethod, shortMessage } from '../enum';
 
 const UserSessionItem = React.memo(({ sessionId }) => {
 
@@ -11,33 +11,13 @@ const UserSessionItem = React.memo(({ sessionId }) => {
 
     const { name, avatar, lastMsgType, lastUserName, lastMsgContent, lastMsgTime, deliveryMethod, unreadMessageCount } = session || {}
 
-    let messageContent;
-    switch (lastMsgType) {
-        case MessageType.TEXT_MESSAGE:
-            messageContent = lastMsgContent
-            break
-        case MessageType.IMAGE_MESSAGE:
-            messageContent = '[图片]'
-            break
-        case MessageType.VIDEO_MESSAGE:
-            messageContent = '[视频]'
-            break
-        case MessageType.FILE_MESSAGE:
-            messageContent = '[文件]'
-            break
-        case MessageType.VOICE_MESSAGE:
-            messageContent = '[语音]'
-            break
-        case MessageType.VOICE_CALL_MESSAGE:
-            messageContent = '[语音通话]'
-            break
-        case MessageType.VIDEO_CALL_MESSAGE:
-            messageContent = '[视频通话]'
-            break
-    }
-    if (messageContent && deliveryMethod === DeliveryMethod.GROUP) {
-        messageContent = lastUserName + ': ' + messageContent
-    }
+    const messageContent = useMemo(() => {
+        const m = shortMessage(lastMsgType, lastMsgContent)
+        if (m && deliveryMethod === DeliveryMethod.GROUP) {
+            m = lastUserName + ': ' + m
+        }
+        return m
+    }, [lastMsgType, lastMsgContent, deliveryMethod, lastUserName])
 
     return (
         <HStack space={5}>

@@ -11,7 +11,7 @@ import { useNavigation, } from '@react-navigation/native';
 import { requestCameraPermission } from '../utils/PermissionRequest';
 import { useSelector } from 'react-redux';
 import { showToast } from './Utils';
-import QuoteMessage from './QuoteMessage';
+import MessageQuote from './MessageQuote';
 import reduxStore from '../redux/store';
 
 const ChatItemFooter = forwardRef(({ sendMessage, sessionId, quoteMessageId, setQuoteMessageId }, ref) => {
@@ -19,6 +19,13 @@ const ChatItemFooter = forwardRef(({ sendMessage, sessionId, quoteMessageId, set
     const navigation = useNavigation()
 
     const call = useSelector(state => state.chat.call)
+
+    const quoteMessage = useSelector(state => {
+        if (!quoteMessageId) {
+            return null
+        }
+        return state.chat.entities.messages[quoteMessageId]
+    })
 
     const { flag: callFlag, callType } = call
 
@@ -39,12 +46,12 @@ const ChatItemFooter = forwardRef(({ sendMessage, sessionId, quoteMessageId, set
     }))
 
     useEffect(() => {
-        if(isVoice === null || isVoice === false ){
-            if(quoteMessageId){
+        if (isVoice === null || isVoice === false) {
+            if (quoteMessageId) {
                 inputRef.current.focus()
             }
         }
-    },[quoteMessageId,isVoice])
+    }, [quoteMessageId, isVoice])
 
     const handleSubmit = (event) => {
         const text = event.nativeEvent.text
@@ -101,12 +108,19 @@ const ChatItemFooter = forwardRef(({ sendMessage, sessionId, quoteMessageId, set
                 fileType: type
             }
         }
-        if(quoteMessageId){
-            const quoteMessage = reduxStore.getState().chat.entities.messages[quoteMessageId]
-            console.log('quoteMessage',quoteMessage)
+        if (quoteMessage) {
+            message.quoteMessage = {
+                type: quoteMessage.type,
+                name: quoteMessage.name,
+                content: quoteMessage.content,
+                self: quoteMessage.self,
+                contentMetadata: { ...quoteMessage.contentMetadata, quoteMessage: null }
+            }
+        }else {
+            message.quoteMessage = null
         }
         sendMessage(message)
-    },[quoteMessageId])
+    }, [quoteMessageId])
 
     const handleInputFocus = () => {
         setIsOpen(false)
@@ -415,7 +429,7 @@ const ChatItemFooter = forwardRef(({ sendMessage, sessionId, quoteMessageId, set
                     <HStack>
                         <HStack flex={1} />
                         <HStack flex={5.5} marginBottom={2}>
-                            <QuoteMessage messageId={quoteMessageId} close={() => setQuoteMessageId(null)} />
+                            <MessageQuote message={quoteMessage} close={() => setQuoteMessageId(null)} />
                         </HStack>
                         <HStack flex={2.5} />
                     </HStack>

@@ -6,7 +6,7 @@ import { MessageStatus } from '../enum';
 import { savePicture } from '../utils/CameraRollUtil';
 
 
-const ImageMessage = React.memo(({ content, status }) => {
+const ImageMessage = React.memo(({ content, status, size = 200 }) => {
 
     const [showImage, setShowImage] = useState({
         isVisible: false,
@@ -48,7 +48,7 @@ const ImageMessage = React.memo(({ content, status }) => {
                 >
                     <Image
                         rounded={8}
-                        size={200}
+                        size={size}
                         shadow={3}
                         resizeMode='cover'
                         source={{

@@ -91,14 +91,19 @@ const ChatItem = ({ route }) => {
 
     const quote = useCallback((messageId) => {
         setQuoteMessageId(messageId)
-    },[quoteMessageId])
+    }, [quoteMessageId])
 
     const sendMessage = useCallback((message) => {
-        const { content, type, width, height, duration, filePath, fileName, fileType, fileSize } = message
+        const { content, type, width, height, duration, filePath, fileName, fileType, fileSize, quoteMessage } = message
         let msg;
         switch (type) {
             case MessageType.TEXT_MESSAGE:
                 msg = messageBase(content, type)
+                if (quoteMessage) {
+                    msg.contentMetadata = {
+                        quoteMessage: quoteMessage,
+                    }
+                }
                 //添加消息
                 dispatch(addMessage({ sessionId: sessionId, message: msg }))
                 //向服务器发送消息
@@ -108,6 +113,7 @@ const ChatItem = ({ route }) => {
                 msg = messageBase(filePath, type)
                 msg.progressId = IdGen.nextId()
                 msg.contentMetadata = {
+                    quoteMessage: quoteMessage,
                     name: fileName,
                     width: width,
                     height: height,
@@ -137,6 +143,7 @@ const ChatItem = ({ route }) => {
                 const minutes = Math.floor(duration / 60);
                 const seconds = Math.floor(duration % 60);
                 msg.contentMetadata = {
+                    quoteMessage: quoteMessage,
                     name: fileName,
                     width: width,
                     height: height,
@@ -195,6 +202,7 @@ const ChatItem = ({ route }) => {
             case MessageType.VOICE_MESSAGE:
                 msg = messageBase(filePath, type)
                 msg.contentMetadata = {
+                    quoteMessage: quoteMessage,
                     name: fileName,
                     mediaType: fileType,
                     size: fileSize,
@@ -222,6 +230,7 @@ const ChatItem = ({ route }) => {
                 msg = messageBase(filePath, type)
                 msg.progressId = IdGen.nextId()
                 msg.contentMetadata = {
+                    quoteMessage: quoteMessage,
                     name: fileName,
                     mediaType: fileType,
                     size: fileSize,

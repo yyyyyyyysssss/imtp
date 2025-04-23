@@ -89,15 +89,15 @@ export const chatSlice = createSlice({
                     state.entities.sessions[sessionId].messages.unshift(message.id)
                 }
                 firstMessage = message
-                if(!lastMessage){
+                if (!lastMessage) {
                     lastMessage = message
                 }
             });
-            if(firstMessage){
+            if (firstMessage) {
                 state.entities.sessions[sessionId].prevMsgId = firstMessage.id
             }
-            if(messageInit === undefined || messageInit === false){
-                if(!state.entities.sessions[sessionId].lastMsgContent && lastMessage){
+            if (messageInit === undefined || messageInit === false) {
+                if (!state.entities.sessions[sessionId].lastMsgContent && lastMessage) {
                     state.entities.sessions[sessionId].lastMsgType = lastMessage.type
                     state.entities.sessions[sessionId].lastMsgContent = lastMessage.content
                     state.entities.sessions[sessionId].lastMsgTime = lastMessage.timestamp
@@ -149,6 +149,12 @@ export const chatSlice = createSlice({
             const messages = state.entities.sessions[sessionId].messages
             const newMessages = messages.filter(item => item !== id)
             state.entities.sessions[sessionId].messages = newMessages
+            const message = state.entities.messages[newMessages[0]]
+            //更新会话最新消息
+            state.entities.sessions[sessionId].lastMsgType = message.type
+            state.entities.sessions[sessionId].lastMsgContent = message.content
+            state.entities.sessions[sessionId].lastMsgTime = message.timestamp
+            state.entities.sessions[sessionId].lastUserName = message.name
         },
         loadUserFriend: (state, action) => {
             const { payload } = action

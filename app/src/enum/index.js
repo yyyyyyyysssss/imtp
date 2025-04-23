@@ -15,6 +15,27 @@ export const MessageType = Object.freeze({
     SIGNALING_CLOSE: 49,
 })
 
+export const shortMessage = (messageType, content) => {
+    switch (messageType) {
+        case MessageType.TEXT_MESSAGE:
+            return content
+        case MessageType.IMAGE_MESSAGE:
+            return '[图片]'
+        case MessageType.VIDEO_MESSAGE:
+            return '[视频]'
+        case MessageType.FILE_MESSAGE:
+            return '[文件]'
+        case MessageType.VOICE_MESSAGE:
+            return '[语音]'
+        case MessageType.VOICE_CALL_MESSAGE:
+            return '[语音通话]'
+        case MessageType.VIDEO_CALL_MESSAGE:
+            return '[视频通话]'
+        default: 
+            return null
+    }
+}
+
 
 export const MessageStatus = Object.freeze({
     PENDING: 'PENDING',

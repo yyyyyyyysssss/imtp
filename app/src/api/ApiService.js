@@ -130,6 +130,18 @@ export const fetchMessageByUserSessionId = (sessionId, prevMsgId = null, pageNum
     })
 }
 
+// 删除消息
+export const deleteUserMessageById = (messageId) => {
+    const deleteUserMessageReq = {
+        id: messageId
+    }
+    return new Promise((resolve, reject) => {
+        api.delete('/social/userMessage/{userId}', { data: deleteUserMessageReq })
+            .then(res => resolve(res.data))
+            .catch(error => handleError)
+    })
+}
+
 // 获取用户好友
 export const fetchUserFriends = () => {
 

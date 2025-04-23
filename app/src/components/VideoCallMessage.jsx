@@ -6,41 +6,48 @@ import { VideoCallMessageIcon } from './CustomIcon';
 
 const VideoCallMessage = React.memo(({ callStatus, self, duration, durationDesc }) => {
 
-    let content
-    switch (callStatus) {
-        case CallStatus.COMPLETED:
-            content = '通话时长'
-            break
-        case CallStatus.CANCELLED:
-            content = self ? '已取消' : '对方已取消'
-            break
-        case CallStatus.REFUSED:
-            content = self ? '对方已拒接' : '已拒接'
-            break
-        case CallStatus.INTERRUPTED:
-            content = '通话中断'
-            break
-    }
-
     return (
         <Box style={self ? styles.chatItemMessageBoxRight : styles.chatItemMessageBoxLeft}>
             <Box style={self ? styles.chatItemMessageBoxRightArrow : styles.chatItemMessageBoxLeftArrow} />
-            <HStack space={2} justifyContent='center' alignItems='center'>
-                <VideoCallMessageIcon size={7} style={{color: 'black'}} />
-                <Text style={styles.chatItemMessageText}>
-                    {content}
-                </Text>
-                {callStatus === CallStatus.COMPLETED && (
-                    <Text style={styles.chatItemMessageText}>
-                        {durationDesc}
-                    </Text>
-                )}
-            </HStack>
+            <SubVideoCallMessage callStatus={callStatus} self={self} durationDesc={durationDesc}/>
 
         </Box>
     )
 
 })
+
+export const SubVideoCallMessage = ({ callStatus, self, durationDesc }) => {
+
+    let content
+        switch (callStatus) {
+            case CallStatus.COMPLETED:
+                content = '通话时长'
+                break
+            case CallStatus.CANCELLED:
+                content = self ? '已取消' : '对方已取消'
+                break
+            case CallStatus.REFUSED:
+                content = self ? '对方已拒接' : '已拒接'
+                break
+            case CallStatus.INTERRUPTED:
+                content = '通话中断'
+                break
+        }
+
+    return (
+        <HStack space={2} justifyContent='center' alignItems='center'>
+            <VideoCallMessageIcon size={7} style={{ color: 'black' }} />
+            <Text style={styles.chatItemMessageText}>
+                {content}
+            </Text>
+            {callStatus === CallStatus.COMPLETED && (
+                <Text style={styles.chatItemMessageText}>
+                    {durationDesc}
+                </Text>
+            )}
+        </HStack>
+    )
+}
 
 const styles = StyleSheet.create({
     chatItemMessageBoxLeft: {

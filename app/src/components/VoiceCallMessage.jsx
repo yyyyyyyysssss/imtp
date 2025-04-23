@@ -6,6 +6,18 @@ import { VoiceCallMessageIcon } from './CustomIcon';
 
 const VoiceCallMessage = React.memo(({ callStatus, self, duration, durationDesc }) => {
 
+    return (
+        <Box style={self ? styles.chatItemMessageBoxRight : styles.chatItemMessageBoxLeft}>
+            <Box style={self ? styles.chatItemMessageBoxRightArrow : styles.chatItemMessageBoxLeftArrow} />
+            <SubVoiceCallMessage callStatus={callStatus} self={self} durationDesc={durationDesc}/>
+        </Box>
+    )
+
+})
+
+
+export const SubVoiceCallMessage = ({ callStatus, self, durationDesc }) => {
+
     let content
     switch (callStatus) {
         case CallStatus.COMPLETED:
@@ -23,24 +35,19 @@ const VoiceCallMessage = React.memo(({ callStatus, self, duration, durationDesc 
     }
 
     return (
-        <Box style={self ? styles.chatItemMessageBoxRight : styles.chatItemMessageBoxLeft }>
-            <Box style={self ? styles.chatItemMessageBoxRightArrow : styles.chatItemMessageBoxLeftArrow} />
-            <HStack space={2} justifyContent='center' alignItems='center'>
-                <VoiceCallMessageIcon size={7} style={{color: 'black'}} />
+        <HStack space={2} justifyContent='center' alignItems='center'>
+            <VoiceCallMessageIcon size={7} style={{ color: 'black' }} />
+            <Text style={styles.chatItemMessageText}>
+                {content}
+            </Text>
+            {callStatus === CallStatus.COMPLETED && (
                 <Text style={styles.chatItemMessageText}>
-                    {content}
+                    {durationDesc}
                 </Text>
-                {callStatus === CallStatus.COMPLETED && (
-                    <Text style={styles.chatItemMessageText}>
-                        {durationDesc}
-                    </Text>
-                )}
-            </HStack>
-
-        </Box>
+            )}
+        </HStack>
     )
-
-})
+}
 
 const styles = StyleSheet.create({
     chatItemMessageBoxLeft: {

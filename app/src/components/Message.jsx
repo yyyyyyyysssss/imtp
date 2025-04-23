@@ -22,6 +22,8 @@ import {
 } from 'react-native-popup-menu';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { deleteMessage } from '../redux/slices/chatSlice';
+import MessageQuote from './MessageQuote';
+import { deleteUserMessageById } from '../api/ApiService';
 
 const { UploadModule } = NativeModules
 const UploadModuleNativeEventEmitter = new NativeEventEmitter(UploadModule);
@@ -164,6 +166,7 @@ const Message = React.memo(({ style, sessionId, messageId, quote }) => {
 
     const confirmDelete = () => {
         setIsDelete(false)
+        deleteUserMessageById(messageId)
         dispatch(deleteMessage({ id: messageId, sessionId: sessionId }))
     }
 
@@ -180,7 +183,7 @@ const Message = React.memo(({ style, sessionId, messageId, quote }) => {
                 }}
                 source={{ uri: avatar }}
             />
-            <VStack flex={1} justifyContent='center' alignItems={self ? 'flex-end' : 'flex-start'}  >
+            <VStack space={1} flex={1} justifyContent='center' alignItems={self ? 'flex-end' : 'flex-start'}  >
                 {!self && deliveryMethod === 'GROUP' && (
                     <HStack>
                         <Text style={styles.chatItemUserName}>{name}</Text>
@@ -196,6 +199,9 @@ const Message = React.memo(({ style, sessionId, messageId, quote }) => {
                     </GestureDetector>
                     {messageStatusIcon}
                 </HStack>
+                {contentMetadata?.quoteMessage && (
+                    <MessageQuote message={contentMetadata?.quoteMessage} type='display'/>
+                )}
                 <Menu
                     opened={messageMenu.isOpen}
                     onBackdropPress={onBackdropPress}

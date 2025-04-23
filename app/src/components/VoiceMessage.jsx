@@ -59,9 +59,9 @@ const VoiceMessage = React.memo(({ content, status, duration, direction }) => {
             }
             if (playRef.current.isPlaying) {
                 setPlaying(true)
-                playRef.current.on('ended',() => {
+                playRef.current.on('ended', () => {
                     setPlaying(false)
-                }) 
+                })
             }
         })
     }
@@ -69,35 +69,91 @@ const VoiceMessage = React.memo(({ content, status, duration, direction }) => {
     return (
         <Box width={calcWidthByDuration} style={direction === 'LEFT' ? styles.chatItemMessageBoxLeft : styles.chatItemMessageBoxRight}>
             <Box style={direction === 'LEFT' ? styles.chatItemMessageBoxLeftArrow : styles.chatItemMessageBoxRightArrow} />
-            <Pressable onPress={playVoice} hitSlop={7}>
-                <HStack opacity={status && status === MessageStatus.PENDING ? 0 : 1} reversed={direction === 'LEFT' ? true : false} justifyContent={direction === 'LEFT' ? 'flex-start' : 'flex-end'} alignItems='center'>
-                    <Text style={styles.durationText}>{durationDesc}</Text>
-
-                    {
-                        playing ?
-                            (
-                                <FastImage
-                                    style={{ width: 28, height: 28, transform: direction === 'LEFT' ? [{ rotate: '90deg' }] : [{ rotate: '-90deg' }] }}
-                                    source={require('../assets/gif/voice-play.gif')}
-                                    resizeMode={FastImage.resizeMode.contain}
-                                />
-                            )
-                            :
-                            (
-                                <Image
-                                    style={{ transform: direction === 'LEFT' ? [{ rotate: '90deg' }] : [{ rotate: '-90deg' }] }}
-                                    alt=''
-                                    size={28}
-                                    source={require('../assets/gif/voice-play.gif')}
-                                />
-                            )
-                    }
-
-                </HStack>
-            </Pressable>
+            <VoicePlay content={content} status={status} duration={duration} direction={direction}/>
         </Box>
     )
 })
+
+export const VoicePlay = ({ content, status, duration, direction }) => {
+
+    const [playing, setPlaying] = useState(false)
+
+    const playRef = useRef()
+
+    useEffect(() => {
+        return () => {
+            playRef.current?.destroy()
+        }
+    }, [])
+
+    useEffect(() => {
+        if (playRef.current) {
+            playRef.current.destroy()
+        }
+        playRef.current = new Player(content, {
+            autoDestroy: false,
+            continuesToPlayInBackground: false,
+            mixWithOthers: false
+        })
+        if (Platform.OS === 'android') {
+            playRef.current.speed = 0.0
+        }
+    }, [content])
+
+    const durationDesc = useMemo(() => {
+
+        return Math.floor(duration / 1000) + '\'\''
+    }, [duration])
+
+    const playVoice = () => {
+        if (playRef.current.isPlaying) {
+            playRef.current.stop()
+            setPlaying(false)
+            return
+        }
+        playRef.current.play((err) => {
+            if (err) {
+                console.log('play', err)
+            }
+            if (playRef.current.isPlaying) {
+                setPlaying(true)
+                playRef.current.on('ended', () => {
+                    setPlaying(false)
+                })
+            }
+        })
+    }
+
+    return (
+        <Pressable onPress={playVoice} hitSlop={7}>
+            <HStack opacity={status && status === MessageStatus.PENDING ? 0 : 1} reversed={direction === 'LEFT' ? true : false} justifyContent={direction === 'LEFT' ? 'flex-start' : 'flex-end'} alignItems='center'>
+                <Text style={styles.durationText}>{durationDesc}</Text>
+
+                {
+                    playing ?
+                        (
+                            <FastImage
+                                style={{ width: 28, height: 28, transform: direction === 'LEFT' ? [{ rotate: '90deg' }] : [{ rotate: '-90deg' }] }}
+                                source={require('../assets/gif/voice-play.gif')}
+                                resizeMode={FastImage.resizeMode.contain}
+                            />
+                        )
+                        :
+                        (
+                            <Image
+                                style={{ transform: direction === 'LEFT' ? [{ rotate: '90deg' }] : [{ rotate: '-90deg' }] }}
+                                alt=''
+                                size={28}
+                                source={require('../assets/gif/voice-play.gif')}
+                            />
+                        )
+                }
+
+            </HStack>
+        </Pressable>
+    )
+}
+
 
 const styles = StyleSheet.create({
     chatItemMessageBoxLeft: {

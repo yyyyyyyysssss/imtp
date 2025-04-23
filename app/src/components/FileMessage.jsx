@@ -1,9 +1,7 @@
-import React, { useEffect } from 'react';
-import { Box, HStack, Text, VStack, Spinner } from 'native-base';
+import React from 'react';
+import { Box, HStack, Text, VStack } from 'native-base';
 import { StyleSheet } from 'react-native';
 import AntDesign from 'react-native-vector-icons/AntDesign';
-import { MessageStatus } from '../enum';
-import * as Progress from 'react-native-progress';
 
 
 const FileMessage = React.memo(({ filename, fileSize }) => {
@@ -16,18 +14,29 @@ const FileMessage = React.memo(({ filename, fileSize }) => {
                 alignItems: 'center'
             }}
         >
-            <HStack shadow={1} style={styles.rootHStack} space={2} justifyContent='center' alignItems='center'>
-                <VStack flex={8} style={styles.leftVstack} justifyContent='space-between'>
-                    <Text numberOfLines={2} style={styles.leftVstackName}>{filename}</Text>
-                    <Text style={styles.leftVstackSize}>{fileSize}</Text>
-                </VStack>
-                <VStack flex={2} style={styles.rightVstack} justifyContent='center'>
-                    <AntDesign name="file1" size={40} />
-                </VStack>
+            <HStack shadow={1} style={styles.rootHStack} >
+                <SubFilemessage filename={filename} fileSize={fileSize} />
             </HStack>
         </Box>
     )
 })
+
+export const SubFilemessage = ({ filename, fileSize, size = 'large', justifyContent = 'center', alignItems = 'center' }) => {
+
+    return (
+        <HStack flex={1} space={2} justifyContent={justifyContent} alignItems={alignItems}>
+            <VStack flex={8} style={styles.leftVstack} justifyContent='space-between'>
+                <Text numberOfLines={2} style={styles.leftVstackName}>{filename}</Text>
+                {fileSize && (
+                    <Text style={styles.leftVstackSize}>{fileSize}</Text>
+                )}
+            </VStack>
+            <VStack flex={2} style={styles.rightVstack} justifyContent='center'>
+                <AntDesign name="file1" size={size === 'large' ? 40 : 30} />
+            </VStack>
+        </HStack>
+    )
+}
 
 const styles = StyleSheet.create({
     rootHStack: {
