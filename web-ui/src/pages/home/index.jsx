@@ -12,9 +12,10 @@ import Friend from '../friend';
 import Group from '../group';
 import './index.less';
 import { useDispatch, useSelector } from 'react-redux';
-import { setUserInfo,switchPanel } from '../../redux/slices/chatSlice';
+import { setUserInfo, switchPanel } from '../../redux/slices/chatSlice';
 import { fetchUserInfo } from '../../api/ApiService';
 import Header from '../../components/header';
+import { useState } from "react";
 
 const { TabPane } = Tabs;
 
@@ -29,14 +30,19 @@ const Home = () => {
 
     const panel = useSelector(state => state.chat.panel)
 
+    const [dimensions, setDimensions] = useState({
+        width: 1000,
+        height: 750,
+    })
+
     useLayoutEffect(() => {
         const fetchData = async () => {
             const userInfo = await fetchUserInfo()
-            dispatch(setUserInfo({userInfo: userInfo}))
+            dispatch(setUserInfo({ userInfo: userInfo }))
         }
         fetchData()
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    },[])
+    }, [])
     //好友组件引用
     const friendRef = useRef();
     //群组组件引用
@@ -44,7 +50,7 @@ const Home = () => {
 
     //切换面板
     const handleSwitchPanel = (panelKey) => {
-        dispatch(switchPanel({panel: panelKey}))
+        dispatch(switchPanel({ panel: panelKey }))
     }
 
     const findUserInfoByGroup = (groupId, id) => {
@@ -61,21 +67,21 @@ const Home = () => {
 
     return (
         <>
-            <Flex className='chat-root-flex' justify='center' align='center' style={{ height: '100%', width: '100%' }}>
+            <Flex className='chat-root-flex' justify='center' align='center' style={{ height: '100vh', width: '100vw' }}>
                 <Flex gap='middle' justify='center' align='center' vertical>
-                    <Flex className='root-panel' style={{ height: '750px', width: '1000px' }} vertical>
-                        <Flex className='root-header' style={{ height: '65px',width: '100%' }}>
+                    <Flex className='root-panel' style={{ height: `${dimensions.height}px`, width: `${dimensions.width}px` }} vertical>
+                        <Flex className='root-header' style={{ height: '65px', width: '100%' }}>
                             <Flex flex={1}>
                                 <Flex className='header-sider' justify='center' align='end' style={{ width: '50px' }}>
                                     <img style={{ height: '35px', width: '35px' }} src={userInfo.avatar} alt='' />
                                 </Flex>
-                                <Flex style={{ width: '950px' }}>
-                                    <Header panel={panel}/>
+                                <Flex flex={1}>
+                                    <Header panel={panel} />
                                 </Flex>
 
                             </Flex>
                         </Flex>
-                        <Flex style={{ height: '685px',width: '100%' }}>
+                        <Flex flex={1}>
                             <HomeContext.Provider value={{ findUserInfoByGroup, findGroupByGroupId, findUserInfoByFriendId }}>
                                 <div className='home-panel-tabs'>
                                     <Tabs
@@ -89,13 +95,13 @@ const Home = () => {
 
                                     >
                                         <TabPane forceRender={true} key={CHAT_PANEL} tab={<img className='panel-img-icon' src={panel === CHAT_PANEL ? homeChatIconSelected : homeChatIcon} alt='' />}>
-                                            <Chat style={{ height: '685px', width: '950px' }} />
+                                            <Chat style={{ height: `calc(${dimensions.height}px - 65px)`, width: `calc(${dimensions.width}px - 50px)` }} />
                                         </TabPane>
                                         <TabPane forceRender={true} key={FRIEND_PANEL} tab={<img className='panel-img-icon' src={panel === FRIEND_PANEL ? homeFriendIconSelected : homeFriendIcon} alt='' />} >
-                                            <Friend ref={friendRef} style={{ height: '685px', width: '950px' }} />
+                                            <Friend ref={friendRef} style={{ height: `calc(${dimensions.height}px - 65px)`, width: `calc(${dimensions.width}px - 50px)` }} />
                                         </TabPane>
                                         <TabPane forceRender={true} key={GROUP_PANEL} tab={<img className='panel-img-icon' src={panel === GROUP_PANEL ? homeGroupIconSelected : homeGroupIcon} alt='' />} >
-                                            <Group ref={groupRef} style={{ height: '685px', width: '950px' }} />
+                                            <Group ref={groupRef} style={{ height: `calc(${dimensions.height}px - 65px)`, width: `calc(${dimensions.width}px - 50px)` }} />
                                         </TabPane>
                                     </Tabs>
                                 </div>

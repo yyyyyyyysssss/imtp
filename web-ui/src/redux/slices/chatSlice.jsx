@@ -179,7 +179,7 @@ export const chatSlice = createSlice({
         scrollToBottom: (state, action) => {
             const { payload } = action
             const { sessionId } = payload
-            state.entities.sessions[sessionId].scrollToIndex = state.entities.sessions[sessionId].messages.length - 1
+            state.entities.sessions[sessionId].scrollToIndex = state.entities.sessions[sessionId].messages?.length - 1
         },
         loadUserFriend: (state, action) => {
             const { payload } = action
