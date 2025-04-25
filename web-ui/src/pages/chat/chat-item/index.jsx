@@ -1,11 +1,11 @@
 import { Flex, Layout } from "antd";
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AutoSizer, CellMeasurer, CellMeasurerCache, List as VirtualizedList } from 'react-virtualized';
 import { fetchMessageByUserSessionId } from '../../../api/ApiService';
 import ChatItemFooter from '../../../components/chat-item-footer';
 import Message from '../../../components/message';
-import { useWebSocket } from '../../../context';
+import { HomeContext, useWebSocket } from '../../../context';
 import { loadMessage, scrollToBottom } from '../../../redux/slices/chatSlice';
 import './index.less';
 import ChatItemRightClickMenu from "../../../components/chat-item-right-click-menu";
@@ -14,6 +14,13 @@ import ChatItemContentFooter from "../../../components/chat-item-content-footer"
 const { Content } = Layout;
 
 const ChatItem = React.memo(({ sessionId }) => {
+
+    const { dimensions } = useContext(HomeContext)
+
+    // 当窗口大小改变时 清除消息高度缓存
+    useEffect(() => {
+        cache.current?.clearAll()
+    }, [dimensions])
 
     const { socket } = useWebSocket();
     const socketRef = useRef();
@@ -57,13 +64,15 @@ const ChatItem = React.memo(({ sessionId }) => {
             dispatch(scrollToBottom({ sessionId: sessionId }))
             setInfIniteRollSwitch(true)
         }
+        // eslint-disable-next-line
     }, [])
 
     const cache = React.useRef(
         new CellMeasurerCache({
             fixedWidth: true
         })
-    );
+    )
+
     //聊天内容显示
     const rowRenderer = useCallback(({ index, key, parent, style }) => {
         const item = messages[index]
@@ -78,22 +87,14 @@ const ChatItem = React.memo(({ sessionId }) => {
             >
                 {({ registerChild }) => (
                     <div ref={registerChild} key={item} className='chat-item' style={style}>
-                        {renderItem(index, item)}
+                        {item ? <Message onContextMenu={(event) => handleContextMenu(event, item, index)} key={item} messageId={item} /> : <></>}
                     </div>
                 )}
 
             </CellMeasurer>
         );
     }, [messages]);
-    //聊天项渲染函数
-    const renderItem = (index, item) => {
-        if (!item) {
-            return (<></>);
-        }
-        return (
-            <Message onContextMenu={(event) => handleContextMenu(event, item, index)} key={item} messageId={item} />
-        )
-    }
+
 
     // 右键菜单
     const [rightMenu, setRightMenu] = useState({
@@ -145,7 +146,7 @@ const ChatItem = React.memo(({ sessionId }) => {
                 setInfIniteRollSwitch(true)
             }, 500)
         })
-        
+
     }
 
     // 加载更多数据
@@ -206,9 +207,7 @@ const ChatItem = React.memo(({ sessionId }) => {
                                             scrollToIndex={scrollToIndex}
                                             onScroll={handleOnScroll}
                                         />
-
-                                    )
-                                    }
+                                    )}
                                 </AutoSizer>
                                 {contentFooter.height > 0 && (
                                     <div

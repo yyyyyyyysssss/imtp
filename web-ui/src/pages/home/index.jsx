@@ -1,5 +1,5 @@
 import { Flex, Tabs } from "antd";
-import React, { useEffect, useLayoutEffect, useRef } from 'react';
+import React, { useEffect, useLayoutEffect, useMemo, useRef } from 'react';
 import homeChatIcon from '../../assets/img/home_chat_icon.png';
 import homeChatIconSelected from '../../assets/img/home_chat_icon_selected.png';
 import homeFriendIcon from '../../assets/img/home_friend_icon.png';
@@ -17,11 +17,12 @@ import { fetchUserInfo } from '../../api/ApiService';
 import Header from '../../components/header';
 import { useState } from "react";
 
-const { TabPane } = Tabs;
-
 const CHAT_PANEL = "CHAT_PANEL";
 const FRIEND_PANEL = "FRIEND_PANEL";
 const GROUP_PANEL = "GROUP_PANEL";
+
+const defaultWidth = 1000
+const defaultHeight = 750
 
 const Home = () => {
     const dispatch = useDispatch()
@@ -31,9 +32,43 @@ const Home = () => {
     const panel = useSelector(state => state.chat.panel)
 
     const [dimensions, setDimensions] = useState({
-        width: 1000,
-        height: 750,
+        width: defaultWidth,
+        height: defaultHeight,
     })
+
+    const windowMaximize = async () => {
+        if (window.electronAPI) {
+            await window.electronAPI.maximizeWindow()
+            const windowSize = await window.electronAPI.getWindowSize()
+            setDimensions({
+                width: windowSize[0],
+                height: windowSize[1],
+            })
+        } else {
+            setDimensions({
+                width: window.innerWidth,
+                height: window.innerHeight,
+            })
+        }
+
+    }
+
+    const windowRecovery = async () => {
+        if (window.electronAPI) {
+            await window.electronAPI.maximizeWindow()
+            const windowSize = await window.electronAPI.getWindowSize()
+            setDimensions({
+                width: windowSize[0],
+                height: windowSize[1],
+            })
+        } else {
+            setDimensions({
+                width: defaultWidth,
+                height: defaultHeight,
+            })
+        }
+
+    }
 
     useLayoutEffect(() => {
         const fetchData = async () => {
@@ -65,6 +100,30 @@ const Home = () => {
         return friendRef.current.findUserInfoByFriendId(id);
     }
 
+
+    const items = useMemo(() => {
+        return [
+            {
+                key: CHAT_PANEL,
+                forceRender: true,
+                label: <img className='panel-img-icon' src={panel === CHAT_PANEL ? homeChatIconSelected : homeChatIcon} alt='' />,
+                children: <Chat style={{ height: `calc(${dimensions.height}px - 65px)`, width: `calc(${dimensions.width}px - 50px)` }} />
+            },
+            {
+                key: FRIEND_PANEL,
+                forceRender: true,
+                label: <img className='panel-img-icon' src={panel === FRIEND_PANEL ? homeFriendIconSelected : homeFriendIcon} alt='' />,
+                children: <Friend ref={friendRef} style={{ height: `calc(${dimensions.height}px - 65px)`, width: `calc(${dimensions.width}px - 50px)` }} />
+            },
+            {
+                key: GROUP_PANEL,
+                forceRender: true,
+                label: <img className='panel-img-icon' src={panel === GROUP_PANEL ? homeGroupIconSelected : homeGroupIcon} alt='' />,
+                children: <Group ref={groupRef} style={{ height: `calc(${dimensions.height}px - 65px)`, width: `calc(${dimensions.width}px - 50px)` }} />
+            }
+        ]
+    }, [panel, dimensions])
+
     return (
         <>
             <Flex className='chat-root-flex' justify='center' align='center' style={{ height: '100vh', width: '100vw' }}>
@@ -76,13 +135,13 @@ const Home = () => {
                                     <img style={{ height: '35px', width: '35px' }} src={userInfo.avatar} alt='' />
                                 </Flex>
                                 <Flex flex={1}>
-                                    <Header panel={panel} />
+                                    <Header panel={panel} windowMaximize={windowMaximize} windowRecovery={windowRecovery} />
                                 </Flex>
 
                             </Flex>
                         </Flex>
                         <Flex flex={1}>
-                            <HomeContext.Provider value={{ findUserInfoByGroup, findGroupByGroupId, findUserInfoByFriendId }}>
+                            <HomeContext.Provider value={{ findUserInfoByGroup, findGroupByGroupId, findUserInfoByFriendId, dimensions }}>
                                 <div className='home-panel-tabs'>
                                     <Tabs
                                         key="home-tabs"
@@ -92,18 +151,8 @@ const Home = () => {
                                         centered
                                         size='large'
                                         onChange={(key) => handleSwitchPanel(key)}
-
-                                    >
-                                        <TabPane forceRender={true} key={CHAT_PANEL} tab={<img className='panel-img-icon' src={panel === CHAT_PANEL ? homeChatIconSelected : homeChatIcon} alt='' />}>
-                                            <Chat style={{ height: `calc(${dimensions.height}px - 65px)`, width: `calc(${dimensions.width}px - 50px)` }} />
-                                        </TabPane>
-                                        <TabPane forceRender={true} key={FRIEND_PANEL} tab={<img className='panel-img-icon' src={panel === FRIEND_PANEL ? homeFriendIconSelected : homeFriendIcon} alt='' />} >
-                                            <Friend ref={friendRef} style={{ height: `calc(${dimensions.height}px - 65px)`, width: `calc(${dimensions.width}px - 50px)` }} />
-                                        </TabPane>
-                                        <TabPane forceRender={true} key={GROUP_PANEL} tab={<img className='panel-img-icon' src={panel === GROUP_PANEL ? homeGroupIconSelected : homeGroupIcon} alt='' />} >
-                                            <Group ref={groupRef} style={{ height: `calc(${dimensions.height}px - 65px)`, width: `calc(${dimensions.width}px - 50px)` }} />
-                                        </TabPane>
-                                    </Tabs>
+                                        items={items}
+                                    />
                                 </div>
                             </HomeContext.Provider>
                         </Flex>

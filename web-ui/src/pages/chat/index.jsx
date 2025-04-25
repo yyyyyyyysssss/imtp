@@ -1,4 +1,4 @@
-import { Flex, message, Tabs } from "antd";
+import { Flex, Tabs } from "antd";
 import React, { useCallback, useContext, useEffect, useMemo, useRef } from 'react';
 import { HomeContext, useWebSocket } from '../../context';
 import { getBit } from '../../utils';
