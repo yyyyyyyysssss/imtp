@@ -520,9 +520,9 @@ const ChatItemFooter = React.memo(({ session, messageId, closeContentFooter }) =
                 </Flex>
                 {/* 文本编辑 */}
                 <Flex flex={6}>
-                    <Content className='content-text-area' >
-                        <EditorContent editor={editor} />
-                    </Content>
+                    {/* <Content className='content-text-area' > */}
+                        <EditorContent style={{width: '100%', height: '100%'}} editor={editor} />
+                    {/* </Content> */}
                 </Flex>
                 {/* 发送按钮 */}
                 <Flex flex={2}>

@@ -56,7 +56,7 @@ const Header = React.memo(({ panel, windowMaximize, windowRecovery }) => {
 
     return (
         <Flex flex={1}>
-            <Flex className='search-head-flex' justify='center' align='end' style={{ width: '25%', borderRight: '1px solid lightgray' }}>
+            <Flex className='search-head-flex' justify='center' align='end' style={{ width: '25%',minWidth: '200px', borderRight: '1px solid lightgray' }}>
                 <Input className='chat-search' size="small" placeholder="搜索" prefix={<SearchOutlined />} />
             </Flex>
             <Flex flex={1}>

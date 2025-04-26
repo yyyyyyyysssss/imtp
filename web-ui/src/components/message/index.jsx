@@ -112,7 +112,7 @@ const Message = React.memo(({ messageId, onContextMenu }) => {
                         align='center'
                         style={{
                             backgroundColor: '#E8E8E8',
-                            padding: 5,
+                            padding: 5
                         }}
                     >
                         <MessageQuote
