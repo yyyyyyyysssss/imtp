@@ -106,7 +106,7 @@ const Home = () => {
             {
                 key: CHAT_PANEL,
                 forceRender: true,
-                label: <img className='panel-img-icon' src={panel === CHAT_PANEL ? homeChatIconSelected : homeChatIcon} alt='' />,
+                label: <img className='frist-panel-img-icon' src={panel === CHAT_PANEL ? homeChatIconSelected : homeChatIcon} alt='' />,
                 children: <Chat style={{ height: `calc(${dimensions.height}px - 65px)`, width: `calc(${dimensions.width}px - 50px)` }} />
             },
             {

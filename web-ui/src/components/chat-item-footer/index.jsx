@@ -527,7 +527,7 @@ const ChatItemFooter = React.memo(({ session, messageId, closeContentFooter }) =
                 {/* 发送按钮 */}
                 <Flex flex={2}>
                     <Content className='content-footer'>
-                        <Flex flex={1} justify='end' align='center'>
+                        <Flex style={{height: '100%'}} flex={1} justify='end' align='center'>
                             <Button className='content-footer-send-button' onClick={() => sendMessage()}>发送(S)</Button>
                         </Flex>
                     </Content>
