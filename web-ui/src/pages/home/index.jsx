@@ -21,8 +21,8 @@ const CHAT_PANEL = "CHAT_PANEL";
 const FRIEND_PANEL = "FRIEND_PANEL";
 const GROUP_PANEL = "GROUP_PANEL";
 
-const defaultWidth = 670
-const defaultHeight = 502.5
+const defaultWidth = 1000
+const defaultHeight = 750
 
 const Home = () => {
     const dispatch = useDispatch()

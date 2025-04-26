@@ -249,10 +249,10 @@ const ChatItemFooter = React.memo(({ session, messageId, closeContentFooter }) =
     const quoteMessageIdRef = useRef();
     useEffect(() => {
         quoteMessageIdRef.current = messageId
-        if(messageId){
+        if (messageId) {
             editor.commands.focus()
         }
-    }, [messageId,editor]);
+    }, [messageId, editor]);
 
     //发送消息
     const sendMessage = (message) => {
@@ -484,16 +484,16 @@ const ChatItemFooter = React.memo(({ session, messageId, closeContentFooter }) =
             avatar: userInfo.avatar
         }
         //消息引用
-        if(quoteMessageIdRef.current){
+        if (quoteMessageIdRef.current) {
             const quoteMessage = reduxStore.getState().chat.entities.messages[quoteMessageIdRef.current]
-            if(quoteMessage){
+            if (quoteMessage) {
                 message.contentMetadata = {
                     quoteMessage: {
                         type: quoteMessage.type,
                         name: quoteMessage.name,
                         content: quoteMessage.content,
                         self: quoteMessage.self,
-                        contentMetadata: {...quoteMessage.contentMetadata, quoteMessage: null}
+                        contentMetadata: { ...quoteMessage.contentMetadata, quoteMessage: null }
                     }
                 }
             }
@@ -505,8 +505,8 @@ const ChatItemFooter = React.memo(({ session, messageId, closeContentFooter }) =
         <Layout style={{ height: '100%' }}>
             <Flex flex={1} vertical>
                 {/* 聊天工具栏 */}
-                <Flex flex={2}>
-                    <Content className='content-toolbar'>
+                <Flex className='content-toolbar' style={{ width: '100%', height: '40px' }}>
+                    {/* <Content className='content-toolbar'> */}
                         <Flex gap='middle' justify='flex-start' align='center' style={{ height: '100%', marginLeft: '15px' }}>
                             <div ref={emojiRef} className='div-Picker' hidden={emojiHide}>
                                 <Picker set="native" previewPosition="none" searchPosition="none" data={emojiMartData} onEmojiSelect={emojiSelectHandler} />
@@ -516,21 +516,21 @@ const ChatItemFooter = React.memo(({ session, messageId, closeContentFooter }) =
                             <img src={voiceCallImg} onClick={voiceCall} title='语音通话' alt='语音通话' style={{ width: '22px', height: '22px', cursor: 'pointer' }} />
                             <img src={videoCallImg} onClick={videoCall} title='视频通话' alt='视频通话' style={{ width: '24px', height: '24px', cursor: 'pointer' }} />
                         </Flex>
-                    </Content>
+                    {/* </Content> */}
                 </Flex>
                 {/* 文本编辑 */}
-                <Flex flex={6}>
+                <Flex style={{width:'100%', height: 'calc(100% - 80px)'}}>
                     {/* <Content className='content-text-area' > */}
-                        <EditorContent style={{width: '100%', height: '100%'}} editor={editor} />
+                        <EditorContent style={{width: '100%',height: '100%'}} editor={editor} />
                     {/* </Content> */}
                 </Flex>
                 {/* 发送按钮 */}
-                <Flex flex={2}>
-                    <Content className='content-footer'>
-                        <Flex style={{height: '100%'}} flex={1} justify='end' align='center'>
-                            <Button className='content-footer-send-button' onClick={() => sendMessage()}>发送(S)</Button>
-                        </Flex>
-                    </Content>
+                <Flex justify='center' align='center' style={{ width: '100%', height: '40px' }}>
+                    {/* <Content className='content-footer'> */}
+                    <Flex flex={1} justify='end' align='center'>
+                        <Button className='content-footer-send-button' onClick={() => sendMessage()}>发送(S)</Button>
+                    </Flex>
+                    {/* </Content> */}
                 </Flex>
             </Flex>
         </Layout>
