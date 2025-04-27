@@ -141,8 +141,8 @@ const Home = () => {
                         style={{
                             height: `${dimensions.height}px`,
                             width: `${dimensions.width}px`,
-                            borderRadius: dimensions.width === window.innerWidth && dimensions.height === window.innerHeight ? '0px' : '8px',
-                            boxShadow: dimensions.width === window.innerWidth && dimensions.height === window.innerHeight ? '' : '0px 0px 2px 1px lightgray',
+                            borderRadius: dimensions.isMaximized ? '0px' : '8px',
+                            boxShadow: dimensions.isMaximized ? '' : '0px 0px 2px 1px lightgray',
                         }}
                         vertical
                     >
