@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import { CloseOutlined, MinusOutlined, SearchOutlined } from '@ant-design/icons';
 import { Flex, Input } from "antd";
@@ -8,25 +8,22 @@ import Cookies from 'js-cookie';
 import { useNavigate } from 'react-router-dom';
 import { WindowMaximizeOutlined, WindowRecoveryOutlined } from '../customIcon';
 
-const Header = React.memo(({ panel, windowMaximize, windowRecovery }) => {
+const Header = React.memo(({ panel, windowMaximize, windowRecovery, isMaximized }) => {
 
     //组件跳转
     const navigate = useNavigate();
 
     const selectedHeadName = useSelector(state => state.chat.selectedHeadName) || ''
 
-    const [windowSizeFlag, setWindowSizeFlag] = useState(false)
-
     //窗口伸缩
     const resizeWindow = useCallback(() => {
-        if (windowSizeFlag) {
+        if (isMaximized) {
             windowRecovery()
         } else {
             windowMaximize()
         }
-        setWindowSizeFlag(!windowSizeFlag)
         // eslint-disable-next-line
-    }, [windowSizeFlag])
+    }, [isMaximized])
 
     // 最小化
     const minimize = () => {
@@ -55,8 +52,8 @@ const Header = React.memo(({ panel, windowMaximize, windowRecovery }) => {
     }
 
     return (
-        <Flex flex={1}>
-            <Flex className='search-head-flex' justify='center' align='end' style={{ width: '25%',minWidth: '200px', borderRight: '1px solid lightgray' }}>
+        <Flex className='app-header' flex={1}>
+            <Flex className='search-head-flex' justify='center' align='end' style={{ width: '25%', minWidth: '200px', borderRight: '1px solid lightgray' }}>
                 <Input className='chat-search' size="small" placeholder="搜索" prefix={<SearchOutlined />} />
             </Flex>
             <Flex flex={1}>
@@ -73,7 +70,7 @@ const Header = React.memo(({ panel, windowMaximize, windowRecovery }) => {
                     )}
 
                     <div className='window-ops-btn' onClick={resizeWindow}>
-                        {windowSizeFlag === true ? (<WindowRecoveryOutlined size={18} />) : (<WindowMaximizeOutlined size={18} />)}
+                        {isMaximized === true ? (<WindowRecoveryOutlined size={18} />) : (<WindowMaximizeOutlined size={18} />)}
                     </div>
                     <div className='window-ops-btn' onClick={logoutHandler}>
                         <CloseOutlined size={20} />

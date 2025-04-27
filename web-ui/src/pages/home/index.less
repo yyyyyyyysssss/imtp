@@ -20,6 +20,7 @@ html {
 .home-panel-tabs .ant-tabs-nav {
     width: 50px;
     background-color: #2E2E2E;
+    app-region: drag;
 }
 
 .home-panel-tabs .ant-tabs-tab {
@@ -30,16 +31,17 @@ html {
     margin-top: 20px;
     height: 30px;
     width: 30px;
+    app-region: no-drag; //electron 不可拖动
 }
 
 .panel-img-icon {
     height: 30px;
     width: 30px;
+    app-region: no-drag; //electron 不可拖动
 }
 
 .root-panel {
-    border-radius: 8;
-    box-shadow: 0px 0px 2px 2px lightgray;
+    overflow: hidden;
 }
 
 .root-header{
@@ -49,6 +51,7 @@ html {
 .header-sider{
     background-color: #2E2E2E;
     box-sizing: border-box;
+    app-region: drag
 }
 
 .search-head-flex {

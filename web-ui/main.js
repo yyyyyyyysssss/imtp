@@ -6,6 +6,7 @@ const createWindow = () => {
         frame: false,
         width: 1000,
         height: 750,
+        show: false,
         webPreferences: {
             contextIsolation: true,
             nodeIntegration: false,
@@ -13,10 +14,27 @@ const createWindow = () => {
         }
     })
 
+    //窗户准备完成
+    win.once('ready-to-show', () => {
+        win.show();  // 显示窗口
+    });
+
+    //窗口大小变化事件
+    win.on('resize', () => {
+        const [width, height] = win.getSize()
+        win.webContents.send('resize', {
+            width: width,
+            height: height,
+            isMaximized: win.isMaximized()
+        })
+    })
+
+    //关闭窗口
     ipcMain.on('closeWindow', (event) => {
         win.close()
     })
 
+    //窗口最大化
     ipcMain.on('maximizeWindow', (event) => {
         if (win.isMaximized()) {
             win.restore(); // 如果窗口已经最大化，则还原
@@ -25,6 +43,7 @@ const createWindow = () => {
         }
     })
 
+    //窗口最小化
     ipcMain.on('minimizedWindow', (event) => {
         win.minimize()
     })
@@ -49,7 +68,7 @@ const getWindowSize = (win) => {
 
 app.whenReady().then(() => {
     let mainWindow = createWindow()
-    ipcMain.handle('getWindowSize',() => getWindowSize(mainWindow))
+    ipcMain.handle('getWindowSize', () => getWindowSize(mainWindow))
     app.on('activate', () => {
         // 在 macOS 系统内, 如果没有已开启的应用窗口
         // 点击托盘图标时通常会重新创建一个新窗口

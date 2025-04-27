@@ -1,5 +1,5 @@
 import { Flex, Tabs } from "antd";
-import React, { useLayoutEffect, useMemo, useRef } from 'react';
+import React, { useEffect, useLayoutEffect, useMemo, useRef } from 'react';
 import homeChatIcon from '../../assets/img/home_chat_icon.png';
 import homeChatIconSelected from '../../assets/img/home_chat_icon_selected.png';
 import homeFriendIcon from '../../assets/img/home_friend_icon.png';
@@ -34,37 +34,30 @@ const Home = () => {
     const [dimensions, setDimensions] = useState({
         width: defaultWidth,
         height: defaultHeight,
+        isMaximized: false
     })
 
-    const windowMaximize = async () => {
+    const windowMaximize = () => {
         if (window.electronAPI) {
-            await window.electronAPI.maximizeWindow()
-            const windowSize = await window.electronAPI.getWindowSize()
-            setDimensions({
-                width: windowSize[0],
-                height: windowSize[1],
-            })
+            window.electronAPI.maximizeWindow()
         } else {
             setDimensions({
                 width: window.innerWidth,
                 height: window.innerHeight,
+                isMaximized: true
             })
         }
 
     }
 
-    const windowRecovery = async () => {
+    const windowRecovery = () => {
         if (window.electronAPI) {
-            await window.electronAPI.maximizeWindow()
-            const windowSize = await window.electronAPI.getWindowSize()
-            setDimensions({
-                width: windowSize[0],
-                height: windowSize[1],
-            })
+            window.electronAPI.maximizeWindow()
         } else {
             setDimensions({
                 width: defaultWidth,
                 height: defaultHeight,
+                isMaximized: false
             })
         }
 
@@ -78,6 +71,21 @@ const Home = () => {
         fetchData()
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
+
+
+    useEffect(() => {
+        if (window.electronAPI) {
+            window.electronAPI.onResize((value) => {
+                const { width, height, isMaximized } = value
+                setDimensions({
+                    width: width,
+                    height: height,
+                    isMaximized: isMaximized
+                })
+            })
+        }
+    }, [])
+
     //好友组件引用
     const friendRef = useRef();
     //群组组件引用
@@ -128,14 +136,23 @@ const Home = () => {
         <>
             <Flex className='chat-root-flex' justify='center' align='center' style={{ height: '100vh', width: '100vw' }}>
                 <Flex gap='middle' justify='center' align='center' vertical>
-                    <Flex className='root-panel' style={{ height: `${dimensions.height}px`, width: `${dimensions.width}px` }} vertical>
+                    <Flex
+                        className='root-panel'
+                        style={{
+                            height: `${dimensions.height}px`,
+                            width: `${dimensions.width}px`,
+                            borderRadius: dimensions.width === window.innerWidth && dimensions.height === window.innerHeight ? '0px' : '8px',
+                            boxShadow: dimensions.width === window.innerWidth && dimensions.height === window.innerHeight ? '' : '0px 0px 2px 1px lightgray',
+                        }}
+                        vertical
+                    >
                         <Flex className='root-header' style={{ height: '65px', width: '100%' }}>
                             <Flex flex={1}>
                                 <Flex className='header-sider' justify='center' align='end' style={{ width: '50px' }}>
                                     <img style={{ height: '35px', width: '35px' }} src={userInfo.avatar} alt='' />
                                 </Flex>
                                 <Flex flex={1}>
-                                    <Header panel={panel} windowMaximize={windowMaximize} windowRecovery={windowRecovery} />
+                                    <Header panel={panel} windowMaximize={windowMaximize} windowRecovery={windowRecovery} isMaximized={dimensions.isMaximized} />
                                 </Flex>
 
                             </Flex>
