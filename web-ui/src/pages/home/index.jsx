@@ -1,5 +1,5 @@
 import { Flex, Tabs } from "antd";
-import React, { useEffect, useLayoutEffect, useMemo, useRef } from 'react';
+import React, { useLayoutEffect, useMemo, useRef } from 'react';
 import homeChatIcon from '../../assets/img/home_chat_icon.png';
 import homeChatIconSelected from '../../assets/img/home_chat_icon_selected.png';
 import homeFriendIcon from '../../assets/img/home_friend_icon.png';

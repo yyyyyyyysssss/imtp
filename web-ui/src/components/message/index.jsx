@@ -94,7 +94,7 @@ const Message = React.memo(({ messageId, onContextMenu }) => {
     return (
         <Flex gap="small" style={{ flexDirection: self ? 'row-reverse' : '' }}>
             <Avatar size={45} shape="square" src={avatar} />
-            <Flex flex={1} gap="small" justify='center' align={self ? 'end' : 'start'} vertical>
+            <Flex flex={1} style={{ width: '100%',overflow: 'hidden' }} gap="small" justify='center' align={self ? 'end' : 'start'} vertical>
                 {!self && deliveryMethod === 'GROUP' && (
                     <Flex>
                         <label className='chat-item-label-name'>{name}</label>
@@ -112,7 +112,8 @@ const Message = React.memo(({ messageId, onContextMenu }) => {
                         align='center'
                         style={{
                             backgroundColor: '#E8E8E8',
-                            padding: 5
+                            padding: 5,
+                            maxWidth: '60%',
                         }}
                     >
                         <MessageQuote

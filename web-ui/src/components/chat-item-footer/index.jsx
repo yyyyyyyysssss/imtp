@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import './index.less'
-import { Flex, Layout, Button } from "antd"
+import { Flex, Button } from "antd"
 import { EditorContent, useEditor } from '@tiptap/react'
 import HardBreak from '@tiptap/extension-hard-break'
 import { StarterKit } from '@tiptap/starter-kit';
@@ -22,7 +22,6 @@ import { formatFileSize, getVideoDimensionsOfByFile, dataURLtoFile, createThumbn
 import { v4 as uuidv4 } from 'uuid';
 import reduxStore from '../../redux/store';
 
-const { Content } = Layout;
 
 const ChatItemFooter = React.memo(({ session, messageId, closeContentFooter }) => {
 
@@ -502,38 +501,30 @@ const ChatItemFooter = React.memo(({ session, messageId, closeContentFooter }) =
     }
 
     return (
-        <Layout style={{ height: '100%' }}>
-            <Flex flex={1} vertical>
-                {/* 聊天工具栏 */}
-                <Flex className='content-toolbar' style={{ width: '100%', height: '40px' }}>
-                    {/* <Content className='content-toolbar'> */}
-                        <Flex gap='middle' justify='flex-start' align='center' style={{ height: '100%', marginLeft: '15px' }}>
-                            <div ref={emojiRef} className='div-Picker' hidden={emojiHide}>
-                                <Picker set="native" previewPosition="none" searchPosition="none" data={emojiMartData} onEmojiSelect={emojiSelectHandler} />
-                            </div>
-                            <img src={emoteImg} title='表情' alt='表情' style={{ width: '20px', height: '20px', cursor: 'pointer' }} onClick={showEmojiFrame} />
-                            <Uploader ref={uploaderRef} {...uploadProps} />
-                            <img src={voiceCallImg} onClick={voiceCall} title='语音通话' alt='语音通话' style={{ width: '22px', height: '22px', cursor: 'pointer' }} />
-                            <img src={videoCallImg} onClick={videoCall} title='视频通话' alt='视频通话' style={{ width: '24px', height: '24px', cursor: 'pointer' }} />
-                        </Flex>
-                    {/* </Content> */}
-                </Flex>
-                {/* 文本编辑 */}
-                <Flex style={{width:'100%', height: 'calc(100% - 80px)'}}>
-                    {/* <Content className='content-text-area' > */}
-                        <EditorContent style={{width: '100%',height: '100%'}} editor={editor} />
-                    {/* </Content> */}
-                </Flex>
-                {/* 发送按钮 */}
-                <Flex justify='center' align='center' style={{ width: '100%', height: '40px' }}>
-                    {/* <Content className='content-footer'> */}
-                    <Flex flex={1} justify='end' align='center'>
-                        <Button className='content-footer-send-button' onClick={() => sendMessage()}>发送(S)</Button>
-                    </Flex>
-                    {/* </Content> */}
+        <Flex style={{ height: '100%' }} flex={1} vertical>
+            {/* 聊天工具栏 */}
+            <Flex className='content-toolbar' style={{ width: '100%', height: '40px' }}>
+                <Flex gap='middle' justify='flex-start' align='center' style={{ height: '100%', marginLeft: '15px' }}>
+                    <div ref={emojiRef} className='div-Picker' hidden={emojiHide}>
+                        <Picker set="native" previewPosition="none" searchPosition="none" data={emojiMartData} onEmojiSelect={emojiSelectHandler} />
+                    </div>
+                    <img src={emoteImg} title='表情' alt='表情' style={{ width: '20px', height: '20px', cursor: 'pointer' }} onClick={showEmojiFrame} />
+                    <Uploader ref={uploaderRef} {...uploadProps} />
+                    <img src={voiceCallImg} onClick={voiceCall} title='语音通话' alt='语音通话' style={{ width: '22px', height: '22px', cursor: 'pointer' }} />
+                    <img src={videoCallImg} onClick={videoCall} title='视频通话' alt='视频通话' style={{ width: '24px', height: '24px', cursor: 'pointer' }} />
                 </Flex>
             </Flex>
-        </Layout>
+            {/* 文本编辑 */}
+            <Flex style={{ width: '100%', height: 'calc(100% - 80px)' }}>
+                <EditorContent style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }} editor={editor} />
+            </Flex>
+            {/* 发送按钮 */}
+            <Flex justify='center' align='center' style={{ width: '100%', height: '40px' }}>
+                <Flex flex={1} justify='end' align='center'>
+                    <Button className='content-footer-send-button' onClick={() => sendMessage()}>发送(S)</Button>
+                </Flex>
+            </Flex>
+        </Flex>
     )
 })
 

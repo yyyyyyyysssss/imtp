@@ -5,6 +5,18 @@ import { VoiceCallOutlined } from '../../customIcon'
 import { CallStatus } from '../../../enum'
 
 const VoiceCallMessage = React.memo(({ callStatus, self, duration, durationDesc }) => {
+
+    return (
+        <div className={`voice-call-message ${self ? 'voice-call-message-right' : 'voice-call-message-left'}`}>
+            <SubVoiceCallMessage callStatus={callStatus} self={self} durationDesc={durationDesc} />
+        </div >
+
+    )
+})
+
+
+export const SubVoiceCallMessage = ({ callStatus, self, durationDesc, color = 'black' }) => {
+
     let content
     switch (callStatus) {
         case CallStatus.COMPLETED:
@@ -22,25 +34,28 @@ const VoiceCallMessage = React.memo(({ callStatus, self, duration, durationDesc 
     }
 
     return (
-        <div className={`voice-call-message ${self ? 'voice-call-message-right' : 'voice-call-message-left'}`}>
-            <Flex gap={6} justify='center'>
-                <VoiceCallOutlined size={23}/>
+        <Flex gap={6} justify='center'>
+            <VoiceCallOutlined size={23} color={color} />
+            <div
+                style={{
+                    whiteSpace: 'nowrap',
+                    color: color
+                }}
+            >
+                {content}
+            </div>
+            {callStatus === CallStatus.COMPLETED && (
                 <div
                     style={{
-                        whiteSpace: 'nowrap'
+                        whiteSpace: 'nowrap',
+                        color: color
                     }}
                 >
-                    {content}
+                    {durationDesc}
                 </div>
-                {callStatus === CallStatus.COMPLETED && (
-                    <div>
-                        {durationDesc}
-                    </div>
-                )}
-            </Flex >
-        </div >
-
+            )}
+        </Flex >
     )
-})
+}
 
 export default VoiceCallMessage
