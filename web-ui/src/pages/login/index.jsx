@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useLayoutEffect } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { Button, Flex, Tabs, Form, Input, Checkbox, Avatar, message } from "antd"
-import Icon, { UserOutlined, LockOutlined, MobileOutlined, MailOutlined, GithubOutlined, GoogleOutlined } from '@ant-design/icons'
+import Icon, { UserOutlined, LockOutlined, MobileOutlined, MailOutlined, GithubOutlined, GoogleOutlined, CloseOutlined } from '@ant-design/icons'
 import { MicrosoftOutlined, SelfOutlined } from '../../components/customIcon'
 import Cookies from 'js-cookie'
 import './index.less'
@@ -214,6 +214,7 @@ const Login = () => {
                 username: values.username,
                 credential: values.password,
                 loginType: 'NORMAL',
+                clientType: window.electronAPI ? 'PC' : 'WEB',
                 rememberMe: values.rememberMe ? 1 : null
             }
         } else {
@@ -221,6 +222,7 @@ const Login = () => {
                 username: values.email,
                 credential: values.verificationCode,
                 loginType: 'EMAIL',
+                clientType: window.electronAPI ? 'PC' : 'WEB',
                 rememberMe: values.rememberMe ? 1 : null
             }
         }
@@ -233,14 +235,14 @@ const Login = () => {
                 (error) => {
                     setLoading(false)
                     if (error.response && error.response.status === 401) {
-                        message.error('身份认证失败');
+                        message.error('用户名或密码错误');
                     }
                 }
             )
 
     }
 
-    const loginSuccessHandler = (data, rememberMe) => {
+    const loginSuccessHandler = async (data, rememberMe) => {
         setLoading(false)
         if (rememberMe) {
             localStorage.setItem('rememberMeToken', data.rememberMeToken)
@@ -254,77 +256,112 @@ const Login = () => {
             const target = urlObj.toString();
             window.location.href = target;
         } else {
+            if (window.electronAPI) {
+                await window.electronAPI.loginSuccess()
+            }
             navigate('/home')
+        }
+    }
+
+    const closeWindow = () => {
+        if (window.electronAPI) {
+            window.electronAPI.quit()
         }
     }
 
     return (
         <>
-            <Flex style={{ height: '100%' }}>
-                <Flex gap='middle' justify='center' align='center' vertical style={{ width: '100%' }}>
-                    <Avatar size={100} src={tmpImg} draggable={false} />
-                    <Form form={form} name="normal_login" className="login-form" style={{ width: '350px' }} onFinish={onFinish}>
-                        <Tabs defaultActiveKey="1" centered onChange={(e) => setLoginMethod(e)}>
-                            <TabPane tab="账号密码登录" key="1">
-                                <Form.Item name="username" rules={[
-                                    {
-                                        required: loginMethod === '1',
-                                        message: '用户名不可为空'
-                                    }
-                                ]}>
-                                    <Input allowClear size="large" placeholder="用户名" prefix={<UserOutlined />} />
-                                </Form.Item>
-                                <Form.Item name="password" rules={[
-                                    {
-                                        required: loginMethod === '1',
-                                        message: '密码不可为空'
-                                    }
-                                ]}>
-                                    <Input.Password size="large" placeholder="密码" prefix={<LockOutlined />} />
-                                </Form.Item>
-                            </TabPane>
-                            <TabPane tab="邮箱登录" key="2">
-                                <Form.Item name="email" validateTrigger="onBlur" rules={[
-                                    {
-                                        validator: emailVerification
-                                    }
-                                ]}>
-                                    <Input allowClear size="large" placeholder="邮箱" prefix={<MobileOutlined />} />
-                                </Form.Item>
-                                <Flex gap='small'>
-                                    <Form.Item name="verificationCode" rules={[
+            <Flex
+                style={{ height: '100%' }}
+                className='login-flex'
+                gap='middle'
+                justify='center'
+                align='center'
+                vertical
+            >
+                <Flex
+                    style={{
+                        width: '350px',
+                        height: '600px',
+                    }}
+                    justify='center'
+                    align='center'
+                    vertical
+                >
+                    <Flex flex={1} style={{ width: '100%' }} align='flex-start' justify='flex-end'>
+                        {window.electronAPI && (
+                            <div onClick={closeWindow} className='close-btn'>
+                                <CloseOutlined size={20} />
+                            </div>
+                        )}
+                    </Flex>
+                    <Flex flex={2} style={{ width: '100%' }} justify='center' align='center'>
+                        <Avatar size={100} src={tmpImg} draggable={false} />
+                    </Flex>
+                    <Flex flex={7} style={{ width: '100%', padding: '30px' }} justify='center' align='flex-start'>
+                        <Form form={form} name="normal_login" className="login-flex drag" style={{ width: '100%' }} onFinish={onFinish}>
+                            <Tabs defaultActiveKey="1" centered onChange={(e) => setLoginMethod(e)}>
+                                <TabPane tab="账号密码登录" key="1">
+                                    <Form.Item name="username" rules={[
                                         {
-                                            required: loginMethod === '2',
-                                            message: '验证码不可为空'
+                                            required: loginMethod === '1',
+                                            message: '用户名不可为空'
                                         }
                                     ]}>
-                                        <Input allowClear size="large" placeholder="请输入验证码!" prefix={<MailOutlined />} />
+                                        <Input className='no-drag' allowClear size="large" placeholder="用户名" prefix={<UserOutlined />} />
                                     </Form.Item>
-                                    <Button disabled={verificationCode.disabled} size="large" onClick={handleWithVerificationCode}>{verificationCode.tips}</Button>
-                                </Flex>
-                            </TabPane>
-                        </Tabs>
-                        <Form.Item>
-                            <Form.Item name="rememberMe" valuePropName="checked" initialValue={true} noStyle>
-                                <Checkbox>记住密码</Checkbox>
+                                    <Form.Item name="password" rules={[
+                                        {
+                                            required: loginMethod === '1',
+                                            message: '密码不可为空'
+                                        }
+                                    ]}>
+                                        <Input.Password className='no-drag' size="large" placeholder="密码" prefix={<LockOutlined />} />
+                                    </Form.Item>
+                                </TabPane>
+                                <TabPane tab="邮箱登录" key="2">
+                                    <Form.Item name="email" validateTrigger="onBlur" rules={[
+                                        {
+                                            validator: emailVerification
+                                        }
+                                    ]}>
+                                        <Input className='no-drag' allowClear size="large" placeholder="邮箱" prefix={<MobileOutlined />} />
+                                    </Form.Item>
+                                    <Flex gap='small'>
+                                        <Form.Item name="verificationCode" rules={[
+                                            {
+                                                required: loginMethod === '2',
+                                                message: '验证码不可为空'
+                                            }
+                                        ]}>
+                                            <Input className='no-drag' allowClear size="large" placeholder="请输入验证码!" prefix={<MailOutlined />} />
+                                        </Form.Item>
+                                        <Button className='no-drag' disabled={verificationCode.disabled} size="large" onClick={handleWithVerificationCode}>{verificationCode.tips}</Button>
+                                    </Flex>
+                                </TabPane>
+                            </Tabs>
+                            <Form.Item>
+                                <Form.Item name="rememberMe" valuePropName="checked" initialValue={true} noStyle>
+                                    <Checkbox className='no-drag'>记住密码</Checkbox>
+                                </Form.Item>
+                                <a className="login-form-forgot no-drag" style={{ float: 'right' }} href="/">
+                                    忘记密码 ？
+                                </a>
                             </Form.Item>
-                            <a className="login-form-forgot" style={{ float: 'right' }} href="/">
-                                忘记密码 ？
-                            </a>
-                        </Form.Item>
-                        <Form.Item>
-                            <Button type="primary" htmlType="submit" style={{ width: '100%' }} size="large" loading={loading}>
-                                登录
-                            </Button>
-                        </Form.Item>
-                        <Flex gap='large' align='center'>
-                            其他登录方式
-                            <GithubOutlined style={{ fontSize: '24px', color: 'gray' }} onClick={githubLogin} />
-                            <GoogleOutlined style={{ fontSize: '24px', color: 'gray' }} onClick={googleLogin} />
-                            <Icon component={MicrosoftOutlined} style={{ fontSize: '24px', color: 'gray' }} onClick={microsoftLogin} />
-                            <Icon component={SelfOutlined} style={{ fontSize: '24px', color: 'gray' }} onClick={selfLogin} />
-                        </Flex>
-                    </Form>
+                            <Form.Item>
+                                <Button className='no-drag' type="primary" htmlType="submit" style={{ width: '100%' }} size="large" loading={loading}>
+                                    登录
+                                </Button>
+                            </Form.Item>
+                            <Flex className='no-drag' gap='large' align='center'>
+                                其他登录方式
+                                <GithubOutlined style={{ fontSize: '24px', color: 'gray' }} onClick={githubLogin} />
+                                <GoogleOutlined style={{ fontSize: '24px', color: 'gray' }} onClick={googleLogin} />
+                                <Icon component={MicrosoftOutlined} style={{ fontSize: '24px', color: 'gray' }} onClick={microsoftLogin} />
+                                <Icon component={SelfOutlined} style={{ fontSize: '24px', color: 'gray' }} onClick={selfLogin} />
+                            </Flex>
+                        </Form>
+                    </Flex>
                 </Flex>
             </Flex>
         </>

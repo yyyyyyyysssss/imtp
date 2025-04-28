@@ -2,8 +2,12 @@ const { contextBridge, ipcRenderer } = require('electron/renderer')
 
 contextBridge.exposeInMainWorld('electronAPI', {
     closeWindow: () => ipcRenderer.send('closeWindow'),
+    hideWindow: () => ipcRenderer.send('hideWindow'),
+    quit: () => ipcRenderer.send('quit'),
     maximizeWindow: () => ipcRenderer.send('maximizeWindow'),
     minimizedWindow: () => ipcRenderer.send('minimizedWindow'),
     getWindowSize: () => ipcRenderer.invoke('getWindowSize'),
-    onResize: (callback) => ipcRenderer.on('resize', (_event, value) => callback(value))
+    onResize: (callback) => ipcRenderer.on('resize', (_event, value) => callback(value)),
+    loginSuccess: () => ipcRenderer.invoke('loginSuccess'),
+    receiveMessage: (message) => ipcRenderer.send('receiveMessage', message),
 })

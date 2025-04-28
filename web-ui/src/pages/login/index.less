@@ -8,6 +8,37 @@ html {
   width: 100%;
 }
 
-.ant-app{
+.ant-app {
   height: 100%;
+}
+
+.login-flex {
+  width: 100%;
+  -webkit-app-region: drag;
+}
+
+.drag {
+  -webkit-app-region: drag;
+}
+
+.no-drag{
+  -webkit-app-region: no-drag; //electron 不可拖动
+}
+
+.ant-tabs-nav{
+  -webkit-app-region: no-drag; //electron 不可拖动
+}
+
+
+.close-btn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 6px;
+  -webkit-app-region: no-drag; //electron 不可拖动
+}
+
+.close-btn:hover{
+  background-color: #FB7373;
+  cursor: pointer;
 }

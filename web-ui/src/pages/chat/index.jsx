@@ -144,6 +144,9 @@ const Chat = (props) => {
                 //添加消息
                 const receiveMessage = messageBase(content, contentMetadata, cmd, timestamp, friendInfo, session)
                 dispatch(addMessage({ sessionId: session.id, message: receiveMessage }))
+                if(window.electronAPI){
+                    window.electronAPI.receiveMessage(receiveMessage)
+                }
             }
             socket.addEventListener('message', handleReceiveEvent);
             return () => {

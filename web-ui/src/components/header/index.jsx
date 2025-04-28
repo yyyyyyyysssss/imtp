@@ -35,7 +35,7 @@ const Header = React.memo(({ panel, windowMaximize, windowRecovery, isMaximized 
     //退出登录
     const logoutHandler = () => {
         if (window.electronAPI) {
-            window.electronAPI.closeWindow()
+            window.electronAPI.hideWindow()
         } else {
             logout()
                 .then(
