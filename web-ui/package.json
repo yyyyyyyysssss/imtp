@@ -181,8 +181,12 @@
     "productName": "oxygen",
     "copyright": "20250501",
     "directories": {
-      "output": "dist"
+      "output": "releases/${platform}/${arch}"
     },
+    "files": [
+      "build/**/*",
+      "package.json"
+    ],
     "nsis": {
       "oneClick": false,
       "allowElevation": true,
@@ -193,7 +197,6 @@
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true
     },
-    "files": [],
     "win": {
       "icon": "build/oxygen.ico",
       "target": [
