@@ -12,7 +12,7 @@ const createWindow = (width, height, minWidth = 0, minHeight = 0, maximizable = 
         minWidth: minWidth,
         height: height,
         minHeight: minHeight,
-        icon: path.join(__dirname, './public/icon.png'),
+        icon: path.join(__dirname, './public/oxygen.png'),
         show: false, //准备完成之前不显示
         maximizable: maximizable, //是否可以最大化
         webPreferences: {
@@ -75,7 +75,7 @@ app.whenReady().then(() => {
             currentWindow.close()
         }
         //设置系统托盘
-        const icon = nativeImage.createFromPath('./public/icon.png')
+        const icon = nativeImage.createFromPath('./public/oxygen.png')
         if(!tray){
             tray = new Tray(icon)
         }
