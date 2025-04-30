@@ -185,6 +185,7 @@
     },
     "files": [
       "build/**/*",
+      "!**/node_modules/**/*",
       "package.json"
     ],
     "nsis": {
