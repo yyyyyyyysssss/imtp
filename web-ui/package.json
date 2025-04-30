@@ -2,6 +2,7 @@
   "name": "web-client",
   "version": "0.1.0",
   "main": "main.js",
+  "homepage": "./",
   "private": true,
   "dependencies": {
     "@babel/core": "^7.16.0",
@@ -90,7 +91,9 @@
     "start": "node scripts/start.js",
     "electron": "electron .",
     "build": "node scripts/build.js",
-    "test": "node scripts/test.js"
+    "test": "node scripts/test.js",
+    "app:dir": "electron-builder --dir",
+    "app:dist": "electron-builder"
   },
   "eslintConfig": {
     "extends": [
@@ -169,7 +172,38 @@
   "devDependencies": {
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "electron": "^35.2.1",
+    "electron-builder": "^26.0.1",
     "less": "^4.2.0",
     "less-loader": "^12.2.0"
+  },
+  "build": {
+    "appId": "org.imtp.app",
+    "productName": "oxygen",
+    "copyright": "20250501",
+    "directories": {
+      "output": "dist"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowElevation": true,
+      "allowToChangeInstallationDirectory": true,
+      "installerIcon": "./build/oxygen.ico",
+      "uninstallerIcon": "./build/oxygen.ico",
+      "installerHeaderIcon": "./build/oxygen.ico",
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    },
+    "files": [],
+    "win": {
+      "icon": "build/oxygen.ico",
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    }
   }
 }

@@ -2,6 +2,7 @@ import { createContext,useState,useEffect,useContext } from 'react'
 import Cookies from 'js-cookie'
 import env from '../env';
 import { MessageType } from '../enum';
+import { getToken } from '../router/AuthProvider';
 
 export const HomeContext = createContext();
 
@@ -25,7 +26,7 @@ export const WebSocketProvider = ({ children }) => {
             if(timeoutId){
                 clearTimeout(timeoutId)
             }
-            const token = Cookies.get("accessToken");
+            const token = getToken()
             ws.send(token);
         }
         ws.onmessage = (event) => {

@@ -1,5 +1,5 @@
 import { lazy } from "react";
-import { Navigate,createBrowserRouter } from 'react-router-dom';
+import { Navigate,createBrowserRouter, createHashRouter } from 'react-router-dom';
 import AuthProvider from "./AuthProvider";
 import LoginProvider from "./LoginProvider.jsx";
 import { WebSocketProvider } from '../context'
@@ -56,6 +56,6 @@ const finalRoutes = routes.map((route) => {
     }
 })
 
-const router = createBrowserRouter(finalRoutes)
+const router = createHashRouter(finalRoutes)
 
 export default router;

@@ -1,7 +1,11 @@
-const { app, Tray, BrowserWindow, Menu, nativeImage, ipcMain } = require('electron')
+const { app, Tray, BrowserWindow, Menu, nativeImage, ipcMain } = require('electron');
 const path = require('node:path')
 
-const createWindow = (width, height, minWidth = 0, minHeight = 0, maximizable = true) => {
+process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = true
+
+app.commandLine.appendSwitch('js-flags', '--max-old-space-size=8092')
+
+const createWindow = (width, height, minWidth = 0, minHeight = 0, maximizable = true, checkLogin = false) => {
     const win = new BrowserWindow({
         frame: false, //是否显示窗口控制按钮
         width: width,
@@ -20,6 +24,9 @@ const createWindow = (width, height, minWidth = 0, minHeight = 0, maximizable = 
     //窗户准备完成
     win.once('ready-to-show', () => {
         win.show();  // 显示窗口
+        if (checkLogin) {
+            win.webContents.send('checkLogin')
+        }
     });
 
     //当窗口获取焦点时 关闭闪烁
@@ -37,8 +44,9 @@ const createWindow = (width, height, minWidth = 0, minHeight = 0, maximizable = 
         })
     })
 
-    // win.loadFile('index.html')
-    win.loadURL('http://localhost:3000')
+
+    win.loadFile(path.join(__dirname, `./build/index.html`))
+    // win.loadURL('http://localhost:3000')
 
     //开发者工具
     // win.webContents.openDevTools()
@@ -54,23 +62,29 @@ let currentWindow;
 let tray;
 
 app.whenReady().then(() => {
-    currentWindow = createWindow(350, 600, 0, 0, false)
-    //获取当前窗口大小
-    ipcMain.handle('getWindowSize', () => {
-        return currentWindow.getSize()
+    currentWindow = createWindow(350, 600, 0, 0, false, true)
+    ipcMain.handle('logout', () => {
+        if (currentWindow) {
+            currentWindow.close()
+        }
+        currentWindow = createWindow(350, 600, 0, 0, false, false)
     })
     //登录成功
     ipcMain.handle('loginSuccess', () => {
-        currentWindow.close()
+        if (currentWindow) {
+            currentWindow.close()
+        }
         //设置系统托盘
         const icon = nativeImage.createFromPath('./public/icon.png')
-        tray = new Tray(icon)
+        if(!tray){
+            tray = new Tray(icon)
+        }
         tray.setToolTip('氧气')
         tray.setContextMenu(Menu.buildFromTemplate([
             {
                 label: '退出',
                 click: () => {
-                    app.quit()
+                    quit()
                 }
             }
         ]))
@@ -78,7 +92,11 @@ app.whenReady().then(() => {
             currentWindow.show()
         })
         //打开新窗口
-        currentWindow = createWindow(1000, 750, 700, 500, true)
+        currentWindow = createWindow(1000, 750, 700, 500, true, false)
+    })
+    //获取当前窗口大小
+    ipcMain.handle('getWindowSize', () => {
+        return currentWindow.getSize()
     })
     //关闭窗口
     ipcMain.on('closeWindow', (event) => {
@@ -90,7 +108,7 @@ app.whenReady().then(() => {
     })
     //退出
     ipcMain.on('quit', (event) => {
-        app.quit()
+        quit()
     })
     //窗口最大化
     ipcMain.on('maximizeWindow', (event) => {
@@ -126,9 +144,14 @@ app.whenReady().then(() => {
 // 直到用户使用 Cmd + Q 明确退出
 app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') {
-        app.quit()
+        quit()
     }
 })
+
+const quit = () => {
+    currentWindow.webContents.send('quit')
+    app.quit()
+}
 
 //隐藏默认菜单
 Menu.setApplicationMenu(null)

@@ -1,9 +1,9 @@
 import axios from "axios";
-import Cookies from 'js-cookie'
 import { message } from "antd"
 import router from '../router/router';
 import { jwtDecode } from 'jwt-decode'
 import env from "../env";
+import { clearToken, getToken } from "../router/AuthProvider";
 
 
 const httpWrapper = axios.create({
@@ -13,7 +13,7 @@ const httpWrapper = axios.create({
 
 httpWrapper.interceptors.request.use(
     (req) => {
-        const token = Cookies.get("accessToken");
+        const token = getToken()
         if (token) {
             const path = req.url;
             //用户id路径参数解析
@@ -43,9 +43,11 @@ httpWrapper.interceptors.response.use(
     (error) => {
         if (error.response) {
             if (error.response.status === 401) {
-                Cookies.remove('accessToken');
-                Cookies.remove('refreshToken');
+                clearToken()
                 if (error.config.url !== '/login') {
+                    if(window.electronAPI){
+                        window.electronAPI.logout()
+                    }
                     return router.navigate('/login');
                 }
             }

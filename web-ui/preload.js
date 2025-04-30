@@ -9,5 +9,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
     getWindowSize: () => ipcRenderer.invoke('getWindowSize'),
     onResize: (callback) => ipcRenderer.on('resize', (_event, value) => callback(value)),
     loginSuccess: () => ipcRenderer.invoke('loginSuccess'),
+    logout: () => ipcRenderer.invoke('logout'),
+    checkLogin: (callback) => ipcRenderer.on('checkLogin', (_event) => callback()),
     receiveMessage: (message) => ipcRenderer.send('receiveMessage', message),
+    onQuit: (callback) => ipcRenderer.on('quit', (_event) => callback()),
 })

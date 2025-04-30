@@ -12,6 +12,7 @@ import { urlParamParse } from '../../utils'
 import { fetchOAuth2ClientConfig, login, loginByOTT, oauth2Login, sendEmailVerificationCode } from '../../api/ApiService'
 import { useDispatch } from 'react-redux';
 import { reset } from '../../redux/slices/chatSlice'
+import { saveToken } from '../../router/AuthProvider'
 
 
 const Login = () => {
@@ -47,7 +48,7 @@ const Login = () => {
             setLoading(true);
             try {
                 const data = await loginByOTT(ottToken)
-                loginSuccessHandler(data, null);
+                loginSuccessHandler(data);
             } catch (error) {
                 setLoading(false);
             }
@@ -64,7 +65,7 @@ const Login = () => {
             setLoading(true);
             try {
                 const data = await oauth2Login(code, state)
-                loginSuccessHandler(data, null);
+                loginSuccessHandler(data);
             } catch (error) {
                 setLoading(false);
             }
@@ -230,7 +231,7 @@ const Login = () => {
         login(loginRequest)
             .then(
                 (data) => {
-                    loginSuccessHandler(data, values.rememberMe);
+                    loginSuccessHandler(data);
                 },
                 (error) => {
                     setLoading(false)
@@ -242,13 +243,9 @@ const Login = () => {
 
     }
 
-    const loginSuccessHandler = async (data, rememberMe) => {
+    const loginSuccessHandler = async (data) => {
         setLoading(false)
-        if (rememberMe) {
-            localStorage.setItem('rememberMeToken', data.rememberMeToken)
-        }
-        Cookies.set('accessToken', data.accessToken)
-        Cookies.set('refreshToken', data.refreshToken)
+        saveToken(data)
         //oauth授权码登录跳转
         if (params.get('target')) {
             const urlObj = new URL(params.get('target'));
