@@ -75,7 +75,7 @@ app.whenReady().then(() => {
             currentWindow.close()
         }
         //设置系统托盘
-        const icon = nativeImage.createFromPath('./public/oxygen.png')
+        const icon = nativeImage.createFromPath(path.join(__dirname, './public/oxygen.png'))
         if(!tray){
             tray = new Tray(icon)
         }
