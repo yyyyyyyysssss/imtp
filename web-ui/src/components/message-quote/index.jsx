@@ -18,7 +18,7 @@ const MessageQuote = React.memo(({ style, message, vertical = true }) => {
         switch (type) {
             case MessageType.TEXT_MESSAGE:
                 return (
-                    <Tooltip style={{width: '100%'}} placement="top" title={content} color='white' overlayInnerStyle={{ color: 'gray' }} >
+                    <Tooltip style={{width: '100%'}} placement="top" title={content} color='white' styles={{body: {color: 'gray'}}} >
                         <div className='quote-content-div-content'>
                             {content}
                         </div>

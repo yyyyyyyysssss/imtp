@@ -5,7 +5,7 @@ process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = true
 
 app.commandLine.appendSwitch('js-flags', '--max-old-space-size=8092')
 
-const createWindow = (width, height, minWidth = 0, minHeight = 0, maximizable = true, checkLogin = false) => {
+const createWindow = (width, height, minWidth = 0, minHeight = 0, maximizable = true, checkLogin = false, pagePath = '') => {
     const win = new BrowserWindow({
         frame: false, //是否显示窗口控制按钮
         width: width,
@@ -45,8 +45,8 @@ const createWindow = (width, height, minWidth = 0, minHeight = 0, maximizable = 
     })
 
 
-    win.loadFile(path.join(__dirname, `./build/index.html`))
-    // win.loadURL('http://localhost:3000')
+    // win.loadFile(path.join(__dirname, `./build/index.html`))
+    win.loadURL(`http://localhost:3000${pagePath}`)
 
     //开发者工具
     // win.webContents.openDevTools()

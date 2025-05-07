@@ -56,6 +56,6 @@ const finalRoutes = routes.map((route) => {
     }
 })
 
-const router = createHashRouter(finalRoutes)
+const router = createBrowserRouter(finalRoutes)
 
 export default router;

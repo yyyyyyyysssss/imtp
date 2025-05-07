@@ -4,6 +4,7 @@ import Cookies from 'js-cookie'
 import { getToken } from './AuthProvider'
 import { useState } from 'react';
 import { tokenValid } from '../api/ApiService';
+import LoggingIn from '../components/logging-in';
 
 
 const AuthenticatedProvider = ({ children }) => {
@@ -25,10 +26,8 @@ const AuthenticatedProvider = ({ children }) => {
             }
             // oauth授权码登录跳转
             if (params.get('target') && loginIn) {
-                console.log(params.get('target'))
                 const token = Cookies.get("accessToken");
                 const target = params.get('target') + '&access_token=' + token;
-                console.log(target)
                 window.location.href = target;
             }
         }
@@ -37,9 +36,11 @@ const AuthenticatedProvider = ({ children }) => {
 
 
     if(loginFlag === null){
+        if(window.electronAPI){
+            return <LoggingIn/>
+        }
         return <></>
     }
-
     //已登录情况下且不是oauth2回调的访问直接跳转主页
     return (!params.get('code') && loginFlag) ? <Navigate to='/home' replace={true} /> : children;
 }

@@ -3,6 +3,7 @@ import Cookies from 'js-cookie'
 import { jwtDecode } from 'jwt-decode'
 import { tokenValid } from '../api/ApiService';
 import { useEffect, useState } from 'react';
+import LoggingIn from '../components/logging-in';
 
 export const isLoginIn = () => {
 
@@ -40,10 +41,10 @@ export const getToken = () => {
 }
 
 export const clearToken = () => {
-    Cookies.remove('accessToken');
-    Cookies.remove('refreshToken');
-    localStorage.removeItem('accessToken')
-    localStorage.removeItem('refreshToken')
+    // Cookies.remove('accessToken');
+    // Cookies.remove('refreshToken');
+    // localStorage.removeItem('accessToken')
+    // localStorage.removeItem('refreshToken')
 }
 
 const AuthProvider = ({ children }) => {
@@ -63,6 +64,9 @@ const AuthProvider = ({ children }) => {
     }, [])
 
     if (loginFlag === null) {
+        // if (window.electronAPI) {
+        //     return <LoggingIn />
+        // }
         return <></>
     }
     if (loginFlag === false) {
