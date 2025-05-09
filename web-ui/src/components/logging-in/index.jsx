@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react'
-import { LoadingOutlined } from '@ant-design/icons';
 import './index.less'
-import { Flex, Progress, Spin } from 'antd'
+import { Flex, Progress } from 'antd'
 import { SystemIcon } from '../customIcon';
 
 

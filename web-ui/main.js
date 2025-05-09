@@ -1,4 +1,6 @@
 const { app, Tray, BrowserWindow, Menu, nativeImage, ipcMain } = require('electron');
+
+const url = require('url');
 const path = require('node:path')
 
 process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = true
@@ -45,7 +47,15 @@ const createWindow = (width, height, minWidth = 0, minHeight = 0, maximizable = 
     })
 
 
-    // win.loadFile(path.join(__dirname, `./build/index.html`))
+    //生产环境
+    // win.loadURL(
+    //     url.format({
+    //         pathname: path.join(__dirname, './build/index.html'),
+    //         protocol: 'file:',
+    //         slashes: true,
+    //     }) + `#${pagePath}`
+    // );
+    //测试环境
     win.loadURL(`http://localhost:3000${pagePath}`)
 
     //开发者工具
@@ -62,12 +72,12 @@ let currentWindow;
 let tray;
 
 app.whenReady().then(() => {
-    currentWindow = createWindow(350, 600, 0, 0, false, true)
+    currentWindow = createWindow(350, 600, 0, 0, false, true, '/login')
     ipcMain.handle('logout', () => {
         if (currentWindow) {
             currentWindow.close()
         }
-        currentWindow = createWindow(350, 600, 0, 0, false, false)
+        currentWindow = createWindow(350, 600, 0, 0, false, false, '/login')
     })
     //登录成功
     ipcMain.handle('loginSuccess', () => {
@@ -76,7 +86,7 @@ app.whenReady().then(() => {
         }
         //设置系统托盘
         const icon = nativeImage.createFromPath(path.join(__dirname, './public/oxygen.png'))
-        if(!tray){
+        if (!tray) {
             tray = new Tray(icon)
         }
         tray.setToolTip('氧气')
@@ -92,7 +102,7 @@ app.whenReady().then(() => {
             currentWindow.show()
         })
         //打开新窗口
-        currentWindow = createWindow(1000, 750, 700, 500, true, false)
+        currentWindow = createWindow(1000, 750, 700, 500, true, false, '/home')
     })
     //获取当前窗口大小
     ipcMain.handle('getWindowSize', () => {
@@ -134,7 +144,7 @@ app.whenReady().then(() => {
         // 在 macOS 系统内, 如果没有已开启的应用窗口
         // 点击托盘图标时通常会重新创建一个新窗口
         if (BrowserWindow.getAllWindows().length === 0) {
-            currentWindow = createWindow(1000, 750, 700, 500)
+            currentWindow = createWindow(1000, 750, 700, 500, '/home')
         }
     })
 })

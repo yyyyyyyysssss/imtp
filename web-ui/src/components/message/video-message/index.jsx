@@ -93,6 +93,7 @@ const VideoMessage = React.memo(({ content, status, contentMetadata, maxHeight =
                 )}
             </div>
             <Modal
+                className='video-pay-modal'
                 centered
                 destroyOnClose={true}
                 maskClosable={false}

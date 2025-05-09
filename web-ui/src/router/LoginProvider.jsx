@@ -41,8 +41,14 @@ const AuthenticatedProvider = ({ children }) => {
         }
         return <></>
     }
+    if(loginFlag === true){
+        if(window.electronAPI){
+            window.electronAPI.loginSuccess()
+            return
+        }
+    }
     //已登录情况下且不是oauth2回调的访问直接跳转主页
-    return (!params.get('code') && loginFlag) ? <Navigate to='/home' replace={true} /> : children;
+    return (!params.get('code') && loginFlag === true) ? <Navigate to='/home' replace={true} /> : children;
 }
 
 

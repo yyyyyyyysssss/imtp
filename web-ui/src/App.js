@@ -4,25 +4,12 @@ import { Provider } from 'react-redux';
 import store from './redux/store';
 import { RouterProvider } from 'react-router-dom';
 import { useEffect } from 'react';
-import { clearToken, getToken } from './router/AuthProvider';
-import { tokenValid } from './api/ApiService';
+import { clearToken } from './router/AuthProvider';
 
 function App() {
 
   useEffect(() => {
-    const checkElectronLogin = async () => {
-      const token = getToken()
-      if (token) {
-        const valid = await tokenValid(token)
-        if (valid.active === true) {
-          window.electronAPI.loginSuccess()
-        }
-      }
-    }
     if (window.electronAPI) {
-      window.electronAPI.checkLogin(() => {
-        checkElectronLogin()
-      })
       window.electronAPI.onQuit(() => {
         clearToken()
       })
@@ -31,8 +18,8 @@ function App() {
 
   return (
     <Provider store={store}>
-      <RouterProvider 
-        router={router} 
+      <RouterProvider
+        router={router}
         future={{
           v7_startTransition: true,
           v7_relativeSplatPath: true
