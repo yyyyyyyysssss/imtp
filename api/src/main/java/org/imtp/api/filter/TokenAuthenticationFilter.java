@@ -1,5 +1,6 @@
 package org.imtp.api.filter;
 
+import groovy.lang.Tuple2;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -7,7 +8,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.imtp.api.config.RedisSecurityContextRepository;
 import org.imtp.api.enums.TokenType;
 import org.imtp.api.service.TokenService;
-import org.imtp.api.utils.JwtUtil;
 import org.imtp.api.utils.PayloadInfo;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -46,8 +46,9 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
         //设置请求属性  由RedisSecurityContextRepository加载SecurityContext
-        if (tokenService.isValid(token,TokenType.ACCESS_TOKEN)){
-            String userId = JwtUtil.extractPayloadInfo(token, PayloadInfo::getSubject);
+        Tuple2<Boolean, PayloadInfo> valid = tokenService.isValid(token, TokenType.ACCESS_TOKEN);
+        if (valid.getV1()){
+            String userId = valid.getV2().getSubject();
             request.setAttribute(RedisSecurityContextRepository.DEFAULT_REQUEST_ATTR_NAME, userId);
         }
         filterChain.doFilter(request,response);

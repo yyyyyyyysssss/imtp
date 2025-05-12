@@ -3,7 +3,9 @@ package org.imtp.api.config;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.imtp.api.domain.entity.User;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.context.SecurityContextHolderStrategy;
@@ -78,6 +80,15 @@ public class RedisSecurityContextRepository implements SecurityContextRepository
     public boolean clearContext(String userId){
 
         return Boolean.TRUE.equals(authRedisTemplate.delete(SECURITY_CONTEXT_KEY_PREFIX + userId));
+    }
+
+    public boolean clearContext(){
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+        if (securityContext != null && securityContext.getAuthentication() != null && !(securityContext.getAuthentication() instanceof AnonymousAuthenticationToken)){
+            User user = (User)securityContext.getAuthentication().getPrincipal();
+            return Boolean.TRUE.equals(authRedisTemplate.delete(SECURITY_CONTEXT_KEY_PREFIX + user.getId()));
+        }
+        return false;
     }
 
 }

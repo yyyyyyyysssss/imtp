@@ -7,6 +7,7 @@ import org.apache.zookeeper.Watcher;
 import org.apache.zookeeper.ZooKeeper;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 
 import java.util.concurrent.CountDownLatch;
@@ -48,6 +49,7 @@ public class ZookeeperConfig {
 
 
     @Bean
+    @DependsOn("zooKeeper")
     public ServiceDiscovery serviceDiscovery(ZooKeeper zooKeeper){
 
         return new ServiceDiscovery(zooKeeper);

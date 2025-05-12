@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react'
-import './index.less'
 import { Flex, Progress } from 'antd'
 import { SystemIcon } from '../customIcon';
 

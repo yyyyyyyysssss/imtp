@@ -1,6 +1,8 @@
 package org.imtp.api.controller;
 
+import groovy.lang.Tuple2;
 import jakarta.annotation.Resource;
+import org.imtp.api.utils.PayloadInfo;
 import org.imtp.common.packet.body.*;
 import org.imtp.common.packet.common.MessageDTO;
 import org.imtp.common.response.Result;
@@ -10,9 +12,7 @@ import org.imtp.api.enums.TokenType;
 import org.imtp.api.service.TokenService;
 import org.imtp.api.service.UserService;
 import org.imtp.api.service.UserSocialService;
-import org.imtp.api.utils.JwtUtil;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 /**
@@ -35,9 +35,9 @@ public class InternalController {
 
     @GetMapping("/tokenValid")
     public Result<UserInfo> tokenValid(@RequestParam("token") String token){
-        boolean valid = tokenService.isValid(token, TokenType.ACCESS_TOKEN);
-        if (valid){
-            String userId = JwtUtil.extractPayloadInfo(token).getSubject();
+        Tuple2<Boolean, PayloadInfo> valid = tokenService.isValid(token, TokenType.ACCESS_TOKEN);
+        if (valid.getV1()){
+            String userId = valid.getV2().getSubject();
             User user = userService.findByUserId(userId);
             UserInfo userInfo = new UserInfo();
             userInfo.setId(user.getId());

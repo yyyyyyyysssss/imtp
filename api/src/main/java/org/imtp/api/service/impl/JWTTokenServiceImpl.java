@@ -1,5 +1,6 @@
 package org.imtp.api.service.impl;
 
+import groovy.lang.Tuple2;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.imtp.common.enums.ClientType;
@@ -39,8 +40,7 @@ public class JWTTokenServiceImpl implements TokenService {
     private AuthProperties authProperties;
 
     @Override
-    public TokenInfo generate(User user, ClientType clientType) {
-        Long userId = user.getId();
+    public TokenInfo generate(Long userId, ClientType clientType) {
         String accessToken = generateAccessToken(userId,clientType);
         String refreshToken = generateRefreshToken(userId,clientType);
         PayloadInfo payloadInfo = JwtUtil.extractPayloadInfo(accessToken);
@@ -110,18 +110,19 @@ public class JWTTokenServiceImpl implements TokenService {
     }
 
     @Override
-    public boolean isValid(String token, TokenType tokenType) {
+    public Tuple2<Boolean, PayloadInfo> isValid(String token, TokenType tokenType) {
         String tokenId;
+        PayloadInfo payloadInfo;
         switch (tokenType){
             case ACCESS_TOKEN :
                 if(!JwtUtil.verifier(token)){
                     log.warn("token已过期");
-                    return false;
+                    return new Tuple2<>(false, null);
                 }
-                PayloadInfo payloadInfo = JwtUtil.extractPayloadInfo(token);
+                payloadInfo = JwtUtil.extractPayloadInfo(token);
                 if(!tokenType.equals(payloadInfo.getTokenType())){
                     log.warn("token类型不相符");
-                    return false;
+                    return new Tuple2<>(false, null);
                 }
                 tokenId = payloadInfo.getId();
                 break;
@@ -130,7 +131,7 @@ public class JWTTokenServiceImpl implements TokenService {
                 long tokenExpiryTime = refreshTokenPayloadInfo.getExpiration();
                 if (tokenExpiryTime < System.currentTimeMillis()){
                     log.warn("签名已过期");
-                    return false;
+                    return new Tuple2<>(false, null);
                 }
                 String clientType = refreshTokenPayloadInfo.getClientType().name();
                 String userId = refreshTokenPayloadInfo.getSubject();
@@ -139,15 +140,23 @@ public class JWTTokenServiceImpl implements TokenService {
                 String actualTokenSignature = refreshTokenPayloadInfo.getId();
                 if (!actualAlgorithm.equals(RefreshTokenServices.RefreshTokenAlgorithm.SHA256)){
                     log.warn("不支持的算法");
-                    return false;
+                    return new Tuple2<>(false, null);
                 }
                 String secretKey = authProperties.getJwt().getSecretKey();
                 String expectedTokenSignature = EncryptUtil.sha256(userId, tokenExpiryTime + "",clientType, secretKey);
                 if(!equals(expectedTokenSignature, actualTokenSignature)){
                     log.warn("当前签名: {} 预期签名: {}",actualTokenSignature,expectedTokenSignature);
-                    return false;
+                    return new Tuple2<>(false, null);
                 }
                 tokenId = refreshTokenPayloadInfo.getId();
+                payloadInfo = PayloadInfo
+                        .builder()
+                        .id(tokenId)
+                        .subject(userId)
+                        .clientType(refreshTokenPayloadInfo.getClientType())
+                        .tokenType(TokenType.REFRESH_TOKEN)
+                        .expiration(refreshTokenPayloadInfo.getExpiration())
+                        .build();
                 break;
             default:
                 throw new UnsupportedOperationException("不支持的token类型: " + tokenType);
@@ -155,9 +164,9 @@ public class JWTTokenServiceImpl implements TokenService {
         //黑名单
         if(redisWrapper.hasKey(RedisKey.TOKEN_BLACKLIST + tokenId)){
             log.warn("token已被加入黑名单");
-            return false;
+            return new Tuple2<>(false, null);
         }
-        return true;
+        return new Tuple2<>(true, payloadInfo);
     }
 
     private String key(Long userId, ClientType clientType) {

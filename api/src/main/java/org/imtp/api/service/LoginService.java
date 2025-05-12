@@ -58,7 +58,7 @@ public class LoginService {
             rememberMeToken = rememberMeToken(user.getUsername(), user.getPassword());
         }
         //生成token
-        TokenInfo tokenInfo = tokenService.generate(user, clientType);
+        TokenInfo tokenInfo = tokenService.generate(user.getId(), clientType);
         tokenInfo.setRememberMeToken(rememberMeToken);
         //序列化securityContext
         saveSecurityContext(user.getId(),authenticate);

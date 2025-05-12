@@ -32,7 +32,7 @@ public class RefreshTokenServices {
     }
 
     public boolean tokenValid(String token){
-        if (!tokenService.isValid(token, TokenType.REFRESH_TOKEN)){
+        if (!tokenService.isValid(token, TokenType.REFRESH_TOKEN).getV1()){
             log.warn("该refreshToken已失效");
             return false;
         }

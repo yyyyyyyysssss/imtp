@@ -1,17 +1,16 @@
 package org.imtp.api.controller;
 
+import groovy.lang.Tuple2;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
 import org.imtp.common.response.Result;
 import org.imtp.common.response.ResultGenerator;
 import org.imtp.api.config.EmailAuthenticationProvider;
-import org.imtp.api.config.RefreshTokenServices;
 import org.imtp.api.domain.dto.EmailInfo;
 import org.imtp.api.domain.vo.TokenValidVO;
 import org.imtp.api.enums.TokenType;
 import org.imtp.api.service.EmailService;
 import org.imtp.api.service.TokenService;
-import org.imtp.api.utils.JwtUtil;
 import org.imtp.api.utils.PayloadInfo;
 import org.imtp.api.utils.QrCodeUtil;
 import org.imtp.api.utils.VerificationCodeUtil;
@@ -46,21 +45,14 @@ public class OpenController {
 
     @GetMapping("/tokenValid")
     public Result<TokenValidVO> tokenValid(@RequestParam("token") String token, @RequestParam("tokenType") TokenType tokenType){
-        boolean valid = tokenService.isValid(token, tokenType);
+        Tuple2<Boolean, PayloadInfo> valid = tokenService.isValid(token, tokenType);
         TokenValidVO tokenValidVO = new TokenValidVO();
-        tokenValidVO.setActive(valid);
-        if (valid) {
-            if (tokenType.equals(TokenType.ACCESS_TOKEN)){
-                PayloadInfo payloadInfo = JwtUtil.extractPayloadInfo(token);
-                tokenValidVO.setSubject(payloadInfo.getSubject());
-                tokenValidVO.setClientType(payloadInfo.getClientType());
-                tokenValidVO.setExpiration(payloadInfo.getExpiration());
-            }else {
-                RefreshTokenServices.RefreshTokenPayloadInfo refreshTokenPayloadInfo = RefreshTokenServices.extractPayloadInfo(token);
-                tokenValidVO.setSubject(refreshTokenPayloadInfo.getSubject());
-                tokenValidVO.setClientType(refreshTokenPayloadInfo.getClientType());
-                tokenValidVO.setExpiration(refreshTokenPayloadInfo.getExpiration());
-            }
+        tokenValidVO.setActive(valid.getV1());
+        if (valid.getV1()) {
+            PayloadInfo payloadInfo = valid.getV2();
+            tokenValidVO.setSubject(payloadInfo.getSubject());
+            tokenValidVO.setClientType(payloadInfo.getClientType());
+            tokenValidVO.setExpiration(payloadInfo.getExpiration());
         }
         return ResultGenerator.ok(tokenValidVO);
     }
