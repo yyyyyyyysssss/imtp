@@ -76,8 +76,8 @@ public class LoginController {
         SecurityContext securityContext = SecurityContextHolder.getContext();
         Authentication authentication = securityContext.getAuthentication();
         TokenInfo tokenInfo = null;
-        if (authentication instanceof RefreshAuthenticationToken) {
-            tokenInfo = loginService.login(authentication, false, ((RefreshAuthenticationToken) authentication).getClientType());
+        if (authentication instanceof RefreshAuthenticationToken refreshAuthenticationToken) {
+            tokenInfo = loginService.login(authentication, false, refreshAuthenticationToken.getClientType());
         }
         if (tokenInfo == null) {
             throw new BadCredentialsException("Bad Credentials");

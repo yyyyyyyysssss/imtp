@@ -1,13 +1,11 @@
 package org.imtp.api.config;
 
+import groovy.lang.Tuple2;
 import lombok.extern.slf4j.Slf4j;
-import org.imtp.common.enums.ClientType;
 import org.imtp.api.enums.TokenType;
 import org.imtp.api.service.TokenService;
-import org.imtp.api.utils.EncryptUtil;
+import org.imtp.api.utils.PayloadInfo;
 import org.springframework.security.core.Authentication;
-
-import java.util.function.Function;
 
 /**
  * @Description
@@ -24,25 +22,14 @@ public class RefreshTokenServices {
     }
 
     public Authentication refreshToken(String token){
-        if (tokenValid(token)){
-            RefreshTokenPayloadInfo refreshTokenPayloadInfo = extractPayloadInfo(token);
-            return RefreshAuthenticationToken.unauthenticated(refreshTokenPayloadInfo.getSubject(),null,refreshTokenPayloadInfo.getClientType());
+        Tuple2<Boolean, PayloadInfo> valid = tokenService.isValid(token, TokenType.REFRESH_TOKEN);
+        if (valid.getV1()){
+            PayloadInfo payloadInfo = valid.getV2();
+            return RefreshAuthenticationToken.unauthenticated(payloadInfo.getSubject(),null,payloadInfo.getClientType());
+        }else {
+            log.warn("该refreshToken已失效:{}",token);
         }
         return null;
-    }
-
-    public boolean tokenValid(String token){
-        if (!tokenService.isValid(token, TokenType.REFRESH_TOKEN).getV1()){
-            log.warn("该refreshToken已失效");
-            return false;
-        }
-        log.info("签名校验成功");
-        return true;
-    }
-
-
-    private static boolean isValidTokensLength(String[] tokens) {
-        return tokens.length == 5;
     }
 
     public enum RefreshTokenAlgorithm {
@@ -56,63 +43,6 @@ public class RefreshTokenServices {
 
         public String getDigestAlgorithm() {
             return this.digestAlgorithm;
-        }
-    }
-
-
-    public static <T> T extractPayloadInfo(String token,Function<RefreshTokenServices.RefreshTokenPayloadInfo,T> claimsResolver){
-        RefreshTokenServices.RefreshTokenPayloadInfo refreshTokenPayloadInfo = extractPayloadInfo(token);
-        return extractPayloadInfo(refreshTokenPayloadInfo,claimsResolver);
-    }
-
-    public static <T> T extractPayloadInfo(RefreshTokenServices.RefreshTokenPayloadInfo refreshTokenPayloadInfo, Function<RefreshTokenServices.RefreshTokenPayloadInfo,T> claimsResolver){
-        return claimsResolver.apply(refreshTokenPayloadInfo);
-    }
-
-    public static RefreshTokenServices.RefreshTokenPayloadInfo extractPayloadInfo(String token){
-        String base64DecodeStr = EncryptUtil.base64Decode(token);
-        String[] tokens = base64DecodeStr.split(":");
-        if (!isValidTokensLength(tokens)){
-            throw new RuntimeException("token length should be 5 but only " + tokens.length);
-        }
-        return new RefreshTokenServices.RefreshTokenPayloadInfo(tokens);
-    }
-
-    public static class RefreshTokenPayloadInfo {
-        private String id;
-        private String subject;
-        private Long expiration;
-        private ClientType clientType;
-        private String algorithm;
-
-        public RefreshTokenPayloadInfo(String[] tokens){
-            this.id = tokens[4];
-            this.subject = tokens[0];
-            this.expiration = Long.parseLong(tokens[1]);
-            this.clientType = ClientType.valueOf(tokens[2]);
-            this.algorithm = tokens[3];
-
-        }
-
-        public String getId() {
-            return id;
-        }
-
-
-        public String getSubject() {
-            return subject;
-        }
-
-        public Long getExpiration() {
-            return expiration;
-        }
-
-        public ClientType getClientType() {
-            return clientType;
-        }
-
-        public String getAlgorithm() {
-            return algorithm;
         }
     }
 

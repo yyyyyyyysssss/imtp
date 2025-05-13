@@ -13,7 +13,6 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.server.resource.web.BearerTokenResolver;
 import org.springframework.web.filter.OncePerRequestFilter;
-
 import java.io.IOException;
 
 /**

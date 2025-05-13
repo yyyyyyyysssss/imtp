@@ -10,12 +10,10 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.context.SecurityContextHolderStrategy;
 import org.springframework.security.oauth2.server.resource.web.BearerTokenResolver;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
-
 import java.io.IOException;
 
 /**
@@ -24,8 +22,6 @@ import java.io.IOException;
  * @Date 2024/7/25 15:25
  */
 public class RefreshTokenAuthenticationFilter extends OncePerRequestFilter {
-
-    private SecurityContextHolderStrategy securityContextHolderStrategy = SecurityContextHolder.getContextHolderStrategy();
 
     private BearerTokenResolver bearerTokenResolver;
 

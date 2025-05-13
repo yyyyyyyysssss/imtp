@@ -11,7 +11,6 @@ import org.imtp.api.config.redis.RedisKey;
 import org.imtp.api.config.redis.RedisWrapper;
 import org.imtp.api.domain.dto.TokenDTO;
 import org.imtp.api.domain.entity.TokenInfo;
-import org.imtp.api.domain.entity.User;
 import org.imtp.api.enums.TokenType;
 import org.imtp.api.service.TokenService;
 import org.imtp.api.utils.EncryptUtil;
@@ -127,17 +126,21 @@ public class JWTTokenServiceImpl implements TokenService {
                 tokenId = payloadInfo.getId();
                 break;
             case REFRESH_TOKEN:
-                RefreshTokenServices.RefreshTokenPayloadInfo refreshTokenPayloadInfo = RefreshTokenServices.extractPayloadInfo(token);
-                long tokenExpiryTime = refreshTokenPayloadInfo.getExpiration();
+                String base64DecodeStr = EncryptUtil.base64Decode(token);
+                String[] tokens = base64DecodeStr.split(":");
+                if (tokens.length != 5){
+                    throw new RuntimeException("token length should be 5 but only " + tokens.length);
+                }
+                long tokenExpiryTime = Long.parseLong(tokens[1]);
                 if (tokenExpiryTime < System.currentTimeMillis()){
                     log.warn("签名已过期");
                     return new Tuple2<>(false, null);
                 }
-                String clientType = refreshTokenPayloadInfo.getClientType().name();
-                String userId = refreshTokenPayloadInfo.getSubject();
-                String alg = refreshTokenPayloadInfo.getAlgorithm();
+                String clientType = ClientType.valueOf(tokens[2]).name();
+                String userId = tokens[0];
+                String alg = tokens[3];
                 RefreshTokenServices.RefreshTokenAlgorithm actualAlgorithm = RefreshTokenServices.RefreshTokenAlgorithm.valueOf(alg);
-                String actualTokenSignature = refreshTokenPayloadInfo.getId();
+                String actualTokenSignature = tokens[4];
                 if (!actualAlgorithm.equals(RefreshTokenServices.RefreshTokenAlgorithm.SHA256)){
                     log.warn("不支持的算法");
                     return new Tuple2<>(false, null);
@@ -148,14 +151,14 @@ public class JWTTokenServiceImpl implements TokenService {
                     log.warn("当前签名: {} 预期签名: {}",actualTokenSignature,expectedTokenSignature);
                     return new Tuple2<>(false, null);
                 }
-                tokenId = refreshTokenPayloadInfo.getId();
+                tokenId = actualTokenSignature;
                 payloadInfo = PayloadInfo
                         .builder()
                         .id(tokenId)
                         .subject(userId)
-                        .clientType(refreshTokenPayloadInfo.getClientType())
+                        .clientType(ClientType.valueOf(clientType))
                         .tokenType(TokenType.REFRESH_TOKEN)
-                        .expiration(refreshTokenPayloadInfo.getExpiration())
+                        .expiration(tokenExpiryTime)
                         .build();
                 break;
             default:
