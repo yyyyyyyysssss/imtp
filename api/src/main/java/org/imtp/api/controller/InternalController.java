@@ -9,7 +9,7 @@ import org.imtp.common.response.Result;
 import org.imtp.common.response.ResultGenerator;
 import org.imtp.api.domain.entity.User;
 import org.imtp.api.enums.TokenType;
-import org.imtp.api.service.TokenService;
+import org.imtp.api.config.security.TokenService;
 import org.imtp.api.service.UserService;
 import org.imtp.api.service.UserSocialService;
 import org.springframework.web.bind.annotation.*;

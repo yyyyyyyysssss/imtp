@@ -1,5 +1,6 @@
 package org.imtp.api.config.security.authentication.email;
 
+import org.imtp.api.config.redis.RedisWrapper;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -18,13 +19,13 @@ public class EmailAuthenticationProvider implements AuthenticationProvider {
 
     private UserDetailsService userDetailsService;
 
-    private RedisTemplate<String, Object> redisTemplate;
+    private RedisWrapper redisWrapper;
 
     public static final String EMAIL_VERIFICATION_CODE_PREFIX = "email:verification:code:";
 
-    public EmailAuthenticationProvider(UserDetailsService userDetailsService,RedisTemplate<String, Object> redisTemplate){
+    public EmailAuthenticationProvider(UserDetailsService userDetailsService,RedisWrapper redisWrapper){
         this.userDetailsService = userDetailsService;
-        this.redisTemplate = redisTemplate;
+        this.redisWrapper = redisWrapper;
     }
 
     @Override
@@ -39,11 +40,11 @@ public class EmailAuthenticationProvider implements AuthenticationProvider {
         if (userDetails == null) {
             throw new InternalAuthenticationServiceException("UserDetailsService returned null, which is an interface contract violation");
         }
-        Object verificationCode = redisTemplate.opsForValue().get(EMAIL_VERIFICATION_CODE_PREFIX + principal);
+        Object verificationCode = redisWrapper.getValue(EMAIL_VERIFICATION_CODE_PREFIX + principal);
         if (verificationCode == null || !verificationCode.equals(credentials)){
             throw new BadCredentialsException("验证码错误!");
         }
-        redisTemplate.delete(EMAIL_VERIFICATION_CODE_PREFIX + principal);
+        redisWrapper.delete(EMAIL_VERIFICATION_CODE_PREFIX + principal);
         EmailAuthenticationToken authenticated = EmailAuthenticationToken.authenticated(
                 userDetails,
                 null,

@@ -3,6 +3,7 @@ package org.imtp.api.service;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.imtp.api.config.security.TokenService;
 import org.imtp.common.enums.ClientType;
 import org.imtp.api.config.security.AuthProperties;
 import org.imtp.api.config.security.RedisSecurityContextRepository;
@@ -61,7 +62,7 @@ public class LoginService {
         TokenInfo tokenInfo = tokenService.generate(user.getId(), clientType);
         tokenInfo.setRememberMeToken(rememberMeToken);
         //序列化securityContext
-        saveSecurityContext(user.getId(),authenticate);
+        saveSecurityContext(tokenInfo.getId(),authenticate);
         return tokenInfo;
     }
 
@@ -73,13 +74,13 @@ public class LoginService {
         return EncryptUtil.base64Encode(username, Long.toString(expiration), TokenBasedRememberMeServices.RememberMeTokenAlgorithm.SHA256.name(), encryptStr);
     }
 
-    private void saveSecurityContext(Long userId,Authentication authenticate){
+    private void saveSecurityContext(String tokenId,Authentication authenticate){
         SecurityContext securityContext = SecurityContextHolder.getContext();
         securityContext.setAuthentication(authenticate);
         RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
         HttpServletRequest request = ((ServletRequestAttributes) requestAttributes).getRequest();
         HttpServletResponse response = ((ServletRequestAttributes) requestAttributes).getResponse();
-        request.setAttribute(RedisSecurityContextRepository.DEFAULT_REQUEST_ATTR_NAME,userId.toString());
+        request.setAttribute(RedisSecurityContextRepository.DEFAULT_REQUEST_ATTR_NAME,tokenId);
         securityContextRepository.saveContext(securityContext,request,response);
     }
 

@@ -10,7 +10,7 @@ import org.imtp.api.domain.dto.EmailInfo;
 import org.imtp.api.domain.vo.TokenValidVO;
 import org.imtp.api.enums.TokenType;
 import org.imtp.api.service.EmailService;
-import org.imtp.api.service.TokenService;
+import org.imtp.api.config.security.TokenService;
 import org.imtp.api.utils.PayloadInfo;
 import org.imtp.api.utils.QrCodeUtil;
 import org.imtp.api.utils.VerificationCodeUtil;

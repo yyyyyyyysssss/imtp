@@ -23,7 +23,7 @@ public class TokenInfo {
     @Tolerate
     public TokenInfo(){}
 
-    private Long id;
+    private String id;
 
     private Long userId;
 

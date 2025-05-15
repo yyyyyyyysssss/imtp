@@ -1,19 +1,22 @@
 package org.imtp.api.config.security;
 
 import jakarta.annotation.Resource;
-import org.imtp.api.config.security.authentication.apikey.SeparatorAntPathRequestMatcher;
-import org.imtp.api.config.security.authorization.PathVariableGuard;
-import org.imtp.api.config.security.oauth2.OAuthClientAuthenticationProvider;
-import org.imtp.api.config.security.authentication.*;
+import org.imtp.api.config.redis.RedisWrapper;
+import org.imtp.api.config.security.authentication.CustomAccessDeniedEntryPoint;
+import org.imtp.api.config.security.authentication.CustomAuthenticationEntryPoint;
+import org.imtp.api.config.security.authentication.NormalBearerTokenResolver;
+import org.imtp.api.config.security.authentication.TokenAuthenticationFilter;
 import org.imtp.api.config.security.authentication.apikey.ApikeyAuthenticationProvider;
+import org.imtp.api.config.security.authentication.apikey.SeparatorAntPathRequestMatcher;
 import org.imtp.api.config.security.authentication.email.EmailAuthenticationProvider;
 import org.imtp.api.config.security.authentication.ott.MagicLinkOneTimeTokenGenerationSuccessHandler;
 import org.imtp.api.config.security.authentication.refreshtoken.RefreshAuthenticationProvider;
-import org.imtp.api.config.security.authentication.refreshtoken.RefreshTokenServices;
-import org.imtp.api.config.security.authorization.RequestPathAuthorizationManager;
 import org.imtp.api.config.security.authentication.refreshtoken.RefreshTokenAuthenticationFilter;
-import org.imtp.api.config.security.authentication.TokenAuthenticationFilter;
-import org.imtp.api.service.TokenService;
+import org.imtp.api.config.security.authentication.refreshtoken.RefreshTokenServices;
+import org.imtp.api.config.security.authorization.PathVariableGuard;
+import org.imtp.api.config.security.authorization.RequestPathAuthorizationManager;
+import org.imtp.api.config.security.oauth2.OAuthClientAuthenticationProvider;
+import org.imtp.api.service.LogoutService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -34,6 +37,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -67,19 +71,16 @@ public class SecurityConfig {
     private UserDetailsService userService;
 
     @Resource
-    private HttpSecurity http;
-
-    @Resource
-    private LogoutHandler logoutHandler;
-
-    @Resource
-    private TokenService tokenService;
+    private LogoutService logoutService;
 
     @Resource
     private AuthProperties authProperties;
 
     @Resource
-    private RedisTemplate<String, Object> redisTemplate;
+    private RedisWrapper redisWrapper;
+
+    @Resource
+    private RedisTemplate<String, SecurityContext> authRedisTemplate;
 
     @Resource
     private JdbcTemplate jdbcTemplate;
@@ -144,15 +145,15 @@ public class SecurityConfig {
                     ott.tokenGenerationSuccessHandler(new MagicLinkOneTimeTokenGenerationSuccessHandler(authProperties.getLoginPage()));
                 })
                 //该过滤器解析token并校验通过后由SecurityContextHolderFilter过滤器加载SecurityContext
-                .addFilterBefore(tokenAuthenticationFilter(), SecurityContextHolderFilter.class)
+                .addFilterBefore(tokenAuthenticationFilter(tokenService()), SecurityContextHolderFilter.class)
                 //记住我过滤器
-                .addFilterBefore(rememberMeFilter(), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(rememberMeFilter(http), UsernamePasswordAuthenticationFilter.class)
                 //刷新token过滤器
-                .addFilterAfter(refreshTokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
+                .addFilterAfter(refreshTokenAuthenticationFilter(http,tokenService()), UsernamePasswordAuthenticationFilter.class)
                 //基于请求头apikey认证的过滤器
-                .addFilterBefore(apikeyAuthenticationFilter(), HeaderWriterFilter.class)
+                .addFilterBefore(apikeyAuthenticationFilter(http), HeaderWriterFilter.class)
                 //登出过滤器
-                .addFilterAfter(logoutFilter(), AuthorizationFilter.class)
+                .addFilterAfter(logoutFilter(bearerTokenResolver(),tokenService()), AuthorizationFilter.class)
                 .logout(AbstractHttpConfigurer::disable);
         return http.build();
     }
@@ -160,7 +161,7 @@ public class SecurityConfig {
     //身份认证管理器
     @Bean
     @Primary
-    public AuthenticationManager authenticationManager() throws Exception {
+    public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
         return http.getSharedObject(AuthenticationManagerBuilder.class)
                 //用户名密码身份认证
                 .authenticationProvider(daoAuthenticationProvider())
@@ -194,7 +195,7 @@ public class SecurityConfig {
     //三方登录认证
     @Bean
     public EmailAuthenticationProvider emailAuthenticationProvider() {
-        return new EmailAuthenticationProvider(userService, redisTemplate);
+        return new EmailAuthenticationProvider(userService, redisWrapper);
     }
 
     //三方登录认证
@@ -214,21 +215,21 @@ public class SecurityConfig {
 
     //token过滤器
     @Bean
-    public TokenAuthenticationFilter tokenAuthenticationFilter() {
+    public TokenAuthenticationFilter tokenAuthenticationFilter(TokenService tokenService) {
 
         return new TokenAuthenticationFilter(bearerTokenResolver(), tokenService);
     }
 
     //刷新token
     @Bean
-    public RefreshTokenServices refreshTokenServices(){
+    public RefreshTokenServices refreshTokenServices(TokenService tokenService){
         return new RefreshTokenServices(tokenService);
     }
 
     @Bean
-    public RefreshTokenAuthenticationFilter refreshTokenAuthenticationFilter() throws Exception {
+    public RefreshTokenAuthenticationFilter refreshTokenAuthenticationFilter(HttpSecurity http,TokenService tokenService) throws Exception {
 
-        return new RefreshTokenAuthenticationFilter(authenticationManager(),bearerTokenResolver(), refreshTokenServices());
+        return new RefreshTokenAuthenticationFilter(authenticationManager(http),bearerTokenResolver(), refreshTokenServices(tokenService));
     }
     @Bean
     public RefreshAuthenticationProvider refreshAuthenticationProvider(){
@@ -237,13 +238,13 @@ public class SecurityConfig {
 
     //基于请求头apikey的认证过滤器
     @Bean
-    public RequestHeaderAuthenticationFilter apikeyAuthenticationFilter() throws Exception {
+    public RequestHeaderAuthenticationFilter apikeyAuthenticationFilter(HttpSecurity http) throws Exception {
         String[] antPaths = authProperties.requestHeadAuthenticationPath();
         RequestHeaderAuthenticationFilter requestHeaderAuthenticationFilter = new RequestHeaderAuthenticationFilter();
         requestHeaderAuthenticationFilter.setPrincipalRequestHeader("apikey");
         requestHeaderAuthenticationFilter.setExceptionIfHeaderMissing(false);
         requestHeaderAuthenticationFilter.setRequiresAuthenticationRequestMatcher(new SeparatorAntPathRequestMatcher(antPaths));
-        requestHeaderAuthenticationFilter.setAuthenticationManager(authenticationManager());
+        requestHeaderAuthenticationFilter.setAuthenticationManager(authenticationManager(http));
         return requestHeaderAuthenticationFilter;
     }
     @Bean
@@ -263,15 +264,31 @@ public class SecurityConfig {
     @Bean
     public SecurityContextRepository securityContextRepository() {
 
-        return new RedisSecurityContextRepository();
+        return new RedisSecurityContextRepository(authRedisTemplate,authProperties);
+    }
+
+    @Bean
+    public TokenService tokenService(){
+
+        return new JWTTokenService(redisWrapper,authProperties,securityContextRepository());
     }
 
     //登出过滤器
     @Bean
-    public LogoutFilter logoutFilter() {
+    public LogoutFilter logoutFilter(BearerTokenResolver bearerTokenResolver,TokenService tokenService) {
 
         return new LogoutFilter((req, res, auth) -> {
-        }, logoutHandler);
+        }, logoutHandler(bearerTokenResolver,tokenService),logoutService);
+    }
+    @Bean
+    public LogoutHandler logoutHandler(BearerTokenResolver bearerTokenResolver,TokenService tokenService){
+
+        return (request, response, authentication) -> {
+            //提取token
+            String token = bearerTokenResolver.resolve(request);
+            //将token过期
+            tokenService.revokeToken(token);
+        };
     }
 
     //密码加密  调试使用 生产环境使用BCryptPasswordEncoder
@@ -282,9 +299,9 @@ public class SecurityConfig {
 
     //记住我
     @Bean
-    public RememberMeAuthenticationFilter rememberMeFilter() throws Exception {
+    public RememberMeAuthenticationFilter rememberMeFilter(HttpSecurity http) throws Exception {
 
-        return new RememberMeAuthenticationFilter(authenticationManager(), rememberMeServices());
+        return new RememberMeAuthenticationFilter(authenticationManager(http), rememberMeServices());
     }
 
     @Bean

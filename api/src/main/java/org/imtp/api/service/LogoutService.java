@@ -1,11 +1,8 @@
 package org.imtp.api.service;
 
-import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.imtp.api.config.security.RedisSecurityContextRepository;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.oauth2.server.resource.web.BearerTokenResolver;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
 import org.springframework.stereotype.Service;
 
@@ -17,22 +14,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class LogoutService implements LogoutHandler {
 
-    @Resource
-    private RedisSecurityContextRepository securityContextRepository;
-
-    @Resource
-    private TokenService tokenService;
-
-    @Resource
-    private BearerTokenResolver bearerTokenResolver;
-
     @Override
     public void logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
-        //提取token
-        String token = bearerTokenResolver.resolve(request);
-        //清除用户的securityContext
-        securityContextRepository.clearContext();
-        //将token过期
-        tokenService.revokeToken(token);
+
     }
 }

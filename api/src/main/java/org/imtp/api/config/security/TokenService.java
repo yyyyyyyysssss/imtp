@@ -1,4 +1,4 @@
-package org.imtp.api.service;
+package org.imtp.api.config.security;
 
 import groovy.lang.Tuple2;
 import org.imtp.api.domain.entity.TokenInfo;

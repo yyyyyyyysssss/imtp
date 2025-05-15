@@ -2,9 +2,8 @@ package org.imtp.api.config.security.authentication.refreshtoken;
 
 import groovy.lang.Tuple2;
 import lombok.extern.slf4j.Slf4j;
-import org.imtp.api.config.security.authentication.refreshtoken.RefreshAuthenticationToken;
 import org.imtp.api.enums.TokenType;
-import org.imtp.api.service.TokenService;
+import org.imtp.api.config.security.TokenService;
 import org.imtp.api.utils.PayloadInfo;
 import org.springframework.security.core.Authentication;
 

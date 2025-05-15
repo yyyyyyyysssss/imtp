@@ -1,23 +1,20 @@
-package org.imtp.api.service.impl;
+package org.imtp.api.config.security;
 
 import groovy.lang.Tuple2;
-import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.imtp.common.enums.ClientType;
-import org.imtp.api.config.security.AuthProperties;
-import org.imtp.api.config.security.authentication.refreshtoken.RefreshTokenServices;
-import org.imtp.api.config.idwork.IdGen;
 import org.imtp.api.config.redis.RedisKey;
 import org.imtp.api.config.redis.RedisWrapper;
+import org.imtp.api.config.security.authentication.refreshtoken.RefreshTokenServices;
 import org.imtp.api.domain.dto.TokenDTO;
 import org.imtp.api.domain.entity.TokenInfo;
 import org.imtp.api.enums.TokenType;
-import org.imtp.api.service.TokenService;
 import org.imtp.api.utils.EncryptUtil;
 import org.imtp.api.utils.JwtUtil;
 import org.imtp.api.utils.PayloadInfo;
+import org.imtp.common.enums.ClientType;
 import org.springframework.security.crypto.codec.Utf8;
-import org.springframework.stereotype.Service;
+import org.springframework.security.web.context.SecurityContextRepository;
+
 import java.security.MessageDigest;
 import java.time.Duration;
 import java.util.Arrays;
@@ -29,14 +26,19 @@ import java.util.Set;
  * @Date 2024/7/16 15:14
  */
 @Slf4j
-@Service
-public class JWTTokenServiceImpl implements TokenService {
+public class JWTTokenService implements TokenService {
 
-    @Resource
     private RedisWrapper redisWrapper;
 
-    @Resource
     private AuthProperties authProperties;
+
+    private RedisSecurityContextRepository securityContextRepository;
+
+    public JWTTokenService(RedisWrapper redisWrapper, AuthProperties authProperties, SecurityContextRepository securityContextRepository){
+        this.redisWrapper = redisWrapper;
+        this.authProperties = authProperties;
+        this.securityContextRepository = (RedisSecurityContextRepository) securityContextRepository;
+    }
 
     @Override
     public TokenInfo generate(Long userId, ClientType clientType) {
@@ -44,7 +46,7 @@ public class JWTTokenServiceImpl implements TokenService {
         String refreshToken = generateRefreshToken(userId,clientType);
         PayloadInfo payloadInfo = JwtUtil.extractPayloadInfo(accessToken);
         TokenInfo token = TokenInfo.builder()
-                .id(IdGen.genId())
+                .id(payloadInfo.getId())
                 .userId(userId)
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
@@ -106,6 +108,8 @@ public class JWTTokenServiceImpl implements TokenService {
     private void revokeToken(String tokenId,Long expiration) {
         //加入黑名单
         redisWrapper.setValue(RedisKey.TOKEN_BLACKLIST + tokenId,null,Duration.ofMillis(expiration));
+        //清除存储的认证信息
+        securityContextRepository.clearContext(tokenId);
     }
 
     @Override

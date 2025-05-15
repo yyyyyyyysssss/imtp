@@ -1,12 +1,8 @@
 package org.imtp.api.config.security;
 
-import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.imtp.api.config.security.AuthProperties;
-import org.imtp.api.domain.entity.User;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.context.SecurityContextHolderStrategy;
@@ -26,11 +22,14 @@ public class RedisSecurityContextRepository implements SecurityContextRepository
 
     private static final String SECURITY_CONTEXT_KEY_PREFIX = "security:context:repository:";
 
-    @Resource
-    private RedisTemplate<String, SecurityContext> authRedisTemplate;
+    private RedisTemplate<String,SecurityContext> redisTemplate;
 
-    @Resource
     private AuthProperties authProperties;
+
+    public RedisSecurityContextRepository(RedisTemplate<String,SecurityContext> redisTemplate,AuthProperties authProperties){
+        this.redisTemplate = redisTemplate;
+        this.authProperties = authProperties;
+    }
 
     private final SecurityContextHolderStrategy securityContextHolderStrategy = SecurityContextHolder.getContextHolderStrategy();
 
@@ -42,7 +41,7 @@ public class RedisSecurityContextRepository implements SecurityContextRepository
             return null;
         }
         try {
-            return authRedisTemplate.opsForValue().get(SECURITY_CONTEXT_KEY_PREFIX + attribute);
+            return redisTemplate.opsForValue().get(SECURITY_CONTEXT_KEY_PREFIX + attribute);
         }finally {
             request.removeAttribute(DEFAULT_REQUEST_ATTR_NAME);
         }
@@ -58,10 +57,10 @@ public class RedisSecurityContextRepository implements SecurityContextRepository
             // 如果当前的context是空的，则移除
             SecurityContext emptyContext = this.securityContextHolderStrategy.createEmptyContext();
             if (emptyContext.equals(context)){
-                authRedisTemplate.delete(SECURITY_CONTEXT_KEY_PREFIX + attribute);
+                redisTemplate.delete(SECURITY_CONTEXT_KEY_PREFIX + attribute);
             }else {
                 Long expiration = authProperties.getJwt().getExpiration();
-                authRedisTemplate.opsForValue().set(SECURITY_CONTEXT_KEY_PREFIX + attribute,context, Duration.ofSeconds(expiration));
+                redisTemplate.opsForValue().set(SECURITY_CONTEXT_KEY_PREFIX + attribute,context, Duration.ofSeconds(expiration));
             }
         }finally {
             request.removeAttribute(DEFAULT_REQUEST_ATTR_NAME);
@@ -74,22 +73,13 @@ public class RedisSecurityContextRepository implements SecurityContextRepository
         if (attribute == null || attribute.isEmpty()){
             return false;
         }
-        return Boolean.TRUE.equals(authRedisTemplate.hasKey(SECURITY_CONTEXT_KEY_PREFIX + attribute));
+        return Boolean.TRUE.equals(redisTemplate.hasKey(SECURITY_CONTEXT_KEY_PREFIX + attribute));
     }
 
 
-    public boolean clearContext(String userId){
+    public boolean clearContext(String tokenId){
 
-        return Boolean.TRUE.equals(authRedisTemplate.delete(SECURITY_CONTEXT_KEY_PREFIX + userId));
-    }
-
-    public boolean clearContext(){
-        SecurityContext securityContext = SecurityContextHolder.getContext();
-        if (securityContext != null && securityContext.getAuthentication() != null && !(securityContext.getAuthentication() instanceof AnonymousAuthenticationToken)){
-            User user = (User)securityContext.getAuthentication().getPrincipal();
-            return Boolean.TRUE.equals(authRedisTemplate.delete(SECURITY_CONTEXT_KEY_PREFIX + user.getId()));
-        }
-        return false;
+        return Boolean.TRUE.equals(redisTemplate.delete(SECURITY_CONTEXT_KEY_PREFIX + tokenId));
     }
 
 }
