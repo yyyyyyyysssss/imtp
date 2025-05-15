@@ -23,10 +23,10 @@ import java.io.InputStream;
 public class MinioFileServiceImpl extends AbstractFileService {
 
     @Resource
-    private MinioHelper minioHelper;
+    MinioHelper minioHelper;
 
     @Resource
-    private FileUploadMapper fileUploadMapper;
+    FileUploadMapper fileUploadMapper;
 
     @Override
     public FileStorageType fileStorageType() {
