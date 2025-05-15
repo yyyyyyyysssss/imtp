@@ -1,11 +1,11 @@
 package org.imtp.api.config.redis;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.imtp.api.config.EmailAuthenticationToken;
-import org.imtp.api.config.OneTimeTokenAuthenticationTokenMixin;
-import org.imtp.api.config.RefreshAuthenticationToken;
-import org.imtp.api.config.RequestUrlAuthority;
-import org.imtp.api.config.oauth2.OAuthClientAuthenticationToken;
+import org.imtp.api.config.security.authentication.email.EmailAuthenticationToken;
+import org.imtp.api.config.security.authentication.ott.OneTimeTokenAuthenticationTokenMixin;
+import org.imtp.api.config.security.authentication.refreshtoken.RefreshAuthenticationToken;
+import org.imtp.api.config.security.RequestUrlAuthority;
+import org.imtp.api.config.security.oauth2.OAuthClientAuthenticationToken;
 import org.imtp.api.domain.entity.User;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

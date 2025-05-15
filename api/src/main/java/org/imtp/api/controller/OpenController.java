@@ -5,7 +5,7 @@ import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
 import org.imtp.common.response.Result;
 import org.imtp.common.response.ResultGenerator;
-import org.imtp.api.config.EmailAuthenticationProvider;
+import org.imtp.api.config.security.authentication.email.EmailAuthenticationProvider;
 import org.imtp.api.domain.dto.EmailInfo;
 import org.imtp.api.domain.vo.TokenValidVO;
 import org.imtp.api.enums.TokenType;

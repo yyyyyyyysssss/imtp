@@ -3,7 +3,7 @@ package org.imtp.api.service;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.imtp.api.config.RedisSecurityContextRepository;
+import org.imtp.api.config.security.RedisSecurityContextRepository;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.server.resource.web.BearerTokenResolver;
 import org.springframework.security.web.authentication.logout.LogoutHandler;

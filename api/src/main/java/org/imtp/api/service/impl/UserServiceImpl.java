@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.imtp.api.config.RequestUrlAuthority;
+import org.imtp.api.config.security.RequestUrlAuthority;
 import org.imtp.api.config.idwork.IdGen;
 import org.imtp.api.domain.entity.Authority;
 import org.imtp.api.domain.entity.Role;

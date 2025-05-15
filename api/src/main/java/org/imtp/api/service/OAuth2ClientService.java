@@ -3,7 +3,7 @@ package org.imtp.api.service;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.imtp.api.config.exception.OAuth2ClientLoginException;
-import org.imtp.api.config.oauth2.*;
+import org.imtp.api.config.security.oauth2.*;
 import org.imtp.api.domain.entity.TokenInfo;
 import org.imtp.api.domain.entity.User;
 import org.imtp.api.domain.vo.*;
