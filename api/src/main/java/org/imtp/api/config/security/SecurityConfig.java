@@ -162,41 +162,23 @@ public class SecurityConfig {
     @Bean
     @Primary
     public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
-//        return http.getSharedObject(AuthenticationManagerBuilder.class)
-//                //用户名密码身份认证
-//                .authenticationProvider(daoAuthenticationProvider())
-//                //邮箱验证码认证
-//                .authenticationProvider(emailAuthenticationProvider())
-//                //用于使用三方登录的身份认证
-//                .authenticationProvider(oAuthClientAuthenticationProvider())
-//                //记住我身份认证
-//                .authenticationProvider(rememberMeAuthenticationProvider())
-//                //一次性令牌认证
-//                .authenticationProvider(oneTimeTokenAuthenticationProvider())
-//                //刷新token
-//                .authenticationProvider(refreshAuthenticationProvider())
-//                //基于apikey认证
-//                .authenticationProvider(apikeyAuthenticationProvider())
-//                .parentAuthenticationManager(null)
-//                .build();
-        return new ProviderManager(
-                List.of(
-                        //用户名密码身份认证
-                        daoAuthenticationProvider(),
-                        //邮箱验证码认证
-                        emailAuthenticationProvider(),
-                        //用于使用三方登录的身份认证
-                        oAuthClientAuthenticationProvider(),
-                        //记住我身份认证
-                        rememberMeAuthenticationProvider(),
-                        //一次性令牌认证
-                        oneTimeTokenAuthenticationProvider(),
-                        //刷新token
-                        refreshAuthenticationProvider(),
-                        //基于apikey认证
-                        apikeyAuthenticationProvider()
-                )
-        );
+        return http.getSharedObject(AuthenticationManagerBuilder.class)
+                //用户名密码身份认证
+                .authenticationProvider(daoAuthenticationProvider())
+                //邮箱验证码认证
+                .authenticationProvider(emailAuthenticationProvider())
+                //用于使用三方登录的身份认证
+                .authenticationProvider(oAuthClientAuthenticationProvider())
+                //记住我身份认证
+                .authenticationProvider(rememberMeAuthenticationProvider())
+                //一次性令牌认证
+                .authenticationProvider(oneTimeTokenAuthenticationProvider())
+                //刷新token
+                .authenticationProvider(refreshAuthenticationProvider())
+                //基于apikey认证
+                .authenticationProvider(apikeyAuthenticationProvider())
+                .parentAuthenticationManager(null)
+                .build();
     }
 
     //基于用户名密码认证
