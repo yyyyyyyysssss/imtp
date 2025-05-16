@@ -32,12 +32,12 @@ public class JWTTokenService implements TokenService {
 
     private AuthProperties authProperties;
 
-    private RedisSecurityContextRepository securityContextRepository;
+    private SecurityContextStore securityContextStore;
 
-    public JWTTokenService(RedisWrapper redisWrapper, AuthProperties authProperties, SecurityContextRepository securityContextRepository){
+    public JWTTokenService(RedisWrapper redisWrapper, AuthProperties authProperties, SecurityContextStore securityContextStore){
         this.redisWrapper = redisWrapper;
         this.authProperties = authProperties;
-        this.securityContextRepository = (RedisSecurityContextRepository) securityContextRepository;
+        this.securityContextStore = securityContextStore;
     }
 
     @Override
@@ -109,7 +109,7 @@ public class JWTTokenService implements TokenService {
         //加入黑名单
         redisWrapper.setValue(RedisKey.TOKEN_BLACKLIST + tokenId,null,Duration.ofMillis(expiration));
         //清除存储的认证信息
-        securityContextRepository.clearContext(tokenId);
+        securityContextStore.clearContext(tokenId);
     }
 
     @Override

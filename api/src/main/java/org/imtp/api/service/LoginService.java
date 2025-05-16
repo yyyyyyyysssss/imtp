@@ -3,13 +3,14 @@ package org.imtp.api.service;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.imtp.api.config.security.TokenService;
-import org.imtp.common.enums.ClientType;
 import org.imtp.api.config.security.AuthProperties;
 import org.imtp.api.config.security.RedisSecurityContextRepository;
+import org.imtp.api.config.security.SecurityContextStore;
+import org.imtp.api.config.security.TokenService;
 import org.imtp.api.domain.entity.TokenInfo;
 import org.imtp.api.domain.entity.User;
 import org.imtp.api.utils.EncryptUtil;
+import org.imtp.common.enums.ClientType;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.RememberMeAuthenticationToken;
@@ -37,7 +38,7 @@ public class LoginService {
     private TokenService tokenService;
 
     @Resource
-    private RedisSecurityContextRepository securityContextRepository;
+    private SecurityContextStore securityContextStore;
 
     @Resource
     private AuthProperties authProperties;
@@ -81,7 +82,7 @@ public class LoginService {
         HttpServletRequest request = ((ServletRequestAttributes) requestAttributes).getRequest();
         HttpServletResponse response = ((ServletRequestAttributes) requestAttributes).getResponse();
         request.setAttribute(RedisSecurityContextRepository.DEFAULT_REQUEST_ATTR_NAME,tokenId);
-        securityContextRepository.saveContext(securityContext,request,response);
+        securityContextStore.saveContext(securityContext,request,response);
     }
 
 }

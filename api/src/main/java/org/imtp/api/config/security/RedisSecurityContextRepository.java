@@ -16,7 +16,7 @@ import java.time.Duration;
  * @Author ys
  * @Date 2024/7/17 15:16
  */
-public class RedisSecurityContextRepository implements SecurityContextRepository {
+public class RedisSecurityContextRepository implements SecurityContextStore {
 
     public static final String DEFAULT_REQUEST_ATTR_NAME = "IM_SECURITY_CONTEXT";
 
@@ -77,6 +77,7 @@ public class RedisSecurityContextRepository implements SecurityContextRepository
     }
 
 
+    @Override
     public boolean clearContext(String tokenId){
 
         return Boolean.TRUE.equals(redisTemplate.delete(SECURITY_CONTEXT_KEY_PREFIX + tokenId));

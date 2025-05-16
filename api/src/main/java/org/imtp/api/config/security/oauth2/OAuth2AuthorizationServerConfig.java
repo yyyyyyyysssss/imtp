@@ -11,6 +11,7 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.imtp.api.config.security.AuthProperties;
 import org.imtp.api.config.security.RequestUrlAuthority;
+import org.imtp.api.config.security.SecurityContextStore;
 import org.imtp.api.domain.entity.User;
 import org.imtp.api.config.security.authentication.TokenAuthenticationFilter;
 import org.imtp.api.utils.RSAUtil;
@@ -70,7 +71,7 @@ public class OAuth2AuthorizationServerConfig {
     private TokenAuthenticationFilter tokenAuthenticationFilter;
 
     @Resource
-    private SecurityContextRepository securityContextRepository;
+    private SecurityContextStore securityContextStore;
 
     @Resource
     private AuthProperties authProperties;
@@ -111,7 +112,7 @@ public class OAuth2AuthorizationServerConfig {
                                 new LoginTargetAuthenticationEntryPoint(authProperties.getLoginPage()),
                                 new MediaTypeRequestMatcher(MediaType.TEXT_HTML)))
                 .securityContext(securityContext -> {
-                    securityContext.securityContextRepository(securityContextRepository);
+                    securityContext.securityContextRepository(securityContextStore);
                 })
                 .addFilterBefore(tokenAuthenticationFilter, SecurityContextHolderFilter.class)
                 .oauth2ResourceServer((resourceServer) -> {

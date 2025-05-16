@@ -52,7 +52,6 @@ import org.springframework.security.web.authentication.preauth.RequestHeaderAuth
 import org.springframework.security.web.authentication.rememberme.RememberMeAuthenticationFilter;
 import org.springframework.security.web.authentication.rememberme.TokenBasedRememberMeServices;
 import org.springframework.security.web.context.SecurityContextHolderFilter;
-import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.security.web.header.HeaderWriterFilter;
 import org.springframework.web.cors.CorsConfiguration;
 
@@ -110,7 +109,7 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 //身份认证信息存储
                 .securityContext(securityContext -> {
-                    securityContext.securityContextRepository(securityContextRepository());
+                    securityContext.securityContextRepository(securityContextStore());
                 })
                 .authorizeHttpRequests(authorize -> {
                     //放行的路径
@@ -262,7 +261,7 @@ public class SecurityConfig {
 
     //用户SecurityContext存储
     @Bean
-    public SecurityContextRepository securityContextRepository() {
+    public SecurityContextStore securityContextStore() {
 
         return new RedisSecurityContextRepository(authRedisTemplate,authProperties);
     }
@@ -270,7 +269,7 @@ public class SecurityConfig {
     @Bean
     public TokenService tokenService(){
 
-        return new JWTTokenService(redisWrapper,authProperties,securityContextRepository());
+        return new JWTTokenService(redisWrapper,authProperties,securityContextStore());
     }
 
     //登出过滤器
