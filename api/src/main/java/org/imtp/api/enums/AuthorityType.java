@@ -1,8 +1,11 @@
 package org.imtp.api.enums;
 
+import lombok.Getter;
+
+@Getter
 public enum AuthorityType {
 
     MENU,
-    PERMISSION
+    BUTTON
 
 }

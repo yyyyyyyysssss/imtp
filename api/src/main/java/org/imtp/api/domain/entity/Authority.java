@@ -44,6 +44,9 @@ public class Authority implements TreeRelation {
     @EnumValue
     private AuthorityType type;
 
+    @TableField("route_path")
+    private String routePath;
+
     @TableField("urls")
     private String urls;
 

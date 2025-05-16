@@ -11,7 +11,7 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class IdDTO {
+public class IdOnlyDTO {
 
     @NotNull(message = "id not null")
     private String id;

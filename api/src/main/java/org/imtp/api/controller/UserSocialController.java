@@ -10,7 +10,7 @@ import org.imtp.common.packet.body.UserGroupInfo;
 import org.imtp.common.packet.body.UserSessionInfo;
 import org.imtp.common.response.Result;
 import org.imtp.common.response.ResultGenerator;
-import org.imtp.api.domain.dto.IdDTO;
+import org.imtp.api.domain.dto.IdOnlyDTO;
 import org.imtp.api.domain.dto.UserSessionDTO;
 import org.imtp.api.domain.entity.User;
 import org.imtp.api.service.UserSocialService;
@@ -57,8 +57,8 @@ public class UserSocialController {
 
     @DeleteMapping("/userSession/{userId}")
     @CircuitBreaker(name = "slowCallBreaker")
-    public Result<Boolean> userSession(@PathVariable(name = "userId") String userId, @RequestBody @Validated IdDTO idDTO) {
-        Boolean deleted = userSocialService.deleteSessionById(idDTO.getId());
+    public Result<Boolean> userSession(@PathVariable(name = "userId") String userId, @RequestBody @Validated IdOnlyDTO idOnlyDTO) {
+        Boolean deleted = userSocialService.deleteSessionById(idOnlyDTO.getId());
         return deleted ? ResultGenerator.ok() : ResultGenerator.failed();
     }
 
@@ -87,8 +87,8 @@ public class UserSocialController {
     }
 
     @DeleteMapping("/userMessage/{userId}")
-    public Result<Boolean> userMessage(@PathVariable(name = "userId") String userId,@RequestBody @Validated IdDTO idDTO){
-        Boolean deleted = userSocialService.deleteMessage(idDTO.getId());
+    public Result<Boolean> userMessage(@PathVariable(name = "userId") String userId,@RequestBody @Validated IdOnlyDTO idOnlyDTO){
+        Boolean deleted = userSocialService.deleteMessage(idOnlyDTO.getId());
         return ResultGenerator.ok(deleted);
     }
 
