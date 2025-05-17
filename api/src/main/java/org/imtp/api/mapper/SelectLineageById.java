@@ -2,7 +2,6 @@ package org.imtp.api.mapper;
 
 import com.baomidou.mybatisplus.core.injector.AbstractMethod;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
-import com.baomidou.mybatisplus.core.toolkit.sql.SqlScriptUtils;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.mapping.SqlSource;
 import org.imtp.api.utils.ReflectUtil;
@@ -10,26 +9,33 @@ import org.imtp.api.utils.ReflectUtil;
 /**
  * @Description
  * @Author ys
- * @Date 2023/8/1 16:29
+ * @Date 2025/5/17 19:48
  */
-public class SelectParentBatchByIds extends AbstractMethod {
-
-    private final static String METHOD_NAME = "selectParentBatchByIds";
+public class SelectLineageById extends AbstractMethod {
+    private final static String METHOD_NAME = "selectLineageById";
 
     private final static String METHOD_SQL =
             "<script>" +
-                "WITH RECURSIVE tmp as (" +
-                " SELECT t.* FROM %s t WHERE t.%s IN (%s)\n" +
-                " UNION DISTINCT \n" +
-                " SELECT f.* FROM %s f INNER JOIN tmp on f.%s = tmp.%s\n" +
-                ") select * from tmp %s" +
-            "</script>";
+                    "WITH RECURSIVE tmp_child as (" +
+                    " SELECT t.* FROM %s t WHERE t.%s = #{%s} \n" +
+                    " UNION ALL \n" +
+                    " SELECT f.* FROM %s f INNER JOIN tmp_child tmp on f.%s = tmp.%s \n" +
+                    "), " +
+                    "tmp_parent as (" +
+                    " SELECT t.* FROM %s t WHERE t.%s = #{%s} \n" +
+                    " UNION ALL \n" +
+                    " SELECT f.* FROM %s f INNER JOIN tmp_parent tmp on f.%s = tmp.%s \n" +
+                    ") " +
+                    " SELECT * from tmp_child \n" +
+                    " UNION \n" +
+                    " SELECT * from tmp_parent %s \n" +
+                    "</script>";
 
-    public SelectParentBatchByIds() {
+    public SelectLineageById() {
         this(METHOD_NAME);
     }
 
-    public SelectParentBatchByIds(String name) {
+    public SelectLineageById(String name) {
         super(name);
     }
 
@@ -43,13 +49,18 @@ public class SelectParentBatchByIds extends AbstractMethod {
         String sql = String.format(METHOD_SQL,
                 tableInfo.getTableName(),
                 tableInfo.getKeyColumn(),
-                SqlScriptUtils.convertForeach("#{item}", "coll", (String)null, "item", ","),
+                tableInfo.getKeyProperty(),
+                tableInfo.getTableName(),
+                parentFieldName,
+                childFieldName,
+                tableInfo.getTableName(),
+                tableInfo.getKeyColumn(),
+                tableInfo.getKeyProperty(),
                 tableInfo.getTableName(),
                 childFieldName,
                 parentFieldName,
                 tableInfo.getLogicDeleteSql(true, true));
-        SqlSource sqlSource = this.languageDriver.createSqlSource(this.configuration,sql,modelClass);
+        SqlSource sqlSource = super.createSqlSource(this.configuration,sql,Object.class);
         return this.addSelectMappedStatementForTable(mapperClass, METHOD_NAME, sqlSource, tableInfo);
     }
-
 }

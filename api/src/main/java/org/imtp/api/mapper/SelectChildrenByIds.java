@@ -12,24 +12,24 @@ import org.apache.ibatis.mapping.SqlSource;
  * @Author ys
  * @Date 2023/8/1 16:29
  */
-public class SelectChildrenBatchByIds extends AbstractMethod {
+public class SelectChildrenByIds extends AbstractMethod {
 
-    private final static String METHOD_NAME = "selectChildrenBatchByIds";
+    private final static String METHOD_NAME = "selectChildrenByIds";
 
     private final static String METHOD_SQL =
             "<script>" +
                 "WITH RECURSIVE tmp as (" +
                 " SELECT t.* FROM %s t WHERE t.%s IN (%s) \n" +
-                " UNION DISTINCT \n" +
+                " UNION ALL \n" +
                 " SELECT f.* FROM %s f INNER JOIN tmp on f.%s = tmp.%s \n" +
                 ") select * from tmp %s" +
             "</script>";
 
-    public SelectChildrenBatchByIds() {
+    public SelectChildrenByIds() {
         this(METHOD_NAME);
     }
 
-    public SelectChildrenBatchByIds(String name) {
+    public SelectChildrenByIds(String name) {
         super(name);
     }
 

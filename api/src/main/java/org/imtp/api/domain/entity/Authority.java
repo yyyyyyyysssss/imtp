@@ -19,14 +19,11 @@ import java.util.Date;
 @Setter
 @TableName("im_authority")
 @Builder
-public class Authority implements TreeRelation {
+public class Authority extends BaseEntity implements TreeRelation {
 
     @Tolerate
     public Authority(){
     }
-
-    @TableId(value = "id", type = IdType.INPUT)
-    private Long id;
 
     @TableField("parent_id")
     private Long parentId;
@@ -52,12 +49,6 @@ public class Authority implements TreeRelation {
 
     @TableField("icon")
     private String icon;
-
-    @TableField("create_time")
-    private Date createTime;
-
-    @TableField("updated_time")
-    private Date updatedTime;
 
     @Override
     public String parentFieldName() {

@@ -14,8 +14,11 @@ public class MySqlInjector extends DefaultSqlInjector {
     public List<AbstractMethod> getMethodList(Class<?> mapperClass, TableInfo tableInfo) {
         List<AbstractMethod> methodList = super.getMethodList(new Configuration(),mapperClass, tableInfo);
         if (TreeMapper.class.isAssignableFrom(mapperClass)){
-            methodList.add(new SelectChildrenBatchByIds());
-            methodList.add(new SelectParentBatchByIds());
+            methodList.add(new SelectChildrenById());
+            methodList.add(new SelectChildrenByIds());
+            methodList.add(new SelectParentById());
+            methodList.add(new SelectParentByIds());
+            methodList.add(new SelectLineageById());
         }
         return methodList;
     }

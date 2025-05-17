@@ -9,13 +9,15 @@ import org.springframework.security.authorization.AuthorizationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.access.intercept.RequestAuthorizationContext;
-import org.springframework.util.AntPathMatcher;
-import org.springframework.util.PathMatcher;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
+import org.springframework.web.util.pattern.PathPatternParser;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Supplier;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @Description 基于请求路径的权限管理器
@@ -29,12 +31,11 @@ public class RequestPathAuthorizationManager implements AuthorizationManager<Req
 
     private static final AuthorizationDecision AFFIRM = new AuthorizationDecision(true);
 
-
     private final AuthenticationTrustResolver trustResolver = new AuthenticationTrustResolverImpl();
 
-    private final static PathMatcher PATH_MATCHER = new AntPathMatcher();
-
     private final static String URL_SEPARATOR = ",";
+
+    private static final Pattern METHOD_PREFIX_PATTERN = Pattern.compile("^(GET|POST|PUT|DELETE|PATCH|OPTIONS|HEAD):(.+)$", Pattern.CASE_INSENSITIVE);
 
     @Override
     public AuthorizationDecision check(Supplier<Authentication> supplier, RequestAuthorizationContext requestAuthorizationContext) {
@@ -53,15 +54,30 @@ public class RequestPathAuthorizationManager implements AuthorizationManager<Req
         if (authorities == null || authorities.isEmpty()){
             return DENY;
         }
-        List<RequestUrlAuthority> requestUrlAuthorities = authorities.stream().map(m -> (RequestUrlAuthority) m).toList();
+        RequestMatcher requestMatcher;
+        List<RequestUrlAuthority> requestUrlAuthorities = authorities.stream().map(m -> (RequestUrlAuthority) m).filter(f -> f.getUrls() != null && !f.getUrls().isBlank()).toList();
         for (RequestUrlAuthority urlAuthority : requestUrlAuthorities){
             String urlStr = urlAuthority.getUrls();
             if (urlStr == null || urlStr.isEmpty()){
                 continue;
             }
+            boolean b = false;
             String[] urls = urlStr.split(URL_SEPARATOR);
-            List<String> urlList = Arrays.asList(urls);
-            boolean b = urlList.parallelStream().anyMatch(m -> PATH_MATCHER.match(m, requestUrl));
+            for (String url : urls){
+                Matcher httpMethodMatcher = METHOD_PREFIX_PATTERN.matcher(url);
+                if (httpMethodMatcher.matches()){
+                    String method = httpMethodMatcher.group(1);
+                    String pattern = httpMethodMatcher.group(2);
+                    requestMatcher = new PathPatternRequestMatcher(pattern,method);
+                }else {
+                    requestMatcher = new PathPatternRequestMatcher(url);
+                }
+                RequestMatcher.MatchResult matcher = requestMatcher.matcher(requestAuthorizationContext.getRequest());
+                if (matcher.isMatch()){
+                    b = true;
+                    break;
+                }
+            }
             if (b){
                 return AFFIRM;
             }

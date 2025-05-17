@@ -1,0 +1,42 @@
+package org.imtp.api.domain.vo;
+
+import lombok.Getter;
+import lombok.Setter;
+import org.imtp.api.enums.AuthorityType;
+
+import java.util.List;
+
+/**
+ * @Description
+ * @Author ys
+ * @Date 2025/5/16 23:38
+ */
+@Getter
+@Setter
+public class AuthorityVO {
+
+    private Long id;
+
+    private Long parentId;
+
+    private Long rootId;
+
+    private String code;
+
+    private String name;
+
+    private AuthorityType type;
+
+    private String routePath;
+
+    private String urls;
+
+    private String icon;
+
+    private String createTime;
+
+    private String updateTime;
+
+    private List<AuthorityVO> children;
+
+}
