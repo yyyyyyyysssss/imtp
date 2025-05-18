@@ -2,10 +2,12 @@ package org.imtp.api.domain.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.validator.group.GroupSequenceProvider;
 import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
+import org.imtp.api.domain.validation.ValidApiUrls;
 import org.imtp.api.enums.AuthorityType;
 
 import java.util.ArrayList;
@@ -38,6 +40,7 @@ public class AuthorityAddDTO {
     private String routePath;
 
     @NotBlank(message = "资源路径不能为空", groups = UrlGroup.class)
+    @ValidApiUrls(groups = UrlGroup.class)
     private String urls;
 
     private String icon;
