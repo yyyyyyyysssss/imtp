@@ -2,18 +2,17 @@ package org.imtp.api.domain.vo;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.imtp.api.enums.AuthorityType;
 
 import java.util.List;
 
 /**
  * @Description
  * @Author ys
- * @Date 2025/5/16 23:38
+ * @Date 2025/5/19 10:10
  */
 @Getter
 @Setter
-public class AuthorityVO {
+public class MenuVO {
 
     private Long id;
 
@@ -31,14 +30,12 @@ public class AuthorityVO {
 
     private String routePath;
 
-    private String urls;
-
     private String icon;
 
     private String createTime;
 
     private String updateTime;
 
-    private List<AuthorityVO> children;
+    private List<MenuVO> children;
 
 }

@@ -13,4 +13,23 @@
         </foreach>
     </select>
 
+    <select id="findMenuByRoleIds" parameterType="java.util.Collection" resultType="org.imtp.api.domain.entity.Authority">
+        SELECT a.*
+        FROM im_role r
+        RIGHT JOIN im_role_authority ra on r.id = ra.role_id
+        RIGHT JOIN im_authority a on ra.authority_id = a.id
+        WHERE a.type = 'MENU'
+        AND r.id in
+        <foreach collection="roleIds" item="item" index="index" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="findDetailsById" resultType="org.imtp.api.domain.vo.AuthorityVO">
+        SELECT t.*,f.`name` as parent_name
+        FROM im_authority t
+        LEFT JOIN im_authority f on t.parent_id = f.id
+        WHERE t.id = #{id}
+    </select>
+
 </mapper>

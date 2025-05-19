@@ -1,14 +1,16 @@
 package org.imtp.api.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.imtp.api.config.exception.BusinessException;
 import org.imtp.api.config.idwork.IdGen;
-import org.imtp.api.domain.dto.AuthorityAddDTO;
+import org.imtp.api.domain.dto.AuthorityCreateDTO;
 import org.imtp.api.domain.dto.AuthorityUpdateDTO;
 import org.imtp.api.domain.entity.Authority;
 import org.imtp.api.domain.vo.AuthorityVO;
+import org.imtp.api.enums.AuthorityType;
 import org.imtp.api.mapper.AuthorityMapper;
 import org.imtp.api.mapping.AuthorityMapping;
 import org.imtp.api.service.AuthorityService;
@@ -18,8 +20,6 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * @Description
@@ -34,34 +34,41 @@ public class AuthorityServiceImpl extends ServiceImpl<AuthorityMapper, Authority
     private AuthorityMapper authorityMapper;
 
     @Override
-    public Long create(AuthorityAddDTO authorityAddDTO) {
+    public Long create(AuthorityCreateDTO authorityAddDTO) {
         Authority authority = AuthorityMapping.INSTANCE.toAuthority(authorityAddDTO);
         authority.setId(IdGen.genId());
-        if(authority.getParentId() != null){
-            Authority selectAuthority = authorityMapper.selectById(authority.getParentId());
-            authority.setRootId(selectAuthority.getRootId());
-        }else {
-            authority.setRootId(authority.getId());
-        }
+        authority.setType(AuthorityType.PERMISSION);
+        Authority selectAuthority = authorityMapper.selectById(authority.getParentId());
+        authority.setRootId(selectAuthority.getRootId());
         int insert = authorityMapper.insert(authority);
         return insert > 0 ? authority.getId() : null;
     }
 
     @Override
     public Integer update(AuthorityUpdateDTO authorityUpdateDTO) {
-        Authority authority = AuthorityMapping.INSTANCE.toAuthority(authorityUpdateDTO);
+        Authority authority = authorityMapper.selectById(authorityUpdateDTO.getId());
+        if (authority == null || !authority.getType().equals(AuthorityType.PERMISSION)) {
+            throw new BusinessException("该操作权限不存在");
+        }
+        AuthorityMapping.INSTANCE.updateAuthority(authorityUpdateDTO,authority);
+        if(authorityUpdateDTO.getParentId() != null && !authorityUpdateDTO.getParentId().isEmpty() && !authorityUpdateDTO.getParentId().equals(authority.getParentId().toString())){
+            Authority selectAuthority = authorityMapper.selectById(authorityUpdateDTO.getParentId());
+            authority.setRootId(selectAuthority.getRootId());
+        }
         return authorityMapper.updateById(authority);
     }
 
     @Override
     public AuthorityVO details(String id) {
-        Authority authority = authorityMapper.selectById(id);
-        return AuthorityMapping.INSTANCE.toAuthorityVO(authority);
+
+        return authorityMapper.findDetailsById(id);
     }
 
     @Override
     public List<AuthorityVO> tree() {
-        List<Authority> authorities = this.list();
+        QueryWrapper<Authority> queryWrapper = new QueryWrapper<>();
+        queryWrapper.in("type", AuthorityType.MENU.name(),AuthorityType.PERMISSION.name());
+        List<Authority> authorities = authorityMapper.selectList(queryWrapper);
         if (authorities == null || authorities.isEmpty()){
             return new ArrayList<>();
         }
@@ -71,22 +78,28 @@ public class AuthorityServiceImpl extends ServiceImpl<AuthorityMapper, Authority
                 AuthorityVO::getId,
                 AuthorityVO::getParentId,
                 AuthorityVO::setChildren,
-                null
+                0L
         );
     }
 
     @Override
     public Integer delete(String id) {
-        List<Authority> authorities = authorityMapper.selectChildrenById(id);
-        if (authorities == null || authorities.isEmpty()){
+        Authority authority = authorityMapper.selectById(id);
+        if (authority == null || !authority.getType().equals(AuthorityType.PERMISSION)){
             throw new BusinessException("该权限不存在");
         }
-        Set<Long> ids = authorities.stream().map(Authority::getId).collect(Collectors.toSet());
-        return authorityMapper.deleteBatchIds(ids);
+        return authorityMapper.deleteById(id);
     }
 
     @Override
     public Integer batchDelete(Collection<String> ids) {
+        List<Authority> authorities = authorityMapper.selectBatchIds(ids);
+        if (authorities == null || authorities.isEmpty()){
+            throw new BusinessException("权限不存在");
+        }
+        if (authorities.stream().anyMatch(f -> !f.getType().equals(AuthorityType.PERMISSION))){
+            throw new BusinessException("存在非权限类型的权限");
+        }
         return authorityMapper.deleteBatchIds(ids);
     }
 }

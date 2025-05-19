@@ -30,7 +30,7 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequestMapping("/social")
-public class UserSocialController {
+public class UserSocialController extends BaseController{
 
     @Resource
     private UserSocialService userSocialService;
@@ -38,7 +38,7 @@ public class UserSocialController {
     @GetMapping("/userInfo/{userId}")
     @CircuitBreaker(name = "commonBreaker", fallbackMethod = "userSocialFallbackMethod")
     public Result<User> userInfo(@PathVariable(name = "userId") String userId) throws AccessDeniedException {
-        return ResultGenerator.ok(currentLoginUser());
+        return ResultGenerator.ok(getCurrentUser());
     }
 
     @GetMapping("/userSession/{userId}")
@@ -90,11 +90,6 @@ public class UserSocialController {
     public Result<Boolean> userMessage(@PathVariable(name = "userId") String userId,@RequestBody @Validated IdOnlyDTO idOnlyDTO){
         Boolean deleted = userSocialService.deleteMessage(idOnlyDTO.getId());
         return ResultGenerator.ok(deleted);
-    }
-
-    private User currentLoginUser() {
-        SecurityContext securityContext = SecurityContextHolder.getContext();
-        return (User) securityContext.getAuthentication().getPrincipal();
     }
 
     public Result<?> userSocialFallbackMethod(String userId, Exception exception) {

@@ -31,7 +31,7 @@ import java.util.Map;
  * @Date 2024/12/5 10:01
  */
 @RestController
-@RequestMapping("/open")
+@RequestMapping("/api/open")
 public class OpenController {
 
     @Resource

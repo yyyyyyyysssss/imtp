@@ -94,13 +94,14 @@ auth:
       - /oauth2/consent
       - /oauth2/activate
       - /activated
-      - /open/**
+      - /api/open/**
     authenticated:
       - /refreshToken
       - /logout
       - /file/**
       - /service/discovery
       - /ott/generate
+      - /api/profile/**
   # 基于请求头的身份认证
   requestHeadAuthentications:
     - antPath: /api/internal/**

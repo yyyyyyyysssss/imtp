@@ -2,7 +2,7 @@ package org.imtp.api.controller.system;
 
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.imtp.api.domain.dto.AuthorityAddDTO;
+import org.imtp.api.domain.dto.AuthorityCreateDTO;
 import org.imtp.api.domain.dto.AuthorityUpdateDTO;
 import org.imtp.api.domain.dto.IdsOnlyDTO;
 import org.imtp.api.domain.vo.AuthorityVO;
@@ -28,8 +28,8 @@ public class AuthorityController {
     private AuthorityService authorityService;
 
     @PostMapping
-    public Result<?> create(@RequestBody @Validated AuthorityAddDTO authorityAddDTO) {
-        Long id = authorityService.create(authorityAddDTO);
+    public Result<?> create(@RequestBody @Validated AuthorityCreateDTO authorityCreateDTO) {
+        Long id = authorityService.create(authorityCreateDTO);
         return ResultGenerator.ok(id);
     }
 
