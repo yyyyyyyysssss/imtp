@@ -11,4 +11,12 @@ import lombok.Setter;
 @Getter
 @Setter
 public class MenuQueryDTO extends PageQueryDTO{
+
+    private String code;
+
+    private String name;
+
+    private String routePath;
+
+
 }

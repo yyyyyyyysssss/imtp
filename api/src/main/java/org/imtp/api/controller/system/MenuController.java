@@ -1,5 +1,6 @@
 package org.imtp.api.controller.system;
 
+import com.github.pagehelper.PageInfo;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.imtp.api.controller.BaseController;
@@ -7,13 +8,14 @@ import org.imtp.api.domain.dto.IdsOnlyDTO;
 import org.imtp.api.domain.dto.MenuCreateDTO;
 import org.imtp.api.domain.dto.MenuQueryDTO;
 import org.imtp.api.domain.dto.MenuUpdateDTO;
-import org.imtp.api.domain.vo.AuthorityVO;
 import org.imtp.api.domain.vo.MenuVO;
 import org.imtp.api.service.MenuService;
 import org.imtp.common.response.Result;
 import org.imtp.common.response.ResultGenerator;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * @Description
@@ -40,10 +42,16 @@ public class MenuController extends BaseController {
         return ResultGenerator.ok(affectedRows);
     }
 
+    @GetMapping("/tree")
+    public Result<?> tree() {
+        List<MenuVO> tree = menuService.tree();
+        return ResultGenerator.ok(tree);
+    }
+
     @PostMapping("/query")
     public Result<?> query(@RequestBody MenuQueryDTO menuQueryDTO) {
-
-        return ResultGenerator.ok();
+        PageInfo<MenuVO> menuVOList = menuService.query(menuQueryDTO);
+        return ResultGenerator.ok(menuVOList);
     }
 
     @GetMapping("/{id}")

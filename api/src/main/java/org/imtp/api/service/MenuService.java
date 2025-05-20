@@ -1,10 +1,11 @@
 package org.imtp.api.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.github.pagehelper.PageInfo;
 import org.imtp.api.domain.dto.MenuCreateDTO;
+import org.imtp.api.domain.dto.MenuQueryDTO;
 import org.imtp.api.domain.dto.MenuUpdateDTO;
 import org.imtp.api.domain.entity.Authority;
-import org.imtp.api.domain.vo.AuthorityVO;
 import org.imtp.api.domain.vo.MenuVO;
 
 import java.util.Collection;
@@ -15,6 +16,10 @@ public interface MenuService extends IService<Authority> {
     Long create(MenuCreateDTO menuCreateDTO);
 
     Integer update(MenuUpdateDTO menuUpdateDTO);
+
+    List<MenuVO> tree();
+
+    PageInfo<MenuVO> query(MenuQueryDTO menuQueryDTO);
 
     MenuVO details(String id);
 

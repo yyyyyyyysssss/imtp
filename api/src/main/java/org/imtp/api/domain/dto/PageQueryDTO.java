@@ -24,6 +24,8 @@ public class PageQueryDTO {
     @Max(value = 1000, message = "每页大小不能超过1000")
     private Integer pageSize = 10;
 
+    private boolean paging = true;
+
     private String sortBy;
 
     private String sortOrder;

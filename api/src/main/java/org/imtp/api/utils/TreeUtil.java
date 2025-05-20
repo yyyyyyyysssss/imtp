@@ -2,6 +2,7 @@ package org.imtp.api.utils;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
@@ -28,7 +29,7 @@ public class TreeUtil {
         Map<Object, List<T>> parentGroupMap = list.stream().collect(Collectors.groupingBy(item -> {
             ID pid  = parentGetter.apply(item);
             return pid != null ? pid : nullKey;
-        }));
+        }, LinkedHashMap::new, Collectors.toList()));
         return buildSubTree(rootParentId,parentGroupMap,idGetter,childrenSetter,nullKey);
     }
 

@@ -9,6 +9,7 @@ import org.imtp.api.enums.AuthorityType;
 import org.imtp.api.mapper.TreeRelation;
 
 import java.util.Date;
+import java.util.Objects;
 
 /**
  * @Description
@@ -58,5 +59,21 @@ public class Authority extends BaseEntity implements TreeRelation {
     @Override
     public String childFieldName() {
         return "id";
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.getId());
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (obj instanceof Authority authority) {
+            return this.getId().equals(authority.getId());
+        }
+        return false;
     }
 }
