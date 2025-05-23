@@ -90,7 +90,7 @@ export const fetchUserInfo = () => {
 export const tokenValid = (token, tokenType = 'ACCESS_TOKEN') => {
 
     return new Promise((resolve, reject) => {
-        httpWrapper.get('/open/tokenValid', {
+        httpWrapper.get('/api/open/tokenValid', {
             params: {
                 token: token,
                 tokenType: tokenType

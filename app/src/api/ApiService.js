@@ -67,7 +67,7 @@ export const fetchUserInfo = (token,userId) => {
 export const tokenValid = (token, tokenType = 'ACCESS_TOKEN') => {
 
     return new Promise((resolve, reject) => {
-        api.get('/open/tokenValid', {
+        api.get('/api/open/tokenValid', {
             params: {
                 token: token,
                 tokenType: tokenType
