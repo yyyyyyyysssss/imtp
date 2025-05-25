@@ -34,6 +34,8 @@ public class AuthorityCreateDTO {
     @ValidApiUrls(message = "资源路径不合法")
     private String urls;
 
+    private Integer sort;
+
 //    public static class AuthorityDTOGroupSequenceProvider implements DefaultGroupSequenceProvider<AuthorityCreateDTO>{
 //
 //        public AuthorityDTOGroupSequenceProvider(){}

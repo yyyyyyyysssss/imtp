@@ -1,6 +1,7 @@
 package org.imtp.api.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -10,6 +11,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.imtp.api.config.exception.BusinessException;
 import org.imtp.api.config.idwork.IdGen;
 import org.imtp.api.domain.dto.MenuCreateDTO;
+import org.imtp.api.domain.dto.MenuDragDTO;
 import org.imtp.api.domain.dto.MenuQueryDTO;
 import org.imtp.api.domain.dto.MenuUpdateDTO;
 import org.imtp.api.domain.entity.Authority;
@@ -22,8 +24,10 @@ import org.imtp.api.mapping.AuthorityMapping;
 import org.imtp.api.service.MenuService;
 import org.imtp.api.utils.TreeUtil;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
+import java.io.Serializable;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
@@ -71,11 +75,86 @@ public class MenuServiceImpl extends ServiceImpl<AuthorityMapper, Authority> imp
     }
 
     @Override
+    @Transactional
+    public Boolean menuDrag(MenuDragDTO menuDragDTO) {
+        String dragId = menuDragDTO.getDragId();
+        String targetId = menuDragDTO.getTargetId();
+        List<Authority> authorityList = authorityMapper.selectBatchIds(List.of(dragId, targetId));
+        if (CollectionUtils.isEmpty(authorityList) || authorityList.size() != 2){
+            throw new BusinessException("菜单不存在");
+        }
+        Authority dragAuthority = authorityList.stream().filter(f -> f.getId().toString().equals(dragId)).findAny().orElseThrow(() -> new BusinessException("拖动的菜单不存在"));
+        Authority targetAuthority = authorityList.stream().filter(f -> f.getId().toString().equals(targetId)).findAny().orElseThrow(() -> new BusinessException("目标菜单不存在"));
+        MenuDragDTO.Position position = menuDragDTO.getPosition();
+        UpdateWrapper<Authority> updateWrapper;
+        switch (position){
+            case BEFORE,AFTER :
+                //设置拖动节点的父节点以及根节点id为目标节点的数据
+                dragAuthority.setParentId(targetAuthority.getParentId());
+                dragAuthority.setRootId(targetAuthority.getParentId() == 0 ? dragAuthority.getId() : targetAuthority.getRootId());
+                //查出目标节点的所有兄弟节点
+                QueryWrapper<Authority> queryWrapper = new QueryWrapper<>();
+                queryWrapper
+                        .lambda()
+                        .eq(Authority::getParentId,targetAuthority.getParentId())
+                        .orderByAsc(Authority::getSort);
+                List<Authority> authorities = authorityMapper.selectList(queryWrapper);
+                //移出拖动的节点(如果存在)
+                authorities.removeIf(r -> r.getId().toString().equals(dragId));
+                int targetIndex = authorities.indexOf(targetAuthority);
+                int insertIndex = position.equals(MenuDragDTO.Position.BEFORE) ? targetIndex : targetIndex + 1;
+                if(insertIndex > authorities.size()){
+                    insertIndex = authorities.size();
+                }
+                authorities.add(insertIndex,dragAuthority);
+
+                int prevIndex = Math.max(insertIndex - 1, 0);
+                int sort = 0;
+                List<Authority> updateAuthorityList = new ArrayList<>();
+                for (int i = 0; i < authorities.size(); i++) {
+                    if (i < prevIndex){
+                        continue;
+                    }
+                    Authority authority = authorities.get(i);
+                    if(i == prevIndex){
+                        sort = authority.getSort();
+                    }else {
+                        authority.setSort(++sort);
+                    }
+                    updateAuthorityList.add(authority);
+                }
+                return this.updateBatchById(updateAuthorityList);
+            case INSIDE:
+                int minSortOfChildren = getMinSortOfChildren(targetAuthority);
+                updateWrapper = new UpdateWrapper<>();
+                updateWrapper
+                        .lambda()
+                        .set(Authority::getSort,minSortOfChildren - 1)
+                        .set(Authority::getParentId,targetId)
+                        .set(Authority::getRootId,targetAuthority.getRootId())
+                        .eq(Authority::getId,dragId);
+                return authorityMapper.update(null, updateWrapper) > 0;
+        }
+        return false;
+    }
+
+    public int getMinSortOfChildren(Authority targetAuthority){
+        QueryWrapper<Authority> queryWrapper = new QueryWrapper<>();
+        queryWrapper.select("Min(sort) as sort");
+        queryWrapper.eq("parent_id",targetAuthority.getId());
+        Authority authority = authorityMapper.selectOne(queryWrapper);
+        return authority != null ? authority.getSort() : targetAuthority.getSort() + 1;
+    }
+
+
+
+    @Override
     public List<MenuVO> tree() {
         QueryWrapper<Authority> queryWrapper = new QueryWrapper<>();
         queryWrapper
                 .lambda()
                 .eq(Authority::getType, AuthorityType.MENU.name())
+                .orderByAsc(Authority::getSort)
                 .orderByAsc(Authority::getId);
         List<Authority> authorities = authorityMapper.selectList(queryWrapper);
         if (authorities == null || authorities.isEmpty()){

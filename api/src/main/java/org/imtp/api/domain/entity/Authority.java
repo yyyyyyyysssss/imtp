@@ -51,6 +51,9 @@ public class Authority extends BaseEntity implements TreeRelation {
     @TableField("icon")
     private String icon;
 
+    @TableField("sort")
+    private Integer sort;
+
     @Override
     public String parentFieldName() {
         return "parent_id";

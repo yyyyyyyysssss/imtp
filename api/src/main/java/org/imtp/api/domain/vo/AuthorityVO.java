@@ -35,6 +35,8 @@ public class AuthorityVO {
 
     private String icon;
 
+    private Integer sort;
+
     private String createTime;
 
     private String updateTime;

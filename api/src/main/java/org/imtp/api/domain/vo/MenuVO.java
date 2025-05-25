@@ -32,6 +32,8 @@ public class MenuVO {
 
     private String icon;
 
+    private Integer sort;
+
     private String createTime;
 
     private String updateTime;

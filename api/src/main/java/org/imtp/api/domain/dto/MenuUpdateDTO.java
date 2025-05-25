@@ -29,4 +29,6 @@ public class MenuUpdateDTO {
 
     private String icon;
 
+    private Integer sort;
+
 }

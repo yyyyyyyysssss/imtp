@@ -28,4 +28,6 @@ public class MenuCreateDTO {
 
     private String icon;
 
+    private Integer sort;
+
 }

@@ -4,10 +4,7 @@ import com.github.pagehelper.PageInfo;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.imtp.api.controller.BaseController;
-import org.imtp.api.domain.dto.IdsOnlyDTO;
-import org.imtp.api.domain.dto.MenuCreateDTO;
-import org.imtp.api.domain.dto.MenuQueryDTO;
-import org.imtp.api.domain.dto.MenuUpdateDTO;
+import org.imtp.api.domain.dto.*;
 import org.imtp.api.domain.vo.MenuVO;
 import org.imtp.api.service.MenuService;
 import org.imtp.common.response.Result;
@@ -40,6 +37,12 @@ public class MenuController extends BaseController {
     public Result<?> update(@RequestBody @Validated MenuUpdateDTO menuUpdateDTO) {
         Integer affectedRows = menuService.update(menuUpdateDTO);
         return ResultGenerator.ok(affectedRows);
+    }
+
+    @PostMapping("/drag")
+    public Result<?> drag(@RequestBody @Validated MenuDragDTO menuDragDTO) {
+        Boolean b = menuService.menuDrag(menuDragDTO);
+        return ResultGenerator.ok(b);
     }
 
     @GetMapping("/tree")

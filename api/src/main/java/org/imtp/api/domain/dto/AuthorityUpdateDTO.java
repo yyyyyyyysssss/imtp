@@ -29,4 +29,6 @@ public class AuthorityUpdateDTO {
     @ValidApiUrls(message = "资源路径不合法")
     private String urls;
 
+    private Integer sort;
+
 }
