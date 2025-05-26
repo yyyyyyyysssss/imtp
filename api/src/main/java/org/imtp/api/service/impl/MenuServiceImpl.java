@@ -97,6 +97,7 @@ public class MenuServiceImpl extends ServiceImpl<AuthorityMapper, Authority> imp
                 queryWrapper
                         .lambda()
                         .eq(Authority::getParentId,targetAuthority.getParentId())
+                        .eq(Authority::getType,AuthorityType.MENU)
                         .orderByAsc(Authority::getSort);
                 List<Authority> authorities = authorityMapper.selectList(queryWrapper);
                 //移出拖动的节点(如果存在)
