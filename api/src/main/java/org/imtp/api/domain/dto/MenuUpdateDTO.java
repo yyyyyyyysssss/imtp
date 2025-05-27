@@ -17,6 +17,7 @@ public class MenuUpdateDTO {
     @NotBlank(message = "菜单ID不能为空")
     private String id;
 
+    @NotBlank(message = "父菜单ID不能为空")
     private String parentId;
 
     private String rootId;

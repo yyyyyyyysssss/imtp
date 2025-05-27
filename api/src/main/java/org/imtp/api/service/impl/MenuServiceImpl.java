@@ -60,6 +60,10 @@ public class MenuServiceImpl extends ServiceImpl<AuthorityMapper, Authority> imp
             authority.setParentId(0L);
             authority.setRootId(authority.getId());
         }
+        if (authority.getSort() == null){
+            int maxSortOfChildren = getMaxSortOfChildren(authority.getParentId());
+            authority.setSort(maxSortOfChildren + 1);
+        }
         int insert = authorityMapper.insert(authority);
         return insert > 0 ? authority.getId() : null;
     }
@@ -126,7 +130,7 @@ public class MenuServiceImpl extends ServiceImpl<AuthorityMapper, Authority> imp
                 }
                 return this.updateBatchById(updateAuthorityList);
             case INSIDE:
-                int minSortOfChildren = getMinSortOfChildren(targetAuthority);
+                int minSortOfChildren = getMinSortOfChildren(targetAuthority.getParentId(), targetAuthority.getSort());
                 updateWrapper = new UpdateWrapper<>();
                 updateWrapper
                         .lambda()
@@ -139,12 +143,20 @@ public class MenuServiceImpl extends ServiceImpl<AuthorityMapper, Authority> imp
         return false;
     }
 
-    public int getMinSortOfChildren(Authority targetAuthority){
+    public int getMinSortOfChildren(Serializable id, int defaultSort) {
         QueryWrapper<Authority> queryWrapper = new QueryWrapper<>();
         queryWrapper.select("Min(sort) as sort");
-        queryWrapper.eq("parent_id",targetAuthority.getId());
+        queryWrapper.eq("parent_id",id);
         Authority authority = authorityMapper.selectOne(queryWrapper);
-        return authority != null ? authority.getSort() : targetAuthority.getSort() + 1;
+        return authority != null ? authority.getSort() : defaultSort;
+    }
+
+    public int getMaxSortOfChildren(Serializable id){
+        QueryWrapper<Authority> queryWrapper = new QueryWrapper<>();
+        queryWrapper.select("Max(sort) as sort");
+        queryWrapper.eq("parent_id",id);
+        Authority authority = authorityMapper.selectOne(queryWrapper);
+        return authority != null ? authority.getSort() : 0;
     }
 
 
