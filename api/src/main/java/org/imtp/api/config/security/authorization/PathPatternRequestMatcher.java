@@ -28,7 +28,7 @@ public class PathPatternRequestMatcher implements RequestMatcher {
 
     @Override
     public boolean matches(HttpServletRequest request) {
-        if (httpMethod != null && !httpMethod.equalsIgnoreCase(request.getMethod())){
+        if (httpMethod != null && !httpMethod.equals("*") && !httpMethod.equalsIgnoreCase(request.getMethod())){
             return false;
         }
         PathContainer path = PathContainer.parsePath(request.getRequestURI());

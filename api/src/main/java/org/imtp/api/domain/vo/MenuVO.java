@@ -30,6 +30,8 @@ public class MenuVO {
 
     private String routePath;
 
+    private List<AuthorityUrlVO> authorityUrls;
+
     private String icon;
 
     private Integer sort;

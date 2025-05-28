@@ -33,7 +33,7 @@ public class RequestPathAuthorizationManager implements AuthorizationManager<Req
 
     private final static String URL_SEPARATOR = ",";
 
-    private static final Pattern METHOD_PREFIX_PATTERN = Pattern.compile("^(GET|POST|PUT|DELETE|PATCH|OPTIONS|HEAD):(.+)$", Pattern.CASE_INSENSITIVE);
+    private static final Pattern METHOD_PREFIX_PATTERN = Pattern.compile("^(GET|POST|PUT|DELETE|PATCH|OPTIONS|HEAD|\\*):(.+)$", Pattern.CASE_INSENSITIVE);
 
     @Override
     public AuthorizationDecision check(Supplier<Authentication> supplier, RequestAuthorizationContext requestAuthorizationContext) {

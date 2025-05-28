@@ -29,7 +29,6 @@ import org.springframework.util.CollectionUtils;
 
 import java.io.Serializable;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -112,23 +111,9 @@ public class MenuServiceImpl extends ServiceImpl<AuthorityMapper, Authority> imp
                     insertIndex = authorities.size();
                 }
                 authorities.add(insertIndex,dragAuthority);
-
-                int prevIndex = Math.max(insertIndex - 1, 0);
-                int sort = 0;
-                List<Authority> updateAuthorityList = new ArrayList<>();
-                for (int i = 0; i < authorities.size(); i++) {
-                    if (i < prevIndex){
-                        continue;
-                    }
-                    Authority authority = authorities.get(i);
-                    if(i == prevIndex){
-                        sort = authority.getSort();
-                    }else {
-                        authority.setSort(++sort);
-                    }
-                    updateAuthorityList.add(authority);
-                }
-                return this.updateBatchById(updateAuthorityList);
+                //根据拖动节点的索引重置兄弟节点的排序
+                List<Authority> resetSortAuthorities = getResetSortAuthoritiesByIndex(insertIndex, authorities);
+                return this.updateBatchById(resetSortAuthorities);
             case INSIDE:
                 int minSortOfChildren = getMinSortOfChildren(targetAuthority.getParentId(), targetAuthority.getSort());
                 updateWrapper = new UpdateWrapper<>();
@@ -141,6 +126,25 @@ public class MenuServiceImpl extends ServiceImpl<AuthorityMapper, Authority> imp
                 return authorityMapper.update(null, updateWrapper) > 0;
         }
         return false;
+    }
+
+    private List<Authority> getResetSortAuthoritiesByIndex(int index, List<Authority> authorities) {
+        int prevIndex = Math.max(index - 1, 0);
+        int sort = 0;
+        List<Authority> resetAuthorityList = new ArrayList<>();
+        for (int i = 0; i < authorities.size(); i++) {
+            if (i < prevIndex){
+                continue;
+            }
+            Authority authority = authorities.get(i);
+            if(i == prevIndex){
+                sort = authority.getSort();
+            }else {
+                authority.setSort(++sort);
+            }
+            resetAuthorityList.add(authority);
+        }
+        return resetAuthorityList;
     }
 
     public int getMinSortOfChildren(Serializable id, int defaultSort) {
@@ -234,7 +238,7 @@ public class MenuServiceImpl extends ServiceImpl<AuthorityMapper, Authority> imp
         QueryWrapper<Authority> queryWrapper = new QueryWrapper<>();
         queryWrapper
                 .lambda()
-                .eq(Authority::getType, AuthorityType.PERMISSION.name())
+                .eq(Authority::getType, AuthorityType.BUTTON.name())
                 .eq(Authority::getParentId, id);
         List<Authority> permissions = authorityMapper.selectList(queryWrapper);
         if (!CollectionUtils.isEmpty(permissions)) {

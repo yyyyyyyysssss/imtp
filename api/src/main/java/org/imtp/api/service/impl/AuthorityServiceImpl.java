@@ -37,7 +37,7 @@ public class AuthorityServiceImpl extends ServiceImpl<AuthorityMapper, Authority
     public Long create(AuthorityCreateDTO authorityAddDTO) {
         Authority authority = AuthorityMapping.INSTANCE.toAuthority(authorityAddDTO);
         authority.setId(IdGen.genId());
-        authority.setType(AuthorityType.PERMISSION);
+        authority.setType(AuthorityType.BUTTON);
         Authority selectAuthority = authorityMapper.selectById(authority.getParentId());
         authority.setRootId(selectAuthority.getRootId());
         int insert = authorityMapper.insert(authority);
@@ -47,7 +47,7 @@ public class AuthorityServiceImpl extends ServiceImpl<AuthorityMapper, Authority
     @Override
     public Integer update(AuthorityUpdateDTO authorityUpdateDTO) {
         Authority authority = authorityMapper.selectById(authorityUpdateDTO.getId());
-        if (authority == null || !authority.getType().equals(AuthorityType.PERMISSION)) {
+        if (authority == null || !authority.getType().equals(AuthorityType.BUTTON)) {
             throw new BusinessException("该操作权限不存在");
         }
         AuthorityMapping.INSTANCE.updateAuthority(authorityUpdateDTO,authority);
@@ -67,7 +67,7 @@ public class AuthorityServiceImpl extends ServiceImpl<AuthorityMapper, Authority
     @Override
     public List<AuthorityVO> tree() {
         QueryWrapper<Authority> queryWrapper = new QueryWrapper<>();
-        queryWrapper.in("type", AuthorityType.MENU.name(),AuthorityType.PERMISSION.name());
+        queryWrapper.in("type", AuthorityType.MENU.name(),AuthorityType.BUTTON.name());
         List<Authority> authorities = authorityMapper.selectList(queryWrapper);
         if (authorities == null || authorities.isEmpty()){
             return new ArrayList<>();
@@ -85,7 +85,7 @@ public class AuthorityServiceImpl extends ServiceImpl<AuthorityMapper, Authority
     @Override
     public Integer delete(String id) {
         Authority authority = authorityMapper.selectById(id);
-        if (authority == null || !authority.getType().equals(AuthorityType.PERMISSION)){
+        if (authority == null || !authority.getType().equals(AuthorityType.BUTTON)){
             throw new BusinessException("该权限不存在");
         }
         return authorityMapper.deleteById(id);
@@ -97,7 +97,7 @@ public class AuthorityServiceImpl extends ServiceImpl<AuthorityMapper, Authority
         if (authorities == null || authorities.isEmpty()){
             throw new BusinessException("权限不存在");
         }
-        if (authorities.stream().anyMatch(f -> !f.getType().equals(AuthorityType.PERMISSION))){
+        if (authorities.stream().anyMatch(f -> !f.getType().equals(AuthorityType.BUTTON))){
             throw new BusinessException("存在非权限类型的权限");
         }
         return authorityMapper.deleteBatchIds(ids);
