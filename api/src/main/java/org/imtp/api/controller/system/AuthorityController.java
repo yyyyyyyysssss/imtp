@@ -39,6 +39,12 @@ public class AuthorityController {
         return ResultGenerator.ok(affectedRows);
     }
 
+    @PatchMapping
+    public Result<?> updatePatch(@RequestBody @Validated AuthorityUpdateDTO authorityUpdateDTO) {
+        Integer affectedRows = authorityService.updatePatch(authorityUpdateDTO);
+        return ResultGenerator.ok(affectedRows);
+    }
+
     @GetMapping("/{id}")
     public Result<?> details(@PathVariable("id") String id) {
         AuthorityVO details = authorityService.details(id);

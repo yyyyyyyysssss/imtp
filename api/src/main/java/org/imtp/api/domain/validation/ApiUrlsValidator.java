@@ -13,7 +13,7 @@ import java.util.regex.Pattern;
 public class ApiUrlsValidator implements ConstraintValidator<ValidApiUrls, String> {
 
     private static final Pattern URL_PATTERN = Pattern.compile(
-            "^(?i)(((GET|POST|PUT|DELETE|PATCH|OPTIONS|HEAD):)?(/[\\w\\-./{}:+*\\[\\]()\\\\]+)(?:,(?:(GET|POST|PUT|DELETE|PATCH|OPTIONS|HEAD):)?(/[\\w\\-./{}:+*\\[\\]()\\\\]+))*)$"
+            "^/[\\w\\-./{}:+*\\[\\]()\\\\]+$"
     );
 
     @Override

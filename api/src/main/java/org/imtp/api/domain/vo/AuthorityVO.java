@@ -2,7 +2,7 @@ package org.imtp.api.domain.vo;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.imtp.api.enums.AuthorityType;
+import org.imtp.api.domain.entity.AuthorityUrl;
 
 import java.util.List;
 
@@ -31,7 +31,7 @@ public class AuthorityVO {
 
     private String routePath;
 
-    private String urls;
+    private List<AuthorityUrl> urls;
 
     private String icon;
 

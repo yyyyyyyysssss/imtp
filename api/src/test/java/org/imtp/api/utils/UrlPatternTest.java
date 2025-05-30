@@ -16,8 +16,8 @@ public class UrlPatternTest {
 
     @Test
     public void testUrlPattern(){
-        String regex = "^(?i)((?:((GET|POST|PUT|DELETE|PATCH|OPTIONS|HEAD):)?(/[\\w\\-./{}:+*\\[\\]()\\\\]+))(?:,(?:(GET|POST|PUT|DELETE|PATCH|OPTIONS|HEAD):)?(/[\\w\\-./{}:+*\\[\\]()\\\\]+))*)$";
-        String test = "post:/system/authority/{id:\\d+},put:/api/system/authority,/api/system/**";
+        String regex = "^/[\\w\\-./{}:+*\\[\\]()\\\\]+$";
+        String test = "/system/authority/{id:\\d+}";
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(test);
         if(matcher.matches()){

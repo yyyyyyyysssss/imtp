@@ -1,10 +1,15 @@
 package org.imtp.api.domain.dto;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
+import org.imtp.api.domain.entity.AuthorityUrl;
 import org.imtp.api.domain.validation.ValidApiUrls;
 import org.imtp.api.enums.AuthorityType;
+
+import java.util.List;
 
 /**
  * @Description
@@ -22,12 +27,10 @@ public class AuthorityUpdateDTO {
 
     private String rootId;
 
-    @NotBlank(message = "权限名称不能为空")
     private String name;
 
-    @NotBlank(message = "资源路径不能为空")
-    @ValidApiUrls(message = "资源路径不合法")
-    private String urls;
+    @Valid
+    private List<AuthorityUrl> urls;
 
     private Integer sort;
 

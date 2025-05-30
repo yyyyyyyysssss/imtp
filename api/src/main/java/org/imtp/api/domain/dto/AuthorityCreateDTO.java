@@ -1,13 +1,12 @@
 package org.imtp.api.domain.dto;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.validator.spi.group.DefaultGroupSequenceProvider;
-import org.imtp.api.domain.validation.ValidApiUrls;
-import org.imtp.api.enums.AuthorityType;
+import org.imtp.api.domain.entity.AuthorityUrl;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -30,29 +29,9 @@ public class AuthorityCreateDTO {
     @NotBlank(message = "权限名称不能为空")
     private String name;
 
-    @NotBlank(message = "资源路径不能为空")
-    @ValidApiUrls(message = "资源路径不合法")
-    private String urls;
+    @Valid
+    private List<AuthorityUrl> urls;
 
     private Integer sort;
-
-//    public static class AuthorityDTOGroupSequenceProvider implements DefaultGroupSequenceProvider<AuthorityCreateDTO>{
-//
-//        public AuthorityDTOGroupSequenceProvider(){}
-//
-//        @Override
-//        public List<Class<?>> getValidationGroups(AuthorityCreateDTO authorityDTO) {
-//            List<Class<?>> groups = new ArrayList<>();
-//            groups.add(AuthorityCreateDTO.class);
-//            if(authorityDTO != null){
-//                if(AuthorityType.MENU.equals(authorityDTO.getType())){
-//                    groups.add(AuthorityCreateDTO.TypeGroup.class);
-//                }else if(AuthorityType.BUTTON.equals(authorityDTO.getType())){
-//                    groups.add(AuthorityCreateDTO.UrlGroup.class);
-//                }
-//            }
-//            return groups;
-//        }
-//    }
 
 }

@@ -2,7 +2,22 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.imtp.api.mapper.AuthorityMapper">
 
-    <select id="findAuthorityByRoleIds" parameterType="java.util.Collection" resultType="org.imtp.api.domain.entity.Authority">
+    <resultMap id="baseResultMap" type="org.imtp.api.domain.entity.Authority">
+        <id property="id" column="id"/>
+        <id property="parentId" column="parent_id"/>
+        <id property="rootId" column="root_id"/>
+        <result property="code" column="code"/>
+        <result property="name" column="name"/>
+        <result property="type" column="type"/>
+        <result property="routePath" column="route_path"/>
+        <result property="urls" typeHandler="com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler" column="urls"/>
+        <result property="icon" column="icon"/>
+        <result property="sort" column="sort"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+    <select id="findAuthorityByRoleIds" parameterType="java.util.Collection" resultMap="baseResultMap">
         SELECT a.*
         FROM im_role r
         RIGHT JOIN im_role_authority ra on r.id = ra.role_id
@@ -13,7 +28,7 @@
         </foreach>
     </select>
 
-    <select id="findMenuByRoleIds" parameterType="java.util.Collection" resultType="org.imtp.api.domain.entity.Authority">
+    <select id="findMenuByRoleIds" parameterType="java.util.Collection" resultMap="baseResultMap">
         SELECT a.*
         FROM im_role r
         RIGHT JOIN im_role_authority ra on r.id = ra.role_id
@@ -23,13 +38,6 @@
         <foreach collection="roleIds" item="item" index="index" separator="," open="(" close=")">
             #{item}
         </foreach>
-    </select>
-
-    <select id="findDetailsById" resultType="org.imtp.api.domain.vo.AuthorityVO">
-        SELECT t.*,f.`name` as parent_name
-        FROM im_authority t
-        LEFT JOIN im_authority f on t.parent_id = f.id
-        WHERE t.id = #{id}
     </select>
 
 </mapper>

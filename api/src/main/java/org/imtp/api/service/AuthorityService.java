@@ -15,6 +15,8 @@ public interface AuthorityService extends IService<Authority> {
 
     Integer update(AuthorityUpdateDTO authorityUpdateDTO);
 
+    Integer updatePatch(AuthorityUpdateDTO authorityUpdateDTO);
+
     AuthorityVO details(String id);
 
     List<AuthorityVO> tree();

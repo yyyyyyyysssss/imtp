@@ -1,7 +1,6 @@
 package org.imtp.api.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.imtp.api.config.exception.BusinessException;
@@ -28,7 +27,7 @@ import java.util.List;
  */
 @Service
 @Slf4j
-public class AuthorityServiceImpl extends ServiceImpl<AuthorityMapper, Authority> implements AuthorityService {
+public class AuthorityServiceImpl extends AbstractAuthorityService implements AuthorityService {
 
     @Resource
     private AuthorityMapper authorityMapper;
@@ -40,12 +39,34 @@ public class AuthorityServiceImpl extends ServiceImpl<AuthorityMapper, Authority
         authority.setType(AuthorityType.BUTTON);
         Authority selectAuthority = authorityMapper.selectById(authority.getParentId());
         authority.setRootId(selectAuthority.getRootId());
+        if (authority.getSort() == null){
+            Long parentId = authority.getParentId();
+            if (authority.getParentId() == null){
+                parentId = 0L;
+            }
+            int maxSortOfChildren = getMaxSortOfChildren(parentId);
+            authority.setSort(maxSortOfChildren + 1);
+        }
         int insert = authorityMapper.insert(authority);
         return insert > 0 ? authority.getId() : null;
     }
 
     @Override
     public Integer update(AuthorityUpdateDTO authorityUpdateDTO) {
+        Authority authority = authorityMapper.selectById(authorityUpdateDTO.getId());
+        if (authority == null || !authority.getType().equals(AuthorityType.BUTTON)) {
+            throw new BusinessException("该操作权限不存在");
+        }
+        AuthorityMapping.INSTANCE.overwriteAuthority(authorityUpdateDTO,authority);
+        if(authorityUpdateDTO.getParentId() != null && !authorityUpdateDTO.getParentId().isEmpty() && !authorityUpdateDTO.getParentId().equals(authority.getParentId().toString())){
+            Authority selectAuthority = authorityMapper.selectById(authorityUpdateDTO.getParentId());
+            authority.setRootId(selectAuthority.getRootId());
+        }
+        return authorityMapper.updateById(authority);
+    }
+
+    @Override
+    public Integer updatePatch(AuthorityUpdateDTO authorityUpdateDTO) {
         Authority authority = authorityMapper.selectById(authorityUpdateDTO.getId());
         if (authority == null || !authority.getType().equals(AuthorityType.BUTTON)) {
             throw new BusinessException("该操作权限不存在");
@@ -61,7 +82,7 @@ public class AuthorityServiceImpl extends ServiceImpl<AuthorityMapper, Authority
     @Override
     public AuthorityVO details(String id) {
 
-        return authorityMapper.findDetailsById(id);
+        return null;
     }
 
     @Override

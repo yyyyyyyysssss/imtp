@@ -118,7 +118,7 @@ public class User implements UserDetails, CredentialsContainer {
             getterVisibility = JsonAutoDetect.Visibility.NONE,
             isGetterVisibility = JsonAutoDetect.Visibility.NONE)
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public abstract static class RequestUrlAuthorityMixin {
+    public abstract static class UserMixin {
     }
 
 

@@ -171,7 +171,7 @@ public class OAuth2AuthorizationServerConfig {
         objectMapper.registerModule(new JavaTimeModule());
         objectMapper.registerModule(new WebServletJackson2Module());
         objectMapper.addMixIn(RequestUrlAuthority.class, RequestUrlAuthority.RequestUrlAuthorityMixin.class);
-        objectMapper.addMixIn(User.class,User.RequestUrlAuthorityMixin.class);
+        objectMapper.addMixIn(User.class,User.UserMixin.class);
 
         authorizationRowMapper.setObjectMapper(objectMapper);
 

@@ -2,6 +2,7 @@ package org.imtp.api.domain.vo;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.imtp.api.domain.entity.AuthorityUrl;
 
 import java.util.List;
 
@@ -30,7 +31,7 @@ public class MenuVO {
 
     private String routePath;
 
-    private List<AuthorityUrlVO> authorityUrls;
+    private List<AuthorityUrl> urls;
 
     private String icon;
 

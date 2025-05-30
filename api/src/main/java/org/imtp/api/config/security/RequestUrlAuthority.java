@@ -4,15 +4,18 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.imtp.api.domain.entity.AuthorityUrl;
 import org.imtp.api.utils.JsonNodeUtil;
 import org.springframework.security.core.GrantedAuthority;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  * @Description 基于请求路径权限认证
@@ -28,7 +31,7 @@ public class RequestUrlAuthority implements GrantedAuthority {
         this(code,null);
     }
 
-    public RequestUrlAuthority(String code, String urls) {
+    public RequestUrlAuthority(String code, List<AuthorityUrl> urls) {
         this.code = code;
         this.urls = urls;
     }
@@ -37,7 +40,7 @@ public class RequestUrlAuthority implements GrantedAuthority {
     private String code;
 
     //该权限可访问的urls 多个以,号隔开
-    private String urls;
+    private List<AuthorityUrl> urls;
 
     public String getCode() {
         return code;
@@ -47,11 +50,11 @@ public class RequestUrlAuthority implements GrantedAuthority {
         this.code = code;
     }
 
-    public String getUrls() {
+    public List<AuthorityUrl> getUrls() {
         return urls;
     }
 
-    public void setUrls(String urls) {
+    public void setUrls(List<AuthorityUrl> urls) {
         this.urls = urls;
     }
 
@@ -78,8 +81,7 @@ public class RequestUrlAuthority implements GrantedAuthority {
             JsonNode root = mapper.readTree(jsonParser);
             RequestUrlAuthority requestAuthority = new RequestUrlAuthority();
             String code = JsonNodeUtil.findStringValue(root, "code");
-            String urls = JsonNodeUtil.findStringValue(root, "urls");
-
+            List<AuthorityUrl> urls = JsonNodeUtil.findValue(root, "urls", new TypeReference<List<AuthorityUrl>>() {}, mapper);
             requestAuthority.setCode(code);
             requestAuthority.setUrls(urls);
             return requestAuthority;

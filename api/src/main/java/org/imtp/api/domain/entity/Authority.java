@@ -1,6 +1,10 @@
 package org.imtp.api.domain.entity;
 
-import com.baomidou.mybatisplus.annotation.*;
+import com.baomidou.mybatisplus.annotation.EnumValue;
+import com.baomidou.mybatisplus.annotation.FieldStrategy;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -8,7 +12,7 @@ import lombok.experimental.Tolerate;
 import org.imtp.api.enums.AuthorityType;
 import org.imtp.api.mapper.TreeRelation;
 
-import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -18,7 +22,7 @@ import java.util.Objects;
  */
 @Getter
 @Setter
-@TableName("im_authority")
+@TableName(value = "im_authority",autoResultMap = true)
 @Builder
 public class Authority extends BaseEntity implements TreeRelation {
 
@@ -42,11 +46,11 @@ public class Authority extends BaseEntity implements TreeRelation {
     @EnumValue
     private AuthorityType type;
 
-    @TableField("route_path")
+    @TableField(value = "route_path", updateStrategy = FieldStrategy.ALWAYS)
     private String routePath;
 
-    @TableField("urls")
-    private String urls;
+    @TableField(value = "urls", typeHandler = JacksonTypeHandler.class, updateStrategy = FieldStrategy.ALWAYS)
+    private List<AuthorityUrl> urls;
 
     @TableField("icon")
     private String icon;
