@@ -25,6 +25,9 @@ public class MenuUpdateDTO {
     @NotBlank(message = "菜单名称不能为空")
     private String name;
 
+    @NotBlank(message = "菜单编码不能为空")
+    private String code;
+
     @NotBlank(message = "菜单路由不能为空")
     private String routePath;
 

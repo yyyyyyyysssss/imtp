@@ -5,6 +5,7 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.zookeeper.Watcher;
 import org.apache.zookeeper.ZooKeeper;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.DependsOn;
@@ -20,6 +21,7 @@ import java.util.concurrent.CountDownLatch;
 
 @Component
 @ConfigurationProperties(prefix = "zookeeper")
+@ConditionalOnProperty(name = "zookeeper.enabled", havingValue = "true")
 @Getter
 @Setter
 @Slf4j
