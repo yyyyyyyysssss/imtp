@@ -1,15 +1,11 @@
 package org.imtp.api.domain.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Tolerate;
-
-import java.util.Date;
 
 /**
  * @Description
@@ -21,14 +17,11 @@ import java.util.Date;
 @Setter
 @TableName("im_role")
 @Builder
-public class Role {
+public class Role extends BaseEntity{
 
     @Tolerate
     public Role(){
     }
-
-    @TableId(value = "id", type = IdType.INPUT)
-    private Long id;
 
     @TableField("code")
     private String code;
@@ -36,7 +29,7 @@ public class Role {
     @TableField("name")
     private String name;
 
-    @TableField("create_time")
-    private Date createTime;
+    @TableField("enabled")
+    private Boolean enabled;
 
 }
