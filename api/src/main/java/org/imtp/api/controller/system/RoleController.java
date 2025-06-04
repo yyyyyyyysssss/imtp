@@ -40,7 +40,13 @@ public class RoleController {
 
     @PatchMapping
     public Result<?> updatePatch(@RequestBody @Validated RoleUpdateDTO roleUpdateDTO) {
-        Integer affectedRows = roleService.update(roleUpdateDTO);
+        Integer affectedRows = roleService.updatePatch(roleUpdateDTO);
+        return ResultGenerator.ok(affectedRows);
+    }
+
+    @DeleteMapping("/{id}")
+    public Result<?> delete(@PathVariable("id") String id) {
+        Integer affectedRows = roleService.delete(id);
         return ResultGenerator.ok(affectedRows);
     }
 

@@ -88,7 +88,10 @@ public class AuthorityServiceImpl extends AbstractAuthorityService implements Au
     @Override
     public List<AuthorityVO> tree() {
         QueryWrapper<Authority> queryWrapper = new QueryWrapper<>();
-        queryWrapper.in("type", AuthorityType.MENU.name(),AuthorityType.BUTTON.name());
+        queryWrapper
+                .lambda()
+                .select(Authority::getId,Authority::getParentId,Authority::getName)
+                .in(Authority::getType, AuthorityType.MENU, AuthorityType.BUTTON);
         List<Authority> authorities = authorityMapper.selectList(queryWrapper);
         if (authorities == null || authorities.isEmpty()){
             return new ArrayList<>();

@@ -1,5 +1,6 @@
 package org.imtp.api.domain.dto;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,4 +12,13 @@ import lombok.Setter;
 @Getter
 @Setter
 public class RoleCreateDTO {
+
+    @NotBlank(message = "角色编码不能为空")
+    private String code;
+
+    @NotBlank(message = "角色名称不能为空")
+    private String name;
+
+    private Boolean enabled = true;
+
 }

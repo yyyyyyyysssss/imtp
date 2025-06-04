@@ -16,7 +16,7 @@ import lombok.experimental.Tolerate;
  */
 @Getter
 @Setter
-@TableName("role_authority")
+@TableName("im_role_authority")
 @Builder
 public class RoleAuthority {
 
