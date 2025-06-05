@@ -9,4 +9,6 @@ public interface CommonConstant {
 
     String TRACE_ID = "traceId";
 
+    String SUPER_ADMIN_ROLE_CODE = "super_admin";
+
 }

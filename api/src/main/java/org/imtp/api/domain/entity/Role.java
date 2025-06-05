@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Tolerate;
+import org.imtp.api.config.constant.CommonConstant;
 
 /**
  * @Description
@@ -31,5 +32,13 @@ public class Role extends BaseEntity{
 
     @TableField("enabled")
     private Boolean enabled;
+
+    /**
+     * 是否为超级管理员角色
+     * @return true 如果是超级管理员角色
+     */
+    public boolean isSuperAdmin() {
+        return this.code.equals(CommonConstant.SUPER_ADMIN_ROLE_CODE);
+    }
 
 }

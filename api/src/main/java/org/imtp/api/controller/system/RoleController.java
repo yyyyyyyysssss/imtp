@@ -38,6 +38,12 @@ public class RoleController {
         return ResultGenerator.ok(affectedRows);
     }
 
+    @PostMapping("/bindAuthority")
+    public Result<?> bindAuthority(@RequestBody @Validated RoleUpdateDTO roleUpdateDTO) {
+        Boolean bindAuthority = roleService.bindAuthority(roleUpdateDTO);
+        return ResultGenerator.ok(bindAuthority);
+    }
+
     @PatchMapping
     public Result<?> updatePatch(@RequestBody @Validated RoleUpdateDTO roleUpdateDTO) {
         Integer affectedRows = roleService.updatePatch(roleUpdateDTO);

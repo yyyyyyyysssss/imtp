@@ -235,7 +235,7 @@ public class MenuServiceImpl extends AbstractAuthorityService implements MenuSer
         if (CollectionUtils.isEmpty(roles)) {
             return Collections.emptyList();
         }
-        boolean isSuperAdmin = roles.stream().anyMatch(f -> f.getCode().equals("super_admin"));
+        boolean isSuperAdmin = roles.stream().anyMatch(Role::isSuperAdmin);
         List<Authority> authorities;
         if (isSuperAdmin){
             QueryWrapper<Authority> queryWrapper = new QueryWrapper<>();

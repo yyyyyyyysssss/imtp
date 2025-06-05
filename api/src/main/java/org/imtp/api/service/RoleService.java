@@ -19,6 +19,8 @@ public interface RoleService extends IService<Role> {
 
     Integer update(RoleUpdateDTO roleUpdateDTO);
 
+    Boolean bindAuthority(RoleUpdateDTO roleUpdateDTO);
+
     Integer updatePatch(RoleUpdateDTO roleUpdateDTO);
 
     PageInfo<RoleVO> queryList(RoleQueryDTO queryDTO);

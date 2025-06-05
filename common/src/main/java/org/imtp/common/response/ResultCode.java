@@ -14,6 +14,7 @@ public enum ResultCode {
     OAUTH2_CLIENT_LOGIN_EXCEPTION(4030,"oauth2使用三方账号登录失败"),
 
     DATABASE_EXCEPTION(5070,"数据库操作异常"),
+    DATABASE_DUPLICATE_KEY_EXCEPTION(5071,"数据存在唯一约束冲突"),
     ;
     private int code;
     private String message;

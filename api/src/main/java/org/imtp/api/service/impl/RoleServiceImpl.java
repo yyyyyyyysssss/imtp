@@ -17,10 +17,18 @@ import org.imtp.api.domain.vo.RoleVO;
 import org.imtp.api.mapper.RoleAuthorityMapper;
 import org.imtp.api.mapper.RoleMapper;
 import org.imtp.api.mapping.RoleMapping;
+import org.imtp.api.service.RoleAuthorityService;
 import org.imtp.api.service.RoleService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @Description
@@ -35,9 +43,10 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role>  implements R
     private RoleMapper roleMapper;
 
     @Resource
-    private RoleAuthorityMapper roleAuthorityMapper;
+    private RoleAuthorityService roleAuthorityService;
 
     @Override
+    @Transactional
     public Long create(RoleCreateDTO roleCreateDTO) {
         Role role = RoleMapping.INSTANCE.toRole(roleCreateDTO);
         role.setId(IdGen.genId());
@@ -45,27 +54,63 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role>  implements R
         if (row <= 0) {
             throw new BusinessException("创建角色失败");
         }
+        if(!CollectionUtils.isEmpty(roleCreateDTO.getAuthorityIds())){
+            addRoleAuthority(role.getId(), roleCreateDTO.getAuthorityIds());
+        }
         return role.getId();
     }
 
     @Override
+    @Transactional
     public Integer update(RoleUpdateDTO roleUpdateDTO) {
         Role role = roleMapper.selectById(roleUpdateDTO.getId());
         if (role == null) {
             throw new BusinessException("角色不存在");
         }
+        if(role.isSuperAdmin()){
+            throw new BusinessException("超级管理员角色无法修改");
+        }
         RoleMapping.INSTANCE.overwriteRole(roleUpdateDTO, role);
-        return roleMapper.updateById(role);
+        int i = roleMapper.updateById(role);
+        if (i <= 0) {
+            throw new BusinessException("更新角色失败");
+        }
+        addRoleAuthority(role.getId(), roleUpdateDTO.getAuthorityIds());
+        return i;
     }
 
     @Override
+    @Transactional
     public Integer updatePatch(RoleUpdateDTO roleUpdateDTO) {
         Role role = roleMapper.selectById(roleUpdateDTO.getId());
         if (role == null) {
             throw new BusinessException("角色不存在");
         }
+        if(role.isSuperAdmin()){
+            throw new BusinessException("超级管理员角色无法修改");
+        }
         RoleMapping.INSTANCE.updateRole(roleUpdateDTO, role);
-        return roleMapper.updateById(role);
+        int i = roleMapper.updateById(role);
+        if (i <= 0) {
+            throw new BusinessException("更新角色失败");
+        }
+        if(!CollectionUtils.isEmpty(roleUpdateDTO.getAuthorityIds())){
+            addRoleAuthority(role.getId(), roleUpdateDTO.getAuthorityIds());
+        }
+        return i;
+    }
+
+    @Override
+    @Transactional
+    public Boolean bindAuthority(RoleUpdateDTO roleUpdateDTO) {
+        Role role = roleMapper.selectById(roleUpdateDTO.getId());
+        if (role == null) {
+            throw new BusinessException("角色不存在");
+        }
+        if(role.isSuperAdmin()){
+            throw new BusinessException("超级管理员角色无法修改");
+        }
+        return addRoleAuthority(role.getId(), roleUpdateDTO.getAuthorityIds());
     }
 
     @Override
@@ -77,7 +122,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role>  implements R
                     .lambda()
                     .eq(RoleAuthority::getRoleId, id);
             // 删除角色对应的权限
-            roleAuthorityMapper.delete(roleAuthorityQueryWrapper);
+            roleAuthorityService.remove(roleAuthorityQueryWrapper);
         }else {
             throw new BusinessException("删除角色失败，角色可能不存在");
         }
@@ -91,20 +136,61 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role>  implements R
         PageHelper.startPage(pageNum, pageSize);
         QueryWrapper<Role> roleQueryWrapper = getRoleQueryWrapper(queryDTO);
         List<Role> roles = roleMapper.selectList(roleQueryWrapper);
+        if (roles == null || roles.isEmpty()) {
+            return new PageInfo<>();
+        }
         PageInfo<Role> rolePageInfo = PageInfo.of(roles);
 
-        List<RoleVO> roleVOs = roles.stream()
-                .map(RoleMapping.INSTANCE::toRoleVO)
-                .toList();
+        List<Long> roleIds = roles.stream().map(Role::getId).toList();
+        // 查询角色对应的权限
+        QueryWrapper<RoleAuthority> roleAuthorityQueryWrapper = new QueryWrapper<>();
+        roleAuthorityQueryWrapper
+                .lambda()
+                .in(RoleAuthority::getRoleId, roleIds);
+        List<RoleAuthority> roleAuthorities = roleAuthorityService.list(roleAuthorityQueryWrapper);
+        Map<Long, List<Long>> roleAuthorityIdMap = roleAuthorities.stream().collect(Collectors.groupingBy(
+                RoleAuthority::getRoleId,
+                Collectors.mapping(RoleAuthority::getAuthorityId, Collectors.toList()
+        )));
+
+        List<RoleVO> result = new ArrayList<>();
+        for (Role role : roles) {
+            RoleVO roleVO = RoleMapping.INSTANCE.toRoleVO(role);
+            List<Long> authorityIds = roleAuthorityIdMap.getOrDefault(role.getId(), new ArrayList<>());
+            roleVO.setAuthorityIds(authorityIds);
+            result.add(roleVO);
+        }
         PageInfo<RoleVO> pageInfo = new PageInfo<>();
-        pageInfo.setList(roleVOs);
+        pageInfo.setList(result);
         pageInfo.setTotal(rolePageInfo.getTotal());
         pageInfo.setPageNum(pageNum);
         pageInfo.setPageSize(pageSize);
         return pageInfo;
     }
 
-
+    @Transactional
+    public boolean addRoleAuthority(Long roleId, Collection<Long> authorityIds) {
+        QueryWrapper<RoleAuthority> roleAuthorityQueryWrapper = new QueryWrapper<>();
+        roleAuthorityQueryWrapper
+                .lambda()
+                .eq(RoleAuthority::getRoleId, roleId);
+        // 删除原有的角色权限
+        roleAuthorityService.remove(roleAuthorityQueryWrapper);
+        if (CollectionUtils.isEmpty(authorityIds)){
+            log.warn("添加角色权限时，权限列表为空");
+            return false;
+        }
+        // 添加新的角色权限
+        List<RoleAuthority> roleAuthorities = new ArrayList<>();
+        for (Long authorityId : authorityIds) {
+            RoleAuthority roleAuthority = new RoleAuthority();
+            roleAuthority.setId(IdGen.genId());
+            roleAuthority.setRoleId(roleId);
+            roleAuthority.setAuthorityId(authorityId);
+            roleAuthorities.add(roleAuthority);
+        }
+        return roleAuthorityService.saveBatch(roleAuthorities);
+    }
 
     private QueryWrapper<Role> getRoleQueryWrapper(RoleQueryDTO queryDTO) {
         QueryWrapper<Role> roleQueryWrapper = new QueryWrapper<>();

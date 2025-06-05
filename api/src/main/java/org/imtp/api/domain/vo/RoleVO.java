@@ -3,6 +3,8 @@ package org.imtp.api.domain.vo;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
 /**
  * @Description
  * @Author ys
@@ -23,5 +25,7 @@ public class RoleVO {
     private String createTime;
 
     private String updateTime;
+
+    private List<Long> authorityIds;
 
 }

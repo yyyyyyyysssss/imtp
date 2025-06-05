@@ -4,6 +4,8 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
 /**
  * @Description
  * @Author ys
@@ -20,5 +22,7 @@ public class RoleCreateDTO {
     private String name;
 
     private Boolean enabled = true;
+
+    private List<Long> authorityIds;
 
 }
