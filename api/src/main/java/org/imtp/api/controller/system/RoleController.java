@@ -3,15 +3,15 @@ package org.imtp.api.controller.system;
 import com.github.pagehelper.PageInfo;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.imtp.api.domain.dto.RoleCreateDTO;
-import org.imtp.api.domain.dto.RoleQueryDTO;
-import org.imtp.api.domain.dto.RoleUpdateDTO;
+import org.imtp.api.domain.dto.*;
 import org.imtp.api.domain.vo.RoleVO;
 import org.imtp.api.service.RoleService;
 import org.imtp.common.response.Result;
 import org.imtp.common.response.ResultGenerator;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * @Description
@@ -38,9 +38,15 @@ public class RoleController {
         return ResultGenerator.ok(affectedRows);
     }
 
-    @PostMapping("/bindAuthority")
-    public Result<?> bindAuthority(@RequestBody @Validated RoleUpdateDTO roleUpdateDTO) {
-        Boolean bindAuthority = roleService.bindAuthority(roleUpdateDTO);
+    @PostMapping("/{id}/authorities")
+    public Result<?> bindAuthorities(@PathVariable Long id, @RequestBody RoleBindAuthoritiesDTO roleBindAuthoritiesDTO) {
+        Boolean bindAuthority = roleService.bindAuthorities(id,roleBindAuthoritiesDTO);
+        return ResultGenerator.ok(bindAuthority);
+    }
+
+    @PostMapping("/{id}/users")
+    public Result<?> bindUsers(@PathVariable Long id, @RequestBody RoleBindUserDTO roleBindUserDTO) {
+        Boolean bindAuthority = roleService.bindUsers(id,roleBindUserDTO);
         return ResultGenerator.ok(bindAuthority);
     }
 

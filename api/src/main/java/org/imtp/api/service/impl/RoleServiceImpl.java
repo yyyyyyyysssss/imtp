@@ -8,13 +8,10 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.imtp.api.config.exception.BusinessException;
 import org.imtp.api.config.idwork.IdGen;
-import org.imtp.api.domain.dto.RoleCreateDTO;
-import org.imtp.api.domain.dto.RoleQueryDTO;
-import org.imtp.api.domain.dto.RoleUpdateDTO;
+import org.imtp.api.domain.dto.*;
 import org.imtp.api.domain.entity.Role;
 import org.imtp.api.domain.entity.RoleAuthority;
 import org.imtp.api.domain.vo.RoleVO;
-import org.imtp.api.mapper.RoleAuthorityMapper;
 import org.imtp.api.mapper.RoleMapper;
 import org.imtp.api.mapping.RoleMapping;
 import org.imtp.api.service.RoleAuthorityService;
@@ -23,7 +20,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -102,15 +98,20 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role>  implements R
 
     @Override
     @Transactional
-    public Boolean bindAuthority(RoleUpdateDTO roleUpdateDTO) {
-        Role role = roleMapper.selectById(roleUpdateDTO.getId());
+    public Boolean bindAuthorities(Long id, RoleBindAuthoritiesDTO roleBindAuthoritiesDTO) {
+        Role role = roleMapper.selectById(id);
         if (role == null) {
             throw new BusinessException("角色不存在");
         }
         if(role.isSuperAdmin()){
             throw new BusinessException("超级管理员角色无法修改");
         }
-        return addRoleAuthority(role.getId(), roleUpdateDTO.getAuthorityIds());
+        return addRoleAuthority(role.getId(), roleBindAuthoritiesDTO.getAuthorityIds());
+    }
+
+    @Override
+    public Boolean bindUsers(Long id, RoleBindUserDTO roleBindUserDTO) {
+        return null;
     }
 
     @Override
@@ -194,11 +195,12 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role>  implements R
 
     private QueryWrapper<Role> getRoleQueryWrapper(RoleQueryDTO queryDTO) {
         QueryWrapper<Role> roleQueryWrapper = new QueryWrapper<>();
-        if (queryDTO.getName() != null && !queryDTO.getName().isEmpty()) {
-            roleQueryWrapper.like("name", queryDTO.getName());
-        }
-        if (queryDTO.getCode() != null && !queryDTO.getCode().isEmpty()) {
-            roleQueryWrapper.like("code", queryDTO.getCode());
+        if (queryDTO.getKeyword() != null && !queryDTO.getKeyword().isEmpty()) {
+            roleQueryWrapper
+                    .lambda()
+                    .like(Role::getName, queryDTO.getKeyword())
+                    .or()
+                    .like(Role::getCode, queryDTO.getKeyword());
         }
         if (queryDTO.getEnabled() != null) {
             roleQueryWrapper.eq("enabled", queryDTO.getEnabled());

@@ -10,7 +10,7 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class RoleQueryDTO extends PageQueryDTO{
+public class UserQueryDTO extends PageQueryDTO{
 
     private String keyword;
 

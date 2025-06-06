@@ -16,14 +16,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.node.MissingNode;
 import lombok.*;
-import org.imtp.common.enums.Gender;
 import org.imtp.api.utils.JsonNodeUtil;
+import org.imtp.common.enums.Gender;
 import org.springframework.security.core.CredentialsContainer;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * @Description
@@ -36,13 +38,10 @@ import java.util.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @TableName("im_user")
-public class User implements UserDetails, CredentialsContainer {
+public class User extends BaseEntity implements UserDetails, CredentialsContainer {
 
     @TableField(exist = false)
     private List<? extends GrantedAuthority> authorities;
-
-    @TableId
-    private Long id;
 
     @TableField("username")
     private String username;
@@ -58,6 +57,9 @@ public class User implements UserDetails, CredentialsContainer {
 
     @TableField("tagline")
     private String tagline;
+
+    @TableField("enabled")
+    private boolean enabled;
 
     @TableField("gender")
     @EnumValue
@@ -75,9 +77,6 @@ public class User implements UserDetails, CredentialsContainer {
     @TableField("region")
     private String region;
 
-    @TableField("create_time")
-    private Date createTime;
-
     @Override
     public String toString() {
         return "User{" +
@@ -93,7 +92,7 @@ public class User implements UserDetails, CredentialsContainer {
                 ", email='" + email + '\'' +
                 ", phone='" + phone + '\'' +
                 ", region='" + region + '\'' +
-                ", createTime=" + createTime +
+                ", createTime=" + this.createTime +
                 '}';
     }
 

@@ -19,12 +19,12 @@ import java.util.Date;
 public class BaseEntity {
 
     @TableId(value = "id", type = IdType.INPUT)
-    private Long id;
+    protected Long id;
 
     @TableField(value = "create_time",fill = FieldFill.INSERT)
-    private Date createTime;
+    protected Date createTime;
 
     @TableField(value = "update_time",fill = FieldFill.INSERT_UPDATE)
-    private Date updateTime;
+    protected Date updateTime;
 
 }

@@ -14,7 +14,8 @@
         FROM im_user_role ur
         LEFT JOIN im_user u on u.id = ur.user_id
         LEFT JOIN im_role r on ur.role_id = r.id
-        WHERE u.id in
+        WHERE r.enabled = 1
+        AND u.id in
         <foreach collection="userIds" item="item" index="index" separator="," open="(" close=")">
             #{item}
         </foreach>

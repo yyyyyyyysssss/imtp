@@ -235,6 +235,7 @@ public class OAuth2ClientService {
                 .nickname(oAuthVO.getNickname())
                 .email(oAuthVO.getEmail())
                 .avatar(oAuthVO.getAvatar())
+                .enabled(Boolean.TRUE)
                 .build();
         userService.saveOrUpdate(user);
     }
