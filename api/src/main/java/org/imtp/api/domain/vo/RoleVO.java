@@ -2,6 +2,7 @@ package org.imtp.api.domain.vo;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.imtp.api.enums.RoleType;
 
 import java.util.List;
 
@@ -21,6 +22,8 @@ public class RoleVO {
     private String name;
 
     private Boolean enabled;
+
+    private RoleType type;
 
     private String createTime;
 

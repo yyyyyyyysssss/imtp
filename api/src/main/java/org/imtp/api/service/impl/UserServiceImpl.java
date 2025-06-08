@@ -2,22 +2,20 @@ package org.imtp.api.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.imtp.api.config.exception.BusinessException;
 import org.imtp.api.config.idwork.IdGen;
 import org.imtp.api.config.security.RequestUrlAuthority;
 import org.imtp.api.domain.dto.UserCreateDTO;
 import org.imtp.api.domain.dto.UserQueryDTO;
 import org.imtp.api.domain.dto.UserUpdateDTO;
-import org.imtp.api.domain.entity.Authority;
-import org.imtp.api.domain.entity.Role;
-import org.imtp.api.domain.entity.User;
-import org.imtp.api.domain.entity.UserRole;
+import org.imtp.api.domain.entity.*;
+import org.imtp.api.domain.vo.UserCreateVO;
 import org.imtp.api.domain.vo.UserVO;
 import org.imtp.api.mapper.AuthorityMapper;
 import org.imtp.api.mapper.RoleMapper;
@@ -25,6 +23,7 @@ import org.imtp.api.mapper.UserMapper;
 import org.imtp.api.mapping.UserMapping;
 import org.imtp.api.service.UserRoleService;
 import org.imtp.api.service.UserService;
+import org.imtp.api.utils.PasswordGenerator;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -127,25 +126,28 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Override
     @Transactional
-    public Long create(UserCreateDTO userCreateDTO) {
+    public UserCreateVO create(UserCreateDTO userCreateDTO) {
         User user = UserMapping.INSTANCE.toUser(userCreateDTO);
         user.setId(IdGen.genId());
+        UserCreateVO userCreateVO = new UserCreateVO();
         String password;
         if(user.getPassword() == null || user.getPassword().isEmpty()){
-            password = RandomStringUtils.secure().nextAlphanumeric(10);
+            password = PasswordGenerator.generate(10);
+            userCreateVO.setInitialPassword(password);
         }else {
             password = user.getPassword();
         }
-        String defaultPassword = passwordEncoder.encode(password);
-        user.setPassword(defaultPassword);
+        String encryptPassword = passwordEncoder.encode(password);
+        user.setPassword(encryptPassword);
         int row = userMapper.insert(user);
         if (row <= 0) {
             throw new BusinessException("创建用户失败");
         }
-        if(userCreateDTO.getUserIds() != null && !userCreateDTO.getUserIds().isEmpty()){
-            addUserRole(user.getId(), userCreateDTO.getUserIds());
+        if(userCreateDTO.getRoleIds() != null && !userCreateDTO.getRoleIds().isEmpty()){
+            addUserRole(user.getId(), userCreateDTO.getRoleIds());
         }
-        return user.getId();
+        userCreateVO.setId(user.getId());
+        return userCreateVO;
     }
 
     @Override
@@ -160,7 +162,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         if (i <= 0) {
             throw new BusinessException("更新用户失败");
         }
-        addUserRole(user.getId(), userUpdateDTO.getUserIds());
+        addUserRole(user.getId(), userUpdateDTO.getRoleIds());
         return i;
     }
 
@@ -176,10 +178,27 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         if (i <= 0) {
             throw new BusinessException("更新用户失败");
         }
-        if(!CollectionUtils.isEmpty(userUpdateDTO.getUserIds())){
-            addUserRole(user.getId(), userUpdateDTO.getUserIds());
+        if(!CollectionUtils.isEmpty(userUpdateDTO.getRoleIds())){
+            addUserRole(user.getId(), userUpdateDTO.getRoleIds());
         }
         return i;
+    }
+
+    @Override
+    public String resetPassword(Long userId) {
+        User user = userMapper.selectById(userId);
+        if (user == null) {
+            throw new BusinessException("用户不存在");
+        }
+        String newPassword = PasswordGenerator.generate(10);
+        String encryptPassword = passwordEncoder.encode(newPassword);
+        UpdateWrapper<User> userUpdateWrapper = new UpdateWrapper<>();
+        userUpdateWrapper.lambda().eq(User::getId,userId).set(User::getPassword,encryptPassword);
+        int update = userMapper.update(null, userUpdateWrapper);
+        if (update <= 0){
+            throw new BusinessException("密码重置失败");
+        }
+        return newPassword;
     }
 
     @Override
@@ -236,10 +255,35 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         return i;
     }
 
+    @Override
     @Transactional
-    public boolean addUserRole(Long userId, Collection<Long> userIds) {
+    public Boolean bindRoles(Long id, List<Long> roleIds) {
 
-        return false;
+        return addUserRole(id,roleIds);
+    }
+
+    @Transactional
+    public boolean addUserRole(Long userId, Collection<Long> roleIds) {
+        QueryWrapper<UserRole> userRoleQueryWrapper = new QueryWrapper<>();
+        userRoleQueryWrapper
+                .lambda()
+                .eq(UserRole::getUserId, userId);
+        // 删除原有的角色权限
+        userRoleService.remove(userRoleQueryWrapper);
+        if (CollectionUtils.isEmpty(roleIds)){
+            log.warn("添加用户角色时，角色列表为空");
+            return true;
+        }
+        // 添加新的角色权限
+        List<UserRole> userRoles = new ArrayList<>();
+        for (Long roleId : roleIds) {
+            UserRole userRole = new UserRole();
+            userRole.setId(IdGen.genId());
+            userRole.setUserId(userId);
+            userRole.setRoleId(roleId);
+            userRoles.add(userRole);
+        }
+        return userRoleService.saveBatch(userRoles);
     }
 
     private QueryWrapper<User> getUserQueryWrapper(UserQueryDTO userQueryDTO) {

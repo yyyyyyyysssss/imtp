@@ -19,13 +19,15 @@ public interface RoleService extends IService<Role> {
 
     Integer update(RoleUpdateDTO roleUpdateDTO);
 
-    Boolean bindAuthorities(Long id, RoleBindAuthoritiesDTO roleBindAuthoritiesDTO);
+    Boolean bindAuthorities(Long roleId, List<Long> authorityIds);
 
-    Boolean bindUsers(Long id, RoleBindUserDTO roleBindUserDTO);
+    Boolean bindUsers(Long id, List<Long> userIds);
 
     Integer updatePatch(RoleUpdateDTO roleUpdateDTO);
 
     PageInfo<RoleVO> queryList(RoleQueryDTO queryDTO);
+
+    List<RoleVO> listRoleOptions();
 
     Integer delete(String id);
 

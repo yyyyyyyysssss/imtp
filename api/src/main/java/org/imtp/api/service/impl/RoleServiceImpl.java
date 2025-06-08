@@ -8,18 +8,25 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.imtp.api.config.exception.BusinessException;
 import org.imtp.api.config.idwork.IdGen;
-import org.imtp.api.domain.dto.*;
+import org.imtp.api.domain.dto.RoleBindUserDTO;
+import org.imtp.api.domain.dto.RoleCreateDTO;
+import org.imtp.api.domain.dto.RoleQueryDTO;
+import org.imtp.api.domain.dto.RoleUpdateDTO;
 import org.imtp.api.domain.entity.Role;
 import org.imtp.api.domain.entity.RoleAuthority;
+import org.imtp.api.domain.entity.UserRole;
 import org.imtp.api.domain.vo.RoleVO;
+import org.imtp.api.enums.RoleType;
 import org.imtp.api.mapper.RoleMapper;
 import org.imtp.api.mapping.RoleMapping;
 import org.imtp.api.service.RoleAuthorityService;
 import org.imtp.api.service.RoleService;
+import org.imtp.api.service.UserRoleService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -41,11 +48,15 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role>  implements R
     @Resource
     private RoleAuthorityService roleAuthorityService;
 
+    @Resource
+    private UserRoleService userRoleService;
+
     @Override
     @Transactional
     public Long create(RoleCreateDTO roleCreateDTO) {
         Role role = RoleMapping.INSTANCE.toRole(roleCreateDTO);
         role.setId(IdGen.genId());
+        role.setType(RoleType.NORMAL);
         int row = roleMapper.insert(role);
         if (row <= 0) {
             throw new BusinessException("创建角色失败");
@@ -59,13 +70,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role>  implements R
     @Override
     @Transactional
     public Integer update(RoleUpdateDTO roleUpdateDTO) {
-        Role role = roleMapper.selectById(roleUpdateDTO.getId());
-        if (role == null) {
-            throw new BusinessException("角色不存在");
-        }
-        if(role.isSuperAdmin()){
-            throw new BusinessException("超级管理员角色无法修改");
-        }
+        Role role = checkAndResult(roleUpdateDTO.getId());
         RoleMapping.INSTANCE.overwriteRole(roleUpdateDTO, role);
         int i = roleMapper.updateById(role);
         if (i <= 0) {
@@ -78,13 +83,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role>  implements R
     @Override
     @Transactional
     public Integer updatePatch(RoleUpdateDTO roleUpdateDTO) {
-        Role role = roleMapper.selectById(roleUpdateDTO.getId());
-        if (role == null) {
-            throw new BusinessException("角色不存在");
-        }
-        if(role.isSuperAdmin()){
-            throw new BusinessException("超级管理员角色无法修改");
-        }
+        Role role = checkAndResult(roleUpdateDTO.getId());
         RoleMapping.INSTANCE.updateRole(roleUpdateDTO, role);
         int i = roleMapper.updateById(role);
         if (i <= 0) {
@@ -98,24 +97,38 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role>  implements R
 
     @Override
     @Transactional
-    public Boolean bindAuthorities(Long id, RoleBindAuthoritiesDTO roleBindAuthoritiesDTO) {
-        Role role = roleMapper.selectById(id);
-        if (role == null) {
-            throw new BusinessException("角色不存在");
-        }
-        if(role.isSuperAdmin()){
-            throw new BusinessException("超级管理员角色无法修改");
-        }
-        return addRoleAuthority(role.getId(), roleBindAuthoritiesDTO.getAuthorityIds());
+    public Boolean bindAuthorities(Long id, List<Long> authorityIds) {
+        Role role = checkAndResult(id);
+        return addRoleAuthority(role.getId(), authorityIds);
     }
 
     @Override
-    public Boolean bindUsers(Long id, RoleBindUserDTO roleBindUserDTO) {
-        return null;
+    public Boolean bindUsers(Long id, List<Long> userIds) {
+        QueryWrapper<UserRole> userRoleQueryWrapper = new QueryWrapper<>();
+        userRoleQueryWrapper
+                .lambda()
+                .eq(UserRole::getRoleId, id)
+                .in(UserRole::getUserId,userIds);
+        userRoleService.remove(userRoleQueryWrapper);
+        if (CollectionUtils.isEmpty(userIds)){
+            log.warn("添加角色用户时，用户列表为空");
+            return true;
+        }
+        // 添加新的角色权限
+        List<UserRole> userRoles = new ArrayList<>();
+        for (Long userId : userIds) {
+            UserRole userRole = new UserRole();
+            userRole.setId(IdGen.genId());
+            userRole.setUserId(userId);
+            userRole.setRoleId(id);
+            userRoles.add(userRole);
+        }
+        return userRoleService.saveBatch(userRoles);
     }
 
     @Override
     public Integer delete(String id) {
+        checkAndResult(id);
         int i = roleMapper.deleteById(id);
         if (i > 0){
             QueryWrapper<RoleAuthority> roleAuthorityQueryWrapper = new QueryWrapper<>();
@@ -169,6 +182,17 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role>  implements R
         return pageInfo;
     }
 
+    @Override
+    public List<RoleVO> listRoleOptions() {
+        QueryWrapper<Role> roleQueryWrapper = new QueryWrapper<>();
+        roleQueryWrapper
+                .lambda()
+                .select(Role::getId,Role::getName)
+                .eq(Role::getType,RoleType.NORMAL);
+        List<Role> roles = roleMapper.selectList(roleQueryWrapper);
+        return RoleMapping.INSTANCE.toRoleVO(roles);
+    }
+
     @Transactional
     public boolean addRoleAuthority(Long roleId, Collection<Long> authorityIds) {
         QueryWrapper<RoleAuthority> roleAuthorityQueryWrapper = new QueryWrapper<>();
@@ -179,7 +203,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role>  implements R
         roleAuthorityService.remove(roleAuthorityQueryWrapper);
         if (CollectionUtils.isEmpty(authorityIds)){
             log.warn("添加角色权限时，权限列表为空");
-            return false;
+            return true;
         }
         // 添加新的角色权限
         List<RoleAuthority> roleAuthorities = new ArrayList<>();
@@ -193,8 +217,20 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role>  implements R
         return roleAuthorityService.saveBatch(roleAuthorities);
     }
 
+    private Role checkAndResult(Serializable id){
+        Role role = roleMapper.selectById(id);
+        if (role == null) {
+            throw new BusinessException("角色不存在");
+        }
+        if(role.isSuperAdmin()){
+            throw new BusinessException("超级管理员角色无法操作");
+        }
+        return role;
+    }
+
     private QueryWrapper<Role> getRoleQueryWrapper(RoleQueryDTO queryDTO) {
         QueryWrapper<Role> roleQueryWrapper = new QueryWrapper<>();
+        roleQueryWrapper.eq("type",RoleType.NORMAL);
         if (queryDTO.getKeyword() != null && !queryDTO.getKeyword().isEmpty()) {
             roleQueryWrapper
                     .lambda()

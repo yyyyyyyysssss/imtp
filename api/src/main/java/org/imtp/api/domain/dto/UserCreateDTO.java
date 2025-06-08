@@ -30,7 +30,7 @@ public class UserCreateDTO {
 
     private boolean enabled = true;
 
-    private List<Long> userIds;
+    private List<Long> roleIds;
 
 
 }

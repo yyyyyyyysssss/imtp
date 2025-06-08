@@ -5,6 +5,7 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.imtp.api.domain.dto.*;
 import org.imtp.api.domain.vo.RoleVO;
+import org.imtp.api.domain.vo.UserCreateVO;
 import org.imtp.api.domain.vo.UserVO;
 import org.imtp.api.service.UserService;
 import org.imtp.common.response.Result;
@@ -28,8 +29,8 @@ public class UserController {
 
     @PostMapping
     public Result<?> create(@RequestBody @Validated UserCreateDTO userCreateDTO) {
-        Long id = userService.create(userCreateDTO);
-        return ResultGenerator.ok(id);
+        UserCreateVO userCreateVO = userService.create(userCreateDTO);
+        return ResultGenerator.ok(userCreateVO);
     }
 
     @PutMapping
@@ -42,6 +43,18 @@ public class UserController {
     public Result<?> updatePatch(@RequestBody @Validated UserUpdateDTO userUpdateDTO) {
         Integer affectedRows = userService.updatePatch(userUpdateDTO);
         return ResultGenerator.ok(affectedRows);
+    }
+
+    @PutMapping("/{id}/password")
+    public Result<?> resetPassword(@PathVariable("id") Long id) {
+        String newPassword = userService.resetPassword(id);
+        return ResultGenerator.ok(newPassword);
+    }
+
+    @PostMapping("/{id}/roles")
+    public Result<?> bindRoles(@PathVariable Long id, @RequestBody UserBindRoleDTO userBindRoleDTO) {
+        Boolean bindRoles = userService.bindRoles(id,userBindRoleDTO.getRoleIds());
+        return ResultGenerator.ok(bindRoles);
     }
 
     @DeleteMapping("/{id}")

@@ -33,7 +33,7 @@ public class UserUpdateDTO {
 
     private Boolean enabled;
 
-    private List<Long> userIds;
+    private List<Long> roleIds;
 
     public interface UpdateAll{}
 

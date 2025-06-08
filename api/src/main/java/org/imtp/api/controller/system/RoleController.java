@@ -40,13 +40,13 @@ public class RoleController {
 
     @PostMapping("/{id}/authorities")
     public Result<?> bindAuthorities(@PathVariable Long id, @RequestBody RoleBindAuthoritiesDTO roleBindAuthoritiesDTO) {
-        Boolean bindAuthority = roleService.bindAuthorities(id,roleBindAuthoritiesDTO);
+        Boolean bindAuthority = roleService.bindAuthorities(id,roleBindAuthoritiesDTO.getAuthorityIds());
         return ResultGenerator.ok(bindAuthority);
     }
 
     @PostMapping("/{id}/users")
     public Result<?> bindUsers(@PathVariable Long id, @RequestBody RoleBindUserDTO roleBindUserDTO) {
-        Boolean bindAuthority = roleService.bindUsers(id,roleBindUserDTO);
+        Boolean bindAuthority = roleService.bindUsers(id,roleBindUserDTO.getUserIds());
         return ResultGenerator.ok(bindAuthority);
     }
 
@@ -66,6 +66,12 @@ public class RoleController {
     public Result<?> query(@RequestBody RoleQueryDTO roleQueryDTO) {
         PageInfo<RoleVO> pageInfo = roleService.queryList(roleQueryDTO);
         return ResultGenerator.ok(pageInfo);
+    }
+
+    @GetMapping("/options")
+    public Result<?> options() {
+        List<RoleVO> roleVOS = roleService.listRoleOptions();
+        return ResultGenerator.ok(roleVOS);
     }
 
 
