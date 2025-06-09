@@ -188,7 +188,8 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role>  implements R
         roleQueryWrapper
                 .lambda()
                 .select(Role::getId,Role::getName)
-                .eq(Role::getType,RoleType.NORMAL);
+                .eq(Role::getType,RoleType.NORMAL)
+                .eq(Role::getEnabled, true);
         List<Role> roles = roleMapper.selectList(roleQueryWrapper);
         return RoleMapping.INSTANCE.toRoleVO(roles);
     }

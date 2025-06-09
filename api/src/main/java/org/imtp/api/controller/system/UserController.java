@@ -3,8 +3,10 @@ package org.imtp.api.controller.system;
 import com.github.pagehelper.PageInfo;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.imtp.api.domain.dto.*;
-import org.imtp.api.domain.vo.RoleVO;
+import org.imtp.api.domain.dto.UserBindRoleDTO;
+import org.imtp.api.domain.dto.UserCreateDTO;
+import org.imtp.api.domain.dto.UserQueryDTO;
+import org.imtp.api.domain.dto.UserUpdateDTO;
 import org.imtp.api.domain.vo.UserCreateVO;
 import org.imtp.api.domain.vo.UserVO;
 import org.imtp.api.service.UserService;
@@ -12,6 +14,8 @@ import org.imtp.common.response.Result;
 import org.imtp.common.response.ResultGenerator;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * @Description
@@ -67,6 +71,12 @@ public class UserController {
     public Result<?> query(@RequestBody UserQueryDTO userQueryDTO) {
         PageInfo<UserVO> pageInfo = userService.queryList(userQueryDTO);
         return ResultGenerator.ok(pageInfo);
+    }
+
+    @GetMapping("/options")
+    public Result<?> options() {
+        List<UserVO> userVOS = userService.listUserOptions();
+        return ResultGenerator.ok(userVOS);
     }
 
 }

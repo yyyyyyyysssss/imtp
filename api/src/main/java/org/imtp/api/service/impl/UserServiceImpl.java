@@ -14,7 +14,10 @@ import org.imtp.api.config.security.RequestUrlAuthority;
 import org.imtp.api.domain.dto.UserCreateDTO;
 import org.imtp.api.domain.dto.UserQueryDTO;
 import org.imtp.api.domain.dto.UserUpdateDTO;
-import org.imtp.api.domain.entity.*;
+import org.imtp.api.domain.entity.Authority;
+import org.imtp.api.domain.entity.Role;
+import org.imtp.api.domain.entity.User;
+import org.imtp.api.domain.entity.UserRole;
 import org.imtp.api.domain.vo.UserCreateVO;
 import org.imtp.api.domain.vo.UserVO;
 import org.imtp.api.mapper.AuthorityMapper;
@@ -237,6 +240,17 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         pageInfo.setPageNum(pageNum);
         pageInfo.setPageSize(pageSize);
         return pageInfo;
+    }
+
+    @Override
+    public List<UserVO> listUserOptions() {
+        QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
+        userQueryWrapper
+                .lambda()
+                .select(User::getId,User::getNickname)
+                .eq(User::isEnabled, true);
+        List<User> users = userMapper.selectList(userQueryWrapper);
+        return UserMapping.INSTANCE.toUserVO(users);
     }
 
     @Override

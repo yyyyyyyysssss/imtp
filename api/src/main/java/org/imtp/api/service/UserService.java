@@ -34,6 +34,8 @@ public interface UserService extends UserDetailsService, IService<User> {
 
     PageInfo<UserVO> queryList(UserQueryDTO queryDTO);
 
+    List<UserVO> listUserOptions();
+
     Boolean bindRoles(Long id, List<Long> roleIds);
 
     Integer delete(String id);
