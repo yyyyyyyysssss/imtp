@@ -51,14 +51,14 @@ public class MenuServiceImpl extends AbstractAuthorityService implements MenuSer
         Authority authority = AuthorityMapping.INSTANCE.toAuthority(menuCreateDTO);
         authority.setId(IdGen.genId());
         authority.setType(AuthorityType.MENU);
-        if(authority.getParentId() != null){
+        if (authority.getParentId() != null) {
             Authority selectAuthority = authorityMapper.selectById(authority.getParentId());
             authority.setRootId(selectAuthority.getRootId());
-        }else {
+        } else {
             authority.setParentId(0L);
             authority.setRootId(authority.getId());
         }
-        if (authority.getSort() == null){
+        if (authority.getSort() == null) {
             int maxSortOfChildren = getMaxSortOfChildren(authority.getParentId());
             authority.setSort(maxSortOfChildren + 1);
         }
@@ -82,15 +82,15 @@ public class MenuServiceImpl extends AbstractAuthorityService implements MenuSer
         String dragId = menuDragDTO.getDragId();
         String targetId = menuDragDTO.getTargetId();
         List<Authority> authorityList = authorityMapper.selectBatchIds(List.of(dragId, targetId));
-        if (CollectionUtils.isEmpty(authorityList) || authorityList.size() != 2){
+        if (CollectionUtils.isEmpty(authorityList) || authorityList.size() != 2) {
             throw new BusinessException("菜单不存在");
         }
         Authority dragAuthority = authorityList.stream().filter(f -> f.getId().toString().equals(dragId)).findAny().orElseThrow(() -> new BusinessException("拖动的菜单不存在"));
         Authority targetAuthority = authorityList.stream().filter(f -> f.getId().toString().equals(targetId)).findAny().orElseThrow(() -> new BusinessException("目标菜单不存在"));
         MenuDragDTO.Position position = menuDragDTO.getPosition();
         UpdateWrapper<Authority> updateWrapper;
-        switch (position){
-            case BEFORE,AFTER :
+        switch (position) {
+            case BEFORE, AFTER:
                 //设置拖动节点的父节点以及根节点id为目标节点的数据
                 dragAuthority.setParentId(targetAuthority.getParentId());
                 dragAuthority.setRootId(targetAuthority.getParentId() == 0 ? dragAuthority.getId() : targetAuthority.getRootId());
@@ -98,18 +98,18 @@ public class MenuServiceImpl extends AbstractAuthorityService implements MenuSer
                 QueryWrapper<Authority> queryWrapper = new QueryWrapper<>();
                 queryWrapper
                         .lambda()
-                        .eq(Authority::getParentId,targetAuthority.getParentId())
-                        .eq(Authority::getType,AuthorityType.MENU)
+                        .eq(Authority::getParentId, targetAuthority.getParentId())
+                        .eq(Authority::getType, AuthorityType.MENU)
                         .orderByAsc(Authority::getSort);
                 List<Authority> authorities = authorityMapper.selectList(queryWrapper);
                 //移出拖动的节点(如果存在)
                 authorities.removeIf(r -> r.getId().toString().equals(dragId));
                 int targetIndex = authorities.indexOf(targetAuthority);
                 int insertIndex = position.equals(MenuDragDTO.Position.BEFORE) ? targetIndex : targetIndex + 1;
-                if(insertIndex > authorities.size()){
+                if (insertIndex > authorities.size()) {
                     insertIndex = authorities.size();
                 }
-                authorities.add(insertIndex,dragAuthority);
+                authorities.add(insertIndex, dragAuthority);
                 //根据拖动节点的索引重置兄弟节点的排序
                 List<Authority> resetSortAuthorities = getResetSortAuthoritiesByIndex(insertIndex, authorities);
                 return this.updateBatchById(resetSortAuthorities);
@@ -118,10 +118,10 @@ public class MenuServiceImpl extends AbstractAuthorityService implements MenuSer
                 updateWrapper = new UpdateWrapper<>();
                 updateWrapper
                         .lambda()
-                        .set(Authority::getSort,minSortOfChildren - 1)
-                        .set(Authority::getParentId,targetId)
-                        .set(Authority::getRootId,targetAuthority.getRootId())
-                        .eq(Authority::getId,dragId);
+                        .set(Authority::getSort, minSortOfChildren - 1)
+                        .set(Authority::getParentId, targetId)
+                        .set(Authority::getRootId, targetAuthority.getRootId())
+                        .eq(Authority::getId, dragId);
                 return authorityMapper.update(null, updateWrapper) > 0;
         }
         return false;
@@ -132,13 +132,13 @@ public class MenuServiceImpl extends AbstractAuthorityService implements MenuSer
         int sort = 0;
         List<Authority> resetAuthorityList = new ArrayList<>();
         for (int i = 0; i < authorities.size(); i++) {
-            if (i < prevIndex){
+            if (i < prevIndex) {
                 continue;
             }
             Authority authority = authorities.get(i);
-            if(i == prevIndex){
+            if (i == prevIndex) {
                 sort = authority.getSort();
-            }else {
+            } else {
                 authority.setSort(++sort);
             }
             resetAuthorityList.add(authority);
@@ -156,7 +156,7 @@ public class MenuServiceImpl extends AbstractAuthorityService implements MenuSer
                 .orderByAsc(Authority::getSort)
                 .orderByAsc(Authority::getId);
         List<Authority> authorities = authorityMapper.selectList(queryWrapper);
-        if (authorities == null || authorities.isEmpty()){
+        if (authorities == null || authorities.isEmpty()) {
             return new ArrayList<>();
         }
         List<MenuVO> menuVOList = AuthorityMapping.INSTANCE.toMenuVo(authorities);
@@ -171,15 +171,15 @@ public class MenuServiceImpl extends AbstractAuthorityService implements MenuSer
 
     @Override
     public PageInfo<MenuVO> query(MenuQueryDTO menuQueryDTO) {
-        if (menuQueryDTO.isPaging()){
+        if (menuQueryDTO.isPaging()) {
             PageHelper.startPage(menuQueryDTO.getPageNum(), menuQueryDTO.getPageSize());
         }
         QueryWrapper<Authority> queryWrapper = new QueryWrapper<>();
         queryWrapper
                 .lambda()
                 .eq(Authority::getType, AuthorityType.MENU.name())
-                .eq(Authority::getParentId,0L)
-                .eq(StringUtils.isNotEmpty(menuQueryDTO.getCode()),Authority::getCode, menuQueryDTO.getCode())
+                .eq(Authority::getParentId, 0L)
+                .eq(StringUtils.isNotEmpty(menuQueryDTO.getCode()), Authority::getCode, menuQueryDTO.getCode())
                 .eq(StringUtils.isNotEmpty(menuQueryDTO.getRoutePath()), Authority::getRoutePath, menuQueryDTO.getRoutePath())
                 .like(StringUtils.isNotEmpty(menuQueryDTO.getName()), Authority::getName, menuQueryDTO.getName())
                 .orderByDesc(Authority::getId);
@@ -220,7 +220,7 @@ public class MenuServiceImpl extends AbstractAuthorityService implements MenuSer
         QueryWrapper<Authority> queryWrapper = new QueryWrapper<>();
         queryWrapper
                 .lambda()
-                .in(Authority::getType, AuthorityType.BUTTON.name(),AuthorityType.API.name())
+                .in(Authority::getType, AuthorityType.BUTTON.name(), AuthorityType.API.name())
                 .eq(Authority::getParentId, id);
         List<Authority> permissions = authorityMapper.selectList(queryWrapper);
         if (!CollectionUtils.isEmpty(permissions)) {
@@ -232,18 +232,27 @@ public class MenuServiceImpl extends AbstractAuthorityService implements MenuSer
     @Override
     public List<MenuVO> getMenuByUserId(Long userId) {
         List<Role> roles = roleMapper.findRoleByUserIds(Collections.singleton(userId));
-        if (CollectionUtils.isEmpty(roles)) {
-            return Collections.emptyList();
-        }
-        boolean isSuperAdmin = roles.stream().anyMatch(Role::isSuperAdmin);
         List<Authority> authorities;
-        if (isSuperAdmin){
+        if (CollectionUtils.isEmpty(roles)) {
             QueryWrapper<Authority> queryWrapper = new QueryWrapper<>();
-            queryWrapper.eq("type", AuthorityType.MENU.name());
+            queryWrapper
+                    .lambda()
+                    .eq(Authority::getType, AuthorityType.BASE.name())
+                    .orderByAsc(Authority::getSort, Authority::getId);
             authorities = authorityMapper.selectList(queryWrapper);
-        }else {
-            Set<Long> roleIds = roles.stream().map(Role::getId).collect(Collectors.toSet());
-            authorities = authorityMapper.findMenuByRoleIds(roleIds);
+        } else {
+            boolean isSuperAdmin = roles.stream().anyMatch(Role::isSuperAdmin);
+            if (isSuperAdmin) {
+                QueryWrapper<Authority> queryWrapper = new QueryWrapper<>();
+                queryWrapper
+                        .lambda()
+                        .in(Authority::getType, AuthorityType.MENU.name(), AuthorityType.BASE.name())
+                        .orderByAsc(Authority::getSort, Authority::getId);
+                authorities = authorityMapper.selectList(queryWrapper);
+            } else {
+                Set<Long> roleIds = roles.stream().map(Role::getId).collect(Collectors.toSet());
+                authorities = authorityMapper.findMenuByRoleIds(roleIds);
+            }
         }
         if (CollectionUtils.isEmpty(authorities)) {
             return Collections.emptyList();
@@ -262,7 +271,7 @@ public class MenuServiceImpl extends AbstractAuthorityService implements MenuSer
     public Integer delete(String id) {
         //查询出菜单对应的所有子菜单或权限
         List<Authority> authorities = authorityMapper.selectChildrenById(id);
-        if (authorities == null || authorities.isEmpty()){
+        if (authorities == null || authorities.isEmpty()) {
             throw new BusinessException("该菜单不存在");
         }
         Set<Long> delIds = authorities.stream().map(Authority::getId).collect(Collectors.toSet());
@@ -273,7 +282,7 @@ public class MenuServiceImpl extends AbstractAuthorityService implements MenuSer
     public Integer batchDelete(Collection<String> ids) {
         //批量查询出菜单对应的所有子菜单或权限
         List<Authority> authorities = authorityMapper.selectChildrenByIds(ids);
-        if (authorities == null || authorities.isEmpty()){
+        if (authorities == null || authorities.isEmpty()) {
             throw new BusinessException("菜单不存在");
         }
         Set<Long> delIds = authorities.stream().map(Authority::getId).collect(Collectors.toSet());

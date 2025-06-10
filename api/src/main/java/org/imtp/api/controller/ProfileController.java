@@ -2,14 +2,14 @@ package org.imtp.api.controller;
 
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.imtp.api.domain.dto.ChangePasswordDTO;
 import org.imtp.api.domain.entity.User;
 import org.imtp.api.domain.vo.MenuVO;
-import org.imtp.api.service.MenuService;
+import org.imtp.api.service.ProfileService;
 import org.imtp.common.response.Result;
 import org.imtp.common.response.ResultGenerator;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -24,13 +24,20 @@ import java.util.List;
 public class ProfileController extends BaseController {
 
      @Resource
-     private MenuService menuService;
+     private ProfileService profileService;
 
      @GetMapping("/menu")
      public Result<?> currentUserMenu() {
          Long userId = getCurrentUser(User::getId);
-         List<MenuVO> menuVOList = menuService.getMenuByUserId(userId);
+         List<MenuVO> menuVOList = profileService.getMenuByUserId(userId);
          return ResultGenerator.ok(menuVOList);
+     }
+
+     @PutMapping("/changePassword")
+     public Result<?> changePassword(@RequestBody @Validated ChangePasswordDTO changePasswordDTO){
+         Long userId = getCurrentUser(User::getId);
+         Boolean b = profileService.changePassword(userId,changePasswordDTO);
+         return ResultGenerator.ok(b);
      }
 
 }
