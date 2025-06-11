@@ -27,6 +27,8 @@ public class AuthorityUpdateDTO {
 
     private String rootId;
 
+    private String code;
+
     private String name;
 
     @Valid

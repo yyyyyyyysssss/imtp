@@ -27,10 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -189,6 +186,30 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role>  implements R
                 .lambda()
                 .select(Role::getId,Role::getName)
                 .eq(Role::getType,RoleType.NORMAL)
+                .eq(Role::getEnabled, true);
+        List<Role> roles = roleMapper.selectList(roleQueryWrapper);
+        return RoleMapping.INSTANCE.toRoleVO(roles);
+    }
+
+
+    @Override
+    public List<RoleVO> findRoleByUserId(Long userId) {
+        if (userId == null) {
+            return Collections.emptyList();
+        }
+        QueryWrapper<UserRole> userRoleQueryWrapper = new QueryWrapper<>();
+        userRoleQueryWrapper
+                .lambda()
+                .eq(UserRole::getUserId, userId);
+        List<UserRole> userRoles = userRoleService.list(userRoleQueryWrapper);
+        if(CollectionUtils.isEmpty(userRoles)){
+            return Collections.emptyList();
+        }
+        List<Long> roleIds = userRoles.stream().map(UserRole::getRoleId).toList();
+        QueryWrapper<Role> roleQueryWrapper = new QueryWrapper<>();
+        roleQueryWrapper
+                .lambda()
+                .in(Role::getId, roleIds)
                 .eq(Role::getEnabled, true);
         List<Role> roles = roleMapper.selectList(roleQueryWrapper);
         return RoleMapping.INSTANCE.toRoleVO(roles);

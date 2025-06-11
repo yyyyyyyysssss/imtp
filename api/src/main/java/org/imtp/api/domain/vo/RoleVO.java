@@ -1,5 +1,6 @@
 package org.imtp.api.domain.vo;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 import org.imtp.api.enums.RoleType;
@@ -30,5 +31,10 @@ public class RoleVO {
     private String updateTime;
 
     private List<Long> authorityIds;
+
+    @JsonIgnore
+    public boolean isSuperAdmin() {
+        return RoleType.SUPER_ADMIN.equals(this.type);
+    }
 
 }

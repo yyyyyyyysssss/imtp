@@ -31,4 +31,6 @@ public interface RoleService extends IService<Role> {
 
     Integer delete(String id);
 
+    List<RoleVO> findRoleByUserId(Long userId);
+
 }

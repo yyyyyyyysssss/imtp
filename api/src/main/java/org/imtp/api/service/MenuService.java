@@ -26,7 +26,7 @@ public interface MenuService extends IService<Authority> {
 
     MenuVO details(String id);
 
-    List<MenuVO> getMenuByUserId(Long userId);
+    List<MenuVO> findMenuByRoleIds(List<Long> roleIds);
 
     Integer delete(String id);
 

@@ -24,4 +24,6 @@ public interface AuthorityService extends IService<Authority> {
     Integer delete(String id);
 
     Integer batchDelete(Collection<String> ids);
+
+    List<AuthorityVO> findAuthorityByRoleIds(Collection<Long> menuIds);
 }

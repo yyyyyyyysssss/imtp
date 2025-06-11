@@ -16,11 +16,13 @@ import org.imtp.api.domain.dto.MenuUpdateDTO;
 import org.imtp.api.domain.entity.Authority;
 import org.imtp.api.domain.entity.Role;
 import org.imtp.api.domain.vo.MenuVO;
+import org.imtp.api.domain.vo.RoleVO;
 import org.imtp.api.enums.AuthorityType;
 import org.imtp.api.mapper.AuthorityMapper;
 import org.imtp.api.mapper.RoleMapper;
 import org.imtp.api.mapping.AuthorityMapping;
 import org.imtp.api.service.MenuService;
+import org.imtp.api.service.RoleService;
 import org.imtp.api.utils.TreeUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,6 +44,9 @@ public class MenuServiceImpl extends AbstractAuthorityService implements MenuSer
 
     @Resource
     private RoleMapper roleMapper;
+
+    @Resource
+    private RoleService roleService;
 
     @Resource
     private AuthorityMapper authorityMapper;
@@ -221,7 +226,8 @@ public class MenuServiceImpl extends AbstractAuthorityService implements MenuSer
         queryWrapper
                 .lambda()
                 .in(Authority::getType, AuthorityType.BUTTON.name(), AuthorityType.API.name())
-                .eq(Authority::getParentId, id);
+                .eq(Authority::getParentId, id)
+                .orderByAsc(Authority::getSort, Authority::getId);
         List<Authority> permissions = authorityMapper.selectList(queryWrapper);
         if (!CollectionUtils.isEmpty(permissions)) {
             menuVo.setChildren(AuthorityMapping.INSTANCE.toMenuVo(permissions));
@@ -230,10 +236,9 @@ public class MenuServiceImpl extends AbstractAuthorityService implements MenuSer
     }
 
     @Override
-    public List<MenuVO> getMenuByUserId(Long userId) {
-        List<Role> roles = roleMapper.findRoleByUserIds(Collections.singleton(userId));
+    public List<MenuVO> findMenuByRoleIds(List<Long> roleIds) {
         List<Authority> authorities;
-        if (CollectionUtils.isEmpty(roles)) {
+        if (CollectionUtils.isEmpty(roleIds)) {
             QueryWrapper<Authority> queryWrapper = new QueryWrapper<>();
             queryWrapper
                     .lambda()
@@ -241,6 +246,7 @@ public class MenuServiceImpl extends AbstractAuthorityService implements MenuSer
                     .orderByAsc(Authority::getSort, Authority::getId);
             authorities = authorityMapper.selectList(queryWrapper);
         } else {
+            List<Role> roles = roleService.listByIds(roleIds);
             boolean isSuperAdmin = roles.stream().anyMatch(Role::isSuperAdmin);
             if (isSuperAdmin) {
                 QueryWrapper<Authority> queryWrapper = new QueryWrapper<>();
@@ -250,21 +256,13 @@ public class MenuServiceImpl extends AbstractAuthorityService implements MenuSer
                         .orderByAsc(Authority::getSort, Authority::getId);
                 authorities = authorityMapper.selectList(queryWrapper);
             } else {
-                Set<Long> roleIds = roles.stream().map(Role::getId).collect(Collectors.toSet());
                 authorities = authorityMapper.findMenuByRoleIds(roleIds);
             }
         }
         if (CollectionUtils.isEmpty(authorities)) {
             return Collections.emptyList();
         }
-        List<MenuVO> menuVOList = authorities.stream().map(AuthorityMapping.INSTANCE::toMenuVo).toList();
-        return TreeUtil.buildTree(
-                menuVOList,
-                MenuVO::getId,
-                MenuVO::getParentId,
-                MenuVO::setChildren,
-                0L
-        );
+        return authorities.stream().map(AuthorityMapping.INSTANCE::toMenuVo).toList();
     }
 
     @Override

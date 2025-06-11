@@ -8,16 +8,20 @@ import org.imtp.api.config.idwork.IdGen;
 import org.imtp.api.domain.dto.AuthorityCreateDTO;
 import org.imtp.api.domain.dto.AuthorityUpdateDTO;
 import org.imtp.api.domain.entity.Authority;
+import org.imtp.api.domain.entity.RoleAuthority;
 import org.imtp.api.domain.vo.AuthorityVO;
 import org.imtp.api.enums.AuthorityType;
 import org.imtp.api.mapper.AuthorityMapper;
 import org.imtp.api.mapping.AuthorityMapping;
 import org.imtp.api.service.AuthorityService;
+import org.imtp.api.service.RoleAuthorityService;
 import org.imtp.api.utils.TreeUtil;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -31,6 +35,9 @@ public class AuthorityServiceImpl extends AbstractAuthorityService implements Au
 
     @Resource
     private AuthorityMapper authorityMapper;
+
+    @Resource
+    private RoleAuthorityService roleAuthorityService;
 
     @Override
     public Long create(AuthorityCreateDTO authorityAddDTO) {
@@ -91,7 +98,8 @@ public class AuthorityServiceImpl extends AbstractAuthorityService implements Au
         queryWrapper
                 .lambda()
                 .select(Authority::getId,Authority::getParentId,Authority::getName)
-                .in(Authority::getType, AuthorityType.MENU, AuthorityType.BUTTON);
+                .in(Authority::getType, AuthorityType.MENU, AuthorityType.BUTTON)
+                .orderByAsc(Authority::getSort,Authority::getId);
         List<Authority> authorities = authorityMapper.selectList(queryWrapper);
         if (authorities == null || authorities.isEmpty()){
             return new ArrayList<>();
@@ -113,6 +121,27 @@ public class AuthorityServiceImpl extends AbstractAuthorityService implements Au
             throw new BusinessException("该权限不存在");
         }
         return authorityMapper.deleteById(id);
+    }
+
+    @Override
+    public List<AuthorityVO> findAuthorityByRoleIds(Collection<Long> roleIds) {
+        if (CollectionUtils.isEmpty(roleIds)) {
+            return Collections.emptyList();
+        }
+        QueryWrapper<RoleAuthority> queryWrapper = new QueryWrapper<>();
+        queryWrapper
+                .lambda()
+                .in(RoleAuthority::getRoleId, roleIds);
+        List<RoleAuthority> roleAuthorities = roleAuthorityService.list(queryWrapper);
+        if (CollectionUtils.isEmpty(roleAuthorities)){
+            return Collections.emptyList();
+        }
+        List<Long> authorityIds = roleAuthorities.stream().map(RoleAuthority::getAuthorityId).distinct().toList();
+        List<Authority> authorities = authorityMapper.selectBatchIds(authorityIds);
+        if (CollectionUtils.isEmpty(authorities)) {
+            return Collections.emptyList();
+        }
+        return AuthorityMapping.INSTANCE.toAuthorityVO(authorities);
     }
 
     @Override
