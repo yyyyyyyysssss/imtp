@@ -62,6 +62,8 @@ public class LoginService {
         //生成token
         TokenInfo tokenInfo = tokenService.generate(user.getId(), clientType);
         tokenInfo.setRememberMeToken(rememberMeToken);
+        // 将tokenId冗余到securityContext再进行序列化
+        user.setTokenId(tokenInfo.getId());
         //序列化securityContext
         saveSecurityContext(tokenInfo.getId(),authenticate);
         return tokenInfo;

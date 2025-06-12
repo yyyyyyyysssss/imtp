@@ -43,6 +43,9 @@ public class User extends BaseEntity implements UserDetails, CredentialsContaine
     @TableField(exist = false)
     private List<? extends GrantedAuthority> authorities;
 
+    @TableField(exist = false)
+    private String tokenId;
+
     @TableField("username")
     private String username;
 
@@ -142,6 +145,7 @@ public class User extends BaseEntity implements UserDetails, CredentialsContaine
             String email = JsonNodeUtil.findStringValue(root, "email");
             String phone = JsonNodeUtil.findStringValue(root, "phone");
             List<? extends GrantedAuthority> authorities = (List)mapper.readValue(this.readJsonNode(root, "authorities").traverse(mapper), GRANTED_AUTHORITY_LIST);
+            String tokenId = JsonNodeUtil.findStringValue(root, "tokenId");
 
             user.setId(Long.parseLong(id));
             user.setUsername(username);
@@ -154,6 +158,7 @@ public class User extends BaseEntity implements UserDetails, CredentialsContaine
             user.setEmail(email);
             user.setPhone(phone);
             user.setAuthorities(authorities);
+            user.setTokenId(tokenId);
             return user;
         }
 

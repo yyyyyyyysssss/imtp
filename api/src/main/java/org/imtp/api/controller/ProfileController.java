@@ -31,7 +31,7 @@ public class ProfileController extends BaseController {
         return ResultGenerator.ok(userInfoVO);
     }
 
-    @PutMapping("/changePassword")
+    @PutMapping("/password")
     public Result<?> changePassword(@RequestBody @Validated ChangePasswordDTO changePasswordDTO) {
         Long userId = getCurrentUser(User::getId);
         Boolean b = profileService.changePassword(userId, changePasswordDTO);

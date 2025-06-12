@@ -103,6 +103,7 @@ auth:
       - /service/discovery
       - /ott/generate
       - /api/profile/**
+      - /api/authenticated/**
   # 基于请求头的身份认证
   requestHeadAuthentications:
     - antPath: /api/internal/**

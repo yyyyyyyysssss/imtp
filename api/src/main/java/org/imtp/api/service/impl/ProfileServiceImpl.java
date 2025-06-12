@@ -106,9 +106,11 @@ public class ProfileServiceImpl implements ProfileService {
         if (user == null){
             throw new BusinessException("用户不存在");
         }
-        boolean matches = passwordEncoder.matches(changePasswordDTO.getOriginPassword(), user.getPassword());
-        if (!matches){
+        if (!passwordEncoder.matches(changePasswordDTO.getOriginPassword(), user.getPassword())){
             throw new BusinessException("原密码不正确");
+        }
+        if(passwordEncoder.matches(changePasswordDTO.getNewPassword(), user.getPassword())){
+            throw new BusinessException("新密码不能与原密码相同");
         }
         String newEncodedPassword = passwordEncoder.encode(changePasswordDTO.getNewPassword());
         UpdateWrapper<User> userUpdateWrapper = new UpdateWrapper<>();
