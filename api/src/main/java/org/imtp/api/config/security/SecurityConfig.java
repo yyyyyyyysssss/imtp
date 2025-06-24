@@ -145,15 +145,15 @@ public class SecurityConfig {
                     ott.tokenGenerationSuccessHandler(new MagicLinkOneTimeTokenGenerationSuccessHandler(authProperties.getLoginPage()));
                 })
                 //该过滤器解析token并校验通过后由SecurityContextHolderFilter过滤器加载SecurityContext
-                .addFilterBefore(tokenAuthenticationFilter(tokenService(),bearerTokenResolver()), SecurityContextHolderFilter.class)
+                .addFilterBefore(tokenAuthenticationFilter(tokenService(securityContextStore()),bearerTokenResolver()), SecurityContextHolderFilter.class)
                 //记住我过滤器
-                .addFilterBefore(rememberMeFilter(http), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(rememberMeFilter(authenticationManager(http),rememberMeServices()), UsernamePasswordAuthenticationFilter.class)
                 //刷新token过滤器
-                .addFilterAfter(refreshTokenAuthenticationFilter(authenticationManager(http),bearerTokenResolver(),refreshTokenServices(tokenService())), UsernamePasswordAuthenticationFilter.class)
+                .addFilterAfter(refreshTokenAuthenticationFilter(authenticationManager(http),bearerTokenResolver(),refreshTokenServices(tokenService(securityContextStore()))), UsernamePasswordAuthenticationFilter.class)
                 //基于请求头apikey认证的过滤器
-                .addFilterBefore(apikeyAuthenticationFilter(http), HeaderWriterFilter.class)
+                .addFilterBefore(apikeyAuthenticationFilter(authenticationManager(http)), HeaderWriterFilter.class)
                 //登出过滤器
-                .addFilterAfter(logoutFilter(bearerTokenResolver(),tokenService()), AuthorizationFilter.class)
+                .addFilterAfter(logoutFilter(bearerTokenResolver(),tokenService(securityContextStore())), AuthorizationFilter.class)
                 .logout(AbstractHttpConfigurer::disable);
         return http.build();
     }
@@ -241,13 +241,13 @@ public class SecurityConfig {
 
     //基于请求头apikey的认证过滤器
     @Bean
-    public RequestHeaderAuthenticationFilter apikeyAuthenticationFilter(HttpSecurity http) throws Exception {
+    public RequestHeaderAuthenticationFilter apikeyAuthenticationFilter(AuthenticationManager authenticationManager) throws Exception {
         String[] antPaths = authProperties.requestHeadAuthenticationPath();
         RequestHeaderAuthenticationFilter requestHeaderAuthenticationFilter = new RequestHeaderAuthenticationFilter();
         requestHeaderAuthenticationFilter.setPrincipalRequestHeader("apikey");
         requestHeaderAuthenticationFilter.setExceptionIfHeaderMissing(false);
         requestHeaderAuthenticationFilter.setRequiresAuthenticationRequestMatcher(new SeparatorAntPathRequestMatcher(antPaths));
-        requestHeaderAuthenticationFilter.setAuthenticationManager(authenticationManager(http));
+        requestHeaderAuthenticationFilter.setAuthenticationManager(authenticationManager);
         return requestHeaderAuthenticationFilter;
     }
     @Bean
@@ -271,9 +271,9 @@ public class SecurityConfig {
     }
 
     @Bean
-    public TokenService tokenService(){
+    public TokenService tokenService(SecurityContextStore securityContextStore){
 
-        return new JWTTokenService(redisWrapper,authProperties,securityContextStore());
+        return new JWTTokenService(redisWrapper,authProperties,securityContextStore);
     }
 
     //登出过滤器
@@ -302,9 +302,9 @@ public class SecurityConfig {
 
     //记住我
     @Bean
-    public RememberMeAuthenticationFilter rememberMeFilter(HttpSecurity http) throws Exception {
+    public RememberMeAuthenticationFilter rememberMeFilter(AuthenticationManager authenticationManager,RememberMeServices rememberMeServices) {
 
-        return new RememberMeAuthenticationFilter(authenticationManager(http), rememberMeServices());
+        return new RememberMeAuthenticationFilter(authenticationManager, rememberMeServices);
     }
 
     @Bean
