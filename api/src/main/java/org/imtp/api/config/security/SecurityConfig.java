@@ -145,11 +145,11 @@ public class SecurityConfig {
                     ott.tokenGenerationSuccessHandler(new MagicLinkOneTimeTokenGenerationSuccessHandler(authProperties.getLoginPage()));
                 })
                 //该过滤器解析token并校验通过后由SecurityContextHolderFilter过滤器加载SecurityContext
-                .addFilterBefore(tokenAuthenticationFilter(tokenService()), SecurityContextHolderFilter.class)
+                .addFilterBefore(tokenAuthenticationFilter(tokenService(),bearerTokenResolver()), SecurityContextHolderFilter.class)
                 //记住我过滤器
                 .addFilterBefore(rememberMeFilter(http), UsernamePasswordAuthenticationFilter.class)
                 //刷新token过滤器
-                .addFilterAfter(refreshTokenAuthenticationFilter(http,tokenService()), UsernamePasswordAuthenticationFilter.class)
+                .addFilterAfter(refreshTokenAuthenticationFilter(authenticationManager(http),bearerTokenResolver(),refreshTokenServices(tokenService())), UsernamePasswordAuthenticationFilter.class)
                 //基于请求头apikey认证的过滤器
                 .addFilterBefore(apikeyAuthenticationFilter(http), HeaderWriterFilter.class)
                 //登出过滤器
@@ -215,9 +215,9 @@ public class SecurityConfig {
 
     //token过滤器
     @Bean
-    public TokenAuthenticationFilter tokenAuthenticationFilter(TokenService tokenService) {
+    public TokenAuthenticationFilter tokenAuthenticationFilter(TokenService tokenService ,BearerTokenResolver bearerTokenResolver) {
 
-        return new TokenAuthenticationFilter(bearerTokenResolver(), tokenService);
+        return new TokenAuthenticationFilter(bearerTokenResolver, tokenService);
     }
 
     //刷新token
@@ -227,9 +227,12 @@ public class SecurityConfig {
     }
 
     @Bean
-    public RefreshTokenAuthenticationFilter refreshTokenAuthenticationFilter(HttpSecurity http,TokenService tokenService) throws Exception {
+    public RefreshTokenAuthenticationFilter refreshTokenAuthenticationFilter(
+            AuthenticationManager authenticationManager,
+            BearerTokenResolver bearerTokenResolver,
+            RefreshTokenServices refreshTokenServices) {
 
-        return new RefreshTokenAuthenticationFilter(authenticationManager(http),bearerTokenResolver(), refreshTokenServices(tokenService));
+        return new RefreshTokenAuthenticationFilter(authenticationManager,bearerTokenResolver, refreshTokenServices);
     }
     @Bean
     public RefreshAuthenticationProvider refreshAuthenticationProvider(){
