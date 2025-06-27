@@ -9,4 +9,6 @@ public interface ProfileService {
 
     Boolean changePassword(Long userId, ChangePasswordDTO changePasswordDTO);
 
+    Boolean changeAvatar(Long userId, String avatarUrl);
+
 }

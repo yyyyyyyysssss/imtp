@@ -2,6 +2,7 @@ package org.imtp.api.controller;
 
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.imtp.api.domain.dto.ChangeAvatarDTO;
 import org.imtp.api.domain.dto.ChangePasswordDTO;
 import org.imtp.api.domain.entity.User;
 import org.imtp.api.domain.vo.UserInfoVO;
@@ -35,6 +36,13 @@ public class ProfileController extends BaseController {
     public Result<?> changePassword(@RequestBody @Validated ChangePasswordDTO changePasswordDTO) {
         Long userId = getCurrentUser(User::getId);
         Boolean b = profileService.changePassword(userId, changePasswordDTO);
+        return ResultGenerator.ok(b);
+    }
+
+    @PutMapping("/avatar")
+    public Result<?> changeAvatar(@RequestBody @Validated ChangeAvatarDTO changeAvatarDTO) {
+        Long userId = getCurrentUser(User::getId);
+        Boolean b = profileService.changeAvatar(userId, changeAvatarDTO.getNewAvatarUrl());
         return ResultGenerator.ok(b);
     }
 

@@ -120,4 +120,23 @@ public class ProfileServiceImpl implements ProfileService {
                 .eq(User::getId, userId);
         return userService.update(userUpdateWrapper);
     }
+
+    @Override
+    public Boolean changeAvatar(Long userId, String avatarUrl) {
+        QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
+        userQueryWrapper
+                .lambda()
+                .select(User::getId)
+                .eq(User::getId, userId);
+        User user = userService.getOne(userQueryWrapper);
+        if (user == null){
+            throw new BusinessException("用户不存在");
+        }
+        UpdateWrapper<User> userUpdateWrapper = new UpdateWrapper<>();
+        userUpdateWrapper
+                .lambda()
+                .set(User::getAvatar, avatarUrl)
+                .eq(User::getId, userId);
+        return userService.update(userUpdateWrapper);
+    }
 }
