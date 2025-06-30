@@ -12,6 +12,8 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.Duration;
+
 /**
  * @Description
  * @Author ys
@@ -53,9 +55,9 @@ public class FileController {
     }
 
     //根据上传id获取访问文件临时访问路径
-    @GetMapping("/temporaryUrl")
-    public Result<?> temporaryUrl(@RequestParam("uploadId") String uploadId){
-        String temporaryUrl = fileService.temporaryUrl(uploadId);
+    @GetMapping("/{uploadId}/temporaryUrl")
+    public Result<?> temporaryUrl(@PathVariable("uploadId") String uploadId,@RequestParam(required = false,value = "expiryHours", defaultValue = "1") Integer expiryHours){
+        String temporaryUrl = fileService.temporaryUrl(uploadId, Duration.ofHours(expiryHours));
         return ResultGenerator.ok(temporaryUrl);
     }
 

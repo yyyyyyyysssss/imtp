@@ -16,12 +16,6 @@ public class FileChunkDTO {
     //id
     private String uploadId;
 
-    //文件总大小
-    private Long totalSize;
-
-    //总块数
-    private Long totalChunk;
-
     //每块的大小(最后一块文件大小小于等于该值)
     private Long chunkSize;
 

@@ -11,8 +11,6 @@ import org.imtp.common.response.ResultGenerator;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 /**
  * @Description
  * @Author ys
@@ -66,12 +64,6 @@ public class RoleController {
     public Result<?> query(@RequestBody RoleQueryDTO roleQueryDTO) {
         PageInfo<RoleVO> pageInfo = roleService.queryList(roleQueryDTO);
         return ResultGenerator.ok(pageInfo);
-    }
-
-    @GetMapping("/options")
-    public Result<?> options() {
-        List<RoleVO> roleVOS = roleService.listRoleOptions();
-        return ResultGenerator.ok(roleVOS);
     }
 
 

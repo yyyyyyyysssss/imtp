@@ -12,6 +12,7 @@ import org.imtp.api.mapper.FileUploadMapper;
 import org.springframework.stereotype.Service;
 
 import java.io.InputStream;
+import java.time.Duration;
 
 /**
  * @Description
@@ -49,7 +50,7 @@ public class MinioFileServiceImpl extends AbstractFileService {
     }
 
     @Override
-    public String temporaryUrl(String uploadId) {
+    public String temporaryUrl(String uploadId, Duration duration) {
         QueryWrapper<FileUpload> fileUploadQueryWrapper = new QueryWrapper<>();
         fileUploadQueryWrapper.select("id,file_name,access_url");
         fileUploadQueryWrapper.eq("upload_id",uploadId);
@@ -59,7 +60,7 @@ public class MinioFileServiceImpl extends AbstractFileService {
         }
         String accessUrl = fileUpload.getAccessUrl();
         String objectName = accessUrl.substring(accessUrl.lastIndexOf("/") + 1);
-        return minioHelper.getTemporaryAccessUrl(objectName);
+        return minioHelper.getTemporaryAccessUrl(objectName,duration);
     }
 
     @Override

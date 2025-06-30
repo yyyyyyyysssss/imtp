@@ -175,11 +175,6 @@ public class MinioHelper extends MinioAsyncClient {
         }
     }
 
-    public String getTemporaryAccessUrl(String name) throws MinioException{
-
-        return getTemporaryAccessUrl(name, Duration.ofDays(3));
-    }
-
     public String getTemporaryAccessUrl(String name, Duration duration) throws MinioException{
         try {
             GetPresignedObjectUrlArgs args = GetPresignedObjectUrlArgs

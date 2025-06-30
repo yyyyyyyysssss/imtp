@@ -43,6 +43,7 @@ public abstract class AbstractFileService implements FileService {
     private final String uploadPrefix = "upload:";
 
     private final String totalChunkField = "totalChunk";
+    private final String totalSizeField = "totalSize";
     private final String uploadedChunkCountField = "uploadedChunkCount";
     private final String newFilenameField = "newFilenameField";
     private final String accessUrlField = "accessUrlField";
@@ -74,6 +75,7 @@ public abstract class AbstractFileService implements FileService {
             throw new DatabaseException("文件上传落库失败");
         }
         Map<String,Object> map = new HashMap<>();
+        map.put(totalSizeField,fileInfoDTO.getTotalSize());
         map.put(totalChunkField,fileInfoDTO.getTotalChunk());
         map.put(uploadedChunkCountField,0);
         map.put(newFilenameField,newFilename);
@@ -94,12 +96,16 @@ public abstract class AbstractFileService implements FileService {
     @Transactional(noRollbackFor = BusinessException.class)
     public boolean uploadChunk(FileChunkDTO fileChunkDTO) {
         String uploadId = fileChunkDTO.getUploadId();
-        Long totalSize = fileChunkDTO.getTotalSize();
-        Long totalChunk = fileChunkDTO.getTotalChunk();
         Integer chunkIndex = fileChunkDTO.getChunkIndex();
         Long chunkSize = fileChunkDTO.getChunkSize();
         MultipartFile file = fileChunkDTO.getFile();
-        String filename = (String)redisWrapper.getHash(uploadPrefix + uploadId, newFilenameField);
+        Map<String, Object> map = redisWrapper.getHashAll(uploadPrefix + uploadId);
+        if(map == null || map.isEmpty()){
+            throw new BusinessException("上传任务不存在或已过期: " + uploadId);
+        }
+        String filename = (String) map.get(newFilenameField);
+        Long totalSize = Long.parseLong(map.get(totalSizeField).toString());
+        Long totalChunk = Long.parseLong(map.get(totalChunkField).toString());
         log.debug("uploadId:{}, totalSize:{}, totalChunk:{}, chunkIndex:{}, chunkSize:{}, partSize:{}", uploadId, totalSize, totalChunk, chunkIndex, chunkSize,file.getSize());
         InputStream inputStream = null;
         try {

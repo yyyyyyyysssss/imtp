@@ -73,10 +73,4 @@ public class UserController {
         return ResultGenerator.ok(pageInfo);
     }
 
-    @GetMapping("/options")
-    public Result<?> options() {
-        List<UserVO> userVOS = userService.listUserOptions();
-        return ResultGenerator.ok(userVOS);
-    }
-
 }

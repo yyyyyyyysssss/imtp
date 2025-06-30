@@ -14,6 +14,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.time.Duration;
 import java.util.UUID;
 
 /**
@@ -82,7 +83,7 @@ public class LocalFileServiceImpl extends AbstractFileService {
     }
 
     @Override
-    public String temporaryUrl(String uploadId) {
+    public String temporaryUrl(String uploadId, Duration duration) {
         throw new UnsupportedOperationException("本地文件暂不支持生成临时访问url");
     }
 

@@ -5,6 +5,8 @@ import org.imtp.api.domain.dto.FileChunkDTO;
 import org.imtp.api.domain.vo.FileUploadProgressVO;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.Duration;
+
 /**
  * @Description
  * @Author ys
@@ -20,7 +22,7 @@ public interface FileService {
 
     String accessUrl(String uploadId);
 
-    String temporaryUrl(String uploadId);
+    String temporaryUrl(String uploadId, Duration duration);
 
     String simpleUpload(MultipartFile file);
 
