@@ -84,7 +84,7 @@ public class FileController {
             // 将文件头信息添加到响应头中
             headerMap.forEach(httpHeaders::add);
         }
-        if(type != null && type.equals("download")) {
+        if(type != null && type.equalsIgnoreCase("download")) {
             // 设置响应头以指示下载
             httpHeaders.setContentDispositionFormData("attachment", objectName);
             httpHeaders.setContentType(MediaType.APPLICATION_OCTET_STREAM);
