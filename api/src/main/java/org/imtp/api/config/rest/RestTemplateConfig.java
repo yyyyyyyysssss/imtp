@@ -22,8 +22,13 @@ import org.slf4j.MDC;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.MediaType;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestTemplate;
 
 import javax.net.ssl.SSLContext;
@@ -31,6 +36,9 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 import java.net.URISyntaxException;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -57,10 +65,31 @@ public class RestTemplateConfig {
     }
 
     private RestTemplate createRestTemplate() {
-        return new RestTemplate(clientHttpRequestFactory());
+        return new RestTemplate(createClientHttpRequestFactory(true));
     }
 
-    public ClientHttpRequestFactory clientHttpRequestFactory() {
+
+    @Bean
+    public RestClient restClient() {
+        List<HttpMessageConverter<?>> messageConverters = new ArrayList<>();
+        MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
+        converter.setSupportedMediaTypes(Collections.singletonList(MediaType.ALL));
+        messageConverters.add(converter);
+        return RestClient.builder()
+                .requestFactory(createClientHttpRequestFactory())
+                .defaultStatusHandler(HttpStatusCode::isError, (req, res) -> {
+                    log.error("request error code: {}", res.getStatusCode().value());
+                })
+                .messageConverters(messageConverters)
+                .build();
+    }
+
+    public ClientHttpRequestFactory createClientHttpRequestFactory() {
+
+        return createClientHttpRequestFactory(false);
+    }
+
+    public ClientHttpRequestFactory createClientHttpRequestFactory(boolean useProxy) {
         RequestConfig requestConfig = RequestConfig
                 .custom()
                 .setConnectionRequestTimeout(connectionRequestTimeout, TimeUnit.SECONDS)
@@ -99,7 +128,7 @@ public class RestTemplateConfig {
                                     )
                                     .build()
                     );
-            if (proxy != null && !proxy.isEmpty()) {
+            if (useProxy && proxy != null && !proxy.isEmpty()) {
                 httpClientBuilder.setRoutePlanner(new DefaultProxyRoutePlanner(HttpHost.create(proxy)));
             }
         } catch (URISyntaxException e) {

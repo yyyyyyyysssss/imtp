@@ -161,11 +161,16 @@ public class MinioHelper extends MinioAsyncClient {
         }
     }
 
-    public InputStream download(String filename){
+    public GetObjectResponse download(String objectName){
+
+        return download(minioConfig.getBucketName(), objectName);
+    }
+
+    public GetObjectResponse download(String bucketName,String objectName){
         GetObjectArgs getObjectArgs = GetObjectArgs
                 .builder()
                 .bucket(minioConfig.getBucketName())
-                .object(filename)
+                .object(objectName)
                 .build();
         try {
             return minioClient.getObject(getObjectArgs);

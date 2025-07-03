@@ -1,11 +1,14 @@
 package org.imtp.api.service;
 
+import groovy.lang.Tuple2;
 import org.imtp.api.domain.dto.FileInfoDTO;
 import org.imtp.api.domain.dto.FileChunkDTO;
 import org.imtp.api.domain.vo.FileUploadProgressVO;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 import java.time.Duration;
+import java.util.Map;
 
 /**
  * @Description
@@ -25,5 +28,7 @@ public interface FileService {
     String temporaryUrl(String uploadId, Duration duration);
 
     String simpleUpload(MultipartFile file);
+
+    Tuple2<StreamingResponseBody, Map<String,String>> getFileStream(String bucketName, String objectName);
 
 }

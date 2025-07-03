@@ -58,6 +58,9 @@ public class FileUpload {
     @TableField("access_url")
     private String accessUrl;
 
+    @TableField("original_url")
+    private String originalUrl;
+
     @TableField("status")
     private FileUploadStatus status;
 

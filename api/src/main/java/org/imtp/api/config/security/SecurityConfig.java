@@ -1,6 +1,7 @@
 package org.imtp.api.config.security;
 
 import jakarta.annotation.Resource;
+import jakarta.servlet.DispatcherType;
 import org.imtp.api.config.redis.RedisWrapper;
 import org.imtp.api.config.security.authentication.CustomAccessDeniedEntryPoint;
 import org.imtp.api.config.security.authentication.CustomAuthenticationEntryPoint;
@@ -117,6 +118,8 @@ public class SecurityConfig {
                     authorize
                             //允许所有人访问的路径
                             .requestMatchers(authProperties.getAuthorize().getPermit().toArray(new String[0])).permitAll()
+                            //允许所有异步请求
+                            .dispatcherTypeMatchers(DispatcherType.ASYNC).permitAll()
                             //只需要通过身份认证就能访问的路径
                             .requestMatchers(authProperties.getAuthorize().getAuthenticated().toArray(new String[0])).authenticated()
                             //基于请求头apikey授权

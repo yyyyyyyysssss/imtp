@@ -2,6 +2,7 @@ package org.imtp.api.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import groovy.lang.Tuple2;
+import io.minio.GetObjectResponse;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.imtp.api.config.exception.BusinessException;
@@ -9,10 +10,15 @@ import org.imtp.api.config.minio.MinioHelper;
 import org.imtp.api.domain.entity.FileUpload;
 import org.imtp.api.enums.FileStorageType;
 import org.imtp.api.mapper.FileUploadMapper;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.time.Duration;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @Description
@@ -67,4 +73,26 @@ public class MinioFileServiceImpl extends AbstractFileService {
     public Tuple2<String, String> simpleUpload(InputStream inputStream, String filename, String contentType, Long size) {
         return minioHelper.upload(inputStream,filename,contentType,size);
     }
+
+    @Override
+    public Tuple2<StreamingResponseBody, Map<String,String>> getFileStream(String bucketName, String objectName) {
+        GetObjectResponse response = minioHelper.download(bucketName,objectName);
+        Map<String,String> headerMap = new HashMap<>();
+        response.headers().forEach(h -> headerMap.put(h.getFirst(), h.getSecond()));
+        StreamingResponseBody responseBody = outputStream -> {
+            try (InputStream inputStream = response) {
+                byte[] buffer = new byte[8192];
+                int bytesRead;
+                while ((bytesRead = inputStream.read(buffer)) != -1) {
+                    outputStream.write(buffer, 0, bytesRead);
+                }
+            } catch (IOException e) {
+                // 处理异常
+                log.error("Error while streaming file: {}", e.getMessage(), e);
+                throw new BusinessException("Error while streaming file: " + e.getMessage());
+            }
+        };
+        return new Tuple2<>(responseBody, headerMap);
+    }
+
 }

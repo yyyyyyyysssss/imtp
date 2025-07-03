@@ -1,18 +1,23 @@
 package org.imtp.api.controller;
 
+import groovy.lang.Tuple2;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.imtp.common.response.Result;
-import org.imtp.common.response.ResultGenerator;
 import org.imtp.api.domain.dto.FileChunkDTO;
 import org.imtp.api.domain.dto.FileInfoDTO;
 import org.imtp.api.domain.vo.FileUploadProgressVO;
 import org.imtp.api.service.FileService;
+import org.imtp.common.response.Result;
+import org.imtp.common.response.ResultGenerator;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 import java.time.Duration;
+import java.util.Map;
 
 /**
  * @Description
@@ -66,6 +71,27 @@ public class FileController {
     public Result<String> simpleUpload(@RequestPart("file") MultipartFile file){
         String accessUrl = fileService.simpleUpload(file);
         return ResultGenerator.ok(accessUrl);
+    }
+
+    //获取文件
+    @GetMapping("/{bucketName}/{objectName}")
+    public ResponseEntity<StreamingResponseBody> getFile(@PathVariable("bucketName") String bucketName, @PathVariable("objectName") String objectName,@RequestParam(required = false,value = "type") String type) {
+        HttpHeaders httpHeaders = new HttpHeaders();
+        Tuple2<StreamingResponseBody, Map<String, String>> fileStream = fileService.getFileStream(bucketName, objectName);
+        StreamingResponseBody streamingResponseBody = fileStream.getV1();
+        Map<String, String> headerMap = fileStream.getV2();
+        if(headerMap != null && !headerMap.isEmpty()) {
+            // 将文件头信息添加到响应头中
+            headerMap.forEach(httpHeaders::add);
+        }
+        if(type != null && type.equals("download")) {
+            // 设置响应头以指示下载
+            httpHeaders.setContentDispositionFormData("attachment", objectName);
+            httpHeaders.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+        }
+        return ResponseEntity.ok()
+                .headers(httpHeaders)
+                .body(streamingResponseBody);
     }
 
 }

@@ -18,11 +18,14 @@ import org.imtp.api.enums.FileStorageType;
 import org.imtp.api.enums.FileUploadStatus;
 import org.imtp.api.mapper.FileUploadMapper;
 import org.imtp.api.service.FileService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.time.Duration;
 import java.util.Date;
 import java.util.HashMap;
@@ -47,6 +50,9 @@ public abstract class AbstractFileService implements FileService {
     private final String uploadedChunkCountField = "uploadedChunkCount";
     private final String newFilenameField = "newFilenameField";
     private final String accessUrlField = "accessUrlField";
+
+    @Value("${api.endpoint}")
+    String apiEndpoint;
 
     @Resource
     private RedisWrapper redisWrapper;
@@ -121,9 +127,11 @@ public abstract class AbstractFileService implements FileService {
                 Tuple2<String, String> tuple2 = mergePart(uploadId, filename, totalChunk.intValue());
 
                 String etag = tuple2.getV1();
-                String accessUrl = tuple2.getV2();
+                String originalUrl = tuple2.getV2();
+                String accessUrl = createAccessUrl(originalUrl);
                 UpdateWrapper<FileUpload> updateWrapper = new UpdateWrapper<>();
                 updateWrapper.set("access_url",accessUrl);
+                updateWrapper.set("original_url",originalUrl);
                 updateWrapper.set("uploaded_chunk_count",uploadedChunkNum);
                 updateWrapper.set("status",FileUploadStatus.COMPLETED);
                 updateWrapper.set("etag",etag);
@@ -236,9 +244,11 @@ public abstract class AbstractFileService implements FileService {
             long size = file.getSize();
             Tuple2<String, String> tuple2 = simpleUpload(inputStream, filename, contentType, size);
             String etag = tuple2.getV1();
-            String accessUrl = tuple2.getV2();
+            String originalUrl = tuple2.getV2();
+            String accessUrl = createAccessUrl(originalUrl);
             fileUpload.setEtag(etag);
             fileUpload.setAccessUrl(accessUrl);
+            fileUpload.setOriginalUrl(originalUrl);
             fileUpload.setStatus(FileUploadStatus.COMPLETED);
             fileUploadMapper.insert(fileUpload);
             return accessUrl;
@@ -255,6 +265,30 @@ public abstract class AbstractFileService implements FileService {
                     log.error("upload close InputStream error: ", e);
                 }
             }
+        }
+    }
+
+    private String createAccessUrl(String originalUrl) {
+        if (StringUtils.isEmpty(originalUrl)) {
+            throw new BusinessException("original url cannot be empty");
+        }
+        String[] parsePath = parsePath(originalUrl);
+        return apiEndpoint + "/file/" + parsePath[parsePath.length - 2] + "/" + parsePath[parsePath.length - 1];
+    }
+
+
+    private String[] parsePath(String path) {
+
+        return removeProtocol(path).split("/");
+    }
+
+    private String removeProtocol(String url) {
+        try {
+            URI uri = new URI(url);
+            return uri.getPath();  // 获取去掉协议后的路径部分
+        } catch (URISyntaxException e) {
+            // 如果是无效的URL，可以返回原始字符串或根据需求处理
+            return url;
         }
     }
 }

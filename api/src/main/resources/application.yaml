@@ -82,6 +82,9 @@ mybatis-plus:
     map-underscore-to-camel-case: true
 
 
+api:
+  endpoint: http://localhost:9090
+
 auth:
   loginPage: http://localhost:3000/login
   authorize:

@@ -5,16 +5,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.imtp.api.config.exception.BusinessException;
 import org.imtp.api.enums.FileStorageType;
 import org.springframework.stereotype.Service;
+import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.RandomAccessFile;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.Duration;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -85,6 +84,24 @@ public class LocalFileServiceImpl extends AbstractFileService {
     @Override
     public String temporaryUrl(String uploadId, Duration duration) {
         throw new UnsupportedOperationException("本地文件暂不支持生成临时访问url");
+    }
+
+    @Override
+    public Tuple2<StreamingResponseBody, Map<String,String>> getFileStream(String bucketName, String objectName) {
+        String newFilePath = tmpdir + "/" + bucketName + "/" + objectName;
+        try (FileInputStream fileOutputStream = new FileInputStream(newFilePath)) {
+            StreamingResponseBody responseBody = outputStream -> {
+                byte[] buffer = new byte[8192];
+                int bytesRead;
+                while ((bytesRead = fileOutputStream.read(buffer)) != -1) {
+                    outputStream.write(buffer, 0, bytesRead);
+                }
+            };
+            return new Tuple2<>(responseBody, Map.of("Content-Type", Files.probeContentType(Paths.get(newFilePath))));
+        }catch (Exception e){
+            log.error("getFileStream error: ",e);
+            throw new BusinessException("getFileStream error: " + e.getMessage());
+        }
     }
 
     @Override
