@@ -47,8 +47,8 @@ public class MinioFileServiceImpl extends AbstractFileService {
     }
 
     @Override
-    public String uploadId(String filename,String fileType) {
-        return minioHelper.uploadId(filename,fileType);
+    public String uploadId(String filename, String fileType) {
+        return minioHelper.uploadId(filename, fileType);
     }
 
     @Override
@@ -65,60 +65,61 @@ public class MinioFileServiceImpl extends AbstractFileService {
     public String temporaryUrl(String uploadId, Duration duration) {
         QueryWrapper<FileUpload> fileUploadQueryWrapper = new QueryWrapper<>();
         fileUploadQueryWrapper.select("id,file_name,access_url,original_url");
-        fileUploadQueryWrapper.eq("upload_id",uploadId);
+        fileUploadQueryWrapper.eq("upload_id", uploadId);
         FileUpload fileUpload = fileUploadMapper.selectOne(fileUploadQueryWrapper);
-        if (fileUpload == null){
+        if (fileUpload == null) {
             throw new BusinessException("该上传任务不存在: " + uploadId);
         }
         String originalUrl = fileUpload.getOriginalUrl();
         String objectName = originalUrl.substring(originalUrl.lastIndexOf("/") + 1);
-        return minioHelper.getTemporaryAccessUrl(objectName,duration);
+        return minioHelper.getTemporaryAccessUrl(objectName, duration);
     }
 
     @Override
     public Tuple2<String, String> simpleUpload(InputStream inputStream, String filename, String contentType, Long size) {
-        return minioHelper.upload(inputStream,filename,contentType,size);
+        return minioHelper.upload(inputStream, filename, contentType, size);
     }
 
     @Override
-    public Tuple2<StreamingResponseBody, Map<String,String>> getFileStream(String bucketName, String objectName, List<FileRangeDTO> rangeList) {
-        Map<String,String> headerMap = new HashMap<>();
+    public Tuple2<StreamingResponseBody, Map<String, String>> getFileStream(String bucketName, String objectName, FileRangeDTO range) {
+        Map<String, String> headerMap = new HashMap<>();
         GetObjectResponse objectResponse;
         StatObjectResponse statObjectResponse;
         // 如果没有指定范围，则直接下载整个文件
-        if(rangeList == null || rangeList.isEmpty()){
+        if (range == null) {
             objectResponse = minioHelper.download(bucketName, objectName);
             objectResponse.headers().forEach(h -> headerMap.put(h.getFirst(), h.getSecond()));
             statObjectResponse = null;
         } else {
             objectResponse = null;
             statObjectResponse = minioHelper.statObject(bucketName, objectName);
-            headerMap.put(HttpHeaders.CONTENT_LENGTH, String.valueOf(statObjectResponse.size()));
+            headerMap.put(HttpHeaders.CONTENT_RANGE, "bytes " + range.getStart() + "-" + (range.getEnd() == -1 ? statObjectResponse.size() - 1 : range.getEnd()) + "/" + statObjectResponse.size());
+            long length;
+            if (range.getEnd() == -1) {
+                length = statObjectResponse.size() - range.getStart();
+            } else {
+                length = range.getEnd() - range.getStart() + 1;
+            }
+            headerMap.put(HttpHeaders.CONTENT_LENGTH, String.valueOf(length));
         }
         StreamingResponseBody responseBody = outputStream -> {
-            if(rangeList != null && !rangeList.isEmpty()){
-                for (FileRangeDTO range : rangeList) {
-                    long offset  = range.getStart();
-                    long length;
-                    // 如果 range.getEnd() 为 -1，表示下载到文件末尾
-                    if(range.getEnd() == -1){
-                        if(statObjectResponse == null){
-                            throw new BusinessException("File not found: " + objectName);
-                        }
-                        length = statObjectResponse.size() - range.getStart() + 1;
-                    }else {
-                        length = range.getEnd() - range.getStart() + 1;
-                    }
-                    GetObjectResponse rangeObjectResponse = minioHelper.download(bucketName, objectName, offset, length);
-                    streamFile(rangeObjectResponse, outputStream);
+            if (range != null) {
+                long offset = range.getStart();
+                long length;
+                // 如果 range.getEnd() 为 -1，表示下载到文件末尾
+                if (range.getEnd() == -1) {
+                    length = statObjectResponse.size() - range.getStart() + 1;
+                } else {
+                    length = range.getEnd() - range.getStart() + 1;
                 }
-            }else {
+                GetObjectResponse rangeObjectResponse = minioHelper.download(bucketName, objectName, offset, length);
+                streamFile(rangeObjectResponse, outputStream);
+            } else {
                 streamFile(objectResponse, outputStream);
             }
         };
         return new Tuple2<>(responseBody, headerMap);
     }
-
 
 
     @Override

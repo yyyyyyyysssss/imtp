@@ -3,6 +3,7 @@ package org.imtp.api.controller;
 import groovy.lang.Tuple2;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.imtp.api.config.exception.BusinessException;
 import org.imtp.api.domain.dto.FileChunkDTO;
 import org.imtp.api.domain.dto.FileInfoDTO;
 import org.imtp.api.domain.dto.FileRangeDTO;
@@ -19,10 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * @Description
@@ -92,12 +90,8 @@ public class FileController {
                                                          @RequestParam(required = false,value = "type") String type,
                                                          @RequestHeader(value = HttpHeaders.RANGE, required = false) String range) {
         HttpHeaders httpHeaders = new HttpHeaders();
-        List<FileRangeDTO> rangeList = parseRange(range);
-        if(rangeList != null && !rangeList.isEmpty()){
-            long contentLength = rangeList.stream().mapToLong(FileRangeDTO::getContentLength).sum();
-            httpHeaders.setContentLength(contentLength);
-        }
-        Tuple2<StreamingResponseBody, Map<String, String>> fileStream = fileService.getFileStream(bucketName, objectName,rangeList);
+        FileRangeDTO fileRangeDTO = parseRange(range);
+        Tuple2<StreamingResponseBody, Map<String, String>> fileStream = fileService.getFileStream(bucketName, objectName, fileRangeDTO);
         StreamingResponseBody streamingResponseBody = fileStream.getV1();
         Map<String, String> headerMap = fileStream.getV2();
         if(headerMap != null && !headerMap.isEmpty()) {
@@ -115,20 +109,18 @@ public class FileController {
     }
 
 
-    private List<FileRangeDTO> parseRange(String range) {
-        List<FileRangeDTO> rangeList = null;
+    private FileRangeDTO parseRange(String range) {
         if(range != null && !range.isEmpty()) {
-            rangeList = new ArrayList<>();
             String[] ranges = range.replace("bytes=", "").split(",");
-            for (String rangeStr : ranges) {
-                String[] limits = rangeStr.split("-");
-                long start = Objects.equals(limits[0], "") ? 0 : Long.parseLong(limits[0]);
-                long end = limits.length > 1 ? Long.parseLong(limits[1]) : -1;
-                FileRangeDTO fileRangeDTO = new FileRangeDTO(start,end);
-                rangeList.add(fileRangeDTO);
+            if(ranges.length > 1){
+                throw new BusinessException("暂不支持多范围请求");
             }
+            String[] limits = ranges[0].split("-");
+            long start = Objects.equals(limits[0], "") ? 0 : Long.parseLong(limits[0]);
+            long end = limits.length > 1 ? Long.parseLong(limits[1]) : -1;
+            return new FileRangeDTO(start, end);
         }
-        return rangeList;
+        return null;
     }
 
 }

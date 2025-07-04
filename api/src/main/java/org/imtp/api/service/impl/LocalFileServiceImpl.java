@@ -6,12 +6,14 @@ import org.apache.commons.lang3.StringUtils;
 import org.imtp.api.config.exception.BusinessException;
 import org.imtp.api.domain.dto.FileRangeDTO;
 import org.imtp.api.enums.FileStorageType;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 import java.io.*;
 import java.nio.file.*;
 import java.time.Duration;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -87,13 +89,25 @@ public class LocalFileServiceImpl extends AbstractFileService {
     }
 
     @Override
-    public Tuple2<StreamingResponseBody, Map<String, String>> getFileStream(String bucketName, String objectName, List<FileRangeDTO> rangeList) {
-        String newFilePath = tmpdir + bucketName + File.separator + objectName;
-        File file = new File(newFilePath);
-        StreamingResponseBody responseBody = outputStream -> {
-            if (rangeList != null && !rangeList.isEmpty()) {
-                try (RandomAccessFile randomAccessFile = new RandomAccessFile(newFilePath, "r")) {
-                    for (FileRangeDTO range : rangeList) {
+    public Tuple2<StreamingResponseBody, Map<String, String>> getFileStream(String bucketName, String objectName, FileRangeDTO range) {
+        Map<String, String> headerMap = new HashMap<>();
+        try {
+            String newFilePath = tmpdir + bucketName + File.separator + objectName;
+            headerMap.put("Content-Type", Files.probeContentType(Paths.get(newFilePath)));
+            File file = new File(newFilePath);
+            if (range != null) {
+                headerMap.put(HttpHeaders.CONTENT_RANGE, "bytes " + range.getStart() + "-" + (range.getEnd() == -1 ? file.length() - 1 : range.getEnd()) + "/" + file.length());
+                long length;
+                if (range.getEnd() == -1) {
+                    length = file.length() - range.getStart();
+                } else {
+                    length = range.getEnd() - range.getStart() + 1;
+                }
+                headerMap.put(HttpHeaders.CONTENT_LENGTH, String.valueOf(length));
+            }
+            StreamingResponseBody responseBody = outputStream -> {
+                if (range != null) {
+                    try (RandomAccessFile randomAccessFile = new RandomAccessFile(newFilePath, "r")) {
                         long start = range.getStart();
                         long length;
                         // 如果 range.getEnd() 为 -1，表示下载到文件末尾
@@ -109,17 +123,16 @@ public class LocalFileServiceImpl extends AbstractFileService {
                             outputStream.write(buffer, 0, bytesRead);
                             length -= bytesRead;
                         }
+                    } catch (IOException e) {
+                        log.error("getFileStream error: ", e);
+                        throw new BusinessException("getFileStream error: " + e.getMessage());
                     }
-                } catch (IOException e) {
-                    log.error("getFileStream error: ", e);
-                    throw new BusinessException("getFileStream error: " + e.getMessage());
+                } else {
+                    streamFile(new FileInputStream(newFilePath), outputStream);
                 }
-            } else {
-                streamFile(new FileInputStream(newFilePath), outputStream);
-            }
-        };
-        try {
-            return new Tuple2<>(responseBody, Map.of("Content-Type", Files.probeContentType(Paths.get(newFilePath))));
+            };
+
+            return new Tuple2<>(responseBody, headerMap);
         } catch (Exception e) {
             log.error("getFileStream error: ", e);
             throw new BusinessException("getFileStream error: " + e.getMessage());

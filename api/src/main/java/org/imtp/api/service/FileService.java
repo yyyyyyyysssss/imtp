@@ -31,7 +31,7 @@ public interface FileService {
 
     String simpleUpload(MultipartFile file);
 
-    Tuple2<StreamingResponseBody, Map<String,String>> getFileStream(String bucketName, String objectName, List<FileRangeDTO> rangeList);
+    Tuple2<StreamingResponseBody, Map<String,String>> getFileStream(String bucketName, String objectName, FileRangeDTO range);
 
     FileInfoDTO getFileInfo(String bucketName, String objectName);
 
