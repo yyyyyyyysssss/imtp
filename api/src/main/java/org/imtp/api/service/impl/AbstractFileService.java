@@ -22,8 +22,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.Duration;
@@ -31,6 +33,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.regex.Pattern;
 
 /**
  * @Description
@@ -42,6 +45,8 @@ public abstract class AbstractFileService implements FileService {
 
     @Resource
     protected FileUploadMapper fileUploadMapper;
+
+    protected final int bufferSize = 8192;
 
     private final String uploadPrefix = "upload:";
 
@@ -97,6 +102,8 @@ public abstract class AbstractFileService implements FileService {
     public abstract String storePart(String uploadId,InputStream inputStream,String filename,Long chunkSize,Integer chunkIndex,Long partSize);
 
     public abstract Tuple2<String, String> mergePart(String uploadId, String filename, Integer totalChunk);
+
+    public abstract String pathSeparator();
 
     @Override
     @Transactional(noRollbackFor = BusinessException.class)
@@ -268,7 +275,39 @@ public abstract class AbstractFileService implements FileService {
         }
     }
 
-    private String createAccessUrl(String originalUrl) {
+    @Override
+    public FileInfoDTO getFileInfo(String bucketName, String objectName) {
+        String accessUrl = createAccessUrl(bucketName + pathSeparator() + objectName);
+        QueryWrapper<FileUpload> fileUploadQueryWrapper = new QueryWrapper<>();
+        fileUploadQueryWrapper
+                .lambda()
+                .eq(FileUpload::getAccessUrl, accessUrl);
+        FileUpload fileUpload = fileUploadMapper.selectOne(fileUploadQueryWrapper);
+        if(fileUpload == null){
+            throw new BusinessException("文件不存在或已被删除: " + accessUrl);
+        }
+        FileInfoDTO fileInfoDTO = new FileInfoDTO();
+        fileInfoDTO.setFilename(fileUpload.getFileName());
+        fileInfoDTO.setFileType(fileUpload.getFileType());
+        fileInfoDTO.setTotalSize(fileUpload.getTotalSize());
+        return fileInfoDTO;
+    }
+
+    protected void streamFile(InputStream is, OutputStream outputStream) {
+        try (InputStream inputStream = is) {
+            byte[] buffer = new byte[bufferSize];
+            int bytesRead;
+            while ((bytesRead = inputStream.read(buffer)) != -1) {
+                outputStream.write(buffer, 0, bytesRead);
+            }
+        } catch (IOException e) {
+            // 处理异常
+            log.error("Error while streaming file: {}", e.getMessage(), e);
+            throw new BusinessException("Error while streaming file: " + e.getMessage());
+        }
+    }
+
+    protected String createAccessUrl(String originalUrl) {
         if (StringUtils.isEmpty(originalUrl)) {
             throw new BusinessException("original url cannot be empty");
         }
@@ -276,10 +315,9 @@ public abstract class AbstractFileService implements FileService {
         return apiEndpoint + "/file/" + parsePath[parsePath.length - 2] + "/" + parsePath[parsePath.length - 1];
     }
 
-
     private String[] parsePath(String path) {
 
-        return removeProtocol(path).split("/");
+        return removeProtocol(path).split(Pattern.quote(pathSeparator()));
     }
 
     private String removeProtocol(String url) {

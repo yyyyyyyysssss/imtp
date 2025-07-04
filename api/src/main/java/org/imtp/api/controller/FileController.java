@@ -5,10 +5,12 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.imtp.api.domain.dto.FileChunkDTO;
 import org.imtp.api.domain.dto.FileInfoDTO;
+import org.imtp.api.domain.dto.FileRangeDTO;
 import org.imtp.api.domain.vo.FileUploadProgressVO;
 import org.imtp.api.service.FileService;
 import org.imtp.common.response.Result;
 import org.imtp.common.response.ResultGenerator;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +19,10 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * @Description
@@ -29,7 +34,7 @@ import java.util.Map;
 @Slf4j
 public class FileController {
 
-    @Resource(name = "minioFileService")
+    @Resource(name = "minioFileService") // 使用本地文件服务
     private FileService fileService;
 
     //分片上传前置获取当前上传id
@@ -73,18 +78,33 @@ public class FileController {
         return ResultGenerator.ok(accessUrl);
     }
 
+    //获取文件信息
+    @GetMapping("/{bucketName}/{objectName}/info")
+    public Result<?> fileInfo(@PathVariable("bucketName") String bucketName, @PathVariable("objectName") String objectName) {
+        FileInfoDTO fileInfo = fileService.getFileInfo(bucketName, objectName);
+        return ResultGenerator.ok(fileInfo);
+    }
+
     //获取文件
     @GetMapping("/{bucketName}/{objectName}")
-    public ResponseEntity<StreamingResponseBody> getFile(@PathVariable("bucketName") String bucketName, @PathVariable("objectName") String objectName,@RequestParam(required = false,value = "type") String type) {
+    public ResponseEntity<StreamingResponseBody> getFile(@PathVariable("bucketName") String bucketName,
+                                                         @PathVariable("objectName") String objectName,
+                                                         @RequestParam(required = false,value = "type") String type,
+                                                         @RequestHeader(value = HttpHeaders.RANGE, required = false) String range) {
         HttpHeaders httpHeaders = new HttpHeaders();
-        Tuple2<StreamingResponseBody, Map<String, String>> fileStream = fileService.getFileStream(bucketName, objectName);
+        List<FileRangeDTO> rangeList = parseRange(range);
+        if(rangeList != null && !rangeList.isEmpty()){
+            long contentLength = rangeList.stream().mapToLong(FileRangeDTO::getContentLength).sum();
+            httpHeaders.setContentLength(contentLength);
+        }
+        Tuple2<StreamingResponseBody, Map<String, String>> fileStream = fileService.getFileStream(bucketName, objectName,rangeList);
         StreamingResponseBody streamingResponseBody = fileStream.getV1();
         Map<String, String> headerMap = fileStream.getV2();
         if(headerMap != null && !headerMap.isEmpty()) {
             // 将文件头信息添加到响应头中
             headerMap.forEach(httpHeaders::add);
         }
-        if(type != null && type.equalsIgnoreCase("download")) {
+        if(type != null && (type.equalsIgnoreCase("download") || type.equalsIgnoreCase("d"))) {
             // 设置响应头以指示下载
             httpHeaders.setContentDispositionFormData("attachment", objectName);
             httpHeaders.setContentType(MediaType.APPLICATION_OCTET_STREAM);
@@ -92,6 +112,23 @@ public class FileController {
         return ResponseEntity.ok()
                 .headers(httpHeaders)
                 .body(streamingResponseBody);
+    }
+
+
+    private List<FileRangeDTO> parseRange(String range) {
+        List<FileRangeDTO> rangeList = null;
+        if(range != null && !range.isEmpty()) {
+            rangeList = new ArrayList<>();
+            String[] ranges = range.replace("bytes=", "").split(",");
+            for (String rangeStr : ranges) {
+                String[] limits = rangeStr.split("-");
+                long start = Objects.equals(limits[0], "") ? 0 : Long.parseLong(limits[0]);
+                long end = limits.length > 1 ? Long.parseLong(limits[1]) : -1;
+                FileRangeDTO fileRangeDTO = new FileRangeDTO(start,end);
+                rangeList.add(fileRangeDTO);
+            }
+        }
+        return rangeList;
     }
 
 }

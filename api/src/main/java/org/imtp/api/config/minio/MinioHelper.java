@@ -123,6 +123,20 @@ public class MinioHelper extends MinioAsyncClient {
         }
     }
 
+    public StatObjectResponse statObject(String bucketName,String objectName){
+        try {
+            StatObjectArgs statObjectArgs = StatObjectArgs
+                    .builder()
+                    .bucket(bucketName)
+                    .object(objectName)
+                    .build();
+            return minioClient.statObject(statObjectArgs);
+        } catch (Exception e) {
+            log.error("statObject error: ", e);
+            throw new MinioException("获取对象状态异常");
+        }
+    }
+
 
     public Tuple2<String, String> upload(String filepath, String filename) throws MinioException{
         try {
@@ -161,17 +175,20 @@ public class MinioHelper extends MinioAsyncClient {
         }
     }
 
-    public GetObjectResponse download(String objectName){
+    public GetObjectResponse download(String bucketName,String objectName){
 
-        return download(minioConfig.getBucketName(), objectName);
+        return download(bucketName, objectName,null,null);
     }
 
-    public GetObjectResponse download(String bucketName,String objectName){
-        GetObjectArgs getObjectArgs = GetObjectArgs
-                .builder()
-                .bucket(minioConfig.getBucketName())
-                .object(objectName)
-                .build();
+    public GetObjectResponse download(String bucketName,String objectName,Long offset,Long length){
+        GetObjectArgs.Builder builder = GetObjectArgs.builder();
+        builder.bucket(bucketName)
+                .object(objectName);
+        if(offset != null && length != null) {
+            builder.offset(offset)
+                    .length(length);
+        }
+        GetObjectArgs getObjectArgs = builder.build();
         try {
             return minioClient.getObject(getObjectArgs);
         } catch (Exception e) {

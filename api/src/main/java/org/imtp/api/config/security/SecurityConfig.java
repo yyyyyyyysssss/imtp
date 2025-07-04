@@ -3,10 +3,7 @@ package org.imtp.api.config.security;
 import jakarta.annotation.Resource;
 import jakarta.servlet.DispatcherType;
 import org.imtp.api.config.redis.RedisWrapper;
-import org.imtp.api.config.security.authentication.CustomAccessDeniedEntryPoint;
-import org.imtp.api.config.security.authentication.CustomAuthenticationEntryPoint;
-import org.imtp.api.config.security.authentication.NormalBearerTokenResolver;
-import org.imtp.api.config.security.authentication.TokenAuthenticationFilter;
+import org.imtp.api.config.security.authentication.*;
 import org.imtp.api.config.security.authentication.apikey.ApikeyAuthenticationProvider;
 import org.imtp.api.config.security.authentication.apikey.SeparatorAntPathRequestMatcher;
 import org.imtp.api.config.security.authentication.email.EmailAuthenticationProvider;
@@ -26,7 +23,6 @@ import org.springframework.core.annotation.Order;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.RememberMeAuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.authentication.ott.JdbcOneTimeTokenService;
@@ -149,6 +145,8 @@ public class SecurityConfig {
                 })
                 //该过滤器解析token并校验通过后由SecurityContextHolderFilter过滤器加载SecurityContext
                 .addFilterBefore(tokenAuthenticationFilter(tokenService(securityContextStore()),bearerTokenResolver()), SecurityContextHolderFilter.class)
+                // 用于文件访问的过滤器
+                .addFilterBefore(fileCookieAuthenticationFilter(tokenService(securityContextStore())), SecurityContextHolderFilter.class)
                 //记住我过滤器
                 .addFilterBefore(rememberMeFilter(authenticationManager(http),rememberMeServices()), UsernamePasswordAuthenticationFilter.class)
                 //刷新token过滤器
@@ -214,6 +212,12 @@ public class SecurityConfig {
     public RequestPathAuthorizationManager requestPathAuthorizationManager() {
 
         return new RequestPathAuthorizationManager();
+    }
+
+    @Bean
+    public FileCookieAuthenticationFilter fileCookieAuthenticationFilter(TokenService tokenService){
+
+        return new FileCookieAuthenticationFilter(tokenService);
     }
 
     //token过滤器
