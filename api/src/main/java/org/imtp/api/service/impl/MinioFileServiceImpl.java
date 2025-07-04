@@ -93,10 +93,14 @@ public class MinioFileServiceImpl extends AbstractFileService {
         } else {
             objectResponse = null;
             statObjectResponse = minioHelper.statObject(bucketName, objectName);
-            headerMap.put(HttpHeaders.CONTENT_RANGE, "bytes " + range.getStart() + "-" + (range.getEnd() == -1 ? statObjectResponse.size() - 1 : range.getEnd()) + "/" + statObjectResponse.size());
+            long size = statObjectResponse.size();
+            if (range.getStart() < 0 || (range.getEnd() != -1 && range.getEnd() >= size)) {
+                throw new BusinessException("Invalid range: The range exceeds the file size.");
+            }
+            headerMap.put(HttpHeaders.CONTENT_RANGE, "bytes " + range.getStart() + "-" + (range.getEnd() == -1 ? size - 1 : range.getEnd()) + "/" + size);
             long length;
             if (range.getEnd() == -1) {
-                length = statObjectResponse.size() - range.getStart();
+                length = size - range.getStart();
             } else {
                 length = range.getEnd() - range.getStart() + 1;
             }

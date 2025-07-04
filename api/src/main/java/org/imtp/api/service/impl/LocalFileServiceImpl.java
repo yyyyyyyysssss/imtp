@@ -96,6 +96,9 @@ public class LocalFileServiceImpl extends AbstractFileService {
             headerMap.put("Content-Type", Files.probeContentType(Paths.get(newFilePath)));
             File file = new File(newFilePath);
             if (range != null) {
+                if (range.getStart() < 0 || (range.getEnd() != -1 && range.getEnd() >= file.length())) {
+                    throw new BusinessException("Invalid range: The range exceeds the file size.");
+                }
                 headerMap.put(HttpHeaders.CONTENT_RANGE, "bytes " + range.getStart() + "-" + (range.getEnd() == -1 ? file.length() - 1 : range.getEnd()) + "/" + file.length());
                 long length;
                 if (range.getEnd() == -1) {
