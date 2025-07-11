@@ -5,6 +5,7 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.zookeeper.Watcher;
 import org.apache.zookeeper.ZooKeeper;
+import org.apache.zookeeper.client.ZKClientConfig;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -35,12 +36,14 @@ public class ZookeeperConfig {
     public ZooKeeper zooKeeper(){
         ZooKeeper zooKeeper = null;
         try {
+            ZKClientConfig zkClientConfig = new ZKClientConfig();
+            zkClientConfig.setProperty(ZKClientConfig.ENABLE_CLIENT_SASL_KEY,"false");
             final CountDownLatch countDownLatch = new CountDownLatch(1);
             zooKeeper = new ZooKeeper(servers, sessionTimeout, watchedEvent -> {
                 if (Watcher.Event.KeeperState.SyncConnected == watchedEvent.getState()){
                     countDownLatch.countDown();
                 }
-            });
+            },zkClientConfig);
             countDownLatch.await();
             log.info("初始化zookeeper连接完成：{}",zooKeeper.getState());
         }catch (Exception e){
