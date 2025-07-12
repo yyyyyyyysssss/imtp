@@ -1,5 +1,11 @@
 {
     "globals": {
         "BigInt": true
+    },
+    "parser": "@babel/eslint-parser",
+    "parserOptions": {
+    "babelOptions": {
+       "presets": ["@babel/preset-react"]
     }
+   }
 }

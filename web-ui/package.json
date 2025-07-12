@@ -171,6 +171,7 @@
   },
   "devDependencies": {
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
+    "@babel/preset-react": "^7.27.1",
     "electron": "^35.2.1",
     "electron-builder": "^26.0.1",
     "less": "^4.2.0",
