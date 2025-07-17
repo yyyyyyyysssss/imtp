@@ -50,10 +50,8 @@ public class ControllerLogAspect {
     public Object around(ProceedingJoinPoint joinPoint) throws Throwable {
         StringBuilder stringBuilder = new StringBuilder();
         ServletRequestAttributes servletRequestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-        if (servletRequestAttributes != null) {
-            HttpServletRequest request = servletRequestAttributes.getRequest();
-            stringBuilder.append(String.format("Request: [%s] %s", request.getMethod(), request.getRequestURI()));
-        }
+        HttpServletRequest request = servletRequestAttributes.getRequest();
+        stringBuilder.append(String.format("Request: [%s] %s", request.getMethod(), request.getRequestURI()));
         stringBuilder.append(String.format("   ,Args: %s",  OBJECT_MAPPER.writeValueAsString(joinPoint.getArgs())));
         long s = System.currentTimeMillis();
         Object result;
@@ -63,7 +61,7 @@ public class ControllerLogAspect {
             long diff = System.currentTimeMillis() - s;
             stringBuilder.append(String.format("   Spend: %f s", diff / 1000.0));
             stringBuilder.append(String.format("   ,Exception: %s", e));
-            log.error(stringBuilder.toString());
+            log.error(stringBuilder.toString(),e);
             throw e;
         }
         long e = System.currentTimeMillis();

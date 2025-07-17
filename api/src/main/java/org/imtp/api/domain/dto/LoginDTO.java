@@ -1,5 +1,6 @@
 package org.imtp.api.domain.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 import org.imtp.common.enums.ClientType;
@@ -20,6 +21,7 @@ public class LoginDTO {
 
     private String username;
 
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String credential;
 
     private LoginType loginType = LoginType.NORMAL;
@@ -32,5 +34,4 @@ public class LoginDTO {
     public boolean rememberMe(){
         return rememberMe != null && rememberMe == 1;
     }
-
 }
