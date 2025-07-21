@@ -2,6 +2,8 @@ package org.imtp.api.domain.vo;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.imtp.api.config.jackson.Sensitive;
+import org.imtp.api.config.jackson.SensitiveType;
 import org.imtp.common.enums.Gender;
 
 import java.util.List;
@@ -27,8 +29,10 @@ public class UserVO {
 
     private String avatar;
 
+    @Sensitive(SensitiveType.EMAIL)
     private String email;
 
+    @Sensitive(SensitiveType.MOBILE)
     private String phone;
 
     private String region;
