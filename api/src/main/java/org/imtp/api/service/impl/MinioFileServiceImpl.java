@@ -84,47 +84,37 @@ public class MinioFileServiceImpl extends AbstractFileService {
     public Tuple2<StreamingResponseBody, Map<String, String>> getFileStream(String bucketName, String objectName, FileRangeDTO range) {
         Map<String, String> headerMap = new HashMap<>();
         GetObjectResponse objectResponse;
-        StatObjectResponse statObjectResponse;
         // 如果没有指定范围，则直接下载整个文件
         if (range == null) {
             objectResponse = minioHelper.download(bucketName, objectName);
             objectResponse.headers().forEach(h -> headerMap.put(h.getFirst(), h.getSecond()));
-            statObjectResponse = null;
-        } else {
-            objectResponse = null;
-            statObjectResponse = minioHelper.statObject(bucketName, objectName);
-            long size = statObjectResponse.size();
-            if (range.getStart() < 0 || (range.getEnd() != -1 && range.getEnd() >= size)) {
-                throw new BusinessException("Invalid range: The range exceeds the file size.");
-            }
-            headerMap.put(HttpHeaders.CONTENT_RANGE, "bytes " + range.getStart() + "-" + (range.getEnd() == -1 ? size - 1 : range.getEnd()) + "/" + size);
-            long length;
-            if (range.getEnd() == -1) {
-                length = size - range.getStart();
-            } else {
-                length = range.getEnd() - range.getStart() + 1;
-            }
-            headerMap.put(HttpHeaders.CONTENT_LENGTH, String.valueOf(length));
+            return new Tuple2<>(outputStream -> streamFile(objectResponse, outputStream), headerMap);
         }
-        StreamingResponseBody responseBody = outputStream -> {
-            if (range != null) {
-                long offset = range.getStart();
-                long length;
-                // 如果 range.getEnd() 为 -1，表示下载到文件末尾
-                if (range.getEnd() == -1) {
-                    length = statObjectResponse.size() - range.getStart() + 1;
-                } else {
-                    length = range.getEnd() - range.getStart() + 1;
-                }
-                GetObjectResponse rangeObjectResponse = minioHelper.download(bucketName, objectName, offset, length);
-                streamFile(rangeObjectResponse, outputStream);
-            } else {
-                streamFile(objectResponse, outputStream);
-            }
-        };
-        return new Tuple2<>(responseBody, headerMap);
+        //指定范围时 先获取文件信息
+        StatObjectResponse statObjectResponse = minioHelper.statObject(bucketName, objectName);
+        long size = statObjectResponse.size();
+        //验证范围
+        validateRange(range, size);
+
+        //如果范围是 -1 则表示从开始到结束
+        long start = range.getStart();
+        long end = range.getEnd() == -1 ? size - 1 : range.getEnd();
+        long length = end - start + 1;
+        //设置请求头
+        headerMap.put(HttpHeaders.CONTENT_RANGE, "bytes " + start + "-" + end + "/" + size);
+        headerMap.put(HttpHeaders.CONTENT_LENGTH, String.valueOf(length));
+        //读取
+        GetObjectResponse rangeObjectResponse = minioHelper.download(bucketName, objectName, start, length);
+
+        return new Tuple2<>(outputStream -> streamFile(rangeObjectResponse, outputStream), headerMap);
     }
 
+    private void validateRange(FileRangeDTO range, long size) {
+        if (range.getStart() < 0 ||
+                (range.getEnd() != -1 && (range.getEnd() >= size || range.getEnd() < range.getStart()))) {
+            throw new BusinessException("Invalid range: The range exceeds the file size.");
+        }
+    }
 
     @Override
     public String pathSeparator() {
