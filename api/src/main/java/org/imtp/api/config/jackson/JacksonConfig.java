@@ -1,6 +1,7 @@
 package org.imtp.api.config.jackson;
 
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
@@ -14,10 +15,13 @@ public class JacksonConfig {
     public ObjectMapper objectMapper() {
         ObjectMapper objectMapper = new ObjectMapper();
         SimpleModule module = new SimpleModule();
+        // 全局配置，忽略不存在的字段
+        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
         // 定制 Long 类型的序列化器
         module.addSerializer(Long.class, ToStringSerializer.instance);
         module.addSerializer(long.class, ToStringSerializer.instance);
+
         // 注册模块
         objectMapper.registerModule(module);
         return objectMapper;

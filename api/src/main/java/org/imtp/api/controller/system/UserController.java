@@ -74,4 +74,10 @@ public class UserController {
         return ResultGenerator.ok(pageInfo);
     }
 
+    @PostMapping("/search")
+    public Result<?> search(@RequestBody UserQueryDTO userQueryDTO) {
+        PageInfo<UserVO> pageInfo = userService.search(userQueryDTO.getPageNum(), userQueryDTO.getPageSize(), userQueryDTO.getKeyword(),userQueryDTO.getIds());
+        return ResultGenerator.ok(pageInfo);
+    }
+
 }

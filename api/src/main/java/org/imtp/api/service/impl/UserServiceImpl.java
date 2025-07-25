@@ -244,6 +244,36 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     @Override
+    public PageInfo<UserVO> search(Integer pageNum,Integer pageSize,String name,List<Long> ids){
+        QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
+        userQueryWrapper
+                .lambda()
+                .select(User::getId, User::getNickname)
+                .eq(User::isEnabled, true)
+                .orderByDesc(User::getCreateTime);
+        if (name != null && !name.isEmpty()) {
+            userQueryWrapper.lambda().like(User::getNickname, name);
+        }
+        if(ids != null && !ids.isEmpty()){
+            pageSize = ids.size();
+            userQueryWrapper.lambda().in(User::getId, ids);
+        }
+        PageHelper.startPage(pageNum, pageSize);
+        List<User> users = userMapper.selectList(userQueryWrapper);
+        if (users == null || users.isEmpty()) {
+            return new PageInfo<>();
+        }
+        PageInfo<User> userPageInfo = PageInfo.of(users);
+        List<UserVO> userVO = UserMapping.INSTANCE.toUserVO(users);
+        PageInfo<UserVO> pageInfo = new PageInfo<>();
+        pageInfo.setList(userVO);
+        pageInfo.setTotal(userPageInfo.getTotal());
+        pageInfo.setPageNum(pageNum);
+        pageInfo.setPageSize(pageSize);
+        return pageInfo;
+    }
+
+    @Override
     public List<UserVO> listUserOptions() {
         QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
         userQueryWrapper

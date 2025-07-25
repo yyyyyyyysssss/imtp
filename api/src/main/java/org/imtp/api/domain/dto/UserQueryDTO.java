@@ -3,6 +3,8 @@ package org.imtp.api.domain.dto;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
 /**
  * @Description
  * @Author ys
@@ -13,6 +15,8 @@ import lombok.Setter;
 public class UserQueryDTO extends PageQueryDTO{
 
     private String keyword;
+
+    private List<Long> ids;
 
     private Boolean enabled;
 

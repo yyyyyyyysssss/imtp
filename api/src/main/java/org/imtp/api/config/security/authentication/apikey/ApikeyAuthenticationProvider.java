@@ -29,7 +29,9 @@ public class ApikeyAuthenticationProvider implements AuthenticationProvider {
 
     private final static PathMatcher PATH_MATCHER = new AntPathMatcher();
 
-    private final static Set<? extends GrantedAuthority> REQUEST_HEADER_AUTHORITY = Collections.singleton((GrantedAuthority) () -> "request_header");
+    public final static String APIKEY_ROLE_CODE = "ROLE_APIKEY";
+
+    private final static Set<? extends GrantedAuthority> REQUEST_HEADER_AUTHORITY = Collections.singleton((GrantedAuthority) () -> APIKEY_ROLE_CODE);
 
     private final static String URL_SEPARATOR = ",";
 

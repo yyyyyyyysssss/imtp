@@ -119,7 +119,7 @@ public class SecurityConfig {
                             //只需要通过身份认证就能访问的路径
                             .requestMatchers(authProperties.getAuthorize().getAuthenticated().toArray(new String[0])).authenticated()
                             //基于请求头apikey授权
-                            .requestMatchers(authProperties.requestHeadAuthenticationPath()).hasAuthority("request_header")
+                            .requestMatchers(authProperties.requestHeadAuthenticationPath()).hasAuthority(ApikeyAuthenticationProvider.APIKEY_ROLE_CODE)
                             //基于用户id路径参数的授权
                             .requestMatchers("/social/*/{userId}")
                             .access((authentication, context) -> new AuthorizationDecision(
