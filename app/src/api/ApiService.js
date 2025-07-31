@@ -53,7 +53,7 @@ export const loginByGoogle = (code) => {
 export const fetchUserInfo = (token,userId) => {
 
     return new Promise((resolve, reject) => {
-        api.get(`/social/userInfo/${userId}`, {
+        api.get(`/api/social/userInfo/${userId}`, {
             headers: {
                 Authorization: `Bearer ${token}`
             }
@@ -82,7 +82,7 @@ export const tokenValid = (token, tokenType = 'ACCESS_TOKEN') => {
 export const fetchUserSessions = () => {
 
     return new Promise((resolve, reject) => {
-        api.get('/social/userSession/{userId}')
+        api.get('/api/social/userSession/{userId}')
             .then(res => resolve(res.data))
             .catch(error => handleError)
     })
@@ -95,7 +95,7 @@ export const createUserSession = (receiverUserId, deliveryMethod) => {
         deliveryMethod: deliveryMethod
     }
     return new Promise((resolve, reject) => {
-        api.post('/social/userSession/{userId}', createUserSessionReq)
+        api.post('/api/social/userSession/{userId}', createUserSessionReq)
             .then(res => resolve(res.data))
             .catch(error => handleError)
     })
@@ -107,7 +107,7 @@ export const deleteUserSessionById = (id) => {
         id: id
     }
     return new Promise((resolve, reject) => {
-        api.delete('/social/userSession/{userId}', { data: deleteUserSessionReq })
+        api.delete('/api/social/userSession/{userId}', { data: deleteUserSessionReq })
             .then(res => resolve(res.data))
             .catch(error => handleError)
     })
@@ -117,7 +117,7 @@ export const deleteUserSessionById = (id) => {
 export const fetchMessageByUserSessionId = (sessionId, prevMsgId = null, pageNum = 1, pageSize = 20) => {
 
     return new Promise((resolve, reject) => {
-        api.get('/social/userMessage/{userId}', {
+        api.get('/api/social/userMessage/{userId}', {
             params: {
                 sessionId: sessionId,
                 prevMsgId: prevMsgId,
@@ -136,7 +136,7 @@ export const deleteUserMessageById = (messageId) => {
         id: messageId
     }
     return new Promise((resolve, reject) => {
-        api.delete('/social/userMessage/{userId}', { data: deleteUserMessageReq })
+        api.delete('/api/social/userMessage/{userId}', { data: deleteUserMessageReq })
             .then(res => resolve(res.data))
             .catch(error => handleError)
     })
@@ -146,7 +146,7 @@ export const deleteUserMessageById = (messageId) => {
 export const fetchUserFriends = () => {
 
     return new Promise((resolve, reject) => {
-        api.get('/social/userFriend/{userId}')
+        api.get('/api/social/userFriend/{userId}')
             .then(res => resolve(res.data))
             .catch(error => handleError)
     })
@@ -156,7 +156,7 @@ export const fetchUserFriends = () => {
 export const fetchUserGroups = () => {
 
     return new Promise((resolve, reject) => {
-        api.get('/social/userGroup/{userId}')
+        api.get('/api/social/userGroup/{userId}')
             .then(res => resolve(res.data))
             .catch(error => handleError)
     })
