@@ -187,7 +187,7 @@ export const fetchUserGroups = () => {
 export const fetchUploadId = (fileInfo) => {
 
     return new Promise((resolve, reject) => {
-        httpWrapper.post('/file/uploadId', fileInfo)
+        httpWrapper.post('/api/file/uploadId', fileInfo)
             .then(res => resolve(res.data))
             .catch(error => handleError)
     })

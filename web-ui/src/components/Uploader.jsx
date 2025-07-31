@@ -67,7 +67,7 @@ const Uploader = forwardRef((props, ref) => {
         return new Promise((resolve) => {
             //上传完成获取访问url
             httpWrapper
-                .get('/file/accessUrl', {
+                .get('/api/file/accessUrl', {
                     params: {
                         uploadId: uploadId
                     }
@@ -83,7 +83,7 @@ const Uploader = forwardRef((props, ref) => {
         return new Promise((resolve) => {
             let latestUploadSize = 0
             httpWrapper
-                .post("/file/upload/chunk", uploadFormData, {
+                .post("/api/file/upload/chunk", uploadFormData, {
                     headers: {
                         "Content-Type": "multipart/form-data"
                     },

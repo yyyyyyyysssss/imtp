@@ -84,7 +84,7 @@ public class ChunkedUploader {
             fileInfoDTO.setChunkSize(chunkSize);
             //前置获取uploadId
             return CompletableFuture.supplyAsync(() -> {
-                Result<String> uploadIdResult = okHttpClientHelper.doPost("/file/uploadId",fileInfoDTO, new TypeReference<>() {
+                Result<String> uploadIdResult = okHttpClientHelper.doPost("/api/file/uploadId",fileInfoDTO, new TypeReference<>() {
                 });
                 return uploadIdResult.getData();
                 //多任务上传分片
@@ -124,7 +124,7 @@ public class ChunkedUploader {
                 return CompletableFuture
                         .allOf(futures.toArray(new CompletableFuture[0]))
                         .thenApply(t -> {
-                            Result<String> result = okHttpClientHelper.doGet("/file/accessUrl?uploadId=" + uploadId, new TypeReference<>() {});
+                            Result<String> result = okHttpClientHelper.doGet("/api/file/accessUrl?uploadId=" + uploadId, new TypeReference<>() {});
                             return result.getData();
                         });
             });
@@ -146,7 +146,7 @@ public class ChunkedUploader {
                 .addFormDataPart("chunkIndex", chunkIndex + "")
                 .addFormDataPart("file", "", requestBody)
                 .build();
-        okHttpClientHelper.doPost("/file/upload/chunk", multipartBody, new TypeReference<Void>() {
+        okHttpClientHelper.doPost("/api/file/upload/chunk", multipartBody, new TypeReference<Void>() {
         });
     }
 

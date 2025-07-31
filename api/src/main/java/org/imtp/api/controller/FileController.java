@@ -27,7 +27,7 @@ import java.util.*;
  * @Author ys
  * @Date 2024/8/19 9:55
  */
-@RequestMapping("/file")
+@RequestMapping("/api/file")
 @RestController
 @Slf4j
 public class FileController {

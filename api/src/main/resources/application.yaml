@@ -102,9 +102,9 @@ auth:
     authenticated:
       - /refreshToken
       - /logout
-      - /file/**
       - /service/discovery
       - /ott/generate
+      - /api/file/**
       - /api/profile/**
       - /api/authenticated/**
   # 基于请求头的身份认证
