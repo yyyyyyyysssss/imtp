@@ -26,7 +26,7 @@ httpWrapper.interceptors.request.use(
         return req;
     },
     (error) => {
-        Promise.reject(error);
+        return Promise.reject(error);
     }
 )
 
@@ -41,8 +41,13 @@ httpWrapper.interceptors.response.use(
         }
     },
     (error) => {
-        if (error.response) {
-            if (error.response.status === 401) {
+        if (!error.response) {
+            message.error(error.message || '网络错误');
+            return Promise.reject(error);
+        }
+        const { status, message: errorMessage } = error.response;
+        switch (status) {
+            case 401:
                 clearToken()
                 if (error.config.url !== '/login') {
                     if(window.electronAPI){
@@ -50,15 +55,15 @@ httpWrapper.interceptors.response.use(
                     }
                     return router.navigate('/login');
                 }
-            }
-            if (error.response.status === 403) {
-                return message.error("未经授权的访问");
-            }
-            if(error.response.status === 500){
-                return message.error(error.message);
-            }
-        } else {
-            return message.error(error.message);
+                break
+            case 403:
+                message.error("未经授权的访问");
+                break
+            case 500:
+                message.error('服务器内部错误');
+                break
+            default:
+                message.error(errorMessage || '未知错误');
         }
         return Promise.reject(error);
     }

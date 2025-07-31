@@ -4,88 +4,60 @@ import api from "./api"
 // 登录
 export const login = (req) => {
 
-    return new Promise((resolve, reject) => {
-        api.post('/login', req)
-            .then(res => resolve(res.data))
-            .catch(error => reject(error))
-    })
+    return apiRequestWrapper(() => api.post('/login', req))
 }
 
 // 登出
 export const logout = () => {
 
-    return new Promise((resolve, reject) => {
-        api.post('/logout', null)
-            .then(res => resolve(res.data))
-            .catch(error => reject(error))
-    })
+    return apiRequestWrapper(() => api.post('/logout', null))
 }
 
 // 获取oauth2三方登录的配置信息
 export const fetchOAuth2ClientConfig = () => {
-    return new Promise((resolve, reject) => {
-        api
-            .get('/oauth2/client/other/config',{
-                params: {
-                    clientType: 'APP'
-                }
-            })
-            .then(res => resolve(res.data))
-            .catch(error => handleError)
-    })
+
+    return apiRequestWrapper(() => api.get('/oauth2/client/other/config', {
+        params: {
+            clientType: 'APP'
+        }
+    }))
 }
 
 // 获取oauth2三方登录的配置信息
 export const loginByGoogle = (code) => {
-    return new Promise((resolve, reject) => {
-        api
-            .get('/oauth2/client/google/login',{
-                params: {
-                    code: code
-                }
-            })
-            .then(res => resolve(res.data))
-            .catch(error => handleError)
-    })
+
+    return apiRequestWrapper(() => api.get('/oauth2/client/google/login', {
+        params: {
+            code: code
+        }
+    }))
 }
 
 // 获取当前登录用户的信息
-export const fetchUserInfo = (token,userId) => {
+export const fetchUserInfo = (token, userId) => {
 
-    return new Promise((resolve, reject) => {
-        api.get(`/api/social/userInfo/${userId}`, {
-            headers: {
-                Authorization: `Bearer ${token}`
-            }
-        })
-            .then(res => resolve(res.data))
-            .catch(error => handleError)
-    })
+    return apiRequestWrapper(() => api.get(`/api/social/userInfo/${userId}`, {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    }))
 }
 
 // 验证token是否有效
 export const tokenValid = (token, tokenType = 'ACCESS_TOKEN') => {
 
-    return new Promise((resolve, reject) => {
-        api.get('/api/open/tokenValid', {
-            params: {
-                token: token,
-                tokenType: tokenType
-            }
-        })
-            .then(res => resolve(res.data))
-            .catch(error => reject(error))
-    })
+    return apiRequestWrapper(() => api.get('/api/open/tokenValid', {
+        params: {
+            token: token,
+            tokenType: tokenType
+        }
+    }))
 }
 
 // 获取用户会话信息
 export const fetchUserSessions = () => {
 
-    return new Promise((resolve, reject) => {
-        api.get('/api/social/userSession/{userId}')
-            .then(res => resolve(res.data))
-            .catch(error => handleError)
-    })
+    return apiRequestWrapper(() => api.get('/api/social/userSession/{userId}'))
 }
 
 // 创建用户会话
@@ -94,11 +66,8 @@ export const createUserSession = (receiverUserId, deliveryMethod) => {
         receiverUserId: receiverUserId,
         deliveryMethod: deliveryMethod
     }
-    return new Promise((resolve, reject) => {
-        api.post('/api/social/userSession/{userId}', createUserSessionReq)
-            .then(res => resolve(res.data))
-            .catch(error => handleError)
-    })
+
+    return apiRequestWrapper(() => api.post('/api/social/userSession/{userId}', createUserSessionReq))
 }
 
 // 根据会话id删除会话
@@ -106,28 +75,20 @@ export const deleteUserSessionById = (id) => {
     const deleteUserSessionReq = {
         id: id
     }
-    return new Promise((resolve, reject) => {
-        api.delete('/api/social/userSession/{userId}', { data: deleteUserSessionReq })
-            .then(res => resolve(res.data))
-            .catch(error => handleError)
-    })
+    return apiRequestWrapper(() => api.delete('/api/social/userSession/{userId}', { data: deleteUserSessionReq }))
 }
 
 // 分页获取用户会话关联的消息
 export const fetchMessageByUserSessionId = (sessionId, prevMsgId = null, pageNum = 1, pageSize = 20) => {
 
-    return new Promise((resolve, reject) => {
-        api.get('/api/social/userMessage/{userId}', {
-            params: {
-                sessionId: sessionId,
-                prevMsgId: prevMsgId,
-                pageNum: pageNum,
-                pageSize: pageSize
-            }
-        })
-            .then(res => resolve(res.data))
-            .catch(error => handleError)
-    })
+    return apiRequestWrapper(() => api.get('/api/social/userMessage/{userId}', {
+        params: {
+            sessionId: sessionId,
+            prevMsgId: prevMsgId,
+            pageNum: pageNum,
+            pageSize: pageSize
+        }
+    }))
 }
 
 // 删除消息
@@ -135,31 +96,30 @@ export const deleteUserMessageById = (messageId) => {
     const deleteUserMessageReq = {
         id: messageId
     }
-    return new Promise((resolve, reject) => {
-        api.delete('/api/social/userMessage/{userId}', { data: deleteUserMessageReq })
-            .then(res => resolve(res.data))
-            .catch(error => handleError)
-    })
+    return apiRequestWrapper(() => api.delete('/api/social/userMessage/{userId}', { data: deleteUserMessageReq }))
 }
 
 // 获取用户好友
 export const fetchUserFriends = () => {
 
-    return new Promise((resolve, reject) => {
-        api.get('/api/social/userFriend/{userId}')
-            .then(res => resolve(res.data))
-            .catch(error => handleError)
-    })
+    return apiRequestWrapper(() => api.get('/api/social/userFriend/{userId}'))
 }
 
 // 获取用户群组
 export const fetchUserGroups = () => {
 
-    return new Promise((resolve, reject) => {
-        api.get('/api/social/userGroup/{userId}')
-            .then(res => resolve(res.data))
-            .catch(error => handleError)
-    })
+    return apiRequestWrapper(() => api.get('/api/social/userGroup/{userId}'))
+}
+
+
+const apiRequestWrapper = async (requestFn) => {
+    try {
+        const res = await requestFn()
+        return res.data
+    } catch (err) {
+        handleError(err)
+        throw err
+    }
 }
 
 const handleError = (error) => {

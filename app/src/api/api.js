@@ -13,14 +13,14 @@ const api = axios.create({
 
 api.interceptors.request.use(
     async (req) => {
-        const {userToken,userInfo} = await Storage.multiGet(['userToken','userInfo'])
-        if(userToken){
+        const { userToken, userInfo } = await Storage.multiGet(['userToken', 'userInfo'])
+        if (userToken) {
             const path = req.url;
             //用户id路径参数解析
-            if(path.includes("{userId}")){
-                req.url = path.replaceAll("{userId}",userInfo.id);
+            if (path.includes("{userId}")) {
+                req.url = path.replaceAll("{userId}", userInfo.id);
             }
-            const {accessToken} = userToken
+            const { accessToken } = userToken
             req.headers['Authorization'] = `Bearer ${accessToken}`
         }
         return req;
@@ -38,14 +38,25 @@ api.interceptors.response.use(
         return Promise.reject(res)
     },
     (error) => {
-        if (error.response) {
-            if (error.response.status === 401 && error.response.config.url != '/login' && error.response.config.url != '/logout') {
-                reduxStore.dispatch(authSlice.actions.signOut())
-            }
-            if (error.response.status === 500) {
-                showToast(error.message)
-                return Promise.reject(error)
-            }
+        if (!error.response) {
+            message.error(error.message || '网络错误');
+            return Promise.reject(error);
+        }
+        const { status, message: errorMessage, config } = error.response;
+        switch (status) {
+            case 401:
+                if (status === 401 && config.url != '/login' && config.url != '/logout') {
+                    reduxStore.dispatch(authSlice.actions.signOut())
+                }
+                break
+            case 403:
+                showToast("未经授权的访问");
+                break
+            case 500:
+                showToast('服务器内部错误');
+                break
+            default:
+                showToast(errorMessage || '未知错误');
         }
         return Promise.reject(error)
     }

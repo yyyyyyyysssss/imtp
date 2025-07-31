@@ -4,110 +4,74 @@ import httpWrapper from "./axiosWrapper"
 // 登录
 export const login = (req) => {
 
-    return new Promise((resolve, reject) => {
-        httpWrapper.post('/login', req)
-            .then(res => resolve(res.data))
-            .catch(error => reject(error))
-    })
+    return apiRequestWrapper(() => httpWrapper.post('/login', req))
 }
 
 // 一次性token登录
 export const loginByOTT = (ottToken) => {
 
-    return new Promise((resolve, reject) => {
-        httpWrapper.get('/login/ott', {
-            params: {
-                ottToken: ottToken,
-                clientType: 'WEB'
-            }
-        })
-            .then(res => resolve(res.data))
-            .catch(error => reject(error))
-    })
+    return apiRequestWrapper(() => httpWrapper.get('/login/ott', {
+        params: {
+            ottToken: ottToken,
+            clientType: 'WEB'
+        }
+    }))
 }
 
 // 登出
 export const logout = () => {
 
-    return new Promise((resolve, reject) => {
-        httpWrapper.post('/logout', null)
-            .then(res => resolve(res.data))
-            .catch(error => reject(error))
-    })
+    return apiRequestWrapper(() => httpWrapper.post('/logout', null))
 }
 
 //发送邮箱验证码
 export const sendEmailVerificationCode = (email) => {
 
-    return new Promise((resolve, reject) => {
-        httpWrapper
-            .get('/open/sendEmailVerificationCode', {
-                params: {
-                    email: email
-                }
-            })
-            .then(res => resolve(res.data))
-            .catch(error => handleError)
-    })
+    return apiRequestWrapper(() => httpWrapper.get('/open/sendEmailVerificationCode', {
+        params: {
+            email: email
+        }
+    }))
 }
 
 // oauth2 登录
 export const oauth2Login = (code, state) => {
-    return new Promise((resolve, reject) => {
-        httpWrapper
-            .get('/oauth2/client/other/login', {
-                params: {
-                    code: code,
-                    state: state
-                }
-            })
-            .then(res => resolve(res.data))
-            .catch(error => handleError)
-    })
+
+    return apiRequestWrapper(() => httpWrapper.get('/oauth2/client/other/login', {
+        params: {
+            code: code,
+            state: state
+        }
+    }))
 }
 
 // 获取oauth2三方登录的配置信息
 export const fetchOAuth2ClientConfig = () => {
-    return new Promise((resolve, reject) => {
-        httpWrapper
-            .get('/oauth2/client/other/config')
-            .then(res => resolve(res.data))
-            .catch(error => handleError)
-    })
+
+    return apiRequestWrapper(() => httpWrapper.get('/oauth2/client/other/config'))
 }
 
 // 获取当前登录用户的信息
 export const fetchUserInfo = () => {
 
-    return new Promise((resolve, reject) => {
-        httpWrapper.get('/api/social/userInfo/{userId}')
-            .then(res => resolve(res.data))
-            .catch(error => handleError)
-    })
+    return apiRequestWrapper(() => httpWrapper.get('/api/social/userInfo/{userId}'))
 }
 
 // 验证token是否有效
 export const tokenValid = (token, tokenType = 'ACCESS_TOKEN') => {
 
-    return new Promise((resolve, reject) => {
-        httpWrapper.get('/api/open/tokenValid', {
-            params: {
-                token: token,
-                tokenType: tokenType
-            }
-        })
-            .then(res => resolve(res.data))
-            .catch(error => reject(error))
-    })
+    return apiRequestWrapper(() => httpWrapper.get('/api/open/tokenValid', {
+        params: {
+            token: token,
+            tokenType: tokenType
+        }
+    }))
 }
 
 // 获取用户会话信息
 export const fetchUserSessions = () => {
-    return new Promise((resolve, reject) => {
-        httpWrapper.get('/api/social/userSession/{userId}')
-            .then(res => resolve(res.data))
-            .catch(error => handleError)
-    })
+
+    return apiRequestWrapper(() => httpWrapper.get('/api/social/userSession/{userId}'))
 }
 
 // 创建用户会话
@@ -116,11 +80,7 @@ export const createUserSession = (receiverUserId, deliveryMethod) => {
         receiverUserId: receiverUserId,
         deliveryMethod: deliveryMethod
     }
-    return new Promise((resolve, reject) => {
-        httpWrapper.post('/api/social/userSession/{userId}', createUserSessionReq)
-            .then(res => resolve(res.data))
-            .catch(error => handleError)
-    })
+    return apiRequestWrapper(() => httpWrapper.post('/api/social/userSession/{userId}', createUserSessionReq))
 }
 
 // 根据会话id删除会话
@@ -128,69 +88,57 @@ export const deleteUserSessionById = (id) => {
     const deleteUserSessionReq = {
         id: id
     }
-    return new Promise((resolve, reject) => {
-        httpWrapper.delete('/api/social/userSession/{userId}', { data: deleteUserSessionReq })
-            .then(res => resolve(res.data))
-            .catch(error => handleError)
-    })
+    return apiRequestWrapper(() => httpWrapper.delete('/api/social/userSession/{userId}', { data: deleteUserSessionReq }))
 }
 
 // 分页获取用户会话关联的消息
 export const fetchMessageByUserSessionId = (sessionId, prevMsgId = null, pageNum = 1, pageSize = 10) => {
 
-    return new Promise((resolve, reject) => {
-        httpWrapper.get('/api/social/userMessage/{userId}', {
-            params: {
-                sessionId: sessionId,
-                prevMsgId: prevMsgId,
-                pageNum: pageNum,
-                pageSize: pageSize
-            }
-        })
-            .then(res => resolve(res.data))
-            .catch(error => handleError)
-    })
+    return apiRequestWrapper(() => httpWrapper.get('/api/social/userMessage/{userId}', {
+        params: {
+            sessionId: sessionId,
+            prevMsgId: prevMsgId,
+            pageNum: pageNum,
+            pageSize: pageSize
+        }
+    }))
 }
 
 export const deleteUserMessageById = (messageId) => {
     const deleteUserMessageReq = {
         id: messageId
     }
-    return new Promise((resolve, reject) => {
-        httpWrapper.delete('/api/social/userMessage/{userId}', { data: deleteUserMessageReq })
-            .then(res => resolve(res.data))
-            .catch(error => handleError)
-    })
+
+    return apiRequestWrapper(() => httpWrapper.delete('/api/social/userMessage/{userId}', { data: deleteUserMessageReq }))
 }
 
 // 获取用户好友
 export const fetchUserFriends = () => {
 
-    return new Promise((resolve, reject) => {
-        httpWrapper.get('/api/social/userFriend/{userId}')
-            .then(res => resolve(res.data))
-            .catch(error => handleError)
-    })
+    return apiRequestWrapper(() => httpWrapper.get('/api/social/userFriend/{userId}'))
 }
 
 // 获取用户群组
 export const fetchUserGroups = () => {
 
-    return new Promise((resolve, reject) => {
-        httpWrapper.get('/api/social/userGroup/{userId}')
-            .then(res => resolve(res.data))
-            .catch(error => handleError)
-    })
+    return apiRequestWrapper(() => httpWrapper.get('/api/social/userGroup/{userId}'))
 }
 
 // 获取上传任务id
 export const fetchUploadId = (fileInfo) => {
 
-    return new Promise((resolve, reject) => {
-        httpWrapper.post('/api/file/uploadId', fileInfo)
-            .then(res => resolve(res.data))
-            .catch(error => handleError)
-    })
+    return apiRequestWrapper(() => httpWrapper.post('/api/file/uploadId', fileInfo))
+}
+
+
+const apiRequestWrapper = async (requestFn) => {
+    try {
+        const res = await requestFn()
+        return res.data
+    } catch (err) {
+        handleError(err)
+        throw err
+    }
 }
 
 const handleError = (error) => {
