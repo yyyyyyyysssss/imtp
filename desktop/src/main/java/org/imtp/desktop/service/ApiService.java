@@ -23,7 +23,7 @@ public class ApiService {
 
     public static CompletableFuture<List<UserSessionInfo>> fetchUserSessions() {
         return CompletableFuture.supplyAsync(() -> {
-            Result<List<UserSessionInfo>> result = OKHttpClientHelper.getInstance().doGet("/social/userSession/" + getUserId(), new TypeReference<Result<List<UserSessionInfo>>>() {
+            Result<List<UserSessionInfo>> result = OKHttpClientHelper.getInstance().doGet("/api/social/userSession/" + getUserId(), new TypeReference<Result<List<UserSessionInfo>>>() {
             });
             return result.getData();
         });
@@ -31,7 +31,7 @@ public class ApiService {
 
     public static CompletableFuture<List<UserFriendInfo>> fetchUserFriends() {
         return CompletableFuture.supplyAsync(() -> {
-            Result<List<UserFriendInfo>> result = OKHttpClientHelper.getInstance().doGet("/social/userFriend/" + getUserId(), new TypeReference<Result<List<UserFriendInfo>>>() {
+            Result<List<UserFriendInfo>> result = OKHttpClientHelper.getInstance().doGet("/api/social/userFriend/" + getUserId(), new TypeReference<Result<List<UserFriendInfo>>>() {
             });
             return result.getData();
         });
@@ -39,7 +39,7 @@ public class ApiService {
 
     public static CompletableFuture<List<UserGroupInfo>> fetchUserGroups() {
         return CompletableFuture.supplyAsync(() -> {
-            Result<List<UserGroupInfo>> result = OKHttpClientHelper.getInstance().doGet("/social/userGroup/" + getUserId(), new TypeReference<Result<List<UserGroupInfo>>>() {
+            Result<List<UserGroupInfo>> result = OKHttpClientHelper.getInstance().doGet("/api/social/userGroup/" + getUserId(), new TypeReference<Result<List<UserGroupInfo>>>() {
             });
             return result.getData();
         });

@@ -121,7 +121,7 @@ public class SecurityConfig {
                             //基于请求头apikey授权
                             .requestMatchers(authProperties.requestHeadAuthenticationPath()).hasAuthority(ApikeyAuthenticationProvider.APIKEY_ROLE_CODE)
                             //基于用户id路径参数的授权
-                            .requestMatchers("/social/*/{userId}")
+                            .requestMatchers("/api/social/*/{userId}")
                             .access((authentication, context) -> new AuthorizationDecision(
                                     pathVariableGuard.checkUserId(authentication.get(),context.getVariables().get("userId"))
                             ))

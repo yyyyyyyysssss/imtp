@@ -101,7 +101,7 @@ public class ChunkedUploader {
     }
 
     private static String uploadId(FileInfoDTO fileInfoDTO){
-        Result<String> uploadIdResult = okHttpClientHelper.doPost("/file/uploadId",fileInfoDTO, new TypeReference<>() {
+        Result<String> uploadIdResult = okHttpClientHelper.doPost("/api/file/uploadId",fileInfoDTO, new TypeReference<>() {
         });
         return uploadIdResult.getData();
     }
@@ -159,7 +159,7 @@ public class ChunkedUploader {
                 return CompletableFuture
                         .allOf(futures.toArray(new CompletableFuture[0]))
                         .thenApply(t -> {
-                            Result<String> result = okHttpClientHelper.doGet("/file/accessUrl?uploadId=" + uploadId, new TypeReference<>() {});
+                            Result<String> result = okHttpClientHelper.doGet("/api/file/accessUrl?uploadId=" + uploadId, new TypeReference<>() {});
                             return result.getData();
                         });
             });
@@ -183,7 +183,7 @@ public class ChunkedUploader {
                 .addFormDataPart("chunkIndex", chunkIndex + "")
                 .addFormDataPart("file", "", requestBody)
                 .build();
-        okHttpClientHelper.doPost("/file/upload/chunk", multipartBody, new TypeReference<Void>() {});
+        okHttpClientHelper.doPost("/api/file/upload/chunk", multipartBody, new TypeReference<Void>() {});
         if (progressListener != null){
             progressListener.onProgress(chunkData.length);
         }
@@ -196,7 +196,7 @@ public class ChunkedUploader {
                 .setType(MultipartBody.FORM)
                 .addFormDataPart("file",fileName,requestBody)
                 .build();
-        okHttpClientHelper.doPost("/file/upload/simple", multipartBody, new TypeReference<Void>() {});
+        okHttpClientHelper.doPost("/api/file/upload/simple", multipartBody, new TypeReference<Void>() {});
         if (progressListener != null){
             progressListener.onProgress(bytes.length);
         }

@@ -12,7 +12,7 @@ class Uplaod {
 
     static async #getUploadId(fileInfo) {
         return new Promise((resolve, reject) => {
-            api.post('/file/uploadId', fileInfo)
+            api.post('/api/file/uploadId', fileInfo)
                 .then(
                     (res) => {
                         resolve(res.data)

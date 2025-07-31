@@ -29,7 +29,7 @@ import java.util.List;
  */
 @Slf4j
 @RestController
-@RequestMapping("/social")
+@RequestMapping("/api/social")
 public class UserSocialController extends BaseController{
 
     @Resource

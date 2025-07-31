@@ -80,7 +80,7 @@ export const fetchOAuth2ClientConfig = () => {
 export const fetchUserInfo = () => {
 
     return new Promise((resolve, reject) => {
-        httpWrapper.get('/social/userInfo/{userId}')
+        httpWrapper.get('/api/social/userInfo/{userId}')
             .then(res => resolve(res.data))
             .catch(error => handleError)
     })
@@ -104,7 +104,7 @@ export const tokenValid = (token, tokenType = 'ACCESS_TOKEN') => {
 // 获取用户会话信息
 export const fetchUserSessions = () => {
     return new Promise((resolve, reject) => {
-        httpWrapper.get('/social/userSession/{userId}')
+        httpWrapper.get('/api/social/userSession/{userId}')
             .then(res => resolve(res.data))
             .catch(error => handleError)
     })
@@ -117,7 +117,7 @@ export const createUserSession = (receiverUserId, deliveryMethod) => {
         deliveryMethod: deliveryMethod
     }
     return new Promise((resolve, reject) => {
-        httpWrapper.post('/social/userSession/{userId}', createUserSessionReq)
+        httpWrapper.post('/api/social/userSession/{userId}', createUserSessionReq)
             .then(res => resolve(res.data))
             .catch(error => handleError)
     })
@@ -129,7 +129,7 @@ export const deleteUserSessionById = (id) => {
         id: id
     }
     return new Promise((resolve, reject) => {
-        httpWrapper.delete('/social/userSession/{userId}', { data: deleteUserSessionReq })
+        httpWrapper.delete('/api/social/userSession/{userId}', { data: deleteUserSessionReq })
             .then(res => resolve(res.data))
             .catch(error => handleError)
     })
@@ -139,7 +139,7 @@ export const deleteUserSessionById = (id) => {
 export const fetchMessageByUserSessionId = (sessionId, prevMsgId = null, pageNum = 1, pageSize = 10) => {
 
     return new Promise((resolve, reject) => {
-        httpWrapper.get('/social/userMessage/{userId}', {
+        httpWrapper.get('/api/social/userMessage/{userId}', {
             params: {
                 sessionId: sessionId,
                 prevMsgId: prevMsgId,
@@ -157,7 +157,7 @@ export const deleteUserMessageById = (messageId) => {
         id: messageId
     }
     return new Promise((resolve, reject) => {
-        httpWrapper.delete('/social/userMessage/{userId}', { data: deleteUserMessageReq })
+        httpWrapper.delete('/api/social/userMessage/{userId}', { data: deleteUserMessageReq })
             .then(res => resolve(res.data))
             .catch(error => handleError)
     })
@@ -167,7 +167,7 @@ export const deleteUserMessageById = (messageId) => {
 export const fetchUserFriends = () => {
 
     return new Promise((resolve, reject) => {
-        httpWrapper.get('/social/userFriend/{userId}')
+        httpWrapper.get('/api/social/userFriend/{userId}')
             .then(res => resolve(res.data))
             .catch(error => handleError)
     })
@@ -177,7 +177,7 @@ export const fetchUserFriends = () => {
 export const fetchUserGroups = () => {
 
     return new Promise((resolve, reject) => {
-        httpWrapper.get('/social/userGroup/{userId}')
+        httpWrapper.get('/api/social/userGroup/{userId}')
             .then(res => resolve(res.data))
             .catch(error => handleError)
     })
