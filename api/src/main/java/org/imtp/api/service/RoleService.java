@@ -2,7 +2,9 @@ package org.imtp.api.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.github.pagehelper.PageInfo;
-import org.imtp.api.domain.dto.*;
+import org.imtp.api.domain.dto.RoleCreateDTO;
+import org.imtp.api.domain.dto.RoleQueryDTO;
+import org.imtp.api.domain.dto.RoleUpdateDTO;
 import org.imtp.api.domain.entity.Role;
 import org.imtp.api.domain.vo.RoleVO;
 
@@ -19,11 +21,11 @@ public interface RoleService extends IService<Role> {
 
     Integer update(RoleUpdateDTO roleUpdateDTO);
 
+    Integer updatePartial(RoleUpdateDTO roleUpdateDTO);
+
     Boolean bindAuthorities(Long roleId, List<Long> authorityIds);
 
     Boolean bindUsers(Long id, List<Long> userIds);
-
-    Integer updatePatch(RoleUpdateDTO roleUpdateDTO);
 
     PageInfo<RoleVO> queryList(RoleQueryDTO queryDTO);
 

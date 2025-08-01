@@ -29,15 +29,13 @@ public interface UserService extends UserDetailsService, IService<User> {
 
     Integer update(UserUpdateDTO userUpdateDTO);
 
-    Integer updatePatch(UserUpdateDTO userUpdateDTO);
+    Integer updatePartial(UserUpdateDTO userUpdateDTO);
 
     String resetPassword(Long userId);
 
     PageInfo<UserVO> queryList(UserQueryDTO queryDTO);
 
     PageInfo<UserVO> search(Integer pageNum,Integer pageSize,String name,List<Long> ids);
-
-    List<UserVO> listUserOptions();
 
     Boolean bindRoles(Long id, List<Long> roleIds);
 

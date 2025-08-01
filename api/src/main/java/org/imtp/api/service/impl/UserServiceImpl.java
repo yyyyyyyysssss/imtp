@@ -172,7 +172,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Override
     @Transactional
-    public Integer updatePatch(UserUpdateDTO userUpdateDTO) {
+    public Integer updatePartial(UserUpdateDTO userUpdateDTO) {
         User user = userMapper.selectById(userUpdateDTO.getId());
         if (user == null) {
             throw new BusinessException("用户不存在");
@@ -271,17 +271,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         pageInfo.setPageNum(pageNum);
         pageInfo.setPageSize(pageSize);
         return pageInfo;
-    }
-
-    @Override
-    public List<UserVO> listUserOptions() {
-        QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
-        userQueryWrapper
-                .lambda()
-                .select(User::getId,User::getNickname)
-                .eq(User::isEnabled, true);
-        List<User> users = userMapper.selectList(userQueryWrapper);
-        return UserMapping.INSTANCE.toUserVO(users);
     }
 
     @Override

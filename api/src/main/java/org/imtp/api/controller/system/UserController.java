@@ -3,7 +3,6 @@ package org.imtp.api.controller.system;
 import com.github.pagehelper.PageInfo;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.imtp.api.config.jackson.SensitiveContextHolder;
 import org.imtp.api.domain.dto.UserBindRoleDTO;
 import org.imtp.api.domain.dto.UserCreateDTO;
 import org.imtp.api.domain.dto.UserQueryDTO;
@@ -15,8 +14,6 @@ import org.imtp.common.response.Result;
 import org.imtp.common.response.ResultGenerator;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 /**
  * @Description
@@ -46,7 +43,7 @@ public class UserController {
 
     @PatchMapping
     public Result<?> updatePatch(@RequestBody @Validated UserUpdateDTO userUpdateDTO) {
-        Integer affectedRows = userService.updatePatch(userUpdateDTO);
+        Integer affectedRows = userService.updatePartial(userUpdateDTO);
         return ResultGenerator.ok(affectedRows);
     }
 

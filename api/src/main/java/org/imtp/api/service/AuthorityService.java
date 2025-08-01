@@ -15,7 +15,7 @@ public interface AuthorityService extends IService<Authority> {
 
     Integer update(AuthorityUpdateDTO authorityUpdateDTO);
 
-    Integer updatePatch(AuthorityUpdateDTO authorityUpdateDTO);
+    Integer updatePartial(AuthorityUpdateDTO authorityUpdateDTO);
 
     AuthorityVO details(String id);
 
@@ -23,7 +23,7 @@ public interface AuthorityService extends IService<Authority> {
 
     Integer delete(String id);
 
-    Integer batchDelete(Collection<String> ids);
+    Boolean batchDelete(Collection<String> ids);
 
     List<AuthorityVO> findAuthorityByRoleIds(Collection<Long> menuIds);
 }

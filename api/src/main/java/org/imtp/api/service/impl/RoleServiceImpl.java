@@ -79,7 +79,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role>  implements R
 
     @Override
     @Transactional
-    public Integer updatePatch(RoleUpdateDTO roleUpdateDTO) {
+    public Integer updatePartial(RoleUpdateDTO roleUpdateDTO) {
         Role role = checkAndResult(roleUpdateDTO.getId());
         RoleMapping.INSTANCE.updateRole(roleUpdateDTO, role);
         int i = roleMapper.updateById(role);

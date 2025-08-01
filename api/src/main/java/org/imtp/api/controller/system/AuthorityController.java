@@ -41,7 +41,7 @@ public class AuthorityController {
 
     @PatchMapping
     public Result<?> updatePatch(@RequestBody @Validated AuthorityUpdateDTO authorityUpdateDTO) {
-        Integer affectedRows = authorityService.updatePatch(authorityUpdateDTO);
+        Integer affectedRows = authorityService.updatePartial(authorityUpdateDTO);
         return ResultGenerator.ok(affectedRows);
     }
 
@@ -64,9 +64,9 @@ public class AuthorityController {
     }
 
     @DeleteMapping("/delete")
-    public Result<?> batchDelete(@RequestBody @Validated IdsOnlyDTO idsOnlyDTO) {
-        Integer affectedRows = authorityService.batchDelete(idsOnlyDTO.getId());
-        return ResultGenerator.ok(affectedRows);
+    public Result<Boolean> batchDelete(@RequestBody @Validated IdsOnlyDTO idsOnlyDTO) {
+        Boolean b = authorityService.batchDelete(idsOnlyDTO.getId());
+        return ResultGenerator.ok(b);
     }
 
 }

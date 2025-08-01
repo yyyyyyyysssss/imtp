@@ -17,6 +17,7 @@ import org.imtp.api.service.AuthorityService;
 import org.imtp.api.service.RoleAuthorityService;
 import org.imtp.api.utils.TreeUtil;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
@@ -73,7 +74,7 @@ public class AuthorityServiceImpl extends AbstractAuthorityService implements Au
     }
 
     @Override
-    public Integer updatePatch(AuthorityUpdateDTO authorityUpdateDTO) {
+    public Integer updatePartial(AuthorityUpdateDTO authorityUpdateDTO) {
         Authority authority = authorityMapper.selectById(authorityUpdateDTO.getId());
         if (authority == null || !authority.getType().equals(AuthorityType.BUTTON)) {
             throw new BusinessException("该操作权限不存在");
@@ -88,8 +89,8 @@ public class AuthorityServiceImpl extends AbstractAuthorityService implements Au
 
     @Override
     public AuthorityVO details(String id) {
-
-        return null;
+        Authority authority = authorityMapper.selectById(id);
+        return AuthorityMapping.INSTANCE.toAuthorityVO(authority);
     }
 
     @Override
@@ -145,14 +146,20 @@ public class AuthorityServiceImpl extends AbstractAuthorityService implements Au
     }
 
     @Override
-    public Integer batchDelete(Collection<String> ids) {
-        List<Authority> authorities = authorityMapper.selectBatchIds(ids);
+    @Transactional
+    public Boolean batchDelete(Collection<String> ids) {
+        QueryWrapper<Authority> authorityQueryWrapper = new QueryWrapper<>();
+        authorityQueryWrapper
+                .lambda()
+                .select(Authority::getType)
+                .in(Authority::getId,ids);
+        List<Authority> authorities = authorityMapper.selectList(authorityQueryWrapper);
         if (authorities == null || authorities.isEmpty()){
             throw new BusinessException("权限不存在");
         }
         if (authorities.stream().anyMatch(f -> !f.getType().equals(AuthorityType.BUTTON))){
             throw new BusinessException("存在非权限类型的权限");
         }
-        return authorityMapper.deleteBatchIds(ids);
+        return this.removeBatchByIds(ids);
     }
 }

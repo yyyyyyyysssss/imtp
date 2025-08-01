@@ -50,7 +50,7 @@ public class RoleController {
 
     @PatchMapping
     public Result<?> updatePatch(@RequestBody @Validated RoleUpdateDTO roleUpdateDTO) {
-        Integer affectedRows = roleService.updatePatch(roleUpdateDTO);
+        Integer affectedRows = roleService.updatePartial(roleUpdateDTO);
         return ResultGenerator.ok(affectedRows);
     }
 

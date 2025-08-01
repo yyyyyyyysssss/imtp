@@ -16,7 +16,7 @@ public interface UserSocialService {
 
     Long createUserSessionByUserId(String userId,UserSessionDTO userSessionDTO);
 
-    Boolean deleteSessionById(String userId);
+    Boolean deleteSessionById(String sessionId);
 
     List<UserFriendInfo> findUserFriendByUserId(String userId);
 
