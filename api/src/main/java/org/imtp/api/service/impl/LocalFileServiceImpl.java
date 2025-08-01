@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.imtp.api.config.exception.BusinessException;
 import org.imtp.api.domain.dto.FileRangeDTO;
+import org.imtp.api.domain.vo.FileStreamVO;
 import org.imtp.api.enums.FileStorageType;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
@@ -12,6 +13,8 @@ import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBo
 
 import java.io.*;
 import java.nio.file.*;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
@@ -47,12 +50,23 @@ public class LocalFileServiceImpl extends AbstractFileService {
         String tmpFilePath = newFilePath(uploadId) + ".tmp";
         try (RandomAccessFile raf = new RandomAccessFile(tmpFilePath, "rw")) {
             raf.seek(chunkIndex * chunkSize);
+
+            MessageDigest md = MessageDigest.getInstance("MD5");
+
             byte[] buffer = new byte[bufferSize];
             int n;
             while ((n = inputStream.read(buffer)) != -1) {
                 raf.write(buffer, 0, n);
+                md.update(buffer, 0, n);
             }
-        } catch (IOException e) {
+            byte[] digest = md.digest();
+            // 转成16进制字符串
+            StringBuilder sb = new StringBuilder();
+            for (byte b : digest) {
+                sb.append(String.format("%02x", b & 0xff));
+            }
+            return sb.toString();
+        } catch (IOException | NoSuchAlgorithmException e) {
             log.error("upload error: ", e);
             return null;
         } finally {
@@ -64,7 +78,6 @@ public class LocalFileServiceImpl extends AbstractFileService {
                 }
             }
         }
-        return null;
     }
 
     @Override
@@ -84,12 +97,12 @@ public class LocalFileServiceImpl extends AbstractFileService {
     }
 
     @Override
-    public String temporaryUrl(String uploadId, Duration duration) {
+    public String generateTemporaryUrl(String uploadId, Duration duration) {
         throw new UnsupportedOperationException("本地文件暂不支持生成临时访问url");
     }
 
     @Override
-    public Tuple2<StreamingResponseBody, Map<String, String>> getFileStream(String bucketName, String objectName, FileRangeDTO range) {
+    public FileStreamVO getFileStream(String bucketName, String objectName, FileRangeDTO range) {
         Map<String, String> headerMap = new HashMap<>();
         try {
             String newFilePath = tmpdir + bucketName + File.separator + objectName;
@@ -135,7 +148,7 @@ public class LocalFileServiceImpl extends AbstractFileService {
                 }
             };
 
-            return new Tuple2<>(responseBody, headerMap);
+            return new FileStreamVO(responseBody, headerMap);
         } catch (Exception e) {
             log.error("getFileStream error: ", e);
             throw new BusinessException("getFileStream error: " + e.getMessage());

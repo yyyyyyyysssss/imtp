@@ -1,16 +1,15 @@
 package org.imtp.api.service;
 
-import groovy.lang.Tuple2;
-import org.imtp.api.domain.dto.FileInfoDTO;
 import org.imtp.api.domain.dto.FileChunkDTO;
+import org.imtp.api.domain.dto.FileInfoDTO;
 import org.imtp.api.domain.dto.FileRangeDTO;
+import org.imtp.api.domain.vo.FileInfoVO;
+import org.imtp.api.domain.vo.FileStreamVO;
+import org.imtp.api.domain.vo.FileUploadChunkVO;
 import org.imtp.api.domain.vo.FileUploadProgressVO;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 import java.time.Duration;
-import java.util.List;
-import java.util.Map;
 
 /**
  * @Description
@@ -19,20 +18,20 @@ import java.util.Map;
  */
 public interface FileService {
 
-    String uploadId(FileInfoDTO fileInfoDTO);
+    String getUploadId(FileInfoDTO fileInfoDTO);
 
-    boolean uploadChunk(FileChunkDTO fileChunkDTO);
+    FileUploadChunkVO uploadChunk(FileChunkDTO fileChunkDTO);
 
-    FileUploadProgressVO uploadProgress(String uploadId);
+    FileUploadProgressVO getUploadProgress(String uploadId);
 
-    String accessUrl(String uploadId);
+    String getAccessUrl(String uploadId);
 
-    String temporaryUrl(String uploadId, Duration duration);
+    String generateTemporaryUrl(String uploadId, Duration duration);
 
-    String simpleUpload(MultipartFile file);
+    String uploadSingleFile(MultipartFile file);
 
-    Tuple2<StreamingResponseBody, Map<String,String>> getFileStream(String bucketName, String objectName, FileRangeDTO range);
+    FileStreamVO getFileStream(String bucketName, String objectName, FileRangeDTO range);
 
-    FileInfoDTO getFileInfo(String bucketName, String objectName);
+    FileInfoVO getFileInfo(String bucketName, String objectName);
 
 }

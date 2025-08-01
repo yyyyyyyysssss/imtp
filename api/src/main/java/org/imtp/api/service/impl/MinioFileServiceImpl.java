@@ -10,6 +10,7 @@ import org.imtp.api.config.exception.BusinessException;
 import org.imtp.api.config.minio.MinioHelper;
 import org.imtp.api.domain.dto.FileRangeDTO;
 import org.imtp.api.domain.entity.FileUpload;
+import org.imtp.api.domain.vo.FileStreamVO;
 import org.imtp.api.enums.FileStorageType;
 import org.imtp.api.mapper.FileUploadMapper;
 import org.springframework.beans.factory.annotation.Value;
@@ -62,7 +63,7 @@ public class MinioFileServiceImpl extends AbstractFileService {
     }
 
     @Override
-    public String temporaryUrl(String uploadId, Duration duration) {
+    public String generateTemporaryUrl(String uploadId, Duration duration) {
         QueryWrapper<FileUpload> fileUploadQueryWrapper = new QueryWrapper<>();
         fileUploadQueryWrapper.select("id,file_name,access_url,original_url");
         fileUploadQueryWrapper.eq("upload_id", uploadId);
@@ -72,7 +73,7 @@ public class MinioFileServiceImpl extends AbstractFileService {
         }
         String originalUrl = fileUpload.getOriginalUrl();
         String objectName = originalUrl.substring(originalUrl.lastIndexOf("/") + 1);
-        return minioHelper.getTemporaryAccessUrl(objectName, duration);
+        return minioHelper.generateTemporaryAccessUrl(objectName, duration);
     }
 
     @Override
@@ -81,14 +82,14 @@ public class MinioFileServiceImpl extends AbstractFileService {
     }
 
     @Override
-    public Tuple2<StreamingResponseBody, Map<String, String>> getFileStream(String bucketName, String objectName, FileRangeDTO range) {
+    public FileStreamVO getFileStream(String bucketName, String objectName, FileRangeDTO range) {
         Map<String, String> headerMap = new HashMap<>();
         GetObjectResponse objectResponse;
         // 如果没有指定范围，则直接下载整个文件
         if (range == null) {
             objectResponse = minioHelper.download(bucketName, objectName);
             objectResponse.headers().forEach(h -> headerMap.put(h.getFirst(), h.getSecond()));
-            return new Tuple2<>(outputStream -> streamFile(objectResponse, outputStream), headerMap);
+            return new FileStreamVO(outputStream -> streamFile(objectResponse, outputStream), headerMap);
         }
         //指定范围时 先获取文件信息
         StatObjectResponse statObjectResponse = minioHelper.statObject(bucketName, objectName);
@@ -106,7 +107,7 @@ public class MinioFileServiceImpl extends AbstractFileService {
         //读取
         GetObjectResponse rangeObjectResponse = minioHelper.download(bucketName, objectName, start, length);
 
-        return new Tuple2<>(outputStream -> streamFile(rangeObjectResponse, outputStream), headerMap);
+        return new FileStreamVO(outputStream -> streamFile(rangeObjectResponse, outputStream), headerMap);
     }
 
     private void validateRange(FileRangeDTO range, long size) {

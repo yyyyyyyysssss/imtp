@@ -1,17 +1,18 @@
 package org.imtp.api.controller;
 
-import groovy.lang.Tuple2;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.imtp.api.config.exception.BusinessException;
 import org.imtp.api.domain.dto.FileChunkDTO;
 import org.imtp.api.domain.dto.FileInfoDTO;
 import org.imtp.api.domain.dto.FileRangeDTO;
+import org.imtp.api.domain.vo.FileInfoVO;
+import org.imtp.api.domain.vo.FileStreamVO;
+import org.imtp.api.domain.vo.FileUploadChunkVO;
 import org.imtp.api.domain.vo.FileUploadProgressVO;
 import org.imtp.api.service.FileService;
 import org.imtp.common.response.Result;
 import org.imtp.common.response.ResultGenerator;
-import org.jetbrains.annotations.Nullable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +21,8 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 import java.time.Duration;
-import java.util.*;
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * @Description
@@ -38,48 +40,46 @@ public class FileController {
     //分片上传前置获取当前上传id
     @PostMapping("/uploadId")
     public Result<String> uploadId(@RequestBody FileInfoDTO fileInfoDTO){
-        String uploadId = fileService.uploadId(fileInfoDTO);
+        String uploadId = fileService.getUploadId(fileInfoDTO);
         return ResultGenerator.ok(uploadId);
     }
 
     //分片上传
     @PostMapping(value = "/upload/chunk",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public void uploadChunk(FileChunkDTO uploadChunkDTO){
-        fileService.uploadChunk(uploadChunkDTO);
+    public Result<FileUploadChunkVO> uploadChunk(FileChunkDTO uploadChunkDTO){
+        FileUploadChunkVO fileUploadChunkVO = fileService.uploadChunk(uploadChunkDTO);
+        return ResultGenerator.ok(fileUploadChunkVO);
     }
 
     //获取上传进度
     @GetMapping("/upload/progress")
-    public Result<?> uploadProgress(@RequestParam("uploadId") String uploadId){
-        FileUploadProgressVO fileUploadProgressVO = fileService.uploadProgress(uploadId);
+    public Result<FileUploadProgressVO> uploadProgress(@RequestParam("uploadId") String uploadId){
+        FileUploadProgressVO fileUploadProgressVO = fileService.getUploadProgress(uploadId);
         return ResultGenerator.ok(fileUploadProgressVO);
     }
 
     //根据上传id获取访问文件访问路径
     @GetMapping("/accessUrl")
-    public Result<String> accessUrl(@RequestParam("uploadId") String uploadId){
-        String accessUrl = fileService.accessUrl(uploadId);
+    public Result<String> accessUrl(@RequestParam("uploadId") String uploadId,@RequestParam(required = false,value = "expiryHours") Integer expiryHours){
+        if(expiryHours != null && expiryHours > 0) {
+            String temporaryUrl = fileService.generateTemporaryUrl(uploadId, Duration.ofHours(expiryHours));
+            return ResultGenerator.ok(temporaryUrl);
+        }
+        String accessUrl = fileService.getAccessUrl(uploadId);
         return ResultGenerator.ok(accessUrl);
-    }
-
-    //根据上传id获取访问文件临时访问路径
-    @GetMapping("/{uploadId}/temporaryUrl")
-    public Result<?> temporaryUrl(@PathVariable("uploadId") String uploadId,@RequestParam(required = false,value = "expiryHours", defaultValue = "1") Integer expiryHours){
-        String temporaryUrl = fileService.temporaryUrl(uploadId, Duration.ofHours(expiryHours));
-        return ResultGenerator.ok(temporaryUrl);
     }
 
     //简单上传 只能上传最大不超过 20MB 的文件
     @PostMapping(value = "/upload/simple",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public Result<String> simpleUpload(@RequestPart("file") MultipartFile file){
-        String accessUrl = fileService.simpleUpload(file);
+    public Result<String> uploadSimple(@RequestPart("file") MultipartFile file){
+        String accessUrl = fileService.uploadSingleFile(file);
         return ResultGenerator.ok(accessUrl);
     }
 
     //获取文件信息
     @GetMapping("/{bucketName}/{objectName}/info")
-    public Result<?> fileInfo(@PathVariable("bucketName") String bucketName, @PathVariable("objectName") String objectName) {
-        FileInfoDTO fileInfo = fileService.getFileInfo(bucketName, objectName);
+    public Result<FileInfoVO> fileInfo(@PathVariable("bucketName") String bucketName, @PathVariable("objectName") String objectName) {
+        FileInfoVO fileInfo = fileService.getFileInfo(bucketName, objectName);
         return ResultGenerator.ok(fileInfo);
     }
 
@@ -91,9 +91,9 @@ public class FileController {
                                                          @RequestHeader(value = HttpHeaders.RANGE, required = false) String range) {
         HttpHeaders httpHeaders = new HttpHeaders();
         FileRangeDTO fileRangeDTO = parseRange(range);
-        Tuple2<StreamingResponseBody, Map<String, String>> fileStream = fileService.getFileStream(bucketName, objectName, fileRangeDTO);
-        StreamingResponseBody streamingResponseBody = fileStream.getV1();
-        Map<String, String> headerMap = fileStream.getV2();
+        FileStreamVO fileStream = fileService.getFileStream(bucketName, objectName, fileRangeDTO);
+        StreamingResponseBody streamingResponseBody = fileStream.getStreamingResponseBody();
+        Map<String, String> headerMap = fileStream.getHeaders();
         if(headerMap != null && !headerMap.isEmpty()) {
             // 将文件头信息添加到响应头中
             headerMap.forEach(httpHeaders::add);

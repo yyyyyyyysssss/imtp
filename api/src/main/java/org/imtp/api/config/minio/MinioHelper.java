@@ -197,7 +197,7 @@ public class MinioHelper extends MinioAsyncClient {
         }
     }
 
-    public String getTemporaryAccessUrl(String name, Duration duration) throws MinioException{
+    public String generateTemporaryAccessUrl(String name, Duration duration) throws MinioException{
         try {
             GetPresignedObjectUrlArgs args = GetPresignedObjectUrlArgs
                     .builder()
@@ -213,7 +213,7 @@ public class MinioHelper extends MinioAsyncClient {
         }
     }
 
-    public String getTemporaryDownloadUrl(String name) throws MinioException{
+    public String generateTemporaryDownloadUrl(String name) throws MinioException{
         try {
             Map<String, String> map = new HashMap<>();
             map.put("response-content-type", MediaType.APPLICATION_OCTET_STREAM_VALUE);

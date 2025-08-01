@@ -13,6 +13,8 @@ import org.imtp.api.config.redis.RedisWrapper;
 import org.imtp.api.domain.dto.FileChunkDTO;
 import org.imtp.api.domain.dto.FileInfoDTO;
 import org.imtp.api.domain.entity.FileUpload;
+import org.imtp.api.domain.vo.FileInfoVO;
+import org.imtp.api.domain.vo.FileUploadChunkVO;
 import org.imtp.api.domain.vo.FileUploadProgressVO;
 import org.imtp.api.enums.FileStorageType;
 import org.imtp.api.enums.FileUploadStatus;
@@ -63,7 +65,7 @@ public abstract class AbstractFileService implements FileService {
     private RedisWrapper redisWrapper;
 
     @Override
-    public String uploadId(FileInfoDTO fileInfoDTO) {
+    public String getUploadId(FileInfoDTO fileInfoDTO) {
         FileUpload fileUpload = FileUpload
                 .builder()
                 .id(IdGen.genId())
@@ -107,7 +109,7 @@ public abstract class AbstractFileService implements FileService {
 
     @Override
     @Transactional(noRollbackFor = BusinessException.class)
-    public boolean uploadChunk(FileChunkDTO fileChunkDTO) {
+    public FileUploadChunkVO uploadChunk(FileChunkDTO fileChunkDTO) {
         String uploadId = fileChunkDTO.getUploadId();
         Integer chunkIndex = fileChunkDTO.getChunkIndex();
         Long chunkSize = fileChunkDTO.getChunkSize();
@@ -123,7 +125,7 @@ public abstract class AbstractFileService implements FileService {
         InputStream inputStream = null;
         try {
             inputStream = file.getInputStream();
-            storePart(uploadId,inputStream,filename,chunkSize,chunkIndex,file.getSize());
+            String chunkEtag = storePart(uploadId, inputStream, filename, chunkSize, chunkIndex, file.getSize());
             //获取已上传的块数
             Long uploadedChunkNum = redisWrapper.incrHash(uploadPrefix + uploadId, uploadedChunkCountField);
             if (log.isDebugEnabled()){
@@ -147,6 +149,12 @@ public abstract class AbstractFileService implements FileService {
 
                 redisWrapper.addHash(uploadPrefix + uploadId,accessUrlField,accessUrl,Duration.ofMinutes(5));
             }
+            FileUploadChunkVO fileUploadChunkVO = new FileUploadChunkVO();
+            fileUploadChunkVO.setUploadId(uploadId);
+            fileUploadChunkVO.setChunkIndex(chunkIndex);
+            fileUploadChunkVO.setEtag(chunkEtag);
+            fileUploadChunkVO.setUploadSize(file.getSize());
+            return fileUploadChunkVO;
         } catch (Exception e) {
             Object uploadedChunkNum = redisWrapper.getHash(uploadPrefix + uploadId, uploadedChunkCountField);
             UpdateWrapper<FileUpload> updateWrapper = new UpdateWrapper<>();
@@ -166,7 +174,6 @@ public abstract class AbstractFileService implements FileService {
                 }
             }
         }
-        return true;
     }
 
     private String newFilename(String originFilename){
@@ -183,7 +190,7 @@ public abstract class AbstractFileService implements FileService {
     }
 
     @Override
-    public FileUploadProgressVO uploadProgress(String uploadId) {
+    public FileUploadProgressVO getUploadProgress(String uploadId) {
         FileUploadProgressVO fileUploadProgressVO = new FileUploadProgressVO();
         fileUploadProgressVO.setUploadId(uploadId);
         Map<String, Object> map = redisWrapper.getHashAll(uploadPrefix + uploadId);
@@ -208,7 +215,7 @@ public abstract class AbstractFileService implements FileService {
 
 
     @Override
-    public String accessUrl(String uploadId) {
+    public String getAccessUrl(String uploadId) {
         String accessUrl = (String)redisWrapper.getHash(uploadPrefix + uploadId, accessUrlField);
         if (accessUrl != null && !accessUrl.isEmpty()){
             return accessUrl;
@@ -229,7 +236,7 @@ public abstract class AbstractFileService implements FileService {
     public abstract Tuple2<String, String> simpleUpload(InputStream inputStream,String filename,String contentType,Long size);
 
     @Override
-    public String simpleUpload(MultipartFile file) {
+    public String uploadSingleFile(MultipartFile file) {
         FileUpload fileUpload = FileUpload
                 .builder()
                 .id(IdGen.genId())
@@ -276,7 +283,7 @@ public abstract class AbstractFileService implements FileService {
     }
 
     @Override
-    public FileInfoDTO getFileInfo(String bucketName, String objectName) {
+    public FileInfoVO getFileInfo(String bucketName, String objectName) {
         String accessUrl = createAccessUrl(bucketName + pathSeparator() + objectName);
         QueryWrapper<FileUpload> fileUploadQueryWrapper = new QueryWrapper<>();
         fileUploadQueryWrapper
@@ -286,11 +293,11 @@ public abstract class AbstractFileService implements FileService {
         if(fileUpload == null){
             throw new BusinessException("文件不存在或已被删除: " + accessUrl);
         }
-        FileInfoDTO fileInfoDTO = new FileInfoDTO();
-        fileInfoDTO.setFilename(fileUpload.getFileName());
-        fileInfoDTO.setFileType(fileUpload.getFileType());
-        fileInfoDTO.setTotalSize(fileUpload.getTotalSize());
-        return fileInfoDTO;
+        FileInfoVO fileInfoVO = new FileInfoVO();
+        fileInfoVO.setFilename(fileUpload.getFileName());
+        fileInfoVO.setFileType(fileUpload.getFileType());
+        fileInfoVO.setTotalSize(fileUpload.getTotalSize());
+        return fileInfoVO;
     }
 
     protected void streamFile(InputStream is, OutputStream outputStream) {
