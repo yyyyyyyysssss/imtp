@@ -32,7 +32,7 @@ import java.util.Map;
  * @Author ys
  * @Date 2024/8/19 10:19
  */
-@Service("minioFileService")
+@Service("fileService")
 @Slf4j
 public class MinioFileServiceImpl extends AbstractFileService {
 

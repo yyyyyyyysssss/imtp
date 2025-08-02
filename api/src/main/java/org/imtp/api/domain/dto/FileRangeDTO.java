@@ -20,9 +20,5 @@ public class FileRangeDTO {
 
     private Long end;
 
-    public long getContentLength() {
-        return end - start + 1;
-    }
-
 
 }

@@ -21,7 +21,7 @@ import java.util.Objects;
 @Slf4j
 public class FileAccessController {
 
-    @Resource(name = "minioFileService") // 使用本地文件服务
+    @Resource
     private FileService fileService;
 
     //获取文件
@@ -51,14 +51,18 @@ public class FileAccessController {
 
     private FileRangeDTO parseRange(String range) {
         if(range != null && !range.isEmpty()) {
-            String[] ranges = range.replace("bytes=", "").split(",");
-            if(ranges.length > 1){
-                throw new BusinessException("暂不支持多范围请求");
+            try {
+                String[] ranges = range.replace("bytes=", "").split(",");
+                if(ranges.length > 1){
+                    throw new BusinessException("暂不支持多范围请求");
+                }
+                String[] limits = ranges[0].split("-");
+                long start = Objects.equals(limits[0], "") ? 0 : Long.parseLong(limits[0]);
+                long end = limits.length > 1 ? Long.parseLong(limits[1]) : -1;
+                return new FileRangeDTO(start, end);
+            }catch (Exception e){
+                throw new BusinessException("范围解析失败: " + e.getMessage());
             }
-            String[] limits = ranges[0].split("-");
-            long start = Objects.equals(limits[0], "") ? 0 : Long.parseLong(limits[0]);
-            long end = limits.length > 1 ? Long.parseLong(limits[1]) : -1;
-            return new FileRangeDTO(start, end);
         }
         return null;
     }

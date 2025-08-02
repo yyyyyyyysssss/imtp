@@ -26,7 +26,7 @@ import java.time.Duration;
 @Slf4j
 public class FileUploadController {
 
-    @Resource(name = "minioFileService") // 使用本地文件服务
+    @Resource
     private FileService fileService;
 
     //分片上传前置获取当前上传id
