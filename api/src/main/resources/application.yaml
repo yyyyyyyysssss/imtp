@@ -104,6 +104,7 @@ auth:
       - /logout
       - /service/discovery
       - /ott/generate
+      - /file/**
       - /api/file/**
       - /api/profile/**
       - /api/authenticated/**
