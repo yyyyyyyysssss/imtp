@@ -87,9 +87,23 @@ public class RedisWrapper {
         return redisTemplate.opsForZSet().rangeByScore(key,min,max);
     }
 
+    public Set<Object> rangeZSet(String key,long start, long end){
+
+        return redisTemplate.opsForZSet().range(key,start,end);
+    }
+
+    public Long countZSet(String key){
+        return redisTemplate.opsForZSet().zCard(key);
+    }
+
     public Long removeZSet(String key,Object... values){
 
         return redisTemplate.opsForZSet().remove(key,values);
+    }
+
+    public Long removeZSetByScore(String key,double min, double max){
+
+        return  redisTemplate.opsForZSet().removeRangeByScore(key,min,max);
     }
 
     public void addHash(String k,String field,Object value){

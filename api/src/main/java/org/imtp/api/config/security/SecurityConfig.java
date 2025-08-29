@@ -185,8 +185,9 @@ public class SecurityConfig {
     //基于用户名密码认证
     @Bean
     public DaoAuthenticationProvider daoAuthenticationProvider() {
-        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-        authProvider.setUserDetailsService(userService);
+        // 密码防暴力破解登录
+        LoginAttemptService loginAttemptService = new LoginAttemptService(redisWrapper);
+        DaoAuthenticationProvider authProvider = new UsernamePasswordAuthenticationProvider(userService,loginAttemptService);
         // 设置密码编辑器
         authProvider.setPasswordEncoder(passwordEncoder());
         authProvider.setHideUserNotFoundExceptions(false);
