@@ -224,6 +224,11 @@ resilience4j:
         # 限流周期内允许的请求数
         limitForPeriod: 2000
     instances:
+      # 验证码限流: 60秒允许1个请求，触发限流时客户端不等待直接响应
+      verificationCodeLimiter:
+        limitRefreshPeriod: 60s
+        limitForPeriod: 1
+        timeoutDuration: 0
       # 公共限流: 1秒允许2000个请求，触发限流时客户端等待10ms响应
       commonRateLimiter:
         base-config: default

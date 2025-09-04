@@ -1,6 +1,7 @@
 package org.imtp.api.controller;
 
 import groovy.lang.Tuple2;
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
 import org.imtp.common.response.Result;
@@ -64,6 +65,7 @@ public class OpenController {
     }
 
     @GetMapping("/sendEmailVerificationCode")
+    @RateLimiter(name = "verificationCodeLimiter")
     public Result<?> sendEmailVerificationCode(@RequestParam("email") String email) {
         EmailInfo emailInfo = EmailInfo
                 .builder()

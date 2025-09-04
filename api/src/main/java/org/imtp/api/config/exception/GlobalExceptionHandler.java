@@ -1,5 +1,6 @@
 package org.imtp.api.config.exception;
 
+import io.github.resilience4j.ratelimiter.RequestNotPermitted;
 import jakarta.validation.ValidationException;
 import lombok.extern.slf4j.Slf4j;
 import org.imtp.common.response.Result;
@@ -66,6 +67,13 @@ public class GlobalExceptionHandler {
     public Result<?> handlerAccessDeniedException(AccessDeniedException accessDeniedException){
         log.error("Access Denied: ",accessDeniedException);
         return ResultGenerator.failed(ResultCode.ACCESS_AUTHORIZED_EXCEPTION);
+    }
+
+    @ResponseStatus(HttpStatus.TOO_MANY_REQUESTS)
+    @ExceptionHandler({RequestNotPermitted.class})
+    public Result<?> handlerRequestNotPermitted(RequestNotPermitted requestNotPermitted){
+        log.error("限流: ",requestNotPermitted);
+        return ResultGenerator.failed("请求过于频繁，请稍后再试");
     }
 
     @ResponseStatus(HttpStatus.OK)
