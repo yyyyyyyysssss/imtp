@@ -65,7 +65,6 @@ public class OpenController {
     }
 
     @GetMapping("/sendEmailVerificationCode")
-    @RateLimiter(name = "verificationCodeLimiter")
     public Result<?> sendEmailVerificationCode(@RequestParam("email") String email) {
         EmailInfo emailInfo = EmailInfo
                 .builder()
