@@ -1,5 +1,6 @@
 package org.imtp.api.config.exception;
 
+import io.github.resilience4j.ratelimiter.RequestNotPermitted;
 import jakarta.validation.ValidationException;
 import lombok.extern.slf4j.Slf4j;
 import org.imtp.common.response.Result;
@@ -8,7 +9,10 @@ import org.imtp.common.response.ResultGenerator;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.AccountStatusException;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.authentication.LockedException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.BindException;
@@ -30,19 +34,32 @@ import java.util.List;
 @Slf4j
 public class GlobalExceptionHandler {
 
-
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    @ExceptionHandler({BadCredentialsException.class})
-    public Result<?> handlerBadCredentialsException(BadCredentialsException badCredentialsException){
-        log.error("密码错误: ",badCredentialsException);
+    @ExceptionHandler({AuthenticationException.class})
+    public Result<?> handlerAuthenticationException(AuthenticationException authenticationException){
+        if(authenticationException instanceof  BadCredentialsException
+                || authenticationException instanceof UsernameNotFoundException
+        ){
+            log.error("用户名或密码错误: ",authenticationException);
+            return ResultGenerator.failed(ResultCode.USERNAME_OR_PASSWORD_EXCEPTION);
+        }
+        log.error("认证异常: ",authenticationException);
         return ResultGenerator.failed(ResultCode.IDENTITY_AUTHENTICATION_EXCEPTION);
     }
 
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    @ExceptionHandler({UsernameNotFoundException.class})
-    public Result<?> handlerBUsernameNotFoundException(UsernameNotFoundException usernameNotFoundException){
-        log.error("账号不存在: ",usernameNotFoundException);
-        return ResultGenerator.failed(ResultCode.USERNAME_OR_PASSWORD_EXCEPTION);
+    @ExceptionHandler({AccountStatusException.class})
+    public Result<?> handlerAccountStatusException(AccountStatusException accountStatusException){
+        if(accountStatusException instanceof LockedException){
+            log.error("账号已锁定: ",accountStatusException);
+            return ResultGenerator.failed(ResultCode.USERNAME_LOCKED_EXCEPTION);
+        }
+        if(accountStatusException instanceof DisabledException){
+            log.error("账号已停用: ",accountStatusException);
+            return ResultGenerator.failed(ResultCode.USERNAME_DISABLED_EXCEPTION);
+        }
+        log.error("账号状态异常: ",accountStatusException);
+        return ResultGenerator.failed(ResultCode.USERNAME_LOCKED_EXCEPTION);
     }
 
     @ResponseStatus(HttpStatus.FORBIDDEN)
@@ -52,11 +69,11 @@ public class GlobalExceptionHandler {
         return ResultGenerator.failed(ResultCode.ACCESS_AUTHORIZED_EXCEPTION);
     }
 
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    @ExceptionHandler({AuthenticationException.class})
-    public Result<?> handlerAuthenticationException(AuthenticationException authenticationException){
-        log.error("Authentication Exception: ",authenticationException);
-        return ResultGenerator.failed(ResultCode.IDENTITY_AUTHENTICATION_EXCEPTION);
+    @ResponseStatus(HttpStatus.TOO_MANY_REQUESTS)
+    @ExceptionHandler({RequestNotPermitted.class})
+    public Result<?> handlerRequestNotPermitted(RequestNotPermitted requestNotPermitted){
+        log.error("限流: ",requestNotPermitted);
+        return ResultGenerator.failed("请求过于频繁，请稍后再试");
     }
 
     @ResponseStatus(HttpStatus.OK)

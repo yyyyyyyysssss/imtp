@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.4.3</version>
+        <version>3.5.4</version>
         <relativePath/>
     </parent>
 
@@ -21,7 +21,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <common.version>1.0.0-SNAPSHOT</common.version>
-        <spring.boot.version>3.4.3</spring.boot.version>
+        <spring.boot.version>3.5.4</spring.boot.version>
         <skipTests>true</skipTests>
     </properties>
 
