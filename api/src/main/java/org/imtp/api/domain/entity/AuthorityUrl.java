@@ -14,7 +14,7 @@ import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 import lombok.Setter;
 import org.imtp.api.domain.validation.ValidApiUrls;
-import org.imtp.api.utils.JsonNodeUtil;
+import org.imtp.api.utils.JsonNodeUtils;
 
 import java.io.IOException;
 
@@ -53,8 +53,8 @@ public class AuthorityUrl {
             ObjectMapper mapper = (ObjectMapper) jsonParser.getCodec();
             JsonNode root = mapper.readTree(jsonParser);
             AuthorityUrl authorityUrl = new AuthorityUrl();
-            String method = JsonNodeUtil.findStringValue(root, "method");
-            String url = JsonNodeUtil.findStringValue(root, "url");
+            String method = JsonNodeUtils.findStringValue(root, "method");
+            String url = JsonNodeUtils.findStringValue(root, "url");
             authorityUrl.setMethod(method);
             authorityUrl.setUrl(url);
             return authorityUrl;

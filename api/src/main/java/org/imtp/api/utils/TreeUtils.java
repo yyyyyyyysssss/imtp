@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
  * @Author ys
  * @Date 2025/5/17 21:36
  */
-public class TreeUtil {
+public class TreeUtils {
 
     public static <T,ID extends Serializable> List<T> buildTree(
             List<T> list,

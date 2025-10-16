@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-public class WebUtil {
+public class WebUtils {
 
     public static Map<String,String> requestParamConvertMap(String requestParam){
         if (StringUtils.isEmpty(requestParam)){

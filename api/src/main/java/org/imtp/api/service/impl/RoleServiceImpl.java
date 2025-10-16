@@ -112,15 +112,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role>  implements R
             return true;
         }
         // 添加新的角色权限
-        List<UserRole> userRoles = new ArrayList<>();
-        for (Long userId : userIds) {
-            UserRole userRole = new UserRole();
-            userRole.setId(IdGen.genId());
-            userRole.setUserId(userId);
-            userRole.setRoleId(id);
-            userRoles.add(userRole);
-        }
-        return userRoleService.saveBatch(userRoles);
+        return userRoleService.buildUserRoles(userIds, Collections.singletonList(id));
     }
 
     @Override

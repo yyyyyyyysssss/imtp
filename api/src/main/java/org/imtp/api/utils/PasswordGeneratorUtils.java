@@ -10,7 +10,7 @@ import java.util.List;
  * @Author ys
  * @Date 2025/6/6 20:04
  */
-public class PasswordGenerator {
+public class PasswordGeneratorUtils {
 
     private static final String UPPER = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     private static final String LOWER = "abcdefghijklmnopqrstuvwxyz";

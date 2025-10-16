@@ -3,7 +3,7 @@ package org.imtp.api.config.idwork;
 import lombok.extern.slf4j.Slf4j;
 import org.imtp.common.idwork.SnowflakeIdWorker;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
-import org.imtp.api.utils.SpringUtil;
+import org.imtp.api.utils.SpringUtils;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -24,7 +24,7 @@ public class IdGen {
             try {
                 lock.lock();
                 if (snowflakeIdWorker == null) {
-                    snowflakeIdWorker = SpringUtil.getBean("snowflakeIdWorker", SnowflakeIdWorker.class);
+                    snowflakeIdWorker = SpringUtils.getBean("snowflakeIdWorker", SnowflakeIdWorker.class);
                 }
             } catch (NoSuchBeanDefinitionException e) {
                 log.error("ID生成异常", e);

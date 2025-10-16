@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
  * @time: 2022/7/14 13:49
  */
 @Component
-public class SpringUtil implements ApplicationContextAware {
+public class SpringUtils implements ApplicationContextAware {
 
     // 获取applicationContext
     @Getter
@@ -20,8 +20,8 @@ public class SpringUtil implements ApplicationContextAware {
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        if (SpringUtil.applicationContext == null) {
-            SpringUtil.applicationContext = applicationContext;
+        if (SpringUtils.applicationContext == null) {
+            SpringUtils.applicationContext = applicationContext;
         }
     }
 

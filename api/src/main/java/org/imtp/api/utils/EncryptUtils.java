@@ -9,7 +9,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 
 @Slf4j
-public class EncryptUtil {
+public class EncryptUtils {
 
     public static String sha256(String... data) {
         String waitEncryptStr = getWaitEncryptStr(data);

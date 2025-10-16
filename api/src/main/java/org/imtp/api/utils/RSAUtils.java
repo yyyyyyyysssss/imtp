@@ -22,7 +22,7 @@ import java.util.concurrent.ConcurrentMap;
  * @Date 2024/3/1 10:49
  */
 @Slf4j
-public class RSAUtil {
+public class RSAUtils {
 
     private static final int KEY_SIZE = 2048;
 

@@ -9,7 +9,7 @@ import org.mapstruct.factory.Mappers;
 
 import java.util.List;
 
-@Mapper(builder = @org.mapstruct.Builder(disableBuilder = true))
+@Mapper(builder = @org.mapstruct.Builder(disableBuilder = true),uses = {DateMapper.class})
 public interface RoleMapping {
 
     RoleMapping INSTANCE = Mappers.getMapper(RoleMapping.class);
@@ -25,8 +25,6 @@ public interface RoleMapping {
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.SET_TO_NULL)
     void overwriteRole(RoleUpdateDTO roleUpdateDTO, @MappingTarget Role Role);
 
-    @Mapping(source = "createTime",target = "createTime", dateFormat = "yyyy-MM-dd HH:mm:ss")
-    @Mapping(source = "updateTime",target = "updateTime", dateFormat = "yyyy-MM-dd HH:mm:ss")
     RoleVO toRoleVO(Role role);
 
     @IterableMapping(elementTargetType = RoleVO.class)

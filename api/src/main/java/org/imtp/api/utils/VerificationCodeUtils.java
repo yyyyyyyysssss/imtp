@@ -4,7 +4,7 @@ import java.security.SecureRandom;
 import java.util.Random;
 
 
-public class VerificationCodeUtil {
+public class VerificationCodeUtils {
 
     private static final char[] META_DATA = {
             '0', '1', '2', '3', '4',

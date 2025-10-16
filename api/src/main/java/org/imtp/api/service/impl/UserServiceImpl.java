@@ -26,7 +26,7 @@ import org.imtp.api.mapper.UserMapper;
 import org.imtp.api.mapping.UserMapping;
 import org.imtp.api.service.UserRoleService;
 import org.imtp.api.service.UserService;
-import org.imtp.api.utils.PasswordGenerator;
+import org.imtp.api.utils.PasswordGeneratorUtils;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -136,7 +136,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         UserCreateVO userCreateVO = new UserCreateVO();
         String password;
         if(user.getPassword() == null || user.getPassword().isEmpty()){
-            password = PasswordGenerator.generate(10);
+            password = PasswordGeneratorUtils.generate(10);
             userCreateVO.setInitialPassword(password);
         }else {
             password = user.getPassword();
@@ -194,7 +194,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         if (user == null) {
             throw new BusinessException("用户不存在");
         }
-        String newPassword = PasswordGenerator.generate(10);
+        String newPassword = PasswordGeneratorUtils.generate(10);
         String encryptPassword = passwordEncoder.encode(newPassword);
         UpdateWrapper<User> userUpdateWrapper = new UpdateWrapper<>();
         userUpdateWrapper.lambda().eq(User::getId,userId).set(User::getPassword,encryptPassword);
@@ -305,19 +305,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         // 删除原有的角色权限
         userRoleService.remove(userRoleQueryWrapper);
         if (CollectionUtils.isEmpty(roleIds)){
-            log.warn("添加用户角色时，角色列表为空");
             return true;
         }
         // 添加新的角色权限
-        List<UserRole> userRoles = new ArrayList<>();
-        for (Long roleId : roleIds) {
-            UserRole userRole = new UserRole();
-            userRole.setId(IdGen.genId());
-            userRole.setUserId(userId);
-            userRole.setRoleId(roleId);
-            userRoles.add(userRole);
-        }
-        return userRoleService.saveBatch(userRoles);
+        return userRoleService.buildUserRoles(Collections.singleton(userId), roleIds);
     }
 
     private QueryWrapper<User> getUserQueryWrapper(UserQueryDTO userQueryDTO) {

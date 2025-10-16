@@ -3,7 +3,7 @@ package org.imtp.api.utils;
 import java.lang.reflect.Method;
 
 
-public class ReflectUtil {
+public class ReflectUtils {
 
     //反射获取对象  必须要有无参构造器
     public static Object getNewInstance(Class<?> clazz){

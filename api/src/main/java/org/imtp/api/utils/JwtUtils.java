@@ -23,7 +23,7 @@ import java.util.function.Function;
  */
 @Slf4j
 @Component
-public class JwtUtil {
+public class JwtUtils {
 
     @Resource
     private AuthProperties authProperties;

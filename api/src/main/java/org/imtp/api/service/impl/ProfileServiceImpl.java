@@ -12,7 +12,7 @@ import org.imtp.api.domain.vo.MenuVO;
 import org.imtp.api.domain.vo.RoleVO;
 import org.imtp.api.domain.vo.UserInfoVO;
 import org.imtp.api.service.*;
-import org.imtp.api.utils.TreeUtil;
+import org.imtp.api.utils.TreeUtils;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -71,7 +71,7 @@ public class ProfileServiceImpl implements ProfileService {
         // 用户菜单
         List<MenuVO> menus = menuService.findMenuByRoleIds(roleIds);
         if (!CollectionUtils.isEmpty(menus)){
-            List<MenuVO> menuTree = TreeUtil.buildTree(
+            List<MenuVO> menuTree = TreeUtils.buildTree(
                     menus,
                     MenuVO::getId,
                     MenuVO::getParentId,
