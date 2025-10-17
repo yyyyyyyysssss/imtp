@@ -4,7 +4,6 @@ package org.imtp.api.domain.dto;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
-import org.imtp.api.enums.TenantStatus;
 
 import java.util.Date;
 import java.util.List;
@@ -29,8 +28,6 @@ public class TenantCreateDTO {
     private String contactPhone;
 
     private String contactEmail;
-
-    private TenantStatus status;
 
     private Date expireTime;
 

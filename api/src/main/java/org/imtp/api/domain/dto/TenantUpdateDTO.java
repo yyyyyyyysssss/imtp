@@ -2,7 +2,6 @@ package org.imtp.api.domain.dto;
 
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import org.imtp.api.enums.TenantStatus;
@@ -19,7 +18,6 @@ import java.util.List;
 @Setter
 public class TenantUpdateDTO {
 
-    @NotNull(message = "租户ID不能为空")
     private Long id;
 
     @NotBlank(message = "租户名称不能为空")

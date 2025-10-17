@@ -22,6 +22,7 @@ import org.imtp.api.service.TenantUserService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -49,11 +50,12 @@ public class TenantServiceImpl extends ServiceImpl<TenantMapper, Tenant> impleme
         Tenant tenant = TenantMapping.INSTANCE.toTenant(tenantCreateDTO);
         tenant.setId(IdGen.genId());
         tenant.setStatus(TenantStatus.ACTIVE);
+        tenant.setBuiltin(false);
         int row = tenantMapper.insert(tenant);
         if (row <= 0) {
             throw new BusinessException("创建租户失败");
         }
-        if(!CollectionUtils.isEmpty(tenantCreateDTO.getUserIds())){
+        if (!CollectionUtils.isEmpty(tenantCreateDTO.getUserIds())) {
             addTenantUser(tenant.getId(), tenantCreateDTO.getUserIds());
         }
         return tenant.getId();
@@ -61,18 +63,43 @@ public class TenantServiceImpl extends ServiceImpl<TenantMapper, Tenant> impleme
 
     @Override
     @Transactional
-    public Boolean update(TenantUpdateDTO tenantUpdateDTO) {
-        Tenant tenant = tenantMapper.selectById(tenantUpdateDTO.getId());
-        if (tenant == null) {
-            throw new BusinessException("租户不存在");
-        }
-        TenantMapping.INSTANCE.updateTenant(tenantUpdateDTO, tenant);
+    public Boolean update(Long id, TenantUpdateDTO tenantUpdateDTO) {
+        Tenant tenant = checkAndResult(id, tenantUpdateDTO);
+        TenantMapping.INSTANCE.overwriteTenant(tenantUpdateDTO, tenant);
         int i = tenantMapper.updateById(tenant);
         if (i <= 0) {
             throw new BusinessException("更新租户失败");
         }
         addTenantUser(tenant.getId(), tenantUpdateDTO.getUserIds());
         return true;
+    }
+
+    @Override
+    @Transactional
+    public Boolean updatePatch(Long id, TenantUpdateDTO tenantUpdateDTO) {
+        Tenant tenant = checkAndResult(id, tenantUpdateDTO);
+        TenantMapping.INSTANCE.updateTenant(tenantUpdateDTO, tenant);
+        int i = tenantMapper.updateById(tenant);
+        if (i <= 0) {
+            throw new BusinessException("更新租户失败");
+        }
+        if (!CollectionUtils.isEmpty(tenantUpdateDTO.getUserIds())) {
+            addTenantUser(tenant.getId(), tenantUpdateDTO.getUserIds());
+        }
+        return true;
+    }
+
+    private Tenant checkAndResult(Long id, TenantUpdateDTO tenantUpdateDTO) {
+        Tenant tenant = tenantMapper.selectById(id);
+        if (tenant == null) {
+            throw new BusinessException("租户不存在");
+        }
+        if (tenant.getBuiltin()) {
+            if (tenantUpdateDTO != null && tenantUpdateDTO.getStatus() != null && tenantUpdateDTO.getStatus() != tenant.getStatus()) {
+                throw new BusinessException("内置租户不允许修改状态");
+            }
+        }
+        return tenant;
     }
 
     @Override
@@ -88,9 +115,16 @@ public class TenantServiceImpl extends ServiceImpl<TenantMapper, Tenant> impleme
                     .or()
                     .like(Tenant::getTenantName, tenantQueryDTO.getKeyword())
                     .or()
+                    .like(Tenant::getContactName, tenantQueryDTO.getKeyword())
+                    .or()
                     .like(Tenant::getContactPhone, tenantQueryDTO.getKeyword())
                     .or()
                     .like(Tenant::getContactEmail, tenantQueryDTO.getKeyword());
+        }
+        if(tenantQueryDTO.getStatus() != null){
+            tenantQueryWrapper
+                    .lambda()
+                    .eq(Tenant::getStatus, tenantQueryDTO.getStatus());
         }
         List<Tenant> tenants = tenantMapper.selectList(tenantQueryWrapper);
         if (tenants == null || tenants.isEmpty()) {
@@ -124,6 +158,20 @@ public class TenantServiceImpl extends ServiceImpl<TenantMapper, Tenant> impleme
         return pageInfo;
     }
 
+    @Override
+    @Transactional
+    public Boolean delete(Long id) {
+        Tenant tenant = tenantMapper.selectById(id);
+        if (tenant == null) {
+            throw new BusinessException("租户不存在");
+        }
+        if (tenant.getBuiltin()) {
+            throw new BusinessException("内置租户不允许删除");
+        }
+        int i = tenantMapper.deleteById(id);
+        return i > 0 && deleteTenantUser(id);
+    }
+
     @Transactional
     public boolean addTenantUser(Long tenantId, Collection<Long> userIds) {
         QueryWrapper<TenantUser> tenantUserQueryWrapper = new QueryWrapper<>();
@@ -132,7 +180,7 @@ public class TenantServiceImpl extends ServiceImpl<TenantMapper, Tenant> impleme
                 .eq(TenantUser::getTenantId, tenantId);
         // 删除原有的租户用户
         tenantUserService.remove(tenantUserQueryWrapper);
-        if (CollectionUtils.isEmpty(userIds)){
+        if (CollectionUtils.isEmpty(userIds)) {
             return true;
         }
         // 添加新的租户用户
@@ -146,4 +194,15 @@ public class TenantServiceImpl extends ServiceImpl<TenantMapper, Tenant> impleme
         }
         return tenantUserService.saveBatch(tenantUsers);
     }
+
+    @Transactional
+    public boolean deleteTenantUser(Long tenantId) {
+        QueryWrapper<TenantUser> tenantUserQueryWrapper = new QueryWrapper<>();
+        tenantUserQueryWrapper
+                .lambda()
+                .eq(TenantUser::getTenantId, tenantId);
+        // 删除原有的租户用户
+        return tenantUserService.remove(tenantUserQueryWrapper);
+    }
+
 }

@@ -20,20 +20,20 @@ import java.util.Date;
 public class BaseMetaHandler implements MetaObjectHandler {
     @Override
     public void insertFill(MetaObject metaObject) {
-        this.strictInsertFill(metaObject,"createTime",Date.class,new Date());
-        this.strictInsertFill(metaObject,"updateTime",Date.class,new Date());
+        this.strictInsertFill(metaObject, "createTime", Date.class, new Date());
+        this.strictInsertFill(metaObject, "updateTime", Date.class, new Date());
 
         Long userId = SecurityUtils.getCurrentUser(User::getId);
-        this.strictInsertFill(metaObject,"createBy",Long.class,userId);
-        this.strictInsertFill(metaObject,"updateBy",Long.class,userId);
+        this.strictInsertFill(metaObject, "createBy", Long.class, userId);
+        this.strictInsertFill(metaObject, "updateBy", Long.class, userId);
     }
 
     @Override
     public void updateFill(MetaObject metaObject) {
-        this.setFieldValByName("updateTime",new Date(),metaObject);
-        this.setFieldValByName("updateBy",new Date(),metaObject);
+        this.setFieldValByName("updateTime", new Date(), metaObject);
+        Long userId = SecurityUtils.getCurrentUser(User::getId);
+        this.setFieldValByName("updateBy", userId, metaObject);
     }
-
 
 
 }

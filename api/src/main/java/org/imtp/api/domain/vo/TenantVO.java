@@ -38,6 +38,10 @@ public class TenantVO {
 
     private String remark;
 
+    protected String createTime;
+
+    protected String updateTime;
+
     private List<Long> userIds;
 
 }

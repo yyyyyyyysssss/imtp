@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.imtp.common.response.Result;
 import org.imtp.common.response.ResultCode;
 import org.imtp.common.response.ResultGenerator;
+import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.sql.SQLException;
 import java.util.List;
 
 /**
@@ -95,6 +97,20 @@ public class GlobalExceptionHandler {
     public Result<?> duplicateKeyException(DuplicateKeyException e){
         log.error("数据库操作异常，唯一约束冲突: ",e);
         return ResultGenerator.failed(ResultCode.DATABASE_DUPLICATE_KEY_EXCEPTION);
+    }
+
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ExceptionHandler(SQLException.class)
+    public Result<?> sqlException(SQLException e){
+        log.error("数据库操作异常: ",e);
+        return ResultGenerator.failed(ResultCode.DATABASE_EXCEPTION);
+    }
+
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ExceptionHandler(DataAccessException.class)
+    public Result<?> dataAccessException(DataAccessException e){
+        log.error("数据库操作异常: ",e);
+        return ResultGenerator.failed(ResultCode.DATABASE_EXCEPTION);
     }
 
     @ResponseStatus(HttpStatus.OK)

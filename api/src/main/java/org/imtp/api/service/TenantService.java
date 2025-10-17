@@ -12,8 +12,12 @@ public interface TenantService extends IService<Tenant> {
 
     Long create(TenantCreateDTO tenantCreateDTO);
 
-    Boolean update(TenantUpdateDTO tenantUpdateDTO);
+    Boolean update(Long id, TenantUpdateDTO tenantUpdateDTO);
+
+    Boolean updatePatch(Long id, TenantUpdateDTO tenantUpdateDTO);
 
     PageInfo<TenantVO> queryList(TenantQueryDTO tenantQueryDTO);
+
+    Boolean delete(Long id);
 
 }

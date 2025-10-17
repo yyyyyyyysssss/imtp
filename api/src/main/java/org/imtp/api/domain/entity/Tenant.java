@@ -1,5 +1,6 @@
 package org.imtp.api.domain.entity;
 
+import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
@@ -17,10 +18,10 @@ import java.util.Date;
 @Setter
 @TableName("tenant")
 @Builder
-public class Tenant extends BaseEntity{
+public class Tenant extends BaseEntity {
 
     @Tolerate
-    public Tenant(){
+    public Tenant() {
     }
 
     private Long id;
@@ -46,13 +47,16 @@ public class Tenant extends BaseEntity{
     @TableField("expire_time")
     private Date expireTime;
 
+    @TableField("builtin")
+    private Boolean builtin;
+
     @TableField("remark")
     private String remark;
 
-    @TableField("create_by")
+    @TableField(value = "create_by", fill = FieldFill.INSERT)
     private Long createBy;
 
-    @TableField("update_by")
+    @TableField(value = "update_by", fill = FieldFill.INSERT_UPDATE)
     private Long updateBy;
 
 }

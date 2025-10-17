@@ -18,10 +18,12 @@ public interface TenantMapping {
 
     //部分更新
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "id", ignore = true)
     void updateTenant(TenantUpdateDTO tenantUpdateDTO, @MappingTarget Tenant tenant);
 
     //全量更新
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.SET_TO_NULL)
+    @Mapping(target = "id", ignore = true)
     void overwriteTenant(TenantUpdateDTO tenantUpdateDTO, @MappingTarget Tenant tenant);
 
     TenantVO toTenantVO(Tenant tenant);
