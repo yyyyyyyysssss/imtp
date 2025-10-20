@@ -40,7 +40,7 @@ public class SnowflakeIdWorker {
     //上次生成ID的时间截
     private long lastTimestamp = -1L;
 
-    private long allowedOffsetMillis = 5L;
+    private final long allowedOffsetMillis = 5L;
 
     private Lock lock = new ReentrantLock(false);
 
