@@ -50,6 +50,9 @@ public class Tenant extends BaseEntity {
     @TableField("builtin")
     private Boolean builtin;
 
+    @TableField("is_deleted")
+    private Boolean isDeleted;
+
     @TableField("remark")
     private String remark;
 

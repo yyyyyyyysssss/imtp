@@ -22,7 +22,6 @@ import org.imtp.api.service.TenantUserService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -108,6 +107,9 @@ public class TenantServiceImpl extends ServiceImpl<TenantMapper, Tenant> impleme
         Integer pageSize = tenantQueryDTO.getPageSize();
         PageHelper.startPage(pageNum, pageSize);
         QueryWrapper<Tenant> tenantQueryWrapper = new QueryWrapper<>();
+        tenantQueryWrapper
+                .lambda()
+                .eq(Tenant::getIsDeleted, false);
         if (tenantQueryDTO.getKeyword() != null && !tenantQueryDTO.getKeyword().isEmpty()) {
             tenantQueryWrapper
                     .lambda()
@@ -168,8 +170,11 @@ public class TenantServiceImpl extends ServiceImpl<TenantMapper, Tenant> impleme
         if (tenant.getBuiltin()) {
             throw new BusinessException("内置租户不允许删除");
         }
-        int i = tenantMapper.deleteById(id);
-        return i > 0 && deleteTenantUser(id);
+        if(tenant.getStatus().equals(TenantStatus.ACTIVE)){
+            throw new BusinessException("使用中的租户不允许删除");
+        }
+        tenant.setIsDeleted(true);
+        return tenantMapper.updateById(tenant) > 0;
     }
 
     @Transactional
@@ -193,16 +198,6 @@ public class TenantServiceImpl extends ServiceImpl<TenantMapper, Tenant> impleme
             tenantUsers.add(tenantUser);
         }
         return tenantUserService.saveBatch(tenantUsers);
-    }
-
-    @Transactional
-    public boolean deleteTenantUser(Long tenantId) {
-        QueryWrapper<TenantUser> tenantUserQueryWrapper = new QueryWrapper<>();
-        tenantUserQueryWrapper
-                .lambda()
-                .eq(TenantUser::getTenantId, tenantId);
-        // 删除原有的租户用户
-        return tenantUserService.remove(tenantUserQueryWrapper);
     }
 
 }
