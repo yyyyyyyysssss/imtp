@@ -7,7 +7,7 @@ package org.imtp.api.context;
  */
 public class TenantContext {
 
-    private static final InheritableThreadLocal<Long> TENANT_ID = new InheritableThreadLocal<>();
+    private static final ThreadLocal<Long> TENANT_ID = new ThreadLocal<>();
 
     public static void setTenantId(Long tenantId) {
         TENANT_ID.set(tenantId);
