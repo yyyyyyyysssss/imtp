@@ -7,10 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.imtp.api.config.exception.BusinessException;
 import org.imtp.api.domain.dto.ChangePasswordDTO;
 import org.imtp.api.domain.entity.User;
-import org.imtp.api.domain.vo.AuthorityVO;
-import org.imtp.api.domain.vo.MenuVO;
-import org.imtp.api.domain.vo.RoleVO;
-import org.imtp.api.domain.vo.UserInfoVO;
+import org.imtp.api.domain.vo.*;
 import org.imtp.api.service.*;
 import org.imtp.api.utils.TreeUtils;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -42,6 +39,9 @@ public class ProfileServiceImpl implements ProfileService {
 
     @Resource
     private RoleService roleService;
+
+    @Resource
+    private TenantService tenantService;
 
     @Resource
     private PasswordEncoder passwordEncoder;
@@ -91,6 +91,10 @@ public class ProfileServiceImpl implements ProfileService {
         }else {
             userInfoVO.setPermissionCodes(Collections.emptyList());
         }
+
+        // 用户租户
+        List<TenantVO> tenantList = tenantService.findByUserId(userId);
+        userInfoVO.setTenants(tenantList);
 
         return userInfoVO;
     }

@@ -28,4 +28,6 @@ public class UserInfoVO {
 
     private List<String> permissionCodes;
 
+    private List<TenantVO> tenants;
+
 }

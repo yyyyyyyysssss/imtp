@@ -1,6 +1,7 @@
 package org.imtp.api.config;
 
 import org.imtp.api.config.jackson.SensitiveContextInterceptor;
+import org.imtp.api.interceptor.TenantInterceptor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -25,7 +26,11 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
+        // 字段脱敏
         registry.addInterceptor(new SensitiveContextInterceptor())
+                .addPathPatterns("/**");
+        // 多租户拦截器
+        registry.addInterceptor(new TenantInterceptor())
                 .addPathPatterns("/**");
     }
 }

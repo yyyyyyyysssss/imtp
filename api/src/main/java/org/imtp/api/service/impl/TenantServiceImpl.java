@@ -22,10 +22,8 @@ import org.imtp.api.service.TenantUserService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -200,4 +198,27 @@ public class TenantServiceImpl extends ServiceImpl<TenantMapper, Tenant> impleme
         return tenantUserService.saveBatch(tenantUsers);
     }
 
+
+    @Override
+    public List<TenantVO> findByUserId(Long userId) {
+        QueryWrapper<TenantUser> tenantUserQueryWrapper = new QueryWrapper<>();
+        tenantUserQueryWrapper
+                .lambda()
+                .select(TenantUser::getTenantId)
+                .eq(TenantUser::getUserId, userId);
+        List<TenantUser> tenantUsers = tenantUserService.list(tenantUserQueryWrapper);
+        if(CollectionUtils.isEmpty(tenantUsers)){
+            return Collections.emptyList();
+        }
+        List<Long> tenantIds = tenantUsers.stream().map(TenantUser::getTenantId).toList();
+        QueryWrapper<Tenant> tenantQueryWrapper = new QueryWrapper<>();
+        tenantQueryWrapper
+                .lambda()
+                .select(Tenant::getId, Tenant::getTenantCode, Tenant::getTenantName)
+                .eq(Tenant::getStatus, TenantStatus.ACTIVE)
+                .eq(Tenant::getIsDeleted, false)
+                .in(Tenant::getId, tenantIds);
+        List<Tenant> tenants = tenantMapper.selectList(tenantQueryWrapper);
+        return TenantMapping.INSTANCE.toTenantVO(tenants);
+    }
 }

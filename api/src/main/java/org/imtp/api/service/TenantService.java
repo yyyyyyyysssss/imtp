@@ -8,6 +8,8 @@ import org.imtp.api.domain.dto.TenantUpdateDTO;
 import org.imtp.api.domain.entity.Tenant;
 import org.imtp.api.domain.vo.TenantVO;
 
+import java.util.List;
+
 public interface TenantService extends IService<Tenant> {
 
     Long create(TenantCreateDTO tenantCreateDTO);
@@ -19,5 +21,7 @@ public interface TenantService extends IService<Tenant> {
     PageInfo<TenantVO> queryList(TenantQueryDTO tenantQueryDTO);
 
     Boolean delete(Long id);
+
+    List<TenantVO> findByUserId(Long userId);
 
 }
