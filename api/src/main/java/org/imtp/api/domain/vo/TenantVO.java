@@ -24,6 +24,8 @@ public class TenantVO {
 
     private String tenantName;
 
+    private String logo;
+
     private String contactName;
 
     @Sensitive(SensitiveType.MOBILE)

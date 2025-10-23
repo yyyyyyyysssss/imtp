@@ -214,7 +214,7 @@ public class TenantServiceImpl extends ServiceImpl<TenantMapper, Tenant> impleme
         QueryWrapper<Tenant> tenantQueryWrapper = new QueryWrapper<>();
         tenantQueryWrapper
                 .lambda()
-                .select(Tenant::getId, Tenant::getTenantCode, Tenant::getTenantName)
+                .select(Tenant::getId, Tenant::getTenantCode, Tenant::getTenantName, Tenant::getLogo)
                 .eq(Tenant::getStatus, TenantStatus.ACTIVE)
                 .eq(Tenant::getIsDeleted, false)
                 .in(Tenant::getId, tenantIds);

@@ -32,6 +32,9 @@ public class Tenant extends BaseEntity {
     @TableField("tenant_name")
     private String tenantName;
 
+    @TableField("logo")
+    private String logo;
+
     @TableField("contact_name")
     private String contactName;
 

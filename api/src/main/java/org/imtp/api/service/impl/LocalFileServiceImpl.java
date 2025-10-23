@@ -2,6 +2,7 @@ package org.imtp.api.service.impl;
 
 import groovy.lang.Tuple2;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.lang3.StringUtils;
 import org.imtp.api.config.exception.BusinessException;
 import org.imtp.api.domain.dto.FileRangeDTO;
@@ -59,13 +60,7 @@ public class LocalFileServiceImpl extends AbstractFileService {
                 raf.write(buffer, 0, n);
                 md.update(buffer, 0, n);
             }
-            byte[] digest = md.digest();
-            // 转成16进制字符串
-            StringBuilder sb = new StringBuilder();
-            for (byte b : digest) {
-                sb.append(String.format("%02x", b & 0xff));
-            }
-            return sb.toString();
+            return Hex.encodeHexString(md.digest());
         } catch (IOException | NoSuchAlgorithmException e) {
             log.error("upload error: ", e);
             return null;
@@ -88,8 +83,9 @@ public class LocalFileServiceImpl extends AbstractFileService {
         Path path = Paths.get(newFilePath);
         try {
             Files.move(tmpPath, path, StandardCopyOption.REPLACE_EXISTING);
+            String etag = calculateMD5(newFilePath);
             log.info("upload success; filename:{}, accessUrl:{}", filename, newFilePath);
-            return new Tuple2<>(null, newFilePath);
+            return new Tuple2<>(etag, newFilePath);
         } catch (IOException e) {
             log.error("upload  Files.move error: ", e);
             throw new BusinessException(e);
@@ -160,13 +156,17 @@ public class LocalFileServiceImpl extends AbstractFileService {
         String newFilePath = newFilePath(filename);
         FileOutputStream fileOutputStream = null;
         try {
+            MessageDigest md = MessageDigest.getInstance("MD5");
             fileOutputStream = new FileOutputStream(newFilePath);
             byte[] buffer = new byte[bufferSize];
             int n;
             while ((n = inputStream.read(buffer)) != -1) {
                 fileOutputStream.write(buffer, 0, n);
+                md.update(buffer, 0, n);
             }
-            return new Tuple2<>(null, newFilePath);
+            byte[] md5Bytes = md.digest();
+            String etag = Hex.encodeHexString(md5Bytes);
+            return new Tuple2<>(etag, newFilePath);
         } catch (Exception e) {
             log.error("simpleUpload error: ", e);
             throw new BusinessException("simpleUpload error: " + e.getMessage());

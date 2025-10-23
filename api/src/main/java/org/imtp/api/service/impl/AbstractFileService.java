@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import groovy.lang.Tuple2;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.lang3.StringUtils;
 import org.imtp.api.config.exception.BusinessException;
 import org.imtp.api.config.exception.DatabaseException;
@@ -30,6 +31,11 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
 import java.util.Date;
 import java.util.HashMap;
@@ -298,6 +304,33 @@ public abstract class AbstractFileService implements FileService {
         fileInfoVO.setFileType(fileUpload.getFileType());
         fileInfoVO.setTotalSize(fileUpload.getTotalSize());
         return fileInfoVO;
+    }
+
+    protected String calculateMD5(String filePath) throws IOException{
+        Path path = Paths.get(filePath);
+        return calculateMD5(path);
+    }
+
+    protected String calculateMD5(Path path) throws IOException {
+        return calculateMD5(Files.newInputStream(path));
+    }
+
+    protected String calculateMD5(InputStream inputStream) throws IOException {
+        try (inputStream) {
+            MessageDigest messageDigest = MessageDigest.getInstance("MD5");
+            byte[] buffer = new byte[8192];
+            int bytesRead;
+
+            while ((bytesRead = inputStream.read(buffer)) != -1) {
+                messageDigest.update(buffer, 0, bytesRead);
+            }
+
+            byte[] md5Bytes = messageDigest.digest();
+            return Hex.encodeHexString(md5Bytes);  // 通过 Apache Commons Codec 将 MD5 转为字符串
+        } catch (NoSuchAlgorithmException e) {
+            log.error("MD5 algorithm not found", e);
+            throw new BusinessException("MD5 algorithm not found");
+        }
     }
 
     protected void streamFile(InputStream is, OutputStream outputStream) {
