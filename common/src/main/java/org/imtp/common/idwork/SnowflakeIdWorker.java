@@ -1,5 +1,6 @@
 package org.imtp.common.idwork;
 
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -39,7 +40,9 @@ public class SnowflakeIdWorker {
     //上次生成ID的时间截
     private long lastTimestamp = -1L;
 
-    private Lock lock = new ReentrantLock();
+    private final long allowedOffsetMillis = 5L;
+
+    private Lock lock = new ReentrantLock(false);
 
     public SnowflakeIdWorker(WorkIdService workIdService) {
         this.workerId = workIdService.getWorkId();
@@ -52,8 +55,18 @@ public class SnowflakeIdWorker {
         long currentTimestamp = currentTimestamp();
         //如果当前时间小于上一次ID生成的时间戳，说明系统时钟回退过这个时候应当抛出异常
         if (currentTimestamp < lastTimestamp) {
-            throw new RuntimeException(
-                    String.format("Clock moved backwards.  Refusing to generate id for %d milliseconds", lastTimestamp - currentTimestamp));
+            long offset = lastTimestamp - currentTimestamp;
+            if(offset <= allowedOffsetMillis){
+                try {
+                    Thread.sleep(offset);
+                    currentTimestamp = currentTimestamp();
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            }else {
+                throw new RuntimeException(
+                        String.format("Clock moved backwards.  Refusing to generate id for %d milliseconds", lastTimestamp - currentTimestamp));
+            }
         }
         try {
             lock.lock();
@@ -64,20 +77,22 @@ public class SnowflakeIdWorker {
                 sequence = (sequence + 1) & sequenceMask;
                 //如果毫秒内序列溢出，则阻塞到下一毫秒，获取新的时间戳
                 if (sequence == 0) {
-                    currentTimestamp = getNextMill();
+                    currentTimestamp = waitNextMillis(currentTimestamp);
                 }
             } else {
-                sequence = 0;
+                sequence = ThreadLocalRandom.current().nextLong(0, 5);
             }
             lastTimestamp = currentTimestamp;
         } finally {
             lock.unlock();
         }
-        return (currentTimestamp - this.epoch) << this.timestampLeftShift | this.workerId << this.workerIdShift | this.sequence;
+        return ((currentTimestamp - this.epoch) << this.timestampLeftShift)
+                | (this.workerId << this.workerIdShift)
+                | this.sequence;
     }
 
 
-    private long getNextMill() {
+    private long waitNextMillis(long lastTimestamp) {
         long mill = currentTimestamp();
         while (mill <= lastTimestamp) {
             mill = currentTimestamp();

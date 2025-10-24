@@ -1,4 +1,4 @@
-package org.imtp.api.config;
+package org.imtp.api.config.mybatis;
 
 import com.baomidou.mybatisplus.annotation.IEnum;
 import com.baomidou.mybatisplus.core.MybatisParameterHandler;

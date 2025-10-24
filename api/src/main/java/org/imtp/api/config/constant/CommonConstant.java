@@ -7,6 +7,8 @@ package org.imtp.api.config.constant;
  */
 public interface CommonConstant {
 
-    String TRACE_ID = "traceId";
+    String TRACE_ID = "x-request-id";
+
+    String TENANT_ID = "x-tenant-id";
 
 }

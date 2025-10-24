@@ -12,42 +12,42 @@ class RSAUtilTest {
 
     @Test
     void getKeyPair() throws Exception {
-        Tuple2<String, String> keyPair = RSAUtil.getKeyPair();
+        Tuple2<String, String> keyPair = RSAUtils.getKeyPair();
         String publicKey = keyPair.getV1();
         String privateKey = keyPair.getV2();
         log.info("publicKey: {}",publicKey);
         log.info("privateKey: {}",privateKey);
-        String encrypt = RSAUtil.encrypt(TARGET_DATA, publicKey, RSAUtil.PaddingMode.OAEP_SHA1);
-        String decrypt = RSAUtil.decrypt(encrypt, privateKey, RSAUtil.PaddingMode.OAEP_SHA1);
+        String encrypt = RSAUtils.encrypt(TARGET_DATA, publicKey, RSAUtils.PaddingMode.OAEP_SHA1);
+        String decrypt = RSAUtils.decrypt(encrypt, privateKey, RSAUtils.PaddingMode.OAEP_SHA1);
         assertEquals(decrypt,TARGET_DATA);
     }
 
     @Test
     void encrypt() throws Exception {
-        String encrypt = RSAUtil.encrypt(TARGET_DATA);
+        String encrypt = RSAUtils.encrypt(TARGET_DATA);
         log.info("encrypt : {}",encrypt);
         assertNotNull(encrypt);
     }
 
     @Test
     void decrypt() throws Exception {
-        String encrypt = RSAUtil.encrypt(TARGET_DATA);
-        String decrypt = RSAUtil.decrypt(encrypt);
+        String encrypt = RSAUtils.encrypt(TARGET_DATA);
+        String decrypt = RSAUtils.decrypt(encrypt);
         log.info("decrypt : {}",decrypt);
         assertNotNull(decrypt);
     }
 
     @Test
     void sign() throws Exception {
-        String sign = RSAUtil.sign(TARGET_DATA);
+        String sign = RSAUtils.sign(TARGET_DATA);
         log.info("sign : {}",sign);
         assertNotNull(sign);
     }
 
     @Test
     void verify() throws Exception {
-        String sign = RSAUtil.sign(TARGET_DATA);
-        boolean verify = RSAUtil.verify(TARGET_DATA, sign);
+        String sign = RSAUtils.sign(TARGET_DATA);
+        boolean verify = RSAUtils.verify(TARGET_DATA, sign);
         log.info("verify : {}",verify);
         assertTrue(verify);
     }

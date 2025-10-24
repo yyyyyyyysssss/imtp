@@ -15,7 +15,7 @@ import org.imtp.api.mapper.AuthorityMapper;
 import org.imtp.api.mapping.AuthorityMapping;
 import org.imtp.api.service.AuthorityService;
 import org.imtp.api.service.RoleAuthorityService;
-import org.imtp.api.utils.TreeUtil;
+import org.imtp.api.utils.TreeUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -106,7 +106,7 @@ public class AuthorityServiceImpl extends AbstractAuthorityService implements Au
             return new ArrayList<>();
         }
         List<AuthorityVO> authorityList = AuthorityMapping.INSTANCE.toAuthorityVO(authorities);
-        return TreeUtil.buildTree(
+        return TreeUtils.buildTree(
                 authorityList,
                 AuthorityVO::getId,
                 AuthorityVO::getParentId,

@@ -64,7 +64,7 @@ logging:
     org.imtp.api.feign: debug
     org.springframework.security: info
   pattern:
-    console: "%d{yyyy/MM/dd HH:mm:ss.SSS} %highlight(%-5level) %clr([traceId: %X{traceId}]) [%thread] %cyan(%logger) : %msg %n"
+    console: "%d{yyyy/MM/dd HH:mm:ss.SSS} %highlight(%-5level) %clr([x-request-id: %X{x-request-id}]) [%thread] %cyan(%logger) : %msg %n"
 zookeeper:
   enabled: true
   servers: 127.0.0.1:2181

@@ -7,12 +7,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.imtp.api.config.exception.BusinessException;
 import org.imtp.api.domain.dto.ChangePasswordDTO;
 import org.imtp.api.domain.entity.User;
-import org.imtp.api.domain.vo.AuthorityVO;
-import org.imtp.api.domain.vo.MenuVO;
-import org.imtp.api.domain.vo.RoleVO;
-import org.imtp.api.domain.vo.UserInfoVO;
+import org.imtp.api.domain.vo.*;
 import org.imtp.api.service.*;
-import org.imtp.api.utils.TreeUtil;
+import org.imtp.api.utils.TreeUtils;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -44,6 +41,9 @@ public class ProfileServiceImpl implements ProfileService {
     private RoleService roleService;
 
     @Resource
+    private TenantService tenantService;
+
+    @Resource
     private PasswordEncoder passwordEncoder;
 
     @Override
@@ -71,7 +71,7 @@ public class ProfileServiceImpl implements ProfileService {
         // 用户菜单
         List<MenuVO> menus = menuService.findMenuByRoleIds(roleIds);
         if (!CollectionUtils.isEmpty(menus)){
-            List<MenuVO> menuTree = TreeUtil.buildTree(
+            List<MenuVO> menuTree = TreeUtils.buildTree(
                     menus,
                     MenuVO::getId,
                     MenuVO::getParentId,
@@ -91,6 +91,10 @@ public class ProfileServiceImpl implements ProfileService {
         }else {
             userInfoVO.setPermissionCodes(Collections.emptyList());
         }
+
+        // 用户租户
+        List<TenantVO> tenantList = tenantService.findByUserId(userId);
+        userInfoVO.setTenants(tenantList);
 
         return userInfoVO;
     }

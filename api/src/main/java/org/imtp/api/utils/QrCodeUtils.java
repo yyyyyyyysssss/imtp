@@ -22,7 +22,7 @@ import java.util.Map;
  * @Date 2025/1/24 16:45
  */
 @Slf4j
-public class QrCodeUtil {
+public class QrCodeUtils {
 
     private static final int QR_COLOR = 0xFF000000;
 

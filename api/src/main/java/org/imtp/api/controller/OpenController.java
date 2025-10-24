@@ -1,7 +1,6 @@
 package org.imtp.api.controller;
 
 import groovy.lang.Tuple2;
-import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
 import org.imtp.common.response.Result;
@@ -13,8 +12,8 @@ import org.imtp.api.enums.TokenType;
 import org.imtp.api.service.EmailService;
 import org.imtp.api.config.security.TokenService;
 import org.imtp.api.utils.PayloadInfo;
-import org.imtp.api.utils.QrCodeUtil;
-import org.imtp.api.utils.VerificationCodeUtil;
+import org.imtp.api.utils.QrCodeUtils;
+import org.imtp.api.utils.VerificationCodeUtils;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -60,8 +59,8 @@ public class OpenController {
 
     @GetMapping("/simpleQRCode")
     public void simpleQRCode(@RequestParam("content") String content, HttpServletResponse response) throws IOException {
-        BufferedImage qrCodeImage = QrCodeUtil.createQrCodeImage(content);
-        QrCodeUtil.writeQrCodeImage(response.getOutputStream(),qrCodeImage);
+        BufferedImage qrCodeImage = QrCodeUtils.createQrCodeImage(content);
+        QrCodeUtils.writeQrCodeImage(response.getOutputStream(),qrCodeImage);
     }
 
     @GetMapping("/sendEmailVerificationCode")
@@ -71,7 +70,7 @@ public class OpenController {
                 .title("邮箱验证码")
                 .to(new String[]{email})
                 .build();
-        String verificationCode = VerificationCodeUtil.genVerificationCode();
+        String verificationCode = VerificationCodeUtils.genVerificationCode();
         redisTemplate.opsForValue().set(EmailAuthenticationProvider.EMAIL_VERIFICATION_CODE_PREFIX + email, verificationCode);
         Map<String, Object> variable = new HashMap<>();
         variable.put("verificationCode", verificationCode);

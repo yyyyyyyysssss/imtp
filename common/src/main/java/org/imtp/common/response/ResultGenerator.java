@@ -34,8 +34,9 @@ public class ResultGenerator {
     }
 
     public static <T> Result<T> failed(Integer code,String message){
-
-        return new Result<>(code,null,message);
+        Result<T> result = new Result<>(code, null, message);
+        result.setSucceed(false);
+        return result;
     }
 
     public static <T> Result<T> failed(ResultCode resultCode){

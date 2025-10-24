@@ -10,7 +10,7 @@ import org.mapstruct.factory.Mappers;
 
 import java.util.List;
 
-@Mapper(builder = @org.mapstruct.Builder(disableBuilder = true))
+@Mapper(builder = @org.mapstruct.Builder(disableBuilder = true),uses = {DateMapper.class})
 public interface UserMapping {
 
     UserMapping INSTANCE = Mappers.getMapper(UserMapping.class);
@@ -26,8 +26,6 @@ public interface UserMapping {
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.SET_TO_NULL)
     void overwriteUser(UserUpdateDTO userUpdateDTO, @MappingTarget User user);
 
-    @Mapping(source = "createTime",target = "createTime", dateFormat = "yyyy-MM-dd HH:mm:ss")
-    @Mapping(source = "updateTime",target = "updateTime", dateFormat = "yyyy-MM-dd HH:mm:ss")
     UserVO toUserVO(User user);
 
     @IterableMapping(elementTargetType = UserVO.class)

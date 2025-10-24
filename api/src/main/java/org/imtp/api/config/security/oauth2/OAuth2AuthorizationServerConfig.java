@@ -14,7 +14,7 @@ import org.imtp.api.config.security.RequestUrlAuthority;
 import org.imtp.api.config.security.SecurityContextStore;
 import org.imtp.api.domain.entity.User;
 import org.imtp.api.config.security.authentication.TokenAuthenticationFilter;
-import org.imtp.api.utils.RSAUtil;
+import org.imtp.api.utils.RSAUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
@@ -46,7 +46,6 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.security.web.context.SecurityContextHolderFilter;
-import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.security.web.jackson2.WebServletJackson2Module;
 import org.springframework.security.web.util.matcher.MediaTypeRequestMatcher;
 
@@ -188,8 +187,8 @@ public class OAuth2AuthorizationServerConfig {
 
     @Bean
     public JWKSource<SecurityContext> jwkSource() throws Exception {
-        RSAPublicKey publicKey = (RSAPublicKey) RSAUtil.loadLocalPublicKey();
-        RSAPrivateKey privateKey = (RSAPrivateKey) RSAUtil.loadLocalPrivateKey();
+        RSAPublicKey publicKey = (RSAPublicKey) RSAUtils.loadLocalPublicKey();
+        RSAPrivateKey privateKey = (RSAPrivateKey) RSAUtils.loadLocalPrivateKey();
         RSAKey rsaKey = new RSAKey.Builder(publicKey)
                 .privateKey(privateKey)
                 .keyID("355cbc56f03da91b86306f3520186699")

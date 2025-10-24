@@ -17,7 +17,7 @@ import java.util.List;
  * @Author ys
  * @Date 2025/5/17 11:11
  */
-@Mapper(builder = @org.mapstruct.Builder(disableBuilder = true))
+@Mapper(builder = @org.mapstruct.Builder(disableBuilder = true),uses = {DateMapper.class})
 public interface AuthorityMapping {
 
     AuthorityMapping INSTANCE = Mappers.getMapper(AuthorityMapping.class);
@@ -35,8 +35,6 @@ public interface AuthorityMapping {
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.SET_TO_NULL)
     void overwriteAuthority(AuthorityUpdateDTO dto, @MappingTarget Authority entity);
 
-    @Mapping(source = "createTime",target = "createTime", dateFormat = "yyyy-MM-dd HH:mm:ss")
-    @Mapping(source = "updateTime",target = "updateTime", dateFormat = "yyyy-MM-dd HH:mm:ss")
     AuthorityVO toAuthorityVO(Authority authority);
 
     @IterableMapping(elementTargetType = AuthorityVO.class)
@@ -50,8 +48,6 @@ public interface AuthorityMapping {
 
     MenuVO toMenuVo(AuthorityVO authorityVO);
 
-    @Mapping(source = "createTime",target = "createTime", dateFormat = "yyyy-MM-dd HH:mm:ss")
-    @Mapping(source = "updateTime",target = "updateTime", dateFormat = "yyyy-MM-dd HH:mm:ss")
     MenuVO toMenuVo(Authority authority);
 
     @IterableMapping(elementTargetType = MenuVO.class)

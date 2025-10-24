@@ -11,7 +11,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.imtp.api.domain.entity.AuthorityUrl;
-import org.imtp.api.utils.JsonNodeUtil;
+import org.imtp.api.utils.JsonNodeUtils;
 import org.springframework.security.core.GrantedAuthority;
 
 import java.io.IOException;
@@ -80,8 +80,8 @@ public class RequestUrlAuthority implements GrantedAuthority {
             ObjectMapper mapper = (ObjectMapper) jsonParser.getCodec();
             JsonNode root = mapper.readTree(jsonParser);
             RequestUrlAuthority requestAuthority = new RequestUrlAuthority();
-            String code = JsonNodeUtil.findStringValue(root, "code");
-            List<AuthorityUrl> urls = JsonNodeUtil.findValue(root, "urls", new TypeReference<List<AuthorityUrl>>() {}, mapper);
+            String code = JsonNodeUtils.findStringValue(root, "code");
+            List<AuthorityUrl> urls = JsonNodeUtils.findValue(root, "urls", new TypeReference<List<AuthorityUrl>>() {}, mapper);
             requestAuthority.setCode(code);
             requestAuthority.setUrls(urls);
             return requestAuthority;

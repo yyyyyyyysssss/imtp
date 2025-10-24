@@ -7,7 +7,7 @@ import org.imtp.api.config.security.oauth2.*;
 import org.imtp.api.domain.entity.TokenInfo;
 import org.imtp.api.domain.entity.User;
 import org.imtp.api.domain.vo.*;
-import org.imtp.api.utils.WebUtil;
+import org.imtp.api.utils.WebUtils;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -107,7 +107,7 @@ public class OAuth2ClientService {
                 + "&code=" + authorizationCode;
         String accessTokenResult = oauth2ClientRestTemplate.getForObject(accessTokenUrl, String.class);
         log.info("github tokenInfo:{}",accessTokenResult);
-        Map<String, String> map = WebUtil.requestParamConvertMap(accessTokenResult);
+        Map<String, String> map = WebUtils.requestParamConvertMap(accessTokenResult);
         String accessToken = map.get("access_token");
         //根据token获取用户信息
         HttpHeaders headers = new HttpHeaders();

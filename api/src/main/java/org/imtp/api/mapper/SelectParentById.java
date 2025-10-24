@@ -2,10 +2,9 @@ package org.imtp.api.mapper;
 
 import com.baomidou.mybatisplus.core.injector.AbstractMethod;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
-import com.baomidou.mybatisplus.core.toolkit.sql.SqlScriptUtils;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.mapping.SqlSource;
-import org.imtp.api.utils.ReflectUtil;
+import org.imtp.api.utils.ReflectUtils;
 
 /**
  * @Description
@@ -38,8 +37,8 @@ public class SelectParentById extends AbstractMethod {
         if (!TreeRelation.class.isAssignableFrom(modelClass)){
             return null;
         }
-        Object parentFieldName = ReflectUtil.invokeMethodByName(modelClass, "parentFieldName", null);
-        Object childFieldName = ReflectUtil.invokeMethodByName(modelClass, "childFieldName", null);
+        Object parentFieldName = ReflectUtils.invokeMethodByName(modelClass, "parentFieldName", null);
+        Object childFieldName = ReflectUtils.invokeMethodByName(modelClass, "childFieldName", null);
         String sql = String.format(METHOD_SQL,
                 tableInfo.getTableName(),
                 tableInfo.getKeyColumn(),

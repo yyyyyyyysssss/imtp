@@ -9,7 +9,7 @@ import org.imtp.api.config.security.SecurityContextStore;
 import org.imtp.api.config.security.TokenService;
 import org.imtp.api.domain.entity.TokenInfo;
 import org.imtp.api.domain.entity.User;
-import org.imtp.api.utils.EncryptUtil;
+import org.imtp.api.utils.EncryptUtils;
 import org.imtp.common.enums.ClientType;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -73,8 +73,8 @@ public class LoginService {
         Long configExpiration = authProperties.getRememberMe().getExpiration();
         long timestamp = configExpiration * 1000;
         long expiration = System.currentTimeMillis() + timestamp;
-        String encryptStr = EncryptUtil.sha256(username, Long.toString(expiration), password, authProperties.getRememberMe().getSecretKey());
-        return EncryptUtil.base64Encode(username, Long.toString(expiration), TokenBasedRememberMeServices.RememberMeTokenAlgorithm.SHA256.name(), encryptStr);
+        String encryptStr = EncryptUtils.sha256(username, Long.toString(expiration), password, authProperties.getRememberMe().getSecretKey());
+        return EncryptUtils.base64Encode(username, Long.toString(expiration), TokenBasedRememberMeServices.RememberMeTokenAlgorithm.SHA256.name(), encryptStr);
     }
 
     private void saveSecurityContext(String tokenId,Authentication authenticate){

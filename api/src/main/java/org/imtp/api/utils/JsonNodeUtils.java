@@ -12,7 +12,7 @@ import java.util.Set;
  * @Author ys
  * @Date 2024/9/4 12:48
  */
-public class JsonNodeUtil {
+public class JsonNodeUtils {
 
     public static final TypeReference<Set<String>> STRING_SET = new TypeReference<Set<String>>() {
     };

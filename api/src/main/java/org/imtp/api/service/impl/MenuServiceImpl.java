@@ -16,19 +16,17 @@ import org.imtp.api.domain.dto.MenuUpdateDTO;
 import org.imtp.api.domain.entity.Authority;
 import org.imtp.api.domain.entity.Role;
 import org.imtp.api.domain.vo.MenuVO;
-import org.imtp.api.domain.vo.RoleVO;
 import org.imtp.api.enums.AuthorityType;
 import org.imtp.api.mapper.AuthorityMapper;
 import org.imtp.api.mapper.RoleMapper;
 import org.imtp.api.mapping.AuthorityMapping;
 import org.imtp.api.service.MenuService;
 import org.imtp.api.service.RoleService;
-import org.imtp.api.utils.TreeUtil;
+import org.imtp.api.utils.TreeUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
-import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -165,7 +163,7 @@ public class MenuServiceImpl extends AbstractAuthorityService implements MenuSer
             return new ArrayList<>();
         }
         List<MenuVO> menuVOList = AuthorityMapping.INSTANCE.toMenuVo(authorities);
-        return TreeUtil.buildTree(
+        return TreeUtils.buildTree(
                 menuVOList,
                 MenuVO::getId,
                 MenuVO::getParentId,
@@ -199,7 +197,7 @@ public class MenuServiceImpl extends AbstractAuthorityService implements MenuSer
             authorities = Stream.concat(authorities.stream(), children.stream().filter(f -> f.getType().equals(AuthorityType.MENU))).distinct().toList();
         }
         // 构建树形结构
-        List<MenuVO> menuVOList = TreeUtil.buildTree(
+        List<MenuVO> menuVOList = TreeUtils.buildTree(
                 AuthorityMapping.INSTANCE.toMenuVo(authorities),
                 MenuVO::getId,
                 MenuVO::getParentId,

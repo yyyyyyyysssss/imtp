@@ -8,12 +8,12 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.imtp.api.config.security.RedisSecurityContextRepository;
 import org.imtp.api.config.security.TokenService;
+import org.imtp.api.config.security.authorization.PathPatternRequestMatcher;
 import org.imtp.api.enums.TokenType;
 import org.imtp.api.utils.PayloadInfo;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -33,7 +33,7 @@ public class FileCookieAuthenticationFilter extends OncePerRequestFilter {
 
     public FileCookieAuthenticationFilter(TokenService tokenService){
         this.tokenService = tokenService;
-        this.tokenEndpointMatcher = new AntPathRequestMatcher("/file/**", HttpMethod.GET.name());
+        this.tokenEndpointMatcher = new PathPatternRequestMatcher("/file/**", HttpMethod.GET.name());
     }
 
     @Override

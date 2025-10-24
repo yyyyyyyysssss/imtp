@@ -14,7 +14,7 @@ public enum ResultCode {
 
     MINIO_EXCEPTION(6012,"Minio操作异常"),
 
-    DATABASE_EXCEPTION(5070,"数据库操作异常"),
+    DATABASE_EXCEPTION(5070,"数据库操作异常,请联系管理员"),
     DATABASE_DUPLICATE_KEY_EXCEPTION(5071,"数据存在唯一约束冲突"),
     ;
     private int code;
