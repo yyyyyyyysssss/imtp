@@ -296,6 +296,7 @@ CREATE TABLE `tenant` (
                           `contact_phone` varchar(24) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '联系人邮箱',
                           `contact_email` varchar(64) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '联系人邮箱',
                           `builtin` tinyint(1) DEFAULT '0' COMMENT '是否内置租户 0-否 1-是',
+                          `logo` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '图标',
                           `status` varchar(12) COLLATE utf8mb4_general_ci NOT NULL COMMENT '租户状态（PENDING: 待启用，ACTIVE: 使用中，DISABLED: 已停用，EXPIRED: 已过期）',
                           `expire_time` datetime DEFAULT NULL COMMENT '租户过期时间，NULL 表示永久有效',
                           `remark` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '备注',
@@ -303,6 +304,7 @@ CREATE TABLE `tenant` (
                           `create_by` bigint DEFAULT NULL COMMENT '创建人',
                           `update_time` datetime DEFAULT NULL COMMENT '最后修改时间',
                           `update_by` bigint DEFAULT NULL COMMENT '最后修改人',
+                          `is_deleted` tinyint(1) NOT NULL DEFAULT '0' COMMENT '逻辑删除标志：0=未删除，1=已删除',
                           PRIMARY KEY (`id`),
                           UNIQUE KEY `tenant_code_idx` (`tenant_code`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
