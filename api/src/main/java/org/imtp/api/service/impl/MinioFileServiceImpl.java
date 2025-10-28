@@ -15,6 +15,7 @@ import org.imtp.api.enums.FileStorageType;
 import org.imtp.api.mapper.FileUploadMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
@@ -104,6 +105,7 @@ public class MinioFileServiceImpl extends AbstractFileService {
         //设置请求头
         headerMap.put(HttpHeaders.CONTENT_RANGE, "bytes " + start + "-" + end + "/" + size);
         headerMap.put(HttpHeaders.CONTENT_LENGTH, String.valueOf(length));
+        headerMap.put(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_OCTET_STREAM_VALUE);
         //读取
         GetObjectResponse rangeObjectResponse = minioHelper.download(bucketName, objectName, start, length);
 
