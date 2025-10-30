@@ -148,7 +148,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             throw new BusinessException("创建用户失败");
         }
         if(userCreateDTO.getRoleIds() != null && !userCreateDTO.getRoleIds().isEmpty()){
-            addUserRole(user.getId(), userCreateDTO.getRoleIds());
+            bindRoles(user.getId(), userCreateDTO.getRoleIds());
         }
         userCreateVO.setId(user.getId());
         return userCreateVO;
@@ -166,7 +166,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         if (i <= 0) {
             throw new BusinessException("更新用户失败");
         }
-        addUserRole(user.getId(), userUpdateDTO.getRoleIds());
+        bindRoles(user.getId(), userUpdateDTO.getRoleIds());
         return i;
     }
 
@@ -183,7 +183,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             throw new BusinessException("更新用户失败");
         }
         if(!CollectionUtils.isEmpty(userUpdateDTO.getRoleIds())){
-            addUserRole(user.getId(), userUpdateDTO.getRoleIds());
+            bindRoles(user.getId(), userUpdateDTO.getRoleIds());
         }
         return i;
     }
@@ -219,11 +219,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
         List<Long> userIds = users.stream().map(User::getId).toList();
         // 查询用户对应的角色
-        QueryWrapper<UserRole> userRoleQueryWrapper = new QueryWrapper<>();
-        userRoleQueryWrapper
-                .lambda()
-                .in(UserRole::getUserId, userIds);
-        List<UserRole> userRoles = userRoleService.list(userRoleQueryWrapper);
+        List<UserRole> userRoles = userRoleService.findByUserIds(userIds);
         Map<Long, List<Long>> userRoleIdMap = userRoles.stream().collect(Collectors.groupingBy(
                 UserRole::getUserId,
                 Collectors.mapping(UserRole::getRoleId, Collectors.toList()
@@ -274,15 +270,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     @Override
-    public Integer delete(String id) {
+    public Integer delete(Long id) {
         int i = userMapper.deleteById(id);
         if (i > 0){
-            QueryWrapper<UserRole> roleAuthorityQueryWrapper = new QueryWrapper<>();
-            roleAuthorityQueryWrapper
-                    .lambda()
-                    .eq(UserRole::getUserId, id);
             // 删除角色对应的权限
-            userRoleService.remove(roleAuthorityQueryWrapper);
+            userRoleService.deleteByUserIds(Collections.singleton(id));
         }else {
             throw new BusinessException("删除用户失败，用户可能不存在");
         }
@@ -293,23 +285,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Transactional
     public Boolean bindRoles(Long id, List<Long> roleIds) {
 
-        return addUserRole(id,roleIds);
+        return userRoleService.bindUserRoles(Collections.singleton(id), roleIds);
     }
 
-    @Transactional
-    public boolean addUserRole(Long userId, Collection<Long> roleIds) {
-        QueryWrapper<UserRole> userRoleQueryWrapper = new QueryWrapper<>();
-        userRoleQueryWrapper
-                .lambda()
-                .eq(UserRole::getUserId, userId);
-        // 删除原有的角色权限
-        userRoleService.remove(userRoleQueryWrapper);
-        if (CollectionUtils.isEmpty(roleIds)){
-            return true;
-        }
-        // 添加新的角色权限
-        return userRoleService.buildUserRoles(Collections.singleton(userId), roleIds);
-    }
 
     private QueryWrapper<User> getUserQueryWrapper(UserQueryDTO userQueryDTO) {
         QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();

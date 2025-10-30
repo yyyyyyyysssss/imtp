@@ -39,6 +39,6 @@ public interface UserService extends UserDetailsService, IService<User> {
 
     Boolean bindRoles(Long id, List<Long> roleIds);
 
-    Integer delete(String id);
+    Integer delete(Long id);
 
 }

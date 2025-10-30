@@ -58,8 +58,11 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role>  implements R
         if (row <= 0) {
             throw new BusinessException("创建角色失败");
         }
+        if(!CollectionUtils.isEmpty(roleCreateDTO.getUserIds())){
+            bindUsers(role.getId(), roleCreateDTO.getUserIds());
+        }
         if(!CollectionUtils.isEmpty(roleCreateDTO.getAuthorityIds())){
-            addRoleAuthority(role.getId(), roleCreateDTO.getAuthorityIds());
+            bindAuthorities(role.getId(), roleCreateDTO.getAuthorityIds());
         }
         return role.getId();
     }
@@ -73,7 +76,10 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role>  implements R
         if (i <= 0) {
             throw new BusinessException("更新角色失败");
         }
-        addRoleAuthority(role.getId(), roleUpdateDTO.getAuthorityIds());
+        // 更新角色关联的用户
+        bindUsers(role.getId(),roleUpdateDTO.getUserIds());
+        // 更新角色关联的权限
+        bindAuthorities(role.getId(), roleUpdateDTO.getAuthorityIds());
         return i;
     }
 
@@ -86,46 +92,34 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role>  implements R
         if (i <= 0) {
             throw new BusinessException("更新角色失败");
         }
+        if(!CollectionUtils.isEmpty(roleUpdateDTO.getUserIds())){
+            bindUsers(role.getId(),roleUpdateDTO.getUserIds());
+        }
         if(!CollectionUtils.isEmpty(roleUpdateDTO.getAuthorityIds())){
-            addRoleAuthority(role.getId(), roleUpdateDTO.getAuthorityIds());
+            bindAuthorities(role.getId(), roleUpdateDTO.getAuthorityIds());
         }
         return i;
     }
 
     @Override
-    @Transactional
     public Boolean bindAuthorities(Long id, List<Long> authorityIds) {
-        Role role = checkAndResult(id);
-        return addRoleAuthority(role.getId(), authorityIds);
+
+        return roleAuthorityService.bindRoleAuthorities(Collections.singletonList(id), authorityIds);
     }
 
     @Override
     public Boolean bindUsers(Long id, List<Long> userIds) {
-        QueryWrapper<UserRole> userRoleQueryWrapper = new QueryWrapper<>();
-        userRoleQueryWrapper
-                .lambda()
-                .eq(UserRole::getRoleId, id)
-                .in(UserRole::getUserId,userIds);
-        userRoleService.remove(userRoleQueryWrapper);
-        if (CollectionUtils.isEmpty(userIds)){
-            log.warn("添加角色用户时，用户列表为空");
-            return true;
-        }
-        // 添加新的角色权限
-        return userRoleService.buildUserRoles(userIds, Collections.singletonList(id));
+
+        return userRoleService.bindUserRoles(userIds, Collections.singletonList(id));
     }
 
     @Override
-    public Integer delete(String id) {
+    public Integer delete(Long id) {
         checkAndResult(id);
         int i = roleMapper.deleteById(id);
         if (i > 0){
-            QueryWrapper<RoleAuthority> roleAuthorityQueryWrapper = new QueryWrapper<>();
-            roleAuthorityQueryWrapper
-                    .lambda()
-                    .eq(RoleAuthority::getRoleId, id);
             // 删除角色对应的权限
-            roleAuthorityService.remove(roleAuthorityQueryWrapper);
+            roleAuthorityService.deleteByRoleIds(Collections.singletonList(id));
         }else {
             throw new BusinessException("删除角色失败，角色可能不存在");
         }
@@ -146,21 +140,26 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role>  implements R
 
         List<Long> roleIds = roles.stream().map(Role::getId).toList();
         // 查询角色对应的权限
-        QueryWrapper<RoleAuthority> roleAuthorityQueryWrapper = new QueryWrapper<>();
-        roleAuthorityQueryWrapper
-                .lambda()
-                .in(RoleAuthority::getRoleId, roleIds);
-        List<RoleAuthority> roleAuthorities = roleAuthorityService.list(roleAuthorityQueryWrapper);
+        List<RoleAuthority> roleAuthorities = roleAuthorityService.findByRoleIds(roleIds);
         Map<Long, List<Long>> roleAuthorityIdMap = roleAuthorities.stream().collect(Collectors.groupingBy(
                 RoleAuthority::getRoleId,
                 Collectors.mapping(RoleAuthority::getAuthorityId, Collectors.toList()
         )));
+        // 查询角色关联的用户
+        List<UserRole> userRoles = userRoleService.findByRoleIds(roleIds);
+        Map<Long, List<Long>> userRoleIdMap = userRoles.stream().collect(Collectors.groupingBy(
+                UserRole::getRoleId,
+                Collectors.mapping(UserRole::getUserId, Collectors.toList()
+                )));
+
 
         List<RoleVO> result = new ArrayList<>();
         for (Role role : roles) {
             RoleVO roleVO = RoleMapping.INSTANCE.toRoleVO(role);
             List<Long> authorityIds = roleAuthorityIdMap.getOrDefault(role.getId(), new ArrayList<>());
+            List<Long> userIds = userRoleIdMap.getOrDefault(role.getId(), new ArrayList<>());
             roleVO.setAuthorityIds(authorityIds);
+            roleVO.setUserIds(userIds);
             result.add(roleVO);
         }
         PageInfo<RoleVO> pageInfo = new PageInfo<>();
@@ -189,11 +188,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role>  implements R
         if (userId == null) {
             return Collections.emptyList();
         }
-        QueryWrapper<UserRole> userRoleQueryWrapper = new QueryWrapper<>();
-        userRoleQueryWrapper
-                .lambda()
-                .eq(UserRole::getUserId, userId);
-        List<UserRole> userRoles = userRoleService.list(userRoleQueryWrapper);
+        List<UserRole> userRoles = userRoleService.findByUserIds(Collections.singleton(userId));
         if(CollectionUtils.isEmpty(userRoles)){
             return Collections.emptyList();
         }
@@ -205,30 +200,6 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role>  implements R
                 .eq(Role::getEnabled, true);
         List<Role> roles = roleMapper.selectList(roleQueryWrapper);
         return RoleMapping.INSTANCE.toRoleVO(roles);
-    }
-
-    @Transactional
-    public boolean addRoleAuthority(Long roleId, Collection<Long> authorityIds) {
-        QueryWrapper<RoleAuthority> roleAuthorityQueryWrapper = new QueryWrapper<>();
-        roleAuthorityQueryWrapper
-                .lambda()
-                .eq(RoleAuthority::getRoleId, roleId);
-        // 删除原有的角色权限
-        roleAuthorityService.remove(roleAuthorityQueryWrapper);
-        if (CollectionUtils.isEmpty(authorityIds)){
-            log.warn("添加角色权限时，权限列表为空");
-            return true;
-        }
-        // 添加新的角色权限
-        List<RoleAuthority> roleAuthorities = new ArrayList<>();
-        for (Long authorityId : authorityIds) {
-            RoleAuthority roleAuthority = new RoleAuthority();
-            roleAuthority.setId(IdGen.genId());
-            roleAuthority.setRoleId(roleId);
-            roleAuthority.setAuthorityId(authorityId);
-            roleAuthorities.add(roleAuthority);
-        }
-        return roleAuthorityService.saveBatch(roleAuthorities);
     }
 
     private Role checkAndResult(Serializable id){

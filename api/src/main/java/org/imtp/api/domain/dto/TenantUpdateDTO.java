@@ -23,6 +23,8 @@ public class TenantUpdateDTO {
     @NotBlank(message = "租户名称不能为空")
     private String tenantName;
 
+    private String logo;
+
     private String contactName;
 
     private String contactPhone;

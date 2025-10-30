@@ -1,6 +1,7 @@
 package org.imtp.api.domain.entity;
 
 import com.baomidou.mybatisplus.annotation.FieldFill;
+import com.baomidou.mybatisplus.annotation.FieldStrategy;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.*;
@@ -56,7 +57,7 @@ public class Tenant extends BaseEntity {
     @TableField("is_deleted")
     private Boolean isDeleted;
 
-    @TableField("remark")
+    @TableField(value = "remark", updateStrategy = FieldStrategy.ALWAYS)
     private String remark;
 
     @TableField(value = "create_by", fill = FieldFill.INSERT)

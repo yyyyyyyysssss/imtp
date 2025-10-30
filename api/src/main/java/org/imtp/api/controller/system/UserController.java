@@ -60,7 +60,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
-    public Result<?> delete(@PathVariable("id") String id) {
+    public Result<?> delete(@PathVariable("id") Long id) {
         Integer affectedRows = userService.delete(id);
         return ResultGenerator.ok(affectedRows);
     }

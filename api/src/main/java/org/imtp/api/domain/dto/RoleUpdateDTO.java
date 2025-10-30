@@ -24,6 +24,8 @@ public class RoleUpdateDTO {
 
     private Boolean enabled;
 
+    private List<Long> userIds;
+
     private List<Long> authorityIds;
 
 }

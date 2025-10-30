@@ -29,6 +29,8 @@ public class TenantCreateDTO {
 
     private String contactEmail;
 
+    private String logo;
+
     private Date expireTime;
 
     private String remark;
