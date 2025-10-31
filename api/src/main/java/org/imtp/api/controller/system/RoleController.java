@@ -55,9 +55,15 @@ public class RoleController {
     }
 
     @DeleteMapping("/{id}")
-    public Result<?> delete(@PathVariable("id") String id) {
+    public Result<?> delete(@PathVariable("id") Long id) {
         Integer affectedRows = roleService.delete(id);
         return ResultGenerator.ok(affectedRows);
+    }
+
+    @GetMapping("/{id}")
+    public Result<RoleVO> details(@PathVariable("id") Long id) {
+        RoleVO roleVO = roleService.details(id);
+        return ResultGenerator.ok(roleVO);
     }
 
     @PostMapping("/query")

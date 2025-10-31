@@ -14,16 +14,16 @@ import org.imtp.api.config.security.RequestUrlAuthority;
 import org.imtp.api.domain.dto.UserCreateDTO;
 import org.imtp.api.domain.dto.UserQueryDTO;
 import org.imtp.api.domain.dto.UserUpdateDTO;
-import org.imtp.api.domain.entity.Authority;
-import org.imtp.api.domain.entity.Role;
 import org.imtp.api.domain.entity.User;
 import org.imtp.api.domain.entity.UserRole;
+import org.imtp.api.domain.vo.AuthorityVO;
+import org.imtp.api.domain.vo.RoleVO;
 import org.imtp.api.domain.vo.UserCreateVO;
 import org.imtp.api.domain.vo.UserVO;
-import org.imtp.api.mapper.AuthorityMapper;
-import org.imtp.api.mapper.RoleMapper;
 import org.imtp.api.mapper.UserMapper;
 import org.imtp.api.mapping.UserMapping;
+import org.imtp.api.service.AuthorityService;
+import org.imtp.api.service.RoleService;
 import org.imtp.api.service.UserRoleService;
 import org.imtp.api.service.UserService;
 import org.imtp.api.utils.PasswordGeneratorUtils;
@@ -51,10 +51,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     private UserMapper userMapper;
 
     @Resource
-    private RoleMapper roleMapper;
+    private RoleService roleService;
 
     @Resource
-    private AuthorityMapper authorityMapper;
+    private AuthorityService authorityService;
 
     @Resource
     private UserRoleService userRoleService;
@@ -93,21 +93,18 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Override
     public UserDetails loadUserByUserId(Long userId) throws UsernameNotFoundException {
-        User user = userMapper.selectById(userId);
-        if (user == null) {
-            throw new UsernameNotFoundException("用户不存在");
-        }
+        User user = checkAndResult(userId);
         return userDetails(user);
     }
 
     private UserDetails userDetails(User user) {
-        List<Role> roles = roleMapper.findRoleByUserIds(Collections.singleton(user.getId()));
+        List<RoleVO> roles = roleService.findRoleByUserId(user.getId());
         if (roles == null || roles.isEmpty()) {
             user.setAuthorities(new ArrayList<RequestUrlAuthority>());
             return user;
         }
-        List<Long> roleIds = roles.stream().map(Role::getId).toList();
-        List<Authority> authorities = authorityMapper.findAuthorityByRoleIds(roleIds);
+        List<Long> roleIds = roles.stream().map(RoleVO::getId).toList();
+        List<AuthorityVO> authorities = authorityService.findAuthorityByRoleIds(roleIds);
         if (authorities == null || authorities.isEmpty()) {
             user.setAuthorities(new ArrayList<RequestUrlAuthority>());
         } else {
@@ -148,7 +145,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             throw new BusinessException("创建用户失败");
         }
         if(userCreateDTO.getRoleIds() != null && !userCreateDTO.getRoleIds().isEmpty()){
-            addUserRole(user.getId(), userCreateDTO.getRoleIds());
+            bindRoles(user.getId(), userCreateDTO.getRoleIds());
         }
         userCreateVO.setId(user.getId());
         return userCreateVO;
@@ -157,43 +154,34 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Override
     @Transactional
     public Integer update(UserUpdateDTO userUpdateDTO) {
-        User user = userMapper.selectById(userUpdateDTO.getId());
-        if (user == null) {
-            throw new BusinessException("用户不存在");
-        }
+        User user = checkAndResult(userUpdateDTO.getId());
         UserMapping.INSTANCE.overwriteUser(userUpdateDTO, user);
         int i = userMapper.updateById(user);
         if (i <= 0) {
             throw new BusinessException("更新用户失败");
         }
-        addUserRole(user.getId(), userUpdateDTO.getRoleIds());
+        bindRoles(user.getId(), userUpdateDTO.getRoleIds());
         return i;
     }
 
     @Override
     @Transactional
     public Integer updatePartial(UserUpdateDTO userUpdateDTO) {
-        User user = userMapper.selectById(userUpdateDTO.getId());
-        if (user == null) {
-            throw new BusinessException("用户不存在");
-        }
+        User user = checkAndResult(userUpdateDTO.getId());
         UserMapping.INSTANCE.updateUser(userUpdateDTO, user);
         int i = userMapper.updateById(user);
         if (i <= 0) {
             throw new BusinessException("更新用户失败");
         }
         if(!CollectionUtils.isEmpty(userUpdateDTO.getRoleIds())){
-            addUserRole(user.getId(), userUpdateDTO.getRoleIds());
+            bindRoles(user.getId(), userUpdateDTO.getRoleIds());
         }
         return i;
     }
 
     @Override
     public String resetPassword(Long userId) {
-        User user = userMapper.selectById(userId);
-        if (user == null) {
-            throw new BusinessException("用户不存在");
-        }
+        User user = checkAndResult(userId);
         String newPassword = PasswordGeneratorUtils.generate(10);
         String encryptPassword = passwordEncoder.encode(newPassword);
         UpdateWrapper<User> userUpdateWrapper = new UpdateWrapper<>();
@@ -215,32 +203,20 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         if (users == null || users.isEmpty()) {
             return new PageInfo<>();
         }
-        PageInfo<User> userPageInfo = PageInfo.of(users);
+        return toUserVOPageInfo(PageInfo.of(users));
+    }
 
-        List<Long> userIds = users.stream().map(User::getId).toList();
+    @Override
+    public UserVO details(Long id) {
+        User user = checkAndResult(id);
+        UserVO userVO = UserMapping.INSTANCE.toUserVO(user);
         // 查询用户对应的角色
-        QueryWrapper<UserRole> userRoleQueryWrapper = new QueryWrapper<>();
-        userRoleQueryWrapper
-                .lambda()
-                .in(UserRole::getUserId, userIds);
-        List<UserRole> userRoles = userRoleService.list(userRoleQueryWrapper);
-        Map<Long, List<Long>> userRoleIdMap = userRoles.stream().collect(Collectors.groupingBy(
-                UserRole::getUserId,
-                Collectors.mapping(UserRole::getRoleId, Collectors.toList()
-                )));
-        List<UserVO> result = new ArrayList<>();
-        for (User user : users) {
-            UserVO userVO = UserMapping.INSTANCE.toUserVO(user);
-            List<Long> roleIds = userRoleIdMap.getOrDefault(user.getId(), new ArrayList<>());
+        List<UserRole> userRoles = userRoleService.findByUserId(id);
+        if(!CollectionUtils.isEmpty(userRoles)){
+            List<Long> roleIds = userRoles.stream().map(UserRole::getRoleId).toList();
             userVO.setRoleIds(roleIds);
-            result.add(userVO);
         }
-        PageInfo<UserVO> pageInfo = new PageInfo<>();
-        pageInfo.setList(result);
-        pageInfo.setTotal(userPageInfo.getTotal());
-        pageInfo.setPageNum(pageNum);
-        pageInfo.setPageSize(pageSize);
-        return pageInfo;
+        return userVO;
     }
 
     @Override
@@ -263,26 +239,29 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         if (users == null || users.isEmpty()) {
             return new PageInfo<>();
         }
-        PageInfo<User> userPageInfo = PageInfo.of(users);
-        List<UserVO> userVO = UserMapping.INSTANCE.toUserVO(users);
+        return toUserVOPageInfo(PageInfo.of(users));
+    }
+
+    private PageInfo<UserVO> toUserVOPageInfo(PageInfo<User> userPageInfo){
+        List<User> users = userPageInfo.getList();
+        if (users == null || users.isEmpty()) {
+            return new PageInfo<>();
+        }
+        List<UserVO> result = UserMapping.INSTANCE.toUserVO(users);
         PageInfo<UserVO> pageInfo = new PageInfo<>();
-        pageInfo.setList(userVO);
+        pageInfo.setList(result);
         pageInfo.setTotal(userPageInfo.getTotal());
-        pageInfo.setPageNum(pageNum);
-        pageInfo.setPageSize(pageSize);
+        pageInfo.setPageNum(userPageInfo.getPageNum());
+        pageInfo.setPageSize(userPageInfo.getPageSize());
         return pageInfo;
     }
 
     @Override
-    public Integer delete(String id) {
+    public Integer delete(Long id) {
         int i = userMapper.deleteById(id);
         if (i > 0){
-            QueryWrapper<UserRole> roleAuthorityQueryWrapper = new QueryWrapper<>();
-            roleAuthorityQueryWrapper
-                    .lambda()
-                    .eq(UserRole::getUserId, id);
             // 删除角色对应的权限
-            userRoleService.remove(roleAuthorityQueryWrapper);
+            userRoleService.deleteByUserId(id);
         }else {
             throw new BusinessException("删除用户失败，用户可能不存在");
         }
@@ -293,23 +272,17 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Transactional
     public Boolean bindRoles(Long id, List<Long> roleIds) {
 
-        return addUserRole(id,roleIds);
+        return userRoleService.bindUserRole(id, roleIds);
     }
 
-    @Transactional
-    public boolean addUserRole(Long userId, Collection<Long> roleIds) {
-        QueryWrapper<UserRole> userRoleQueryWrapper = new QueryWrapper<>();
-        userRoleQueryWrapper
-                .lambda()
-                .eq(UserRole::getUserId, userId);
-        // 删除原有的角色权限
-        userRoleService.remove(userRoleQueryWrapper);
-        if (CollectionUtils.isEmpty(roleIds)){
-            return true;
+    private User checkAndResult(Long id){
+        User user = userMapper.selectById(id);
+        if (user == null) {
+            throw new BusinessException("用户不存在");
         }
-        // 添加新的角色权限
-        return userRoleService.buildUserRoles(Collections.singleton(userId), roleIds);
+        return user;
     }
+
 
     private QueryWrapper<User> getUserQueryWrapper(UserQueryDTO userQueryDTO) {
         QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();

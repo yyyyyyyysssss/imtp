@@ -68,11 +68,4 @@ public class FileUploadController {
         return ResultGenerator.ok(accessUrl);
     }
 
-    //获取文件信息
-    @GetMapping("/{bucketName}/{objectName}/info")
-    public Result<FileInfoVO> fileInfo(@PathVariable("bucketName") String bucketName, @PathVariable("objectName") String objectName) {
-        FileInfoVO fileInfo = fileService.getFileInfo(bucketName, objectName);
-        return ResultGenerator.ok(fileInfo);
-    }
-
 }

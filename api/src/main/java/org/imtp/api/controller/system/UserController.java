@@ -60,7 +60,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
-    public Result<?> delete(@PathVariable("id") String id) {
+    public Result<?> delete(@PathVariable("id") Long id) {
         Integer affectedRows = userService.delete(id);
         return ResultGenerator.ok(affectedRows);
     }
@@ -69,6 +69,12 @@ public class UserController {
     public Result<?> query(@RequestBody UserQueryDTO userQueryDTO) {
         PageInfo<UserVO> pageInfo = userService.queryList(userQueryDTO);
         return ResultGenerator.ok(pageInfo);
+    }
+
+    @GetMapping("/{id}")
+    public Result<?> details(@PathVariable("id") Long id) {
+        UserVO userVO = userService.details(id);
+        return ResultGenerator.ok(userVO);
     }
 
     @PostMapping("/search")

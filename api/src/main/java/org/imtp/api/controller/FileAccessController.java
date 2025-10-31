@@ -5,8 +5,11 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.imtp.api.config.exception.BusinessException;
 import org.imtp.api.domain.dto.FileRangeDTO;
+import org.imtp.api.domain.vo.FileInfoVO;
 import org.imtp.api.domain.vo.FileStreamVO;
 import org.imtp.api.service.FileService;
+import org.imtp.common.response.Result;
+import org.imtp.common.response.ResultGenerator;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +27,13 @@ public class FileAccessController {
     @Resource
     private FileService fileService;
 
+    //获取文件信息
+    @GetMapping("/{bucketName}/{objectName}/info")
+    public Result<FileInfoVO> fileInfo(@PathVariable("bucketName") String bucketName, @PathVariable("objectName") String objectName) {
+        FileInfoVO fileInfo = fileService.getFileInfo(bucketName, objectName);
+        return ResultGenerator.ok(fileInfo);
+    }
+
     //获取文件
     @GetMapping("/{bucketName}/{objectName}")
     public ResponseEntity<StreamingResponseBody> getFile(@PathVariable("bucketName") String bucketName,
@@ -39,7 +49,7 @@ public class FileAccessController {
             // 将文件头信息添加到响应头中
             headerMap.forEach(httpHeaders::add);
         }
-        if(type != null && (type.equalsIgnoreCase("download") || type.equalsIgnoreCase("d"))) {
+        if(fileRangeDTO == null && type != null && (type.equalsIgnoreCase("download") || type.equalsIgnoreCase("d"))) {
             // 设置响应头以指示下载
             httpHeaders.setContentDispositionFormData("attachment", objectName);
             httpHeaders.setContentType(MediaType.APPLICATION_OCTET_STREAM);

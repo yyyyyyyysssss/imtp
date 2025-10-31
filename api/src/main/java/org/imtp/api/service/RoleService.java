@@ -29,9 +29,11 @@ public interface RoleService extends IService<Role> {
 
     PageInfo<RoleVO> queryList(RoleQueryDTO queryDTO);
 
+    RoleVO details(Long id);
+
     List<RoleVO> listRoleOptions();
 
-    Integer delete(String id);
+    Integer delete(Long id);
 
     List<RoleVO> findRoleByUserId(Long userId);
 

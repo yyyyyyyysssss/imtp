@@ -35,10 +35,12 @@ public interface UserService extends UserDetailsService, IService<User> {
 
     PageInfo<UserVO> queryList(UserQueryDTO queryDTO);
 
+    UserVO details(Long id);
+
     PageInfo<UserVO> search(Integer pageNum,Integer pageSize,String name,List<Long> ids);
 
     Boolean bindRoles(Long id, List<Long> roleIds);
 
-    Integer delete(String id);
+    Integer delete(Long id);
 
 }

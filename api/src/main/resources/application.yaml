@@ -1,7 +1,13 @@
 server:
   port: 9090
+  tomcat:
+    threads:
+      max: 200
 
 spring:
+  mvc:
+    async:
+      request-timeout: -1
   output:
     ansi:
       enabled: always

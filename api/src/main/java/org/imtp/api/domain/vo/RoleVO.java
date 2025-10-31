@@ -30,6 +30,8 @@ public class RoleVO {
 
     private String updateTime;
 
+    private List<Long> userIds;
+
     private List<Long> authorityIds;
 
     @JsonIgnore

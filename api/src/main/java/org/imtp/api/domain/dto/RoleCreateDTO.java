@@ -23,6 +23,8 @@ public class RoleCreateDTO {
 
     private Boolean enabled = true;
 
+    private List<Long> userIds;
+
     private List<Long> authorityIds;
 
 }

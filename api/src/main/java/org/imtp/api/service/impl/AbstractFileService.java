@@ -342,8 +342,7 @@ public abstract class AbstractFileService implements FileService {
             }
         } catch (IOException e) {
             // 处理异常
-            log.error("Error while streaming file: {}", e.getMessage(), e);
-            throw new BusinessException("Error while streaming file: " + e.getMessage());
+            log.error("streaming file error: {}", e.getMessage(), e);
         }
     }
 
