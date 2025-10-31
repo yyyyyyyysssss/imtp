@@ -7,10 +7,10 @@ import java.util.List;
 
 public interface RoleAuthorityService extends IService<RoleAuthority> {
 
-    List<RoleAuthority> findByRoleIds(List<Long> roleIds);
+    List<RoleAuthority> findByRoleId(Long roleId);
 
-    Boolean bindRoleAuthorities(List<Long> roleIds, List<Long> authorityIds);
+    Boolean bindRoleAuthorities(Long roleId, List<Long> authorityIds);
 
-    Boolean deleteByRoleIds(List<Long> roleIds);
+    Boolean deleteByRoleId(Long roleId);
 
 }

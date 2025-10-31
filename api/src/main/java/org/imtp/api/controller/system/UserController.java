@@ -71,6 +71,12 @@ public class UserController {
         return ResultGenerator.ok(pageInfo);
     }
 
+    @GetMapping("/{id}")
+    public Result<?> details(@PathVariable("id") Long id) {
+        UserVO userVO = userService.details(id);
+        return ResultGenerator.ok(userVO);
+    }
+
     @PostMapping("/search")
     public Result<?> search(@RequestBody UserQueryDTO userQueryDTO) {
         PageInfo<UserVO> pageInfo = userService.search(userQueryDTO.getPageNum(), userQueryDTO.getPageSize(), userQueryDTO.getKeyword(),userQueryDTO.getIds());

@@ -23,53 +23,54 @@ import java.util.List;
 public class RoleAuthorityServiceImpl extends ServiceImpl<RoleAuthorityMapper, RoleAuthority> implements RoleAuthorityService {
 
 
-
     @Override
-    public List<RoleAuthority> findByRoleIds(List<Long> roleIds) {
-        if(CollectionUtils.isEmpty(roleIds)){
+    public List<RoleAuthority> findByRoleId(Long roleId) {
+        if(roleId == null){
             return Collections.emptyList();
         }
         QueryWrapper<RoleAuthority> roleAuthorityQueryWrapper = new QueryWrapper<>();
         roleAuthorityQueryWrapper
                 .lambda()
-                .in(RoleAuthority::getRoleId, roleIds);
+                .eq(RoleAuthority::getRoleId, roleId);
         return this.list(roleAuthorityQueryWrapper);
     }
 
+
     @Override
     @Transactional
-    public Boolean bindRoleAuthorities(List<Long> roleIds, List<Long> authorityIds) {
-        if (CollectionUtils.isEmpty(roleIds) || CollectionUtils.isEmpty(authorityIds)) {
-            log.warn("buildRoleAuthorities called with empty roleIds or authorityIds");
+    public Boolean bindRoleAuthorities(Long roleId, List<Long> authorityIds) {
+        if (roleId == null || CollectionUtils.isEmpty(authorityIds)) {
+            log.warn("buildRoleAuthorities called with empty roleId or authorityIds");
             return true;
         }
         QueryWrapper<RoleAuthority> roleAuthorityQueryWrapper = new QueryWrapper<>();
         roleAuthorityQueryWrapper
                 .lambda()
-                .in(RoleAuthority::getRoleId, roleIds)
-                .in(RoleAuthority::getAuthorityId, authorityIds);
+                .eq(RoleAuthority::getRoleId, roleId);
         // 删除原有的角色权限
         this.remove(roleAuthorityQueryWrapper);
         // 添加新的角色权限
         List<RoleAuthority> roleAuthorities = new ArrayList<>();
-        for (Long roleId : roleIds){
-            for (Long authorityId : authorityIds) {
-                RoleAuthority roleAuthority = new RoleAuthority();
-                roleAuthority.setId(IdGen.genId());
-                roleAuthority.setRoleId(roleId);
-                roleAuthority.setAuthorityId(authorityId);
-                roleAuthorities.add(roleAuthority);
-            }
+        for (Long authorityId : authorityIds) {
+            RoleAuthority roleAuthority = new RoleAuthority();
+            roleAuthority.setId(IdGen.genId());
+            roleAuthority.setRoleId(roleId);
+            roleAuthority.setAuthorityId(authorityId);
+            roleAuthorities.add(roleAuthority);
         }
         return this.saveBatch(roleAuthorities);
     }
 
     @Override
-    public Boolean deleteByRoleIds(List<Long> roleIds) {
+    public Boolean deleteByRoleId(Long roleId) {
+        if(roleId == null){
+            log.warn("deleteByRoleId called with null roleId");
+            return true;
+        }
         QueryWrapper<RoleAuthority> roleAuthorityQueryWrapper = new QueryWrapper<>();
         roleAuthorityQueryWrapper
                 .lambda()
-                .in(RoleAuthority::getRoleId, roleIds);
+                .eq(RoleAuthority::getRoleId, roleId);
         // 删除角色对应的权限
         return this.remove(roleAuthorityQueryWrapper);
     }

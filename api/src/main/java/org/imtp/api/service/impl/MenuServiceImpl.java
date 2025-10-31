@@ -41,9 +41,6 @@ import java.util.stream.Stream;
 public class MenuServiceImpl extends AbstractAuthorityService implements MenuService {
 
     @Resource
-    private RoleMapper roleMapper;
-
-    @Resource
     private RoleService roleService;
 
     @Resource

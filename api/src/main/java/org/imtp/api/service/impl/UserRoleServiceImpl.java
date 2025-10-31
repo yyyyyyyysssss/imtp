@@ -23,18 +23,30 @@ import java.util.List;
 @Service
 public class UserRoleServiceImpl extends ServiceImpl<UserRoleMapper, UserRole> implements UserRoleService {
 
+
+
     @Override
     @Transactional
-    public Boolean bindUserRoles(Collection<Long> userIds, Collection<Long> roleIds) {
-        if (CollectionUtils.isEmpty(userIds) || CollectionUtils.isEmpty(roleIds)) {
+    public Boolean bindUserRole(Long userId, Collection<Long> roleIds) {
+        if (userId == null || CollectionUtils.isEmpty(roleIds)) {
             return true;
         }
-        QueryWrapper<UserRole> userRoleQueryWrapper = new QueryWrapper<>();
-        userRoleQueryWrapper
-                .lambda()
-                .in(UserRole::getUserId, userIds)
-                .in(UserRole::getRoleId,roleIds);
-        this.remove(userRoleQueryWrapper);
+        deleteByUserId(userId);
+        return addUserRole(Collections.singletonList(userId), roleIds);
+    }
+
+    @Override
+    @Transactional
+    public Boolean bindRoleUser(Long roleId, Collection<Long> userIds) {
+        if (roleId == null || CollectionUtils.isEmpty(userIds)) {
+            return true;
+        }
+        deleteByRoleId(roleId);
+        return addUserRole(userIds, Collections.singletonList(roleId));
+    }
+
+    @Transactional
+    public Boolean addUserRole(Collection<Long> userIds, Collection<Long> roleIds){
         List<UserRole> result = new ArrayList<>();
         for (Long userId : userIds) {
             for (Long roleId : roleIds) {
@@ -49,35 +61,46 @@ public class UserRoleServiceImpl extends ServiceImpl<UserRoleMapper, UserRole> i
     }
 
     @Override
-    public List<UserRole> findByRoleIds(Collection<Long> roleIds) {
-        if(CollectionUtils.isEmpty(roleIds)){
+    public List<UserRole> findByRoleId(Long roleId) {
+        if(roleId == null){
             return Collections.emptyList();
         }
         QueryWrapper<UserRole> userRoleQueryWrapper = new QueryWrapper<>();
         userRoleQueryWrapper
                 .lambda()
-                .in(UserRole::getRoleId, roleIds);
-        return  this.list(userRoleQueryWrapper);
-    }
-
-    @Override
-    public List<UserRole> findByUserIds(Collection<Long> userIds) {
-        QueryWrapper<UserRole> userRoleQueryWrapper = new QueryWrapper<>();
-        userRoleQueryWrapper
-                .lambda()
-                .in(UserRole::getUserId, userIds);
+                .eq(UserRole::getRoleId, roleId);
         return this.list(userRoleQueryWrapper);
     }
 
     @Override
-    public Boolean deleteByUserIds(Collection<Long> userIds) {
+    public List<UserRole> findByUserId(Long userId) {
+        if(userId == null){
+            return Collections.emptyList();
+        }
+        QueryWrapper<UserRole> userRoleQueryWrapper = new QueryWrapper<>();
+        userRoleQueryWrapper
+                .lambda()
+                .eq(UserRole::getUserId, userId);
+        return this.list(userRoleQueryWrapper);
+    }
+
+    @Override
+    public Boolean deleteByUserId(Long userId) {
         QueryWrapper<UserRole> roleAuthorityQueryWrapper = new QueryWrapper<>();
         roleAuthorityQueryWrapper
                 .lambda()
-                .in(UserRole::getUserId, userIds);
-        // 删除角色对应的权限
+                .eq(UserRole::getUserId, userId);
+        // 删除用户对应的权限
         return this.remove(roleAuthorityQueryWrapper);
     }
 
-
+    @Override
+    public Boolean deleteByRoleId(Long roleId) {
+        QueryWrapper<UserRole> roleAuthorityQueryWrapper = new QueryWrapper<>();
+        roleAuthorityQueryWrapper
+                .lambda()
+                .eq(UserRole::getRoleId, roleId);
+        // 删除角色对应的权限
+        return this.remove(roleAuthorityQueryWrapper);
+    }
 }

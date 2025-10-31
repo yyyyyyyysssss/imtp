@@ -60,6 +60,12 @@ public class RoleController {
         return ResultGenerator.ok(affectedRows);
     }
 
+    @GetMapping("/{id}")
+    public Result<RoleVO> details(@PathVariable("id") Long id) {
+        RoleVO roleVO = roleService.details(id);
+        return ResultGenerator.ok(roleVO);
+    }
+
     @PostMapping("/query")
     public Result<?> query(@RequestBody RoleQueryDTO roleQueryDTO) {
         PageInfo<RoleVO> pageInfo = roleService.queryList(roleQueryDTO);

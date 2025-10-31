@@ -8,12 +8,16 @@ import java.util.List;
 
 public interface UserRoleService extends IService<UserRole> {
 
-    Boolean bindUserRoles(Collection<Long> userIds, Collection<Long> roleIds);
+    Boolean bindUserRole(Long userId, Collection<Long> roleIds);
 
-    List<UserRole> findByRoleIds(Collection<Long> roleIds);
+    Boolean bindRoleUser(Long roleId, Collection<Long> userIds);
 
-    List<UserRole> findByUserIds(Collection<Long> userIds);
+    List<UserRole> findByRoleId(Long roleId);
 
-    Boolean deleteByUserIds(Collection<Long> userIds);
+    List<UserRole> findByUserId(Long userId);
+
+    Boolean deleteByUserId(Long userId);
+
+    Boolean deleteByRoleId(Long roleId);
 
 }

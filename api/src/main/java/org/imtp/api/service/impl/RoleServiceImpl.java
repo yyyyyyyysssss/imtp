@@ -71,6 +71,9 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role>  implements R
     @Transactional
     public Integer update(RoleUpdateDTO roleUpdateDTO) {
         Role role = checkAndResult(roleUpdateDTO.getId());
+        if(role.isSuperAdmin()){
+            throw new BusinessException("超级管理员角色无法修改");
+        }
         RoleMapping.INSTANCE.overwriteRole(roleUpdateDTO, role);
         int i = roleMapper.updateById(role);
         if (i <= 0) {
@@ -87,6 +90,9 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role>  implements R
     @Transactional
     public Integer updatePartial(RoleUpdateDTO roleUpdateDTO) {
         Role role = checkAndResult(roleUpdateDTO.getId());
+        if(role.isSuperAdmin()){
+            throw new BusinessException("超级管理员角色无法修改");
+        }
         RoleMapping.INSTANCE.updateRole(roleUpdateDTO, role);
         int i = roleMapper.updateById(role);
         if (i <= 0) {
@@ -104,22 +110,25 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role>  implements R
     @Override
     public Boolean bindAuthorities(Long id, List<Long> authorityIds) {
 
-        return roleAuthorityService.bindRoleAuthorities(Collections.singletonList(id), authorityIds);
+        return roleAuthorityService.bindRoleAuthorities(id, authorityIds);
     }
 
     @Override
     public Boolean bindUsers(Long id, List<Long> userIds) {
 
-        return userRoleService.bindUserRoles(userIds, Collections.singletonList(id));
+        return userRoleService.bindRoleUser(id, userIds);
     }
 
     @Override
     public Integer delete(Long id) {
-        checkAndResult(id);
+        Role role = checkAndResult(id);
+        if(role.isSuperAdmin()){
+            throw new BusinessException("超级管理员角色无法删除");
+        }
         int i = roleMapper.deleteById(id);
         if (i > 0){
             // 删除角色对应的权限
-            roleAuthorityService.deleteByRoleIds(Collections.singletonList(id));
+            roleAuthorityService.deleteByRoleId(id);
         }else {
             throw new BusinessException("删除角色失败，角色可能不存在");
         }
@@ -137,37 +146,32 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role>  implements R
             return new PageInfo<>();
         }
         PageInfo<Role> rolePageInfo = PageInfo.of(roles);
-
-        List<Long> roleIds = roles.stream().map(Role::getId).toList();
-        // 查询角色对应的权限
-        List<RoleAuthority> roleAuthorities = roleAuthorityService.findByRoleIds(roleIds);
-        Map<Long, List<Long>> roleAuthorityIdMap = roleAuthorities.stream().collect(Collectors.groupingBy(
-                RoleAuthority::getRoleId,
-                Collectors.mapping(RoleAuthority::getAuthorityId, Collectors.toList()
-        )));
-        // 查询角色关联的用户
-        List<UserRole> userRoles = userRoleService.findByRoleIds(roleIds);
-        Map<Long, List<Long>> userRoleIdMap = userRoles.stream().collect(Collectors.groupingBy(
-                UserRole::getRoleId,
-                Collectors.mapping(UserRole::getUserId, Collectors.toList()
-                )));
-
-
-        List<RoleVO> result = new ArrayList<>();
-        for (Role role : roles) {
-            RoleVO roleVO = RoleMapping.INSTANCE.toRoleVO(role);
-            List<Long> authorityIds = roleAuthorityIdMap.getOrDefault(role.getId(), new ArrayList<>());
-            List<Long> userIds = userRoleIdMap.getOrDefault(role.getId(), new ArrayList<>());
-            roleVO.setAuthorityIds(authorityIds);
-            roleVO.setUserIds(userIds);
-            result.add(roleVO);
-        }
+        List<RoleVO> result = RoleMapping.INSTANCE.toRoleVO(roles);
         PageInfo<RoleVO> pageInfo = new PageInfo<>();
         pageInfo.setList(result);
         pageInfo.setTotal(rolePageInfo.getTotal());
         pageInfo.setPageNum(pageNum);
         pageInfo.setPageSize(pageSize);
         return pageInfo;
+    }
+
+    @Override
+    public RoleVO details(Long id) {
+        Role role = checkAndResult(id);
+        RoleVO roleVO = RoleMapping.INSTANCE.toRoleVO(role);
+        // 查询角色对应的权限
+        List<RoleAuthority> roleAuthorities = roleAuthorityService.findByRoleId(id);
+        if(!CollectionUtils.isEmpty(roleAuthorities)){
+            List<Long> authorityIds = roleAuthorities.stream().map(RoleAuthority::getAuthorityId).toList();
+            roleVO.setAuthorityIds(authorityIds);
+        }
+        // 查询角色关联的用户
+        List<UserRole> userRoles = userRoleService.findByRoleId(id);
+        if(!CollectionUtils.isEmpty(userRoles)){
+            List<Long> userIds = userRoles.stream().map(UserRole::getUserId).toList();
+            roleVO.setUserIds(userIds);
+        }
+        return roleVO;
     }
 
     @Override
@@ -188,7 +192,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role>  implements R
         if (userId == null) {
             return Collections.emptyList();
         }
-        List<UserRole> userRoles = userRoleService.findByUserIds(Collections.singleton(userId));
+        List<UserRole> userRoles = userRoleService.findByUserId(userId);
         if(CollectionUtils.isEmpty(userRoles)){
             return Collections.emptyList();
         }
@@ -206,9 +210,6 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role>  implements R
         Role role = roleMapper.selectById(id);
         if (role == null) {
             throw new BusinessException("角色不存在");
-        }
-        if(role.isSuperAdmin()){
-            throw new BusinessException("超级管理员角色无法操作");
         }
         return role;
     }
