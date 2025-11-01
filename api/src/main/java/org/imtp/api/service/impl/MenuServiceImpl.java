@@ -20,7 +20,9 @@ import org.imtp.api.enums.AuthorityType;
 import org.imtp.api.mapper.AuthorityMapper;
 import org.imtp.api.mapper.RoleMapper;
 import org.imtp.api.mapping.AuthorityMapping;
+import org.imtp.api.service.AuthorityService;
 import org.imtp.api.service.MenuService;
+import org.imtp.api.service.RoleAuthorityService;
 import org.imtp.api.service.RoleService;
 import org.imtp.api.utils.TreeUtils;
 import org.springframework.stereotype.Service;
@@ -45,6 +47,9 @@ public class MenuServiceImpl extends AbstractAuthorityService implements MenuSer
 
     @Resource
     private AuthorityMapper authorityMapper;
+
+    @Resource
+    private RoleAuthorityService roleAuthorityService;
 
     @Override
     public Long create(MenuCreateDTO menuCreateDTO) {
@@ -210,7 +215,7 @@ public class MenuServiceImpl extends AbstractAuthorityService implements MenuSer
     }
 
     @Override
-    public MenuVO details(String id) {
+    public MenuVO details(Long id) {
         Authority authority = authorityMapper.selectById(id);
         if (authority == null || !authority.getType().equals(AuthorityType.MENU)) {
             throw new BusinessException("该菜单不存在");
@@ -261,25 +266,21 @@ public class MenuServiceImpl extends AbstractAuthorityService implements MenuSer
     }
 
     @Override
-    public Integer delete(String id) {
+    @Transactional
+    public Boolean deleteById(Long id) {
         //查询出菜单对应的所有子菜单或权限
         List<Authority> authorities = authorityMapper.selectChildrenById(id);
         if (authorities == null || authorities.isEmpty()) {
             throw new BusinessException("该菜单不存在");
         }
         Set<Long> delIds = authorities.stream().map(Authority::getId).collect(Collectors.toSet());
-        return authorityMapper.deleteBatchIds(delIds);
-    }
-
-    @Override
-    public Integer batchDelete(Collection<String> ids) {
-        //批量查询出菜单对应的所有子菜单或权限
-        List<Authority> authorities = authorityMapper.selectChildrenByIds(ids);
-        if (authorities == null || authorities.isEmpty()) {
-            throw new BusinessException("菜单不存在");
+        int i = authorityMapper.deleteBatchIds(delIds);
+        if(i != delIds.size()){
+            throw new BusinessException("删除菜单失败");
         }
-        Set<Long> delIds = authorities.stream().map(Authority::getId).collect(Collectors.toSet());
-        return authorityMapper.deleteBatchIds(delIds);
+        //删除角色对应的菜单
+        roleAuthorityService.deleteByAuthorityId(delIds);
+        return true;
     }
 
 }

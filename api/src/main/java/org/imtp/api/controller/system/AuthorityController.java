@@ -58,15 +58,9 @@ public class AuthorityController {
     }
 
     @DeleteMapping("/{id}")
-    public Result<?> delete(@PathVariable("id") String id) {
-        Integer affectedRows = authorityService.delete(id);
-        return ResultGenerator.ok(affectedRows);
-    }
-
-    @DeleteMapping("/delete")
-    public Result<Boolean> batchDelete(@RequestBody @Validated IdsOnlyDTO idsOnlyDTO) {
-        Boolean b = authorityService.batchDelete(idsOnlyDTO.getId());
-        return ResultGenerator.ok(b);
+    public Result<Boolean> delete(@PathVariable("id") Long id) {
+        Boolean f = authorityService.deleteById(id);
+        return ResultGenerator.ok(f);
     }
 
 }

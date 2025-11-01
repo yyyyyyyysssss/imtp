@@ -109,18 +109,18 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role>  implements R
 
     @Override
     public Boolean bindAuthorities(Long id, List<Long> authorityIds) {
-
-        return roleAuthorityService.bindRoleAuthorities(id, authorityIds);
+        roleAuthorityService.bindRoleAuthorities(id, authorityIds);
+        return true;
     }
 
     @Override
     public Boolean bindUsers(Long id, List<Long> userIds) {
 
-        return userRoleService.bindRoleUser(id, userIds);
+        return !userRoleService.bindRoleUser(id, userIds).isEmpty();
     }
 
     @Override
-    public Integer delete(Long id) {
+    public Boolean deleteById(Long id) {
         Role role = checkAndResult(id);
         if(role.isSuperAdmin()){
             throw new BusinessException("超级管理员角色无法删除");
@@ -132,7 +132,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role>  implements R
         }else {
             throw new BusinessException("删除角色失败，角色可能不存在");
         }
-        return i;
+        return true;
     }
 
     @Override
@@ -188,7 +188,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role>  implements R
 
 
     @Override
-    public List<RoleVO> findRoleByUserId(Long userId) {
+    public List<RoleVO> findByUserId(Long userId) {
         if (userId == null) {
             return Collections.emptyList();
         }
@@ -197,10 +197,21 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role>  implements R
             return Collections.emptyList();
         }
         List<Long> roleIds = userRoles.stream().map(UserRole::getRoleId).toList();
+        return this.findById(roleIds);
+    }
+
+    @Override
+    public RoleVO findById(Long id) {
+        Role role = checkAndResult(id);
+        return RoleMapping.INSTANCE.toRoleVO(role);
+    }
+
+    @Override
+    public List<RoleVO> findById(Collection<Long> ids) {
         QueryWrapper<Role> roleQueryWrapper = new QueryWrapper<>();
         roleQueryWrapper
                 .lambda()
-                .in(Role::getId, roleIds)
+                .in(Role::getId, ids)
                 .eq(Role::getEnabled, true);
         List<Role> roles = roleMapper.selectList(roleQueryWrapper);
         return RoleMapping.INSTANCE.toRoleVO(roles);

@@ -1,23 +1,30 @@
 package org.imtp.api.config.redis;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.imtp.api.config.security.RequestUrlAuthority;
 import org.imtp.api.config.security.authentication.email.EmailAuthenticationToken;
 import org.imtp.api.config.security.authentication.ott.OneTimeTokenAuthenticationTokenMixin;
 import org.imtp.api.config.security.authentication.refreshtoken.RefreshAuthenticationToken;
-import org.imtp.api.config.security.RequestUrlAuthority;
 import org.imtp.api.config.security.oauth2.OAuthClientAuthenticationToken;
+import org.imtp.api.context.TenantContext;
 import org.imtp.api.domain.entity.AuthorityUrl;
 import org.imtp.api.domain.entity.User;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.cache.RedisCacheConfiguration;
+import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.security.authentication.ott.OneTimeTokenAuthenticationToken;
 import org.springframework.security.jackson2.CoreJackson2Module;
 import org.springframework.security.web.jackson2.WebServletJackson2Module;
+
+import java.time.Duration;
 
 /**
  * @Description
@@ -25,10 +32,13 @@ import org.springframework.security.web.jackson2.WebServletJackson2Module;
  * @Date 2024/7/8 16:59
  */
 @Configuration
-public class RedisConfig {
+public class RedisConfig{
+
+    @Value("${spring.application.name:''}")
+    private String applicationName;
 
     @Bean
-    public RedisTemplate<String,Object> redisTemplate(RedisConnectionFactory redisConnectionFactory){
+    public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
         RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(redisConnectionFactory);
 
@@ -45,7 +55,7 @@ public class RedisConfig {
     }
 
     @Bean
-    public <T> RedisTemplate<String,T> authRedisTemplate(RedisConnectionFactory redisConnectionFactory){
+    public <T> RedisTemplate<String, T> authRedisTemplate(RedisConnectionFactory redisConnectionFactory) {
         RedisTemplate<String, T> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(redisConnectionFactory);
 
@@ -71,8 +81,32 @@ public class RedisConfig {
         objectMapper.addMixIn(EmailAuthenticationToken.class, EmailAuthenticationToken.EmailAuthenticationTokenMixin.class);
         objectMapper.addMixIn(RefreshAuthenticationToken.class, RefreshAuthenticationToken.RefreshAuthenticationTokenMixin.class);
         objectMapper.addMixIn(OneTimeTokenAuthenticationToken.class, OneTimeTokenAuthenticationTokenMixin.class);
-        objectMapper.addMixIn(User.class,User.UserMixin.class);
+        objectMapper.addMixIn(User.class, User.UserMixin.class);
         return new GenericJackson2JsonRedisSerializer(objectMapper);
+    }
+
+    @Bean
+    public RedisCacheManager redisCacheManager(RedisConnectionFactory redisConnectionFactory) {
+
+        return RedisCacheManager
+                .builder(redisConnectionFactory)
+                .cacheDefaults(redisCacheConfiguration(Duration.ofHours(1)))
+                .build();
+
+    }
+
+
+    public RedisCacheConfiguration redisCacheConfiguration(Duration duration) {
+        return RedisCacheConfiguration
+                .defaultCacheConfig()
+                .entryTtl(duration) // 默认1小时过期
+                .computePrefixWith(cacheName -> {
+                    Long tenantId = TenantContext.getTenantId();
+                    return applicationName + ":" + tenantId + ":" + cacheName + ":";
+                })
+                .serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(new StringRedisSerializer()))
+                .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(new GenericJackson2JsonRedisSerializer()))
+                .disableCachingNullValues();// 关闭缓存null
     }
 
 }

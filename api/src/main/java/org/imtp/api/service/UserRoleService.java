@@ -8,9 +8,9 @@ import java.util.List;
 
 public interface UserRoleService extends IService<UserRole> {
 
-    Boolean bindUserRole(Long userId, Collection<Long> roleIds);
+    List<UserRole> bindUserRole(Long userId, Collection<Long> roleIds);
 
-    Boolean bindRoleUser(Long roleId, Collection<Long> userIds);
+    List<UserRole> bindRoleUser(Long roleId, Collection<Long> userIds);
 
     List<UserRole> findByRoleId(Long roleId);
 

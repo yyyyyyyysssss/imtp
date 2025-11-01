@@ -56,8 +56,8 @@ public class RoleController {
 
     @DeleteMapping("/{id}")
     public Result<?> delete(@PathVariable("id") Long id) {
-        Integer affectedRows = roleService.delete(id);
-        return ResultGenerator.ok(affectedRows);
+        Boolean f = roleService.deleteById(id);
+        return ResultGenerator.ok(f);
     }
 
     @GetMapping("/{id}")

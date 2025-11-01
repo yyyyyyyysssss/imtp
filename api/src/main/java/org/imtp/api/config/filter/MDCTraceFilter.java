@@ -1,4 +1,4 @@
-package org.imtp.api.filter;
+package org.imtp.api.config.filter;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

@@ -24,12 +24,10 @@ public interface MenuService extends IService<Authority> {
 
     PageInfo<MenuVO> query(MenuQueryDTO menuQueryDTO);
 
-    MenuVO details(String id);
+    MenuVO details(Long id);
 
     List<MenuVO> findMenuByRoleIds(List<Long> roleIds);
 
-    Integer delete(String id);
-
-    Integer batchDelete(Collection<String> ids);
+    Boolean deleteById(Long id);
 
 }

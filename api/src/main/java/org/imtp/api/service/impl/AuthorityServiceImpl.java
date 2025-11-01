@@ -116,24 +116,26 @@ public class AuthorityServiceImpl extends AbstractAuthorityService implements Au
     }
 
     @Override
-    public Integer delete(String id) {
+    @Transactional
+    public Boolean deleteById(Long id) {
         Authority authority = authorityMapper.selectById(id);
         if (authority == null || !authority.getType().equals(AuthorityType.BUTTON)){
             throw new BusinessException("该权限不存在");
         }
-        return authorityMapper.deleteById(id);
+        int i = authorityMapper.deleteById(id);
+        if(i > 0){
+            // 删除权限对应的角色权限关联
+            roleAuthorityService.deleteByAuthorityId(id);
+        }
+        return i > 0;
     }
 
     @Override
-    public List<AuthorityVO> findAuthorityByRoleIds(Collection<Long> roleIds) {
+    public List<AuthorityVO> findByRoleId(Collection<Long> roleIds) {
         if (CollectionUtils.isEmpty(roleIds)) {
             return Collections.emptyList();
         }
-        QueryWrapper<RoleAuthority> queryWrapper = new QueryWrapper<>();
-        queryWrapper
-                .lambda()
-                .in(RoleAuthority::getRoleId, roleIds);
-        List<RoleAuthority> roleAuthorities = roleAuthorityService.list(queryWrapper);
+        List<RoleAuthority> roleAuthorities = roleAuthorityService.findByRoleId(roleIds);
         if (CollectionUtils.isEmpty(roleAuthorities)){
             return Collections.emptyList();
         }
@@ -143,23 +145,5 @@ public class AuthorityServiceImpl extends AbstractAuthorityService implements Au
             return Collections.emptyList();
         }
         return AuthorityMapping.INSTANCE.toAuthorityVO(authorities);
-    }
-
-    @Override
-    @Transactional
-    public Boolean batchDelete(Collection<String> ids) {
-        QueryWrapper<Authority> authorityQueryWrapper = new QueryWrapper<>();
-        authorityQueryWrapper
-                .lambda()
-                .select(Authority::getType)
-                .in(Authority::getId,ids);
-        List<Authority> authorities = authorityMapper.selectList(authorityQueryWrapper);
-        if (authorities == null || authorities.isEmpty()){
-            throw new BusinessException("权限不存在");
-        }
-        if (authorities.stream().anyMatch(f -> !f.getType().equals(AuthorityType.BUTTON))){
-            throw new BusinessException("存在非权限类型的权限");
-        }
-        return this.removeBatchByIds(ids);
     }
 }

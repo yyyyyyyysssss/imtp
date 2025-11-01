@@ -8,6 +8,7 @@ import org.imtp.api.domain.dto.RoleUpdateDTO;
 import org.imtp.api.domain.entity.Role;
 import org.imtp.api.domain.vo.RoleVO;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -33,8 +34,12 @@ public interface RoleService extends IService<Role> {
 
     List<RoleVO> listRoleOptions();
 
-    Integer delete(Long id);
+    Boolean deleteById(Long id);
 
-    List<RoleVO> findRoleByUserId(Long userId);
+    List<RoleVO> findByUserId(Long userId);
+
+    RoleVO findById(Long id);
+
+    List<RoleVO> findById(Collection<Long> ids);
 
 }

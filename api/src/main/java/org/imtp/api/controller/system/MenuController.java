@@ -58,21 +58,15 @@ public class MenuController extends BaseController {
     }
 
     @GetMapping("/{id}")
-    public Result<?> details(@PathVariable("id") String id) {
+    public Result<?> details(@PathVariable("id") Long id) {
         MenuVO menuVO = menuService.details(id);
         return ResultGenerator.ok(menuVO);
     }
 
     @DeleteMapping("/{id}")
-    public Result<?> delete(@PathVariable("id") String id) {
-        Integer affectedRows = menuService.delete(id);
-        return ResultGenerator.ok(affectedRows);
-    }
-
-    @DeleteMapping("/delete")
-    public Result<?> batchDelete(@RequestBody @Validated IdsOnlyDTO idsOnlyDTO) {
-        Integer affectedRows = menuService.batchDelete(idsOnlyDTO.getId());
-        return ResultGenerator.ok(affectedRows);
+    public Result<?> delete(@PathVariable("id") Long id) {
+        Boolean f = menuService.deleteById(id);
+        return ResultGenerator.ok(f);
     }
 
 }

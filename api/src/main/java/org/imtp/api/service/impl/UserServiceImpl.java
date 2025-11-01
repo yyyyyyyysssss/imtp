@@ -98,13 +98,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     private UserDetails userDetails(User user) {
-        List<RoleVO> roles = roleService.findRoleByUserId(user.getId());
+        List<RoleVO> roles = roleService.findByUserId(user.getId());
         if (roles == null || roles.isEmpty()) {
             user.setAuthorities(new ArrayList<RequestUrlAuthority>());
             return user;
         }
         List<Long> roleIds = roles.stream().map(RoleVO::getId).toList();
-        List<AuthorityVO> authorities = authorityService.findAuthorityByRoleIds(roleIds);
+        List<AuthorityVO> authorities = authorityService.findByRoleId(roleIds);
         if (authorities == null || authorities.isEmpty()) {
             user.setAuthorities(new ArrayList<RequestUrlAuthority>());
         } else {
@@ -260,10 +260,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     public Integer delete(Long id) {
         int i = userMapper.deleteById(id);
         if (i > 0){
-            // 删除角色对应的权限
+            // 删除用户对应的角色关联
             userRoleService.deleteByUserId(id);
         }else {
-            throw new BusinessException("删除用户失败，用户可能不存在");
+            throw new BusinessException("删除用户失败，用户不存在");
         }
         return i;
     }
@@ -272,7 +272,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Transactional
     public Boolean bindRoles(Long id, List<Long> roleIds) {
 
-        return userRoleService.bindUserRole(id, roleIds);
+        return !userRoleService.bindUserRole(id, roleIds).isEmpty();
     }
 
     private User checkAndResult(Long id){
