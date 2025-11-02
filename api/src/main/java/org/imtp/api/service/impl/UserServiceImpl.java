@@ -24,7 +24,6 @@ import org.imtp.api.mapper.UserMapper;
 import org.imtp.api.mapping.UserMapping;
 import org.imtp.api.service.AuthorityService;
 import org.imtp.api.service.RoleService;
-import org.imtp.api.service.UserRoleService;
 import org.imtp.api.service.UserService;
 import org.imtp.api.utils.PasswordGeneratorUtils;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -55,9 +54,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Resource
     private AuthorityService authorityService;
-
-    @Resource
-    private UserRoleService userRoleService;
 
     @Resource
     private PasswordEncoder passwordEncoder;
@@ -98,7 +94,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     private UserDetails userDetails(User user) {
-        List<RoleVO> roles = roleService.findByUserId(user.getId());
+        List<RoleVO> roles = roleService.findRoleByUserId(user.getId());
         if (roles == null || roles.isEmpty()) {
             user.setAuthorities(new ArrayList<RequestUrlAuthority>());
             return user;
@@ -123,6 +119,17 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Override
     public User findByUserId(Serializable userId) {
         return userMapper.selectById(userId);
+    }
+
+    @Override
+    public List<UserVO> findByUserId(Collection<Long> userIds) {
+        if (CollectionUtils.isEmpty(userIds)) {
+            log.warn("findByUserId called with empty userIds");
+            return Collections.emptyList();
+        }
+        return userMapper.selectBatchIds(userIds).stream()
+                .map(UserMapping.INSTANCE::toUserVO)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -211,9 +218,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         User user = checkAndResult(id);
         UserVO userVO = UserMapping.INSTANCE.toUserVO(user);
         // 查询用户对应的角色
-        List<UserRole> userRoles = userRoleService.findByUserId(id);
-        if(!CollectionUtils.isEmpty(userRoles)){
-            List<Long> roleIds = userRoles.stream().map(UserRole::getRoleId).toList();
+        List<RoleVO> roles = roleService.findRoleByUserId(id);
+        if(!CollectionUtils.isEmpty(roles)){
+            List<Long> roleIds = roles.stream().map(RoleVO::getId).toList();
             userVO.setRoleIds(roleIds);
         }
         return userVO;
@@ -257,22 +264,21 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     @Override
-    public Integer delete(Long id) {
+    public Boolean deleteById(Long id) {
         int i = userMapper.deleteById(id);
-        if (i > 0){
-            // 删除用户对应的角色关联
-            userRoleService.deleteByUserId(id);
-        }else {
+        if(i <= 0){
             throw new BusinessException("删除用户失败，用户不存在");
         }
-        return i;
+        // 解绑用户对应的角色
+        roleService.unbindUserRoles(id);
+        return true;
     }
 
     @Override
     @Transactional
     public Boolean bindRoles(Long id, List<Long> roleIds) {
-
-        return !userRoleService.bindUserRole(id, roleIds).isEmpty();
+        List<RoleVO> roles = roleService.bindUserRole(id, roleIds);
+        return roles.size() == roleIds.size();
     }
 
     private User checkAndResult(Long id){

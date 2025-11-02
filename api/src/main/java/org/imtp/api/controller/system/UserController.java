@@ -61,8 +61,8 @@ public class UserController {
 
     @DeleteMapping("/{id}")
     public Result<?> delete(@PathVariable("id") Long id) {
-        Integer affectedRows = userService.delete(id);
-        return ResultGenerator.ok(affectedRows);
+        Boolean b = userService.deleteById(id);
+        return ResultGenerator.ok(b);
     }
 
     @PostMapping("/query")

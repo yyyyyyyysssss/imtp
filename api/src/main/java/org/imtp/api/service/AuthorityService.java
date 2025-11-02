@@ -24,4 +24,6 @@ public interface AuthorityService extends IService<Authority> {
     Boolean deleteById(Long id);
 
     List<AuthorityVO> findByRoleId(Collection<Long> roleIds);
+
+    List<AuthorityVO> findByAuthorityId(Collection<Long> authorityIds);
 }

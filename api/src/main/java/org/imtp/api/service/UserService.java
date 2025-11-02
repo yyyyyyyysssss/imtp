@@ -13,6 +13,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.List;
 
 public interface UserService extends UserDetailsService, IService<User> {
@@ -22,6 +23,8 @@ public interface UserService extends UserDetailsService, IService<User> {
     User findByUsername(String username);
 
     User findByUserId(Serializable userId);
+
+    List<UserVO> findByUserId(Collection<Long> userIds);
 
     UserDetails loadUserByUserId(Long userId) throws UsernameNotFoundException;
 
@@ -41,6 +44,6 @@ public interface UserService extends UserDetailsService, IService<User> {
 
     Boolean bindRoles(Long id, List<Long> roleIds);
 
-    Integer delete(Long id);
+    Boolean deleteById(Long id);
 
 }

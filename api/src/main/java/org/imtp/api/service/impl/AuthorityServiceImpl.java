@@ -146,4 +146,16 @@ public class AuthorityServiceImpl extends AbstractAuthorityService implements Au
         }
         return AuthorityMapping.INSTANCE.toAuthorityVO(authorities);
     }
+
+    @Override
+    public List<AuthorityVO> findByAuthorityId(Collection<Long> authorityIds) {
+        if (CollectionUtils.isEmpty(authorityIds)) {
+            return Collections.emptyList();
+        }
+        List<Authority> authorities = authorityMapper.selectBatchIds(authorityIds);
+        if (CollectionUtils.isEmpty(authorities)) {
+            return Collections.emptyList();
+        }
+        return AuthorityMapping.INSTANCE.toAuthorityVO(authorities);
+    }
 }

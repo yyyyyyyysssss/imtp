@@ -6,7 +6,10 @@ import org.imtp.api.domain.dto.RoleCreateDTO;
 import org.imtp.api.domain.dto.RoleQueryDTO;
 import org.imtp.api.domain.dto.RoleUpdateDTO;
 import org.imtp.api.domain.entity.Role;
+import org.imtp.api.domain.entity.UserRole;
+import org.imtp.api.domain.vo.AuthorityVO;
 import org.imtp.api.domain.vo.RoleVO;
+import org.imtp.api.domain.vo.UserVO;
 
 import java.util.Collection;
 import java.util.List;
@@ -24,9 +27,27 @@ public interface RoleService extends IService<Role> {
 
     Integer updatePartial(RoleUpdateDTO roleUpdateDTO);
 
-    Boolean bindAuthorities(Long roleId, List<Long> authorityIds);
+    List<AuthorityVO> findAuthorityByRoleId(Long roleId);
 
-    Boolean bindUsers(Long id, List<Long> userIds);
+    List<AuthorityVO> bindRoleAuthorities(Long roleId, List<Long> authorityIds);
+
+    Boolean unbindRoleAuthorities(Long roleId);
+
+    Boolean unbindAuthorityRole(Collection<Long> authorityIds);
+
+    List<UserVO> findUserByRoleId(Long roleId);
+
+    List<UserVO> bindRoleUsers(Long roleId, List<Long> userIds);
+
+    Boolean unbindRoleUsers(Long roleId);
+
+    List<RoleVO> findRoleByUserId(Long userId);
+
+    List<RoleVO> bindUserRole(Long userId, Collection<Long> roleIds);
+
+    Boolean unbindUserRoles(Long userId);
+
+    RoleVO findById(Long roleId);
 
     PageInfo<RoleVO> queryList(RoleQueryDTO queryDTO);
 
@@ -34,12 +55,6 @@ public interface RoleService extends IService<Role> {
 
     List<RoleVO> listRoleOptions();
 
-    Boolean deleteById(Long id);
-
-    List<RoleVO> findByUserId(Long userId);
-
-    RoleVO findById(Long id);
-
-    List<RoleVO> findById(Collection<Long> ids);
+    Boolean deleteById(Long roleId);
 
 }

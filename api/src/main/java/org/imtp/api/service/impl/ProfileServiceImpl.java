@@ -59,7 +59,7 @@ public class ProfileServiceImpl implements ProfileService {
         userInfoVO.setAvatar(user.getAvatar());
 
         // 用户角色
-        List<RoleVO> roles = roleService.findByUserId(userId);
+        List<RoleVO> roles = roleService.findRoleByUserId(userId);
         if (!CollectionUtils.isEmpty(roles)){
             List<String> roleCodes = roles.stream().map(RoleVO::getCode).toList();
             userInfoVO.setRoleCodes(roleCodes);

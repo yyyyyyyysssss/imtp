@@ -38,14 +38,14 @@ public class RoleController {
 
     @PostMapping("/{id}/authorities")
     public Result<?> bindAuthorities(@PathVariable Long id, @RequestBody RoleBindAuthoritiesDTO roleBindAuthoritiesDTO) {
-        Boolean bindAuthority = roleService.bindAuthorities(id,roleBindAuthoritiesDTO.getAuthorityIds());
-        return ResultGenerator.ok(bindAuthority);
+        roleService.bindRoleAuthorities(id,roleBindAuthoritiesDTO.getAuthorityIds());
+        return ResultGenerator.ok();
     }
 
     @PostMapping("/{id}/users")
     public Result<?> bindUsers(@PathVariable Long id, @RequestBody RoleBindUserDTO roleBindUserDTO) {
-        Boolean bindAuthority = roleService.bindUsers(id,roleBindUserDTO.getUserIds());
-        return ResultGenerator.ok(bindAuthority);
+        roleService.bindRoleUsers(id,roleBindUserDTO.getUserIds());
+        return ResultGenerator.ok();
     }
 
     @PatchMapping
