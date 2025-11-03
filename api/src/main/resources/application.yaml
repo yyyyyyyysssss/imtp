@@ -5,6 +5,8 @@ server:
       max: 200
 
 spring:
+  application:
+    name: api-service
   mvc:
     async:
       request-timeout: -1
