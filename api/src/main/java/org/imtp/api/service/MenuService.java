@@ -14,9 +14,11 @@ import java.util.List;
 
 public interface MenuService extends IService<Authority> {
 
-    Long create(MenuCreateDTO menuCreateDTO);
+    Long createMenu(MenuCreateDTO menuCreateDTO);
 
-    Integer update(MenuUpdateDTO menuUpdateDTO);
+    Integer updateMenu(MenuUpdateDTO menuUpdateDTO);
+
+    Boolean deleteMenu(Long id);
 
     Boolean menuDrag(MenuDragDTO menuDragDTO);
 
@@ -27,7 +29,4 @@ public interface MenuService extends IService<Authority> {
     MenuVO details(Long id);
 
     List<MenuVO> findMenuByRoleIds(List<Long> roleIds);
-
-    Boolean deleteById(Long id);
-
 }

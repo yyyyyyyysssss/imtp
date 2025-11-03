@@ -11,19 +11,17 @@ import java.util.List;
 
 public interface AuthorityService extends IService<Authority> {
 
-    Long create(AuthorityCreateDTO authorityAddDTO);
+    Long createAuthority(AuthorityCreateDTO authorityAddDTO);
 
-    Integer update(AuthorityUpdateDTO authorityUpdateDTO);
-
-    Integer updatePartial(AuthorityUpdateDTO authorityUpdateDTO);
+    Boolean updateAuthority(AuthorityUpdateDTO authorityUpdateDTO, Boolean isFullUpdate);
 
     AuthorityVO details(String id);
 
     List<AuthorityVO> tree();
 
-    Boolean deleteById(Long id);
+    Boolean deleteAuthority(Long id);
 
-    List<AuthorityVO> findByRoleId(Collection<Long> roleIds);
+    List<AuthorityVO> findByRoleId(Long roleId);
 
-    List<AuthorityVO> findByAuthorityId(Collection<Long> authorityIds);
+    List<AuthorityVO> findByUserId(Long userId);
 }

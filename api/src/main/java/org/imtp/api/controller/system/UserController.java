@@ -30,21 +30,21 @@ public class UserController {
     private UserService userService;
 
     @PostMapping
-    public Result<?> create(@RequestBody @Validated UserCreateDTO userCreateDTO) {
-        UserCreateVO userCreateVO = userService.create(userCreateDTO);
+    public Result<?> createUser(@RequestBody @Validated UserCreateDTO userCreateDTO) {
+        UserCreateVO userCreateVO = userService.createUser(userCreateDTO);
         return ResultGenerator.ok(userCreateVO);
     }
 
     @PutMapping
-    public Result<?> update(@RequestBody @Validated(value = UserUpdateDTO.UpdateAll.class) UserUpdateDTO userUpdateDTO) {
-        Integer affectedRows = userService.update(userUpdateDTO);
-        return ResultGenerator.ok(affectedRows);
+    public Result<?> updateUser(@RequestBody @Validated(value = UserUpdateDTO.UpdateAll.class) UserUpdateDTO userUpdateDTO) {
+        Boolean b = userService.updateUser(userUpdateDTO,true);
+        return ResultGenerator.ok(b);
     }
 
     @PatchMapping
-    public Result<?> updatePatch(@RequestBody @Validated UserUpdateDTO userUpdateDTO) {
-        Integer affectedRows = userService.updatePartial(userUpdateDTO);
-        return ResultGenerator.ok(affectedRows);
+    public Result<?> modifyUser(@RequestBody @Validated UserUpdateDTO userUpdateDTO) {
+        Boolean b = userService.updateUser(userUpdateDTO,false);
+        return ResultGenerator.ok(b);
     }
 
     @PutMapping("/{id}/password")
@@ -61,7 +61,7 @@ public class UserController {
 
     @DeleteMapping("/{id}")
     public Result<?> delete(@PathVariable("id") Long id) {
-        Boolean b = userService.deleteById(id);
+        Boolean b = userService.deleteUser(id);
         return ResultGenerator.ok(b);
     }
 

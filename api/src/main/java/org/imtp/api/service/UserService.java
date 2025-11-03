@@ -26,13 +26,13 @@ public interface UserService extends UserDetailsService, IService<User> {
 
     List<UserVO> findByUserId(Collection<Long> userIds);
 
+    List<UserVO> findByRoleId(Long roleId);
+
     UserDetails loadUserByUserId(Long userId) throws UsernameNotFoundException;
 
-    UserCreateVO create(UserCreateDTO userCreateDTO);
+    UserCreateVO createUser(UserCreateDTO userCreateDTO);
 
-    Integer update(UserUpdateDTO userUpdateDTO);
-
-    Integer updatePartial(UserUpdateDTO userUpdateDTO);
+    Boolean updateUser(UserUpdateDTO userUpdateDTO, Boolean isFullUpdate);
 
     String resetPassword(Long userId);
 
@@ -44,6 +44,6 @@ public interface UserService extends UserDetailsService, IService<User> {
 
     Boolean bindRoles(Long id, List<Long> roleIds);
 
-    Boolean deleteById(Long id);
+    Boolean deleteUser(Long id);
 
 }

@@ -8,14 +8,16 @@ import org.imtp.api.config.idwork.IdGen;
 import org.imtp.api.domain.dto.AuthorityCreateDTO;
 import org.imtp.api.domain.dto.AuthorityUpdateDTO;
 import org.imtp.api.domain.entity.Authority;
-import org.imtp.api.domain.entity.RoleAuthority;
 import org.imtp.api.domain.vo.AuthorityVO;
+import org.imtp.api.domain.vo.RoleVO;
 import org.imtp.api.enums.AuthorityType;
 import org.imtp.api.mapper.AuthorityMapper;
 import org.imtp.api.mapping.AuthorityMapping;
 import org.imtp.api.service.AuthorityService;
 import org.imtp.api.service.RoleAuthorityService;
+import org.imtp.api.service.RoleService;
 import org.imtp.api.utils.TreeUtils;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -38,10 +40,13 @@ public class AuthorityServiceImpl extends AbstractAuthorityService implements Au
     private AuthorityMapper authorityMapper;
 
     @Resource
+    private RoleService roleService;
+
+    @Resource
     private RoleAuthorityService roleAuthorityService;
 
     @Override
-    public Long create(AuthorityCreateDTO authorityAddDTO) {
+    public Long createAuthority(AuthorityCreateDTO authorityAddDTO) {
         Authority authority = AuthorityMapping.INSTANCE.toAuthority(authorityAddDTO);
         authority.setId(IdGen.genId());
         authority.setType(AuthorityType.BUTTON);
@@ -60,31 +65,21 @@ public class AuthorityServiceImpl extends AbstractAuthorityService implements Au
     }
 
     @Override
-    public Integer update(AuthorityUpdateDTO authorityUpdateDTO) {
+    public Boolean updateAuthority(AuthorityUpdateDTO authorityUpdateDTO, Boolean isFullUpdate) {
         Authority authority = authorityMapper.selectById(authorityUpdateDTO.getId());
         if (authority == null || !authority.getType().equals(AuthorityType.BUTTON)) {
             throw new BusinessException("该操作权限不存在");
         }
-        AuthorityMapping.INSTANCE.overwriteAuthority(authorityUpdateDTO,authority);
+        if (isFullUpdate){
+            AuthorityMapping.INSTANCE.overwriteAuthority(authorityUpdateDTO,authority);
+        } else {
+            AuthorityMapping.INSTANCE.updateAuthority(authorityUpdateDTO,authority);
+        }
         if(authorityUpdateDTO.getParentId() != null && !authorityUpdateDTO.getParentId().isEmpty() && !authorityUpdateDTO.getParentId().equals(authority.getParentId().toString())){
             Authority selectAuthority = authorityMapper.selectById(authorityUpdateDTO.getParentId());
             authority.setRootId(selectAuthority.getRootId());
         }
-        return authorityMapper.updateById(authority);
-    }
-
-    @Override
-    public Integer updatePartial(AuthorityUpdateDTO authorityUpdateDTO) {
-        Authority authority = authorityMapper.selectById(authorityUpdateDTO.getId());
-        if (authority == null || !authority.getType().equals(AuthorityType.BUTTON)) {
-            throw new BusinessException("该操作权限不存在");
-        }
-        AuthorityMapping.INSTANCE.updateAuthority(authorityUpdateDTO,authority);
-        if(authorityUpdateDTO.getParentId() != null && !authorityUpdateDTO.getParentId().isEmpty() && !authorityUpdateDTO.getParentId().equals(authority.getParentId().toString())){
-            Authority selectAuthority = authorityMapper.selectById(authorityUpdateDTO.getParentId());
-            authority.setRootId(selectAuthority.getRootId());
-        }
-        return authorityMapper.updateById(authority);
+        return authorityMapper.updateById(authority) > 0;
     }
 
     @Override
@@ -117,39 +112,52 @@ public class AuthorityServiceImpl extends AbstractAuthorityService implements Au
 
     @Override
     @Transactional
-    public Boolean deleteById(Long id) {
+    public Boolean deleteAuthority(Long id) {
         Authority authority = authorityMapper.selectById(id);
         if (authority == null || !authority.getType().equals(AuthorityType.BUTTON)){
             throw new BusinessException("该权限不存在");
         }
         int i = authorityMapper.deleteById(id);
-        if(i > 0){
-            // 删除权限对应的角色权限关联
-            roleAuthorityService.deleteByAuthorityId(id);
+        if(i <= 0){
+            throw new BusinessException("删除权限失败");
         }
-        return i > 0;
+        // 解绑该权限与角色的关联关系
+        roleService.unbindAuthorityRole(id);
+        return true;
     }
 
+    // 根据角色ID查询权限
     @Override
-    public List<AuthorityVO> findByRoleId(Collection<Long> roleIds) {
+    @Cacheable(value = "role:authority", key = "#roleId")
+    public List<AuthorityVO> findByRoleId(Long roleId) {
+        if(roleId == null){
+            return Collections.emptyList();
+        }
+        return this.findByRoleId(Collections.singletonList(roleId));
+    }
+
+    // 根据用户ID查询权限
+    @Override
+    @Cacheable(value = "user:authority", key = "#userId")
+    public List<AuthorityVO> findByUserId(Long userId) {
+        if(userId == null){
+            return Collections.emptyList();
+        }
+        List<RoleVO> roles = roleService.findByUserId(userId);
+        if(CollectionUtils.isEmpty(roles)){
+            return Collections.emptyList();
+        }
+        List<Long> roleIds = roles.stream().map(RoleVO::getId).toList();
+        return this.findByRoleId(roleIds);
+    }
+
+
+    private List<AuthorityVO> findByRoleId(Collection<Long> roleIds) {
         if (CollectionUtils.isEmpty(roleIds)) {
             return Collections.emptyList();
         }
-        List<RoleAuthority> roleAuthorities = roleAuthorityService.findByRoleId(roleIds);
-        if (CollectionUtils.isEmpty(roleAuthorities)){
-            return Collections.emptyList();
-        }
-        List<Long> authorityIds = roleAuthorities.stream().map(RoleAuthority::getAuthorityId).distinct().toList();
-        List<Authority> authorities = authorityMapper.selectBatchIds(authorityIds);
-        if (CollectionUtils.isEmpty(authorities)) {
-            return Collections.emptyList();
-        }
-        return AuthorityMapping.INSTANCE.toAuthorityVO(authorities);
-    }
-
-    @Override
-    public List<AuthorityVO> findByAuthorityId(Collection<Long> authorityIds) {
-        if (CollectionUtils.isEmpty(authorityIds)) {
+        List<Long> authorityIds = roleAuthorityService.findAuthorityIdByRoleId(roleIds);
+        if (CollectionUtils.isEmpty(authorityIds)){
             return Collections.emptyList();
         }
         List<Authority> authorities = authorityMapper.selectBatchIds(authorityIds);

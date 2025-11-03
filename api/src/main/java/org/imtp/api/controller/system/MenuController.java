@@ -28,14 +28,14 @@ public class MenuController extends BaseController {
     private MenuService menuService;
 
     @PostMapping
-    public Result<?> create(@RequestBody @Validated MenuCreateDTO menuCreateDTO) {
-        Long id = menuService.create(menuCreateDTO);
+    public Result<?> createMenu(@RequestBody @Validated MenuCreateDTO menuCreateDTO) {
+        Long id = menuService.createMenu(menuCreateDTO);
         return ResultGenerator.ok(id);
     }
 
     @PutMapping
-    public Result<?> update(@RequestBody @Validated MenuUpdateDTO menuUpdateDTO) {
-        Integer affectedRows = menuService.update(menuUpdateDTO);
+    public Result<?> updateMenu(@RequestBody @Validated MenuUpdateDTO menuUpdateDTO) {
+        Integer affectedRows = menuService.updateMenu(menuUpdateDTO);
         return ResultGenerator.ok(affectedRows);
     }
 
@@ -65,7 +65,7 @@ public class MenuController extends BaseController {
 
     @DeleteMapping("/{id}")
     public Result<?> delete(@PathVariable("id") Long id) {
-        Boolean f = menuService.deleteById(id);
+        Boolean f = menuService.deleteMenu(id);
         return ResultGenerator.ok(f);
     }
 

@@ -18,18 +18,18 @@ import org.imtp.api.domain.entity.Role;
 import org.imtp.api.domain.vo.MenuVO;
 import org.imtp.api.enums.AuthorityType;
 import org.imtp.api.mapper.AuthorityMapper;
-import org.imtp.api.mapper.RoleMapper;
 import org.imtp.api.mapping.AuthorityMapping;
-import org.imtp.api.service.AuthorityService;
 import org.imtp.api.service.MenuService;
-import org.imtp.api.service.RoleAuthorityService;
 import org.imtp.api.service.RoleService;
 import org.imtp.api.utils.TreeUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -48,11 +48,8 @@ public class MenuServiceImpl extends AbstractAuthorityService implements MenuSer
     @Resource
     private AuthorityMapper authorityMapper;
 
-    @Resource
-    private RoleAuthorityService roleAuthorityService;
-
     @Override
-    public Long create(MenuCreateDTO menuCreateDTO) {
+    public Long createMenu(MenuCreateDTO menuCreateDTO) {
         Authority authority = AuthorityMapping.INSTANCE.toAuthority(menuCreateDTO);
         authority.setId(IdGen.genId());
         authority.setType(AuthorityType.MENU);
@@ -72,7 +69,7 @@ public class MenuServiceImpl extends AbstractAuthorityService implements MenuSer
     }
 
     @Override
-    public Integer update(MenuUpdateDTO menuUpdateDTO) {
+    public Integer updateMenu(MenuUpdateDTO menuUpdateDTO) {
         Authority authority = authorityMapper.selectById(menuUpdateDTO.getId());
         if (authority == null || !authority.getType().equals(AuthorityType.MENU)) {
             throw new BusinessException("该菜单不存在");
@@ -267,7 +264,7 @@ public class MenuServiceImpl extends AbstractAuthorityService implements MenuSer
 
     @Override
     @Transactional
-    public Boolean deleteById(Long id) {
+    public Boolean deleteMenu(Long id) {
         //查询出菜单对应的所有子菜单或权限
         List<Authority> authorities = authorityMapper.selectChildrenById(id);
         if (authorities == null || authorities.isEmpty()) {
@@ -278,8 +275,8 @@ public class MenuServiceImpl extends AbstractAuthorityService implements MenuSer
         if(i != delIds.size()){
             throw new BusinessException("删除菜单失败");
         }
-        //删除角色对应的菜单
-        roleAuthorityService.deleteByAuthorityId(delIds);
+        //删除菜单或权限与角色的关联关系
+        roleService.unbindAuthorityRole(delIds);
         return true;
     }
 

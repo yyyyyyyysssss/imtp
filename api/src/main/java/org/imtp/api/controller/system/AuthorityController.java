@@ -28,21 +28,21 @@ public class AuthorityController {
     private AuthorityService authorityService;
 
     @PostMapping
-    public Result<?> create(@RequestBody @Validated AuthorityCreateDTO authorityCreateDTO) {
-        Long id = authorityService.create(authorityCreateDTO);
+    public Result<?> createAuthority(@RequestBody @Validated AuthorityCreateDTO authorityCreateDTO) {
+        Long id = authorityService.createAuthority(authorityCreateDTO);
         return ResultGenerator.ok(id);
     }
 
     @PutMapping
-    public Result<?> update(@RequestBody @Validated AuthorityUpdateDTO authorityUpdateDTO) {
-        Integer affectedRows = authorityService.update(authorityUpdateDTO);
-        return ResultGenerator.ok(affectedRows);
+    public Result<?> updateAuthority(@RequestBody @Validated AuthorityUpdateDTO authorityUpdateDTO) {
+        Boolean f = authorityService.updateAuthority(authorityUpdateDTO,true);
+        return ResultGenerator.ok(f);
     }
 
     @PatchMapping
-    public Result<?> updatePatch(@RequestBody @Validated AuthorityUpdateDTO authorityUpdateDTO) {
-        Integer affectedRows = authorityService.updatePartial(authorityUpdateDTO);
-        return ResultGenerator.ok(affectedRows);
+    public Result<?> modifyAuthority(@RequestBody @Validated AuthorityUpdateDTO authorityUpdateDTO) {
+        Boolean f = authorityService.updateAuthority(authorityUpdateDTO,false);
+        return ResultGenerator.ok(f);
     }
 
     @GetMapping("/{id}")
@@ -59,7 +59,7 @@ public class AuthorityController {
 
     @DeleteMapping("/{id}")
     public Result<Boolean> delete(@PathVariable("id") Long id) {
-        Boolean f = authorityService.deleteById(id);
+        Boolean f = authorityService.deleteAuthority(id);
         return ResultGenerator.ok(f);
     }
 

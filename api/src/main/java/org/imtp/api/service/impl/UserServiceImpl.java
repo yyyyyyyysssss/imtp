@@ -14,6 +14,7 @@ import org.imtp.api.config.security.RequestUrlAuthority;
 import org.imtp.api.domain.dto.UserCreateDTO;
 import org.imtp.api.domain.dto.UserQueryDTO;
 import org.imtp.api.domain.dto.UserUpdateDTO;
+import org.imtp.api.domain.entity.Authority;
 import org.imtp.api.domain.entity.User;
 import org.imtp.api.domain.entity.UserRole;
 import org.imtp.api.domain.vo.AuthorityVO;
@@ -22,10 +23,9 @@ import org.imtp.api.domain.vo.UserCreateVO;
 import org.imtp.api.domain.vo.UserVO;
 import org.imtp.api.mapper.UserMapper;
 import org.imtp.api.mapping.UserMapping;
-import org.imtp.api.service.AuthorityService;
-import org.imtp.api.service.RoleService;
-import org.imtp.api.service.UserService;
+import org.imtp.api.service.*;
 import org.imtp.api.utils.PasswordGeneratorUtils;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -54,6 +54,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Resource
     private AuthorityService authorityService;
+
+    @Resource
+    private UserRoleService userRoleService;
+
+    @Resource
+    private RoleAuthorityService roleAuthorityService;
 
     @Resource
     private PasswordEncoder passwordEncoder;
@@ -94,19 +100,19 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     private UserDetails userDetails(User user) {
-        List<RoleVO> roles = roleService.findRoleByUserId(user.getId());
-        if (roles == null || roles.isEmpty()) {
+        List<Long> roleIds = userRoleService.findRoleIdByUserId(user.getId());
+        if(CollectionUtils.isEmpty(roleIds)){
             user.setAuthorities(new ArrayList<RequestUrlAuthority>());
             return user;
         }
-        List<Long> roleIds = roles.stream().map(RoleVO::getId).toList();
-        List<AuthorityVO> authorities = authorityService.findByRoleId(roleIds);
-        if (authorities == null || authorities.isEmpty()) {
+        List<Long> authorityIds = roleAuthorityService.findAuthorityIdByRoleId(roleIds);
+        if (CollectionUtils.isEmpty(authorityIds)) {
             user.setAuthorities(new ArrayList<RequestUrlAuthority>());
-        } else {
-            List<RequestUrlAuthority> requestUrlAuthorities = authorities.stream().map(m -> new RequestUrlAuthority(m.getCode(), m.getUrls())).toList();
-            user.setAuthorities(requestUrlAuthorities);
+            return user;
         }
+        List<Authority> authorities = authorityService.listByIds(authorityIds);
+        List<RequestUrlAuthority> requestUrlAuthorities = authorities.stream().map(m -> new RequestUrlAuthority(m.getCode(), m.getUrls())).toList();
+        user.setAuthorities(requestUrlAuthorities);
         return user;
     }
 
@@ -132,9 +138,26 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
                 .collect(Collectors.toList());
     }
 
+    // 根据角色查询用户
+    @Override
+    @Cacheable(value = "role:user", key = "#roleId")
+    public List<UserVO> findByRoleId(Long roleId) {
+        if (roleId == null) {
+            log.warn("findByRoleId called with null roleId");
+            return Collections.emptyList();
+        }
+        QueryWrapper<UserRole> userRoleQueryWrapper = new QueryWrapper<>();
+        userRoleQueryWrapper
+                .lambda()
+                .eq(UserRole::getRoleId, roleId);
+        List<UserRole> userRoles = userRoleService.list(userRoleQueryWrapper);
+        Set<Long> userIds = userRoles.stream().map(UserRole::getUserId).collect(Collectors.toSet());
+        return this.findByUserId(userIds);
+    }
+
     @Override
     @Transactional
-    public UserCreateVO create(UserCreateDTO userCreateDTO) {
+    public UserCreateVO createUser(UserCreateDTO userCreateDTO) {
         User user = UserMapping.INSTANCE.toUser(userCreateDTO);
         user.setId(IdGen.genId());
         UserCreateVO userCreateVO = new UserCreateVO();
@@ -160,30 +183,25 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Override
     @Transactional
-    public Integer update(UserUpdateDTO userUpdateDTO) {
+    public Boolean updateUser(UserUpdateDTO userUpdateDTO, Boolean isFullUpdate) {
         User user = checkAndResult(userUpdateDTO.getId());
-        UserMapping.INSTANCE.overwriteUser(userUpdateDTO, user);
+        if(isFullUpdate){
+            UserMapping.INSTANCE.overwriteUser(userUpdateDTO, user);
+        } else {
+            UserMapping.INSTANCE.updateUser(userUpdateDTO, user);
+        }
         int i = userMapper.updateById(user);
         if (i <= 0) {
             throw new BusinessException("更新用户失败");
         }
-        bindRoles(user.getId(), userUpdateDTO.getRoleIds());
-        return i;
-    }
-
-    @Override
-    @Transactional
-    public Integer updatePartial(UserUpdateDTO userUpdateDTO) {
-        User user = checkAndResult(userUpdateDTO.getId());
-        UserMapping.INSTANCE.updateUser(userUpdateDTO, user);
-        int i = userMapper.updateById(user);
-        if (i <= 0) {
-            throw new BusinessException("更新用户失败");
-        }
-        if(!CollectionUtils.isEmpty(userUpdateDTO.getRoleIds())){
+        if(isFullUpdate){
             bindRoles(user.getId(), userUpdateDTO.getRoleIds());
+        } else {
+            if(!CollectionUtils.isEmpty(userUpdateDTO.getRoleIds())){
+                bindRoles(user.getId(), userUpdateDTO.getRoleIds());
+            }
         }
-        return i;
+        return true;
     }
 
     @Override
@@ -218,7 +236,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         User user = checkAndResult(id);
         UserVO userVO = UserMapping.INSTANCE.toUserVO(user);
         // 查询用户对应的角色
-        List<RoleVO> roles = roleService.findRoleByUserId(id);
+        List<RoleVO> roles = roleService.findByUserId(id);
         if(!CollectionUtils.isEmpty(roles)){
             List<Long> roleIds = roles.stream().map(RoleVO::getId).toList();
             userVO.setRoleIds(roleIds);
@@ -264,7 +282,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     @Override
-    public Boolean deleteById(Long id) {
+    public Boolean deleteUser(Long id) {
         int i = userMapper.deleteById(id);
         if(i <= 0){
             throw new BusinessException("删除用户失败，用户不存在");
@@ -277,8 +295,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Override
     @Transactional
     public Boolean bindRoles(Long id, List<Long> roleIds) {
-        List<RoleVO> roles = roleService.bindUserRole(id, roleIds);
-        return roles.size() == roleIds.size();
+
+        return roleService.bindUserRole(id, roleIds);
     }
 
     private User checkAndResult(Long id){

@@ -25,14 +25,20 @@ public class RoleController {
     private RoleService roleService;
 
     @PostMapping
-    public Result<?> create(@RequestBody @Validated RoleCreateDTO roleCreateDTO) {
-        Long id = roleService.create(roleCreateDTO);
+    public Result<?> createRole(@RequestBody @Validated RoleCreateDTO roleCreateDTO) {
+        Long id = roleService.createRole(roleCreateDTO);
         return ResultGenerator.ok(id);
     }
 
     @PutMapping
-    public Result<?> update(@RequestBody @Validated RoleUpdateDTO roleUpdateDTO) {
-        Integer affectedRows = roleService.update(roleUpdateDTO);
+    public Result<?> updateRole(@RequestBody @Validated RoleUpdateDTO roleUpdateDTO) {
+        Integer affectedRows = roleService.updateRole(roleUpdateDTO,true);
+        return ResultGenerator.ok(affectedRows);
+    }
+
+    @PatchMapping
+    public Result<?> modifyRole(@RequestBody @Validated RoleUpdateDTO roleUpdateDTO) {
+        Integer affectedRows = roleService.updateRole(roleUpdateDTO,false);
         return ResultGenerator.ok(affectedRows);
     }
 
@@ -48,15 +54,9 @@ public class RoleController {
         return ResultGenerator.ok();
     }
 
-    @PatchMapping
-    public Result<?> updatePatch(@RequestBody @Validated RoleUpdateDTO roleUpdateDTO) {
-        Integer affectedRows = roleService.updatePartial(roleUpdateDTO);
-        return ResultGenerator.ok(affectedRows);
-    }
-
     @DeleteMapping("/{id}")
     public Result<?> delete(@PathVariable("id") Long id) {
-        Boolean f = roleService.deleteById(id);
+        Boolean f = roleService.deleteRole(id);
         return ResultGenerator.ok(f);
     }
 

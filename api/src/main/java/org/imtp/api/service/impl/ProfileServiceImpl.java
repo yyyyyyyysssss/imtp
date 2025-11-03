@@ -59,7 +59,7 @@ public class ProfileServiceImpl implements ProfileService {
         userInfoVO.setAvatar(user.getAvatar());
 
         // 用户角色
-        List<RoleVO> roles = roleService.findRoleByUserId(userId);
+        List<RoleVO> roles = roleService.findByUserId(userId);
         if (!CollectionUtils.isEmpty(roles)){
             List<String> roleCodes = roles.stream().map(RoleVO::getCode).toList();
             userInfoVO.setRoleCodes(roleCodes);
@@ -84,7 +84,7 @@ public class ProfileServiceImpl implements ProfileService {
         }
 
         // 用户权限
-        List<AuthorityVO> authorityVOList = authorityService.findByRoleId(roleIds);
+        List<AuthorityVO> authorityVOList = authorityService.findByUserId(userId);
         if (!CollectionUtils.isEmpty(authorityVOList)){
             List<String> permissionCodes = authorityVOList.stream().map(AuthorityVO::getCode).distinct().toList();
             userInfoVO.setPermissionCodes(permissionCodes);

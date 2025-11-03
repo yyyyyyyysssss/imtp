@@ -8,16 +8,10 @@ import java.util.List;
 
 public interface RoleAuthorityService extends IService<RoleAuthority> {
 
-    List<RoleAuthority> findByRoleId(Long roleId);
+    List<Long> findRoleIdByAuthorityId(Long authorityId);
 
-    List<RoleAuthority> findByRoleId(Collection<Long> roleIds);
+    List<Long> findAuthorityIdByRoleId(Long roleId);
 
-    List<RoleAuthority> bindRoleAuthorities(Long roleId, List<Long> authorityIds);
-
-    Boolean deleteByRoleId(Long roleId);
-
-    Boolean deleteByAuthorityId(Long authorityId);
-
-    Boolean deleteByAuthorityId(Collection<Long> authorityIds);
+    List<Long> findAuthorityIdByRoleId(Collection<Long> roleIds);
 
 }
