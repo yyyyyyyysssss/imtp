@@ -69,7 +69,7 @@ public class ProfileServiceImpl implements ProfileService {
         List<Long> roleIds = Optional.ofNullable(roles).orElse(new ArrayList<>()).stream().map(RoleVO::getId).toList();
 
         // 用户菜单
-        List<MenuVO> menus = menuService.findMenuByRoleIds(roleIds);
+        List<MenuVO> menus = menuService.findByUserId(userId, roleIds);
         if (!CollectionUtils.isEmpty(menus)){
             List<MenuVO> menuTree = TreeUtils.buildTree(
                     menus,

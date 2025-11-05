@@ -1,5 +1,8 @@
 package org.imtp.api.config.redis;
 
+import com.fasterxml.jackson.core.StreamReadFeature;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.imtp.api.config.security.RequestUrlAuthority;
 import org.imtp.api.config.security.authentication.email.EmailAuthenticationToken;
@@ -97,6 +100,10 @@ public class RedisConfig{
 
 
     public RedisCacheConfiguration redisCacheConfiguration(Duration duration) {
+        GenericJackson2JsonRedisSerializer genericJackson2JsonRedisSerializer = new GenericJackson2JsonRedisSerializer();
+        genericJackson2JsonRedisSerializer.configure(objectMapper -> {
+            objectMapper.enable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+        });
         return RedisCacheConfiguration
                 .defaultCacheConfig()
                 .entryTtl(duration) // 默认1小时过期
@@ -105,7 +112,7 @@ public class RedisConfig{
                     return applicationName + ":" + tenantId + ":" + cacheName + ":";
                 })
                 .serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(new StringRedisSerializer()))
-                .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(new GenericJackson2JsonRedisSerializer()))
+                .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(genericJackson2JsonRedisSerializer))
                 .disableCachingNullValues();// 关闭缓存null
     }
 

@@ -16,20 +16,19 @@ import org.imtp.api.domain.dto.MenuUpdateDTO;
 import org.imtp.api.domain.entity.Authority;
 import org.imtp.api.domain.entity.Role;
 import org.imtp.api.domain.vo.MenuVO;
+import org.imtp.api.domain.vo.RoleVO;
 import org.imtp.api.enums.AuthorityType;
 import org.imtp.api.mapper.AuthorityMapper;
 import org.imtp.api.mapping.AuthorityMapping;
 import org.imtp.api.service.MenuService;
 import org.imtp.api.service.RoleService;
 import org.imtp.api.utils.TreeUtils;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -233,7 +232,23 @@ public class MenuServiceImpl extends AbstractAuthorityService implements MenuSer
     }
 
     @Override
-    public List<MenuVO> findMenuByRoleIds(List<Long> roleIds) {
+    @Cacheable(value = "user:menu", key = "#userId")
+    public List<MenuVO> findByUserId(Long userId) {
+        List<RoleVO> roles = roleService.findByUserId(userId);
+        if (CollectionUtils.isEmpty(roles)) {
+            return Collections.emptyList();
+        }
+        List<Long> roleIds = roles.stream().map(RoleVO::getId).toList();
+        return findByUserId(userId,roleIds);
+    }
+
+    @Override
+    @Cacheable(value = "user:menu", key = "#userId")
+    public List<MenuVO> findByUserId(Long userId, Collection<Long> roleIds) {
+        return findByRoleId(roleIds);
+    }
+
+    private List<MenuVO> findByRoleId(Collection<Long> roleIds) {
         List<Authority> authorities;
         if (CollectionUtils.isEmpty(roleIds)) {
             QueryWrapper<Authority> queryWrapper = new QueryWrapper<>();
@@ -259,7 +274,7 @@ public class MenuServiceImpl extends AbstractAuthorityService implements MenuSer
         if (CollectionUtils.isEmpty(authorities)) {
             return Collections.emptyList();
         }
-        return authorities.stream().map(AuthorityMapping.INSTANCE::toMenuVo).toList();
+        return AuthorityMapping.INSTANCE.toMenuVo(authorities);
     }
 
     @Override

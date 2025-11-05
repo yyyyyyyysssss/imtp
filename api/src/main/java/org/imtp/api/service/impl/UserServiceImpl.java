@@ -25,7 +25,9 @@ import org.imtp.api.mapper.UserMapper;
 import org.imtp.api.mapping.UserMapping;
 import org.imtp.api.service.*;
 import org.imtp.api.utils.PasswordGeneratorUtils;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -183,6 +185,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Override
     @Transactional
+    @Caching(evict = {
+            @CacheEvict(value = "user:role", key = "#userUpdateDTO.getId()"),
+            @CacheEvict(value = "user:authority", key = "#userUpdateDTO.getId()"),
+            @CacheEvict(value = "user:menu", key = "#userUpdateDTO.getId()"),
+            @CacheEvict(value = "role:user", allEntries = true),
+    })
     public Boolean updateUser(UserUpdateDTO userUpdateDTO, Boolean isFullUpdate) {
         User user = checkAndResult(userUpdateDTO.getId());
         if(isFullUpdate){

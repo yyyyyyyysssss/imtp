@@ -28,5 +28,7 @@ public interface MenuService extends IService<Authority> {
 
     MenuVO details(Long id);
 
-    List<MenuVO> findMenuByRoleIds(List<Long> roleIds);
+    List<MenuVO> findByUserId(Long userId);
+
+    List<MenuVO> findByUserId(Long userId, Collection<Long> roleIds);
 }

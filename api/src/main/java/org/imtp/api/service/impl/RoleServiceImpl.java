@@ -80,6 +80,13 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role>  implements R
 
     @Override
     @Transactional
+    @Caching(evict = {
+            @CacheEvict(value = "role:authority", key = "#roleUpdateDTO.getId()"),
+            @CacheEvict(value = "role:user", key = "#roleUpdateDTO.getId()"),
+            @CacheEvict(value = "user:role", allEntries = true),
+            @CacheEvict(value = "user:authority", allEntries = true),
+            @CacheEvict(value = "user:menu", allEntries = true),
+    })
     public Integer updateRole(RoleUpdateDTO roleUpdateDTO,Boolean isFullUpdate) {
         Role role = checkAndResult(roleUpdateDTO.getId());
         if(role.isSuperAdmin()){
@@ -173,6 +180,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role>  implements R
     @Caching(evict = {
             @CacheEvict(value = "role:authority", key = "#roleId"),
             @CacheEvict(value = "user:authority", allEntries = true),
+            @CacheEvict(value = "user:menu", allEntries = true),
     })
     public Boolean bindRoleAuthorities(Long roleId, List<Long> authorityIds) {
         if (roleId == null) {
@@ -190,6 +198,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role>  implements R
     @Caching(evict = {
             @CacheEvict(value = "role:authority", key = "#roleId"),
             @CacheEvict(value = "user:authority", allEntries = true),
+            @CacheEvict(value = "user:menu", allEntries = true),
     })
     public Boolean unbindRoleAuthorities(Long roleId) {
         if(roleId == null){
@@ -209,6 +218,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role>  implements R
     @Caching(evict = {
             @CacheEvict(value = "role:authority", allEntries = true),
             @CacheEvict(value = "user:authority", allEntries = true),
+            @CacheEvict(value = "user:menu", allEntries = true),
     })
     public Boolean unbindAuthorityRole(Long authorityId) {
         if(authorityId == null){
@@ -224,6 +234,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role>  implements R
     @Caching(evict = {
             @CacheEvict(value = "role:authority", allEntries = true),
             @CacheEvict(value = "user:authority", allEntries = true),
+            @CacheEvict(value = "user:menu", allEntries = true),
     })
     public Boolean unbindAuthorityRole(Collection<Long> authorityIds) {
         if(CollectionUtils.isEmpty(authorityIds)){
@@ -262,6 +273,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role>  implements R
             @CacheEvict(value = "user:role", allEntries = true),
             @CacheEvict(value = "role:user", key = "#roleId"),
             @CacheEvict(value = "user:authority", allEntries = true),
+            @CacheEvict(value = "user:menu", allEntries = true),
     })
     public Boolean bindRoleUsers(Long roleId, List<Long> userIds) {
         // 先删除角色已有的用户关联
@@ -275,6 +287,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role>  implements R
             @CacheEvict(value = "user:role", allEntries = true),
             @CacheEvict(value = "role:user", key = "#roleId"),
             @CacheEvict(value = "user:authority", allEntries = true),
+            @CacheEvict(value = "user:menu", allEntries = true),
     })
     public Boolean unbindRoleUsers(Long roleId) {
         if(roleId == null){
@@ -315,7 +328,8 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role>  implements R
     @Caching(evict = {
             @CacheEvict(value = "user:role", key = "#userId"),
             @CacheEvict(value = "role:user", allEntries = true),
-            @CacheEvict(value = "user:authority", allEntries = true),
+            @CacheEvict(value = "user:authority", key = "#userId"),
+            @CacheEvict(value = "user:menu", key = "#userId"),
     })
     public Boolean bindUserRole(Long userId, Collection<Long> roleIds) {
         // 先删除用户已有的角色关联
@@ -328,7 +342,8 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role>  implements R
     @Caching(evict = {
             @CacheEvict(value = "user:role", key = "#userId"),
             @CacheEvict(value = "role:user", allEntries = true),
-            @CacheEvict(value = "user:authority", allEntries = true),
+            @CacheEvict(value = "user:authority", key = "#userId"),
+            @CacheEvict(value = "user:menu", key = "#userId"),
     })
     public Boolean unbindUserRoles(Long userId) {
         if(userId == null){
