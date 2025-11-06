@@ -8,19 +8,24 @@ import org.imtp.api.domain.dto.TenantUpdateDTO;
 import org.imtp.api.domain.entity.Tenant;
 import org.imtp.api.domain.vo.TenantVO;
 
+import java.util.Collection;
 import java.util.List;
 
 public interface TenantService extends IService<Tenant> {
 
-    Long create(TenantCreateDTO tenantCreateDTO);
+    Long createTenant(TenantCreateDTO tenantCreateDTO);
 
-    Boolean update(Long id, TenantUpdateDTO tenantUpdateDTO);
-
-    Boolean updatePatch(Long id, TenantUpdateDTO tenantUpdateDTO);
+    Boolean updateTenant(Long id, TenantUpdateDTO tenantUpdateDTO, boolean isFullUpdate);
 
     PageInfo<TenantVO> queryList(TenantQueryDTO tenantQueryDTO);
 
-    Boolean delete(Long id);
+    List<Long> findUserIdById(Long tenantId);
+
+    Boolean deleteById(Long id);
+
+    Boolean bindTenantUser(Long id, Collection<Long> userIds);
+
+    Boolean unbindUserTenant(Long userId);
 
     List<TenantVO> findByUserId(Long userId);
 

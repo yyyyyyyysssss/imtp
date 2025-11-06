@@ -44,6 +44,8 @@ public interface UserService extends UserDetailsService, IService<User> {
 
     Boolean bindRoles(Long id, List<Long> roleIds);
 
+    List<UserVO> listUserOptions();
+
     Boolean deleteUser(Long id);
 
 }

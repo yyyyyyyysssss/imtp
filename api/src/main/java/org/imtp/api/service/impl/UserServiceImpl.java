@@ -17,7 +17,6 @@ import org.imtp.api.domain.dto.UserUpdateDTO;
 import org.imtp.api.domain.entity.Authority;
 import org.imtp.api.domain.entity.User;
 import org.imtp.api.domain.entity.UserRole;
-import org.imtp.api.domain.vo.AuthorityVO;
 import org.imtp.api.domain.vo.RoleVO;
 import org.imtp.api.domain.vo.UserCreateVO;
 import org.imtp.api.domain.vo.UserVO;
@@ -26,7 +25,6 @@ import org.imtp.api.mapping.UserMapping;
 import org.imtp.api.service.*;
 import org.imtp.api.utils.PasswordGeneratorUtils;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -53,6 +51,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Resource
     private RoleService roleService;
+
+    @Resource
+    private TenantService tenantService;
 
     @Resource
     private AuthorityService authorityService;
@@ -142,7 +143,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     // 根据角色查询用户
     @Override
-    @Cacheable(value = "role:user", key = "#roleId")
     public List<UserVO> findByRoleId(Long roleId) {
         if (roleId == null) {
             log.warn("findByRoleId called with null roleId");
@@ -189,7 +189,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             @CacheEvict(value = "user:role", key = "#userUpdateDTO.getId()"),
             @CacheEvict(value = "user:authority", key = "#userUpdateDTO.getId()"),
             @CacheEvict(value = "user:menu", key = "#userUpdateDTO.getId()"),
-            @CacheEvict(value = "role:user", allEntries = true),
     })
     public Boolean updateUser(UserUpdateDTO userUpdateDTO, Boolean isFullUpdate) {
         User user = checkAndResult(userUpdateDTO.getId());
@@ -297,6 +296,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         }
         // 解绑用户对应的角色
         roleService.unbindUserRoles(id);
+        // 解绑用户对应的租户
+        tenantService.unbindUserTenant(id);
         return true;
     }
 
@@ -313,6 +314,21 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             throw new BusinessException("用户不存在");
         }
         return user;
+    }
+
+    @Override
+    public List<UserVO> listUserOptions(){
+        QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
+        userQueryWrapper
+                .lambda()
+                .select(User::getId, User::getNickname)
+                .eq(User::isEnabled, true)
+                .orderByDesc(User::getCreateTime);
+        List<User> users = userMapper.selectList(userQueryWrapper);
+        if (users == null || users.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return UserMapping.INSTANCE.toUserVO(users);
     }
 
 

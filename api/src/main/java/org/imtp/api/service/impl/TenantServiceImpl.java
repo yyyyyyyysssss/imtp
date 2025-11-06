@@ -19,6 +19,8 @@ import org.imtp.api.mapper.TenantMapper;
 import org.imtp.api.mapping.TenantMapping;
 import org.imtp.api.service.TenantService;
 import org.imtp.api.service.TenantUserService;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -43,7 +45,7 @@ public class TenantServiceImpl extends ServiceImpl<TenantMapper, Tenant> impleme
 
     @Override
     @Transactional
-    public Long create(TenantCreateDTO tenantCreateDTO) {
+    public Long createTenant(TenantCreateDTO tenantCreateDTO) {
         Tenant tenant = TenantMapping.INSTANCE.toTenant(tenantCreateDTO);
         tenant.setId(IdGen.genId());
         tenant.setStatus(TenantStatus.ACTIVE);
@@ -60,28 +62,24 @@ public class TenantServiceImpl extends ServiceImpl<TenantMapper, Tenant> impleme
 
     @Override
     @Transactional
-    public Boolean update(Long id, TenantUpdateDTO tenantUpdateDTO) {
+    @CacheEvict(value = "user:tenant", allEntries = true)
+    public Boolean updateTenant(Long id, TenantUpdateDTO tenantUpdateDTO, boolean isFullUpdate) {
         Tenant tenant = checkAndResult(id, tenantUpdateDTO);
-        TenantMapping.INSTANCE.overwriteTenant(tenantUpdateDTO, tenant);
+        if (isFullUpdate) {
+            TenantMapping.INSTANCE.overwriteTenant(tenantUpdateDTO, tenant);
+        } else {
+            TenantMapping.INSTANCE.updateTenant(tenantUpdateDTO, tenant);
+        }
         int i = tenantMapper.updateById(tenant);
         if (i <= 0) {
             throw new BusinessException("更新租户失败");
         }
-        addTenantUser(tenant.getId(), tenantUpdateDTO.getUserIds());
-        return true;
-    }
-
-    @Override
-    @Transactional
-    public Boolean updatePatch(Long id, TenantUpdateDTO tenantUpdateDTO) {
-        Tenant tenant = checkAndResult(id, tenantUpdateDTO);
-        TenantMapping.INSTANCE.updateTenant(tenantUpdateDTO, tenant);
-        int i = tenantMapper.updateById(tenant);
-        if (i <= 0) {
-            throw new BusinessException("更新租户失败");
-        }
-        if (!CollectionUtils.isEmpty(tenantUpdateDTO.getUserIds())) {
-            addTenantUser(tenant.getId(), tenantUpdateDTO.getUserIds());
+        if(isFullUpdate){
+            bindTenantUser(tenant.getId(), tenantUpdateDTO.getUserIds());
+        } else {
+            if (!CollectionUtils.isEmpty(tenantUpdateDTO.getUserIds())) {
+                bindTenantUser(tenant.getId(), tenantUpdateDTO.getUserIds());
+            }
         }
         return true;
     }
@@ -131,25 +129,7 @@ public class TenantServiceImpl extends ServiceImpl<TenantMapper, Tenant> impleme
             return new PageInfo<>();
         }
         PageInfo<Tenant> tenantPageInfo = PageInfo.of(tenants);
-
-        // 查询租户下的用户
-        List<Long> tenantIds = tenants.stream().map(Tenant::getId).toList();
-        QueryWrapper<TenantUser> tenantUserQueryWrapper = new QueryWrapper<>();
-        tenantUserQueryWrapper
-                .lambda()
-                .in(TenantUser::getTenantId, tenantIds);
-        List<TenantUser> tenantUsers = tenantUserService.list(tenantUserQueryWrapper);
-        Map<Long, List<Long>> tenantUserIdMap = tenantUsers.stream().collect(Collectors.groupingBy(
-                TenantUser::getTenantId,
-                Collectors.mapping(TenantUser::getUserId, Collectors.toList()
-                )));
-        List<TenantVO> result = new ArrayList<>();
-        for (Tenant tenant : tenants) {
-            TenantVO tenantVO = TenantMapping.INSTANCE.toTenantVO(tenant);
-            List<Long> userIds = tenantUserIdMap.getOrDefault(tenant.getId(), new ArrayList<>());
-            tenantVO.setUserIds(userIds);
-            result.add(tenantVO);
-        }
+        List<TenantVO> result = TenantMapping.INSTANCE.toTenantVO(tenants);
         PageInfo<TenantVO> pageInfo = new PageInfo<>();
         pageInfo.setList(result);
         pageInfo.setTotal(tenantPageInfo.getTotal());
@@ -159,8 +139,15 @@ public class TenantServiceImpl extends ServiceImpl<TenantMapper, Tenant> impleme
     }
 
     @Override
+    public List<Long> findUserIdById(Long tenantId) {
+
+        return tenantUserService.findUserIdByTenantId(tenantId);
+    }
+
+    @Override
     @Transactional
-    public Boolean delete(Long id) {
+    @CacheEvict(value = "user:tenant", allEntries = true)
+    public Boolean deleteById(Long id) {
         Tenant tenant = tenantMapper.selectById(id);
         if (tenant == null) {
             throw new BusinessException("租户不存在");
@@ -175,14 +162,52 @@ public class TenantServiceImpl extends ServiceImpl<TenantMapper, Tenant> impleme
         return tenantMapper.updateById(tenant) > 0;
     }
 
+
+    @Override
     @Transactional
-    public boolean addTenantUser(Long tenantId, Collection<Long> userIds) {
+    @CacheEvict(value = "user:tenant", allEntries = true)
+    public Boolean bindTenantUser(Long tenantId,Collection<Long> userIds){
+        if (tenantId == null) {
+            log.error("bindTenantUser called with empty tenantId");
+            return true;
+        }
+        // 先解绑原有的租户用户
+        this.unbindTenantUser(tenantId);
+        // 再绑定新的租户用户
+        return addTenantUser(tenantId,userIds);
+    }
+
+    @CacheEvict(value = "user:tenant", allEntries = true)
+    public Boolean unbindTenantUser(Long tenantId){
+        if (tenantId == null) {
+            log.error("unbindTenantUser called with empty tenantId");
+            return true;
+        }
         QueryWrapper<TenantUser> tenantUserQueryWrapper = new QueryWrapper<>();
         tenantUserQueryWrapper
                 .lambda()
                 .eq(TenantUser::getTenantId, tenantId);
         // 删除原有的租户用户
-        tenantUserService.remove(tenantUserQueryWrapper);
+        return tenantUserService.remove(tenantUserQueryWrapper);
+    }
+
+    @CacheEvict(value = "user:tenant", key = "#userId")
+    @Override
+    public Boolean unbindUserTenant(Long userId){
+        if (userId == null) {
+            log.error("unbindUserTenant called with empty userId");
+            return true;
+        }
+        QueryWrapper<TenantUser> tenantUserQueryWrapper = new QueryWrapper<>();
+        tenantUserQueryWrapper
+                .lambda()
+                .eq(TenantUser::getUserId, userId);
+        // 删除原有的租户用户
+        return tenantUserService.remove(tenantUserQueryWrapper);
+    }
+
+    @Transactional
+    public boolean addTenantUser(Long tenantId, Collection<Long> userIds) {
         if (CollectionUtils.isEmpty(userIds)) {
             return true;
         }
@@ -200,6 +225,7 @@ public class TenantServiceImpl extends ServiceImpl<TenantMapper, Tenant> impleme
 
 
     @Override
+    @Cacheable(value = "user:tenant", key = "#userId")
     public List<TenantVO> findByUserId(Long userId) {
         QueryWrapper<TenantUser> tenantUserQueryWrapper = new QueryWrapper<>();
         tenantUserQueryWrapper

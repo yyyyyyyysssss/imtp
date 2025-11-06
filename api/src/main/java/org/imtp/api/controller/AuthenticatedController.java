@@ -3,6 +3,7 @@ package org.imtp.api.controller;
 import jakarta.annotation.Resource;
 import org.imtp.api.domain.vo.AuthorityVO;
 import org.imtp.api.domain.vo.RoleVO;
+import org.imtp.api.domain.vo.UserVO;
 import org.imtp.api.service.AuthenticatedService;
 import org.imtp.common.response.Result;
 import org.imtp.common.response.ResultGenerator;
@@ -23,6 +24,12 @@ public class AuthenticatedController {
 
     @Resource
     private AuthenticatedService authenticatedService;
+
+    @GetMapping("/user/options")
+    public Result<?> userOptions() {
+        List<UserVO> userOptions = authenticatedService.listUserOptions();
+        return ResultGenerator.ok(userOptions);
+    }
 
     @GetMapping("/role/options")
     public Result<?> roleOptions() {

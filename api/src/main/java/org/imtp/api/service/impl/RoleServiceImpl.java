@@ -37,7 +37,7 @@ import java.util.stream.Collectors;
  * @Author ys
  * @Date 2025/6/3 15:36
  */
-@Service("roleServiceProxy")
+@Service
 @Slf4j
 public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role>  implements RoleService {
 
@@ -56,9 +56,6 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role>  implements R
     @Resource
     private UserService userService;
 
-    @Resource(name = "roleServiceProxy")
-    private RoleService roleServiceProxy;
-
     @Override
     @Transactional
     public Long createRole(RoleCreateDTO roleCreateDTO) {
@@ -70,10 +67,10 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role>  implements R
             throw new BusinessException("创建角色失败");
         }
         if(!CollectionUtils.isEmpty(roleCreateDTO.getUserIds())){
-            roleServiceProxy.bindRoleUsers(role.getId(), roleCreateDTO.getUserIds());
+            this.bindRoleUsers(role.getId(), roleCreateDTO.getUserIds());
         }
         if(!CollectionUtils.isEmpty(roleCreateDTO.getAuthorityIds())){
-            roleServiceProxy.bindRoleAuthorities(role.getId(), roleCreateDTO.getAuthorityIds());
+            this.bindRoleAuthorities(role.getId(), roleCreateDTO.getAuthorityIds());
         }
         return role.getId();
     }
@@ -81,8 +78,6 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role>  implements R
     @Override
     @Transactional
     @Caching(evict = {
-            @CacheEvict(value = "role:authority", key = "#roleUpdateDTO.getId()"),
-            @CacheEvict(value = "role:user", key = "#roleUpdateDTO.getId()"),
             @CacheEvict(value = "user:role", allEntries = true),
             @CacheEvict(value = "user:authority", allEntries = true),
             @CacheEvict(value = "user:menu", allEntries = true),
@@ -103,15 +98,15 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role>  implements R
         }
         if(isFullUpdate){
             // 更新角色关联的用户
-            roleServiceProxy.bindRoleUsers(role.getId(),roleUpdateDTO.getUserIds());
+            this.bindRoleUsers(role.getId(),roleUpdateDTO.getUserIds());
             // 更新角色关联的权限
-            roleServiceProxy.bindRoleAuthorities(role.getId(), roleUpdateDTO.getAuthorityIds());
+            this.bindRoleAuthorities(role.getId(), roleUpdateDTO.getAuthorityIds());
         } else {
             if(!CollectionUtils.isEmpty(roleUpdateDTO.getUserIds())){
-                roleServiceProxy.bindRoleUsers(role.getId(),roleUpdateDTO.getUserIds());
+                this.bindRoleUsers(role.getId(),roleUpdateDTO.getUserIds());
             }
             if(!CollectionUtils.isEmpty(roleUpdateDTO.getAuthorityIds())){
-                roleServiceProxy.bindRoleAuthorities(role.getId(), roleUpdateDTO.getAuthorityIds());
+                this.bindRoleAuthorities(role.getId(), roleUpdateDTO.getAuthorityIds());
             }
         }
         return i;
@@ -158,6 +153,11 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role>  implements R
 
     // 删除角色
     @Override
+    @Caching(evict = {
+            @CacheEvict(value = "user:authority", allEntries = true),
+            @CacheEvict(value = "user:menu", allEntries = true),
+            @CacheEvict(value = "user:role", allEntries = true),
+    })
     public Boolean deleteRole(Long roleId) {
         Role role = checkAndResult(roleId);
         if(role.isSuperAdmin()){
@@ -168,9 +168,9 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role>  implements R
             throw new BusinessException("删除角色失败，角色可能不存在");
         }
         // 解绑角色对应的权限
-        roleServiceProxy.unbindRoleAuthorities(roleId);
+        this.unbindRoleAuthorities(roleId);
         // 解绑角色对应的用户
-        roleServiceProxy.unbindRoleUsers(roleId);
+        this.unbindRoleUsers(roleId);
         return true;
     }
 
@@ -178,7 +178,6 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role>  implements R
     @Override
     @Transactional
     @Caching(evict = {
-            @CacheEvict(value = "role:authority", key = "#roleId"),
             @CacheEvict(value = "user:authority", allEntries = true),
             @CacheEvict(value = "user:menu", allEntries = true),
     })
@@ -196,7 +195,6 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role>  implements R
     // 解绑角色下的权限
     @Override
     @Caching(evict = {
-            @CacheEvict(value = "role:authority", key = "#roleId"),
             @CacheEvict(value = "user:authority", allEntries = true),
             @CacheEvict(value = "user:menu", allEntries = true),
     })
@@ -216,7 +214,6 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role>  implements R
     // 解绑权限对应的所有角色
     @Override
     @Caching(evict = {
-            @CacheEvict(value = "role:authority", allEntries = true),
             @CacheEvict(value = "user:authority", allEntries = true),
             @CacheEvict(value = "user:menu", allEntries = true),
     })
@@ -232,7 +229,6 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role>  implements R
     // 批量解绑权限对应的所有角色
     @Override
     @Caching(evict = {
-            @CacheEvict(value = "role:authority", allEntries = true),
             @CacheEvict(value = "user:authority", allEntries = true),
             @CacheEvict(value = "user:menu", allEntries = true),
     })
@@ -271,7 +267,6 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role>  implements R
     @Transactional
     @Caching(evict = {
             @CacheEvict(value = "user:role", allEntries = true),
-            @CacheEvict(value = "role:user", key = "#roleId"),
             @CacheEvict(value = "user:authority", allEntries = true),
             @CacheEvict(value = "user:menu", allEntries = true),
     })
@@ -285,7 +280,6 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role>  implements R
     // 解绑角色下所有用户
     @Caching(evict = {
             @CacheEvict(value = "user:role", allEntries = true),
-            @CacheEvict(value = "role:user", key = "#roleId"),
             @CacheEvict(value = "user:authority", allEntries = true),
             @CacheEvict(value = "user:menu", allEntries = true),
     })
@@ -310,15 +304,10 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role>  implements R
             log.warn("findRoleByUserId called with null userId");
             return Collections.emptyList();
         }
-        QueryWrapper<UserRole> userRoleQueryWrapper = new QueryWrapper<>();
-        userRoleQueryWrapper
-                .lambda()
-                .eq(UserRole::getUserId, userId);
-        List<UserRole> userRoles = userRoleService.list(userRoleQueryWrapper);
-        if(CollectionUtils.isEmpty(userRoles)){
+        Collection<Long> roleIds = userRoleService.findRoleIdByUserId(userId);
+        if(CollectionUtils.isEmpty(roleIds)){
             return Collections.emptyList();
         }
-        Set<Long> roleIds = userRoles.stream().map(UserRole::getRoleId).collect(Collectors.toSet());
         return findRoleByIds(roleIds);
     }
 
@@ -327,7 +316,6 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role>  implements R
     @Transactional
     @Caching(evict = {
             @CacheEvict(value = "user:role", key = "#userId"),
-            @CacheEvict(value = "role:user", allEntries = true),
             @CacheEvict(value = "user:authority", key = "#userId"),
             @CacheEvict(value = "user:menu", key = "#userId"),
     })
@@ -341,7 +329,6 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role>  implements R
     // 解绑用户下所有角色
     @Caching(evict = {
             @CacheEvict(value = "user:role", key = "#userId"),
-            @CacheEvict(value = "role:user", allEntries = true),
             @CacheEvict(value = "user:authority", key = "#userId"),
             @CacheEvict(value = "user:menu", key = "#userId"),
     })
@@ -350,7 +337,8 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role>  implements R
             log.info("unbindUserRoles called with null userId");
             return true;
         }
-        List<RoleVO> roles = roleServiceProxy.findByUserId(userId);
+        Collection<Long> rids = userRoleService.findRoleIdByUserId(userId);
+        List<RoleVO> roles = this.findRoleByIds(rids);
         // 排除超级管理员角色
         List<Long> roleIds = roles.stream().filter(r -> !r.isSuperAdmin()).map(RoleVO::getId).toList();
         if(CollectionUtils.isEmpty(roleIds)){
