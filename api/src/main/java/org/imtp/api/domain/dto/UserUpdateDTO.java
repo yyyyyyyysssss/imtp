@@ -27,6 +27,8 @@ public class UserUpdateDTO {
     @NotBlank(message = "用户名不能为空",groups = UserUpdateDTO.UpdateAll.class)
     private String nickname;
 
+    private String avatar;
+
     private String email;
 
     private String phone;

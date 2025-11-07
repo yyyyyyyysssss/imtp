@@ -26,6 +26,8 @@ public class UserCreateDTO {
 
     private String email;
 
+    private String avatar;
+
     private String phone;
 
     private boolean enabled = true;

@@ -11,8 +11,6 @@ import org.springframework.core.io.ClassPathResource;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -31,8 +29,6 @@ public class QrCodeUtils {
     private static final int DEFAULT_WIDTH = 200;
 
     private static final int DEFAULT_HEIGHT = 200;
-
-    private static final String DEFAULT_IMAGE_FORMAT_NAME = "PNG";
 
     private static final String LOGO_PATH = "asserts/icon.png";
 
@@ -80,8 +76,8 @@ public class QrCodeUtils {
     private static BufferedImage addLogo(BufferedImage qrCodeImage, BufferedImage logoImage) {
         int qrWidth = qrCodeImage.getWidth();
         int qrHeight = qrCodeImage.getHeight();
-        int logoMaxWidth = qrWidth / 5;
-        int logoMaxHeight = qrHeight / 5;
+        int logoMaxWidth = qrWidth / 4;
+        int logoMaxHeight = qrHeight / 4;
         int logoWidth = Math.min(logoImage.getWidth(), logoMaxWidth);
         int logoHeight = Math.min(logoImage.getHeight(), logoMaxHeight);
         Image logo = logoImage.getScaledInstance(logoWidth, logoHeight, Image.SCALE_SMOOTH);
@@ -90,20 +86,15 @@ public class QrCodeUtils {
         Graphics2D g = resultImage.createGraphics();
         //绘制二维码
         g.drawImage(qrCodeImage, 0, 0, null);
-        //绘制logo
+        g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
+        // 计算 logo 放置的位置
         int x = (qrWidth - logoWidth) / 2;
         int y = (qrHeight - logoHeight) / 2;
+
+        // 绘制 logo
         g.drawImage(logo, x, y, null);
         g.dispose();
         return resultImage;
-    }
-
-    public static void writeQrCodeImage(OutputStream outputStream, BufferedImage bufferedImage) {
-        try {
-            ImageIO.write(bufferedImage, DEFAULT_IMAGE_FORMAT_NAME, outputStream);
-        } catch (IOException e) {
-            log.error("writeQrCodeImage error:", e);
-        }
     }
 
 }
