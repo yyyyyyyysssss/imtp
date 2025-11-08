@@ -23,6 +23,7 @@ import org.imtp.api.domain.vo.UserVO;
 import org.imtp.api.mapper.UserMapper;
 import org.imtp.api.mapping.UserMapping;
 import org.imtp.api.service.*;
+import org.imtp.api.utils.AvatarGeneratorUtils;
 import org.imtp.api.utils.PasswordGeneratorUtils;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Caching;
@@ -33,7 +34,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
-import java.io.Serializable;
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -66,6 +69,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Resource
     private PasswordEncoder passwordEncoder;
+
+    @Resource
+    private FileService fileService;
 
     @Override
     public boolean saveOrUpdate(User user) {
@@ -172,6 +178,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         }
         String encryptPassword = passwordEncoder.encode(password);
         user.setPassword(encryptPassword);
+        if(userCreateDTO.getAvatar() == null || userCreateDTO.getAvatar().isEmpty()){
+            String defaultAvatar = generateDefaultAvatar(user.getNickname());
+            user.setAvatar(defaultAvatar);
+        }
         int row = userMapper.insert(user);
         if (row <= 0) {
             throw new BusinessException("创建用户失败");
@@ -211,9 +221,22 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         return true;
     }
 
+    private String generateDefaultAvatar(String name){
+        try (ByteArrayOutputStream os = new ByteArrayOutputStream()){
+            BufferedImage bufferedImage = AvatarGeneratorUtils.generateAvatar(name);
+            ImageIO.write(bufferedImage, "png", os);
+            InputStream inputStream = new ByteArrayInputStream(os.toByteArray());
+            String filename = UUID.randomUUID().toString().replaceAll("-","");
+            return fileService.uploadSingleFile(inputStream, filename + ".png", "image/png");
+        }catch (IOException e){
+            log.error("生成默认头像失败: {}", e.getMessage());
+            return null;
+        }
+    }
+
     @Override
     public String resetPassword(Long userId) {
-        User user = checkAndResult(userId);
+        checkAndResult(userId);
         String newPassword = PasswordGeneratorUtils.generate(10);
         String encryptPassword = passwordEncoder.encode(newPassword);
         UpdateWrapper<User> userUpdateWrapper = new UpdateWrapper<>();

@@ -30,6 +30,8 @@ public class AuthProperties {
 
     private KeyConfig rememberMe = new KeyConfig();
 
+    private KeyConfig totp = new KeyConfig();
+
     private List<RequestHeadAuthenticationConfig> requestHeadAuthentications = new ArrayList<>();
 
     @Setter

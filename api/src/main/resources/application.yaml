@@ -116,12 +116,15 @@ auth:
       - /api/file/**
       - /api/profile/**
       - /api/authenticated/**
+      - /api/mfa/**
   # 基于请求头的身份认证
   requestHeadAuthentications:
     - antPath: /api/internal/**
       apikey: 26662f07703c41d2a4994b8b30b101a9
   # 用户设备最大token数量
   coexistToken: 1
+  totp:
+    secretKey: 7gbF6m9vCURSEW8Nz7/SWYFGdD9btfDLY0D37uHCZcA=
   # jwt token配置
   jwt:
     secretKey: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970

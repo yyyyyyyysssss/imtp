@@ -22,6 +22,7 @@ import org.imtp.api.enums.FileUploadStatus;
 import org.imtp.api.mapper.FileUploadMapper;
 import org.imtp.api.service.FileService;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -243,26 +244,35 @@ public abstract class AbstractFileService implements FileService {
 
     @Override
     public String uploadSingleFile(MultipartFile file) {
+        InputStream inputStream = null;
+        try {
+            inputStream = file.getInputStream();
+        } catch (IOException e) {
+            throw new BusinessException(e);
+        }
+        String filename = newFilename(file.getOriginalFilename());
+        String contentType = file.getContentType();
+        return uploadSingleFile(inputStream, filename, contentType);
+    }
+
+    @Override
+    public String uploadSingleFile(InputStream inputStream, String fileName, String fileType) {
         FileUpload fileUpload = FileUpload
                 .builder()
                 .id(IdGen.genId())
                 .uploadId(UUID.randomUUID().toString().replaceAll("-",""))
                 .storageType(fileStorageType())
-                .fileName(file.getOriginalFilename())
-                .fileType(file.getContentType())
-                .totalSize(file.getSize())
+                .fileName(fileName)
+                .fileType(fileType)
                 .totalChunk(1)
                 .uploadedChunkCount(1)
-                .chunkSize((int)file.getSize())
                 .createTime(new Date())
                 .build();
-        InputStream inputStream = null;
-        try {
-            inputStream = file.getInputStream();
-            String filename = newFilename(file.getOriginalFilename());
-            String contentType = file.getContentType();
-            long size = file.getSize();
-            Tuple2<String, String> tuple2 = simpleUpload(inputStream, filename, contentType, size);
+        try (InputStream in = inputStream){
+            long size = inputStream.available();
+            fileUpload.setTotalSize(size);
+            fileUpload.setChunkSize((int)size);
+            Tuple2<String, String> tuple2 = simpleUpload(in, fileName, fileType, size);
             String etag = tuple2.getV1();
             String originalUrl = tuple2.getV2();
             String accessUrl = createAccessUrl(originalUrl);
@@ -272,19 +282,11 @@ public abstract class AbstractFileService implements FileService {
             fileUpload.setStatus(FileUploadStatus.COMPLETED);
             fileUploadMapper.insert(fileUpload);
             return accessUrl;
-        }catch (Exception e){
+        } catch (IOException e) {
             log.error("upload error: ",e);
             fileUpload.setStatus(FileUploadStatus.FAILED);
             fileUploadMapper.insert(fileUpload);
             throw new BusinessException(e);
-        }finally {
-            if (inputStream != null) {
-                try {
-                    inputStream.close();
-                } catch (IOException e) {
-                    log.error("upload close InputStream error: ", e);
-                }
-            }
         }
     }
 

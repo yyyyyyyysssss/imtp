@@ -70,7 +70,7 @@ public class OpenController extends BaseController{
 
     @PostMapping("/mergeAvatar")
     public void mergeAvatar(@RequestBody List<String> urls, HttpServletResponse response) throws IOException {
-        BufferedImage avatarImage = AvatarGeneratorUtils.mergeAvatar(urls,3);
+        BufferedImage avatarImage = AvatarGeneratorUtils.mergeAvatar(urls);
         writeImage(response.getOutputStream(),avatarImage);
     }
 

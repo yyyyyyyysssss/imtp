@@ -9,6 +9,7 @@ import org.imtp.api.domain.vo.FileUploadChunkVO;
 import org.imtp.api.domain.vo.FileUploadProgressVO;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.InputStream;
 import java.time.Duration;
 
 /**
@@ -29,6 +30,8 @@ public interface FileService {
     String generateTemporaryUrl(String uploadId, Duration duration);
 
     String uploadSingleFile(MultipartFile file);
+
+    String uploadSingleFile(InputStream inputStream, String fileName, String fileType);
 
     FileStreamVO getFileStream(String bucketName, String objectName, FileRangeDTO range);
 

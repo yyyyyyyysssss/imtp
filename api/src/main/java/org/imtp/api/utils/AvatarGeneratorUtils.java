@@ -2,6 +2,7 @@ package org.imtp.api.utils;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
+import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
@@ -40,46 +41,68 @@ public class AvatarGeneratorUtils {
         return createAvatarImage(initial);
     }
 
-    public static BufferedImage mergeAvatar(List<String> imageUrls, int imagesPerRow) throws IOException {
-        BufferedImage[] images = new BufferedImage[imageUrls.size()];
-        // 下载所有头像图片
-        for (int i = 0; i < imageUrls.size(); i++) {
-            images[i] = downloadImage(imageUrls.get(i));
+    public static BufferedImage mergeAvatar(List<String> imageUrls) throws IOException {
+        int size = imageUrls.size();
+        if (size == 0) return null;
+        if(imageUrls.size() > 9) {
+            imageUrls = imageUrls.subList(0, 9); // 只取前 9 个头像
+            size = 9;
         }
-        // 计算合成图的列数和行数
-        int totalImages = imageUrls.size();
-        int rows = (int) Math.ceil((double) totalImages / imagesPerRow);
-        int imageWidth = IMAGE_SIZE / imagesPerRow;  // 每个头像的宽度
-        int imageHeight = IMAGE_SIZE / rows;        // 每个头像的高度
+        // 下载所有头像
+        BufferedImage[] images = new BufferedImage[size];
+        for (int i = 0; i < size; i++) {
+            images[i] = ImageIO.read(new URL(imageUrls.get(i)));
+        }
+        return merge(images);
+    }
 
-        // 创建合成头像
-        BufferedImage mergedImage = new BufferedImage(IMAGE_SIZE, IMAGE_SIZE, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g = mergedImage.createGraphics();
+    private static BufferedImage merge(BufferedImage[] images) {
+        int size = images.length;
+
+        // ✅ 根据头像数量动态设置每行列数（微信群风格）
+        int cols, rows;
+        if (size <= 1) { rows = 1; cols = 1; }
+        else if (size == 2) { rows = 1; cols = 2; }
+        else if (size <= 4) { rows = 2; cols = 2; }
+        else if (size <= 6) { rows = 2; cols = 3; }
+        else { rows = 3; cols = 3; }   // ✅ 9 张固定 3×3
+
+        // ✅ 根据行列数自动计算小图尺寸与间距
+        int padding = 6;
+        // 小头像最大尺寸 = (200 - padding*(cols+1)) / cols
+        int avatarSize = (IMAGE_SIZE - padding * (cols + 1)) / cols;
+
+        // 生成 200x200 圆角背景
+        BufferedImage result = new BufferedImage(IMAGE_SIZE, IMAGE_SIZE, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g = result.createGraphics();
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-        return null;
-    }
+        // 背景
+        g.setColor(new Color(0xE6E6E6));
+        g.fill(new RoundRectangle2D.Double(0, 0, IMAGE_SIZE, IMAGE_SIZE, BORDER_RADIUS, BORDER_RADIUS));
 
-    // 缩放图片到指定的宽高
-    private static BufferedImage resizeImage(BufferedImage originalImage, int width, int height) {
-        // 计算缩放比例
-        double ratio = Math.min((double) width / originalImage.getWidth(), (double) height / originalImage.getHeight());
-        int newWidth = (int) (originalImage.getWidth() * ratio);
-        int newHeight = (int) (originalImage.getHeight() * ratio);
+        // 用内容区域垂直、水平居中
+        int totalW = cols * avatarSize + (cols - 1) * padding;
+        int startX = (IMAGE_SIZE - totalW) / 2;
 
-        // 缩放图片
-        Image scaledImage = originalImage.getScaledInstance(newWidth, newHeight, Image.SCALE_SMOOTH);
-        BufferedImage bufferedScaledImage = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g = bufferedScaledImage.createGraphics();
-        g.drawImage(scaledImage, 0, 0, null);
+        int totalH = rows * avatarSize + (rows - 1) * padding;
+        int startY = (IMAGE_SIZE - totalH) / 2;
+
+        for (int i = 0; i < size; i++) {
+            int row = i / cols;
+            int col = i % cols;
+
+            int x = startX + col * (avatarSize + padding);
+            int y = startY + row * (avatarSize + padding);
+
+            Image scaled = images[i].getScaledInstance(avatarSize, avatarSize, Image.SCALE_SMOOTH);
+            g.drawImage(scaled, x, y, null);
+        }
+
         g.dispose();
-        return bufferedScaledImage;
+        return result;
     }
 
-    private static BufferedImage downloadImage(String imageUrl) throws IOException {
-        URL url = new URL(imageUrl);
-        return ImageIO.read(url);
-    }
 
     private static BufferedImage createAvatarImage(String initial) {
         // 随机选择一个背景颜色

@@ -31,9 +31,17 @@ public class EncryptUtils {
         return new String(encode,StandardCharsets.UTF_8);
     }
 
+    public static String base64Encode(byte[] bytes) {
+        byte[] encode = Base64.getEncoder().encode(bytes);
+        return new String(encode,StandardCharsets.UTF_8);
+    }
+
     public static String base64Decode(String data) {
         byte[] decode = Base64.getDecoder().decode(data.getBytes(StandardCharsets.UTF_8));
         return new String(decode,StandardCharsets.UTF_8);
+    }
+    public static byte[] base64DecodeBytes(String data) {
+        return Base64.getDecoder().decode(data.getBytes(StandardCharsets.UTF_8));
     }
 
     private static String getWaitEncryptStr(String... data){
