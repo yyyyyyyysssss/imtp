@@ -14,7 +14,7 @@ public class ResultGenerator {
 
     public static <T> Result<T> ok(final T data){
 
-        return new Result<>(data).setSucceed(true);
+        return new Result<>(data);
     }
 
 
@@ -35,7 +35,7 @@ public class ResultGenerator {
 
     public static <T> Result<T> failed(Integer code,String message){
         Result<T> result = new Result<>(code, null, message);
-        result.setSucceed(false);
+
         return result;
     }
 
@@ -56,7 +56,7 @@ public class ResultGenerator {
 
     public static <T> Result<T> failed(ResultCode resultCode,T data,String message){
 
-        return new Result<>(resultCode,data,message).setSucceed(false);
+        return new Result<>(resultCode,data,message);
     }
 
 }

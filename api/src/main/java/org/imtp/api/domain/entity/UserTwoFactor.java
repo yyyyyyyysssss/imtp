@@ -5,12 +5,12 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Getter;
 import lombok.Setter;
-import org.imtp.api.enums.MfaType;
+import org.imtp.api.enums.TwoFactorType;
 
-@TableName("im_user_mfa")
+@TableName("im_user_2fa")
 @Getter
 @Setter
-public class UserMfa extends BaseEntity {
+public class UserTwoFactor extends BaseEntity {
 
     @TableField("user_id")
     private Long userId;
@@ -19,7 +19,7 @@ public class UserMfa extends BaseEntity {
     private String username;
 
     @EnumValue
-    private MfaType mfaType;
+    private TwoFactorType type;
 
     @TableField("secret")
     private String secret;

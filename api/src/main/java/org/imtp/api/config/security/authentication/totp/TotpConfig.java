@@ -1,4 +1,4 @@
-package org.imtp.api.config.mfa;
+package org.imtp.api.config.security.authentication.totp;
 
 import com.warrenstrange.googleauth.GoogleAuthenticator;
 import com.warrenstrange.googleauth.GoogleAuthenticatorConfig;
@@ -6,8 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class MfaConfig {
-
+public class TotpConfig {
 
     @Bean
     public GoogleAuthenticator googleAuthenticator(GoogleAuthenticatorConfig googleAuthenticatorConfig) {

@@ -116,7 +116,7 @@ auth:
       - /api/file/**
       - /api/profile/**
       - /api/authenticated/**
-      - /api/mfa/**
+      - /api/2fa/**
   # 基于请求头的身份认证
   requestHeadAuthentications:
     - antPath: /api/internal/**

@@ -1,6 +1,6 @@
 package org.imtp.api.enums;
 
-public enum MfaType {
+public enum TwoFactorType {
 
     TOTP
 

@@ -319,3 +319,20 @@ CREATE TABLE `tenant_user` (
                                `user_id` bigint NOT NULL COMMENT '用户id',
                                PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+
+-- ----------------------------
+-- Table structure for im_user_2fa
+-- ----------------------------
+CREATE TABLE `im_user_2fa` (
+                               `id` bigint NOT NULL,
+                               `user_id` bigint NOT NULL COMMENT '用户id',
+                               `username` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '用户账号',
+                               `type` varchar(20) COLLATE utf8mb4_general_ci NOT NULL COMMENT '类型 TOTP、SMS',
+                               `secret` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '密钥',
+                               `enabled` tinyint(1) NOT NULL DEFAULT '1' COMMENT '是否启用',
+                               `create_time` datetime DEFAULT NULL,
+                               `update_time` datetime DEFAULT NULL,
+                               PRIMARY KEY (`id`),
+                               KEY `user_id_idx` (`user_id`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;

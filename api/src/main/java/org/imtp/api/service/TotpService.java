@@ -40,9 +40,9 @@ public class TotpService {
         return String.format("%06d", code);
     }
 
-    public boolean verifyCode(String secret, String code){
-        int totp = Integer.parseInt(code);
-        return googleAuthenticator.authorize(secret, totp);
+    public boolean verifyCode(String secret, int code){
+
+        return googleAuthenticator.authorize(secret, code);
     }
 
     public String buildOtpAuthUrl(String accountName, String secret) {
