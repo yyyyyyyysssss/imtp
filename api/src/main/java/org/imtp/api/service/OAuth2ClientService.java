@@ -74,9 +74,6 @@ public class OAuth2ClientService {
         );
         SelfTokenVO selfTokenVO = tokenResponseEntity.getBody();
         log.info("self tokenInfo:{}",selfTokenVO);
-        if (selfTokenVO == null){
-            throw new OAuth2ClientLoginException("获取self token失败");
-        }
         //根据token获取用户信息
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", "token " + selfTokenVO.getAccessToken());

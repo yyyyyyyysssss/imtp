@@ -35,14 +35,13 @@ public class AuthorizationConsentController {
     ) {
         log.info("type:{},clientId:{},scope:{},state:{},userCode:{}",type,clientId,scope,state,userCode);
         RegisteredClient registeredClient = this.registeredClientRepository.findByClientId(clientId);
-        StringBuilder url = new StringBuilder();
-        url.append("http://localhost:3000/consent");
-        url.append("?client_id=").append(clientId);
-        url.append("&client_name=").append(registeredClient.getClientName());
-        url.append("&scope=").append(scope);
-        url.append("&state=").append(state);
-        url.append("&type=").append(type);
-        url.append("&user_code=").append(userCode);
+        String url = "http://localhost:3000/consent" +
+                "?client_id=" + clientId +
+                "&client_name=" + registeredClient.getClientName() +
+                "&scope=" + scope +
+                "&state=" + state +
+                "&type=" + type +
+                "&user_code=" + userCode;
         return "redirect:" + url;
     }
 

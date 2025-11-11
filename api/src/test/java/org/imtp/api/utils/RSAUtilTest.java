@@ -12,9 +12,9 @@ class RSAUtilTest {
 
     @Test
     void getKeyPair() throws Exception {
-        Tuple2<String, String> keyPair = RSAUtils.getKeyPair();
-        String publicKey = keyPair.getV1();
-        String privateKey = keyPair.getV2();
+        RSAUtils.KeyPairValue keyPairValue = RSAUtils.generateKeyPair();
+        String publicKey = keyPairValue.getPublicKey();
+        String privateKey = keyPairValue.getPrivateKey();
         log.info("publicKey: {}",publicKey);
         log.info("privateKey: {}",privateKey);
         String encrypt = RSAUtils.encrypt(TARGET_DATA, publicKey, RSAUtils.PaddingMode.OAEP_SHA1);
@@ -31,8 +31,12 @@ class RSAUtilTest {
 
     @Test
     void decrypt() throws Exception {
-        String encrypt = RSAUtils.encrypt(TARGET_DATA);
-        String decrypt = RSAUtils.decrypt(encrypt);
+        int keySize = 1024;
+        RSAUtils.KeyPairValue keyPairValue = RSAUtils.generateKeyPair(keySize);
+        String publicKey = keyPairValue.getPublicKey();
+        String privateKey = keyPairValue.getPrivateKey();
+        String encrypt = RSAUtils.encrypt(TARGET_DATA,publicKey,RSAUtils.PaddingMode.OAEP_MD5,keySize);
+        String decrypt = RSAUtils.decrypt(encrypt,privateKey,RSAUtils.PaddingMode.OAEP_MD5,keySize);
         log.info("decrypt : {}",decrypt);
         assertNotNull(decrypt);
     }

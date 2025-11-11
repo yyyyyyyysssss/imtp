@@ -14,6 +14,7 @@ module common {
 
     exports org.imtp.common.codec;
     exports org.imtp.common.component;
+    exports org.imtp.common.config.constant;
     exports org.imtp.common.enums;
     exports org.imtp.common.packet;
     exports org.imtp.common.packet.base;

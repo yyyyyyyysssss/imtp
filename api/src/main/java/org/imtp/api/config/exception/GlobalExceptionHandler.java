@@ -82,7 +82,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BusinessException.class)
     public Result<?> businessException(BusinessException e){
         log.error("业务异常: ",e);
-        return ResultGenerator.failed(e.getCode(),e.getReason());
+        return ResultGenerator.failed(e.getCode(),e.getMessage());
     }
 
     @ResponseStatus(HttpStatus.OK)

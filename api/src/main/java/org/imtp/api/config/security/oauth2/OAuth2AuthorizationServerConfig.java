@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.imtp.api.config.security.AuthProperties;
 import org.imtp.api.config.security.RequestUrlAuthority;
 import org.imtp.api.config.security.SecurityContextStore;
+import org.imtp.api.domain.entity.AuthorityUrl;
 import org.imtp.api.domain.entity.User;
 import org.imtp.api.config.security.authentication.TokenAuthenticationFilter;
 import org.imtp.api.utils.RSAUtils;
@@ -170,6 +171,7 @@ public class OAuth2AuthorizationServerConfig {
         objectMapper.registerModule(new JavaTimeModule());
         objectMapper.registerModule(new WebServletJackson2Module());
         objectMapper.addMixIn(RequestUrlAuthority.class, RequestUrlAuthority.RequestUrlAuthorityMixin.class);
+        objectMapper.addMixIn(AuthorityUrl.class, AuthorityUrl.AuthorityUrlMixin.class);
         objectMapper.addMixIn(User.class,User.UserMixin.class);
 
         authorizationRowMapper.setObjectMapper(objectMapper);

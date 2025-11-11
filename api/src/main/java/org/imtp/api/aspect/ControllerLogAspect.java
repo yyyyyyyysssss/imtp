@@ -60,8 +60,8 @@ public class ControllerLogAspect {
         } catch (Exception e) {
             long diff = System.currentTimeMillis() - s;
             stringBuilder.append(String.format("   Spend: %f s", diff / 1000.0));
-            stringBuilder.append(String.format("   ,Exception: %s", e));
-            log.error(stringBuilder.toString(),e);
+            stringBuilder.append(String.format("   ,Exception: %s", e.getMessage()));
+            log.error(stringBuilder.toString());
             throw e;
         }
         long e = System.currentTimeMillis();

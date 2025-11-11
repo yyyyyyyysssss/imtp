@@ -6,7 +6,6 @@ import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
-import java.util.Collection;
 import java.util.List;
 import java.util.Random;
 
@@ -19,8 +18,6 @@ public class AvatarGeneratorUtils {
 
     // 头像图片的大小
     private static final int IMAGE_SIZE = 200;
-    // 圆角半径
-    private static final int BORDER_RADIUS = 35;
     // 字体
     private static final Font FONT = new Font("Microsoft YaHei", Font.BOLD, IMAGE_SIZE / 2);
     // 背景颜色列表
@@ -79,7 +76,7 @@ public class AvatarGeneratorUtils {
 
         // 背景
         g.setColor(new Color(0xE6E6E6));
-        g.fill(new RoundRectangle2D.Double(0, 0, IMAGE_SIZE, IMAGE_SIZE, BORDER_RADIUS, BORDER_RADIUS));
+        g.fill(new RoundRectangle2D.Double(0, 0, IMAGE_SIZE, IMAGE_SIZE, 0, 0));
 
         // 用内容区域垂直、水平居中
         int totalW = cols * avatarSize + (cols - 1) * padding;
@@ -115,7 +112,7 @@ public class AvatarGeneratorUtils {
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         // 填充背景色（圆角矩形）
         g.setColor(backgroundColor);
-        g.fillRoundRect(0, 0, IMAGE_SIZE, IMAGE_SIZE, BORDER_RADIUS, BORDER_RADIUS); // 圆角矩形背景
+        g.fillRoundRect(0, 0, IMAGE_SIZE, IMAGE_SIZE, 0, 0); // 矩形背景
         // 设置字体颜色和样式
         g.setColor(Color.WHITE);
         Font font = FONT;

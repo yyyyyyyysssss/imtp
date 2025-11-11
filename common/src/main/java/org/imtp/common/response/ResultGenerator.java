@@ -33,12 +33,6 @@ public class ResultGenerator {
         return failed(ResultCode.FAILED,null,message);
     }
 
-    public static <T> Result<T> failed(Integer code,String message){
-        Result<T> result = new Result<>(code, null, message);
-
-        return result;
-    }
-
     public static <T> Result<T> failed(ResultCode resultCode){
 
         return failed(resultCode,null,resultCode.getMessage());

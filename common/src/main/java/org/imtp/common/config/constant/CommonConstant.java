@@ -1,4 +1,4 @@
-package org.imtp.api.config.constant;
+package org.imtp.common.config.constant;
 
 /**
  * @Description

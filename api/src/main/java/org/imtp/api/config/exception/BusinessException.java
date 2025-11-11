@@ -9,40 +9,41 @@ import org.imtp.common.response.ResultCode;
  */
 public class BusinessException extends RuntimeException{
 
-    public int code;
+    public ResultCode code;
 
-    public String reason;
+    public String message;
 
     public BusinessException(ResultCode resultCode){
-        this(resultCode.getCode(),resultCode.getMessage());
+        this(resultCode,resultCode.getMessage());
     }
 
     public BusinessException(String reason){
-        this(ResultCode.FAILED.getCode(),reason);
+        this(ResultCode.FAILED,reason);
     }
 
     public BusinessException(Throwable throwable){
-        this(ResultCode.FAILED.getCode(),throwable.getMessage());
+        this(ResultCode.FAILED,throwable.getMessage());
     }
 
-    public BusinessException(int code,String reason){
+    public BusinessException(ResultCode code,String message){
         this.code=code;
-        this.reason=reason;
+        this.message=message;
     }
 
-    public int getCode() {
+    public ResultCode getCode() {
         return code;
     }
 
-    public void setCode(int code) {
+    public void setCode(ResultCode code) {
         this.code = code;
     }
 
-    public String getReason() {
-        return reason;
+    @Override
+    public String getMessage() {
+        return message;
     }
 
-    public void setReason(String reason) {
-        this.reason = reason;
+    public void setMessage(String message) {
+        this.message = message;
     }
 }
