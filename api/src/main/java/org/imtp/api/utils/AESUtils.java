@@ -17,8 +17,6 @@ public class AESUtils {
 
     private static final int IV_LENGTH = 12;
 
-    private static final String TRANSFORMATION = "AES/CBC/PKCS5Padding";
-
     private static final int KEY_SIZE = 256;
 
     private static final SecureRandom secureRandom = new SecureRandom();

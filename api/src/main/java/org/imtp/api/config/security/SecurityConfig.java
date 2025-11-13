@@ -1,5 +1,9 @@
 package org.imtp.api.config.security;
 
+import com.nimbusds.jose.jwk.JWKSet;
+import com.nimbusds.jose.jwk.RSAKey;
+import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
+import com.nimbusds.jose.jwk.source.JWKSource;
 import jakarta.annotation.Resource;
 import jakarta.servlet.DispatcherType;
 import org.imtp.api.config.redis.RedisWrapper;
@@ -13,8 +17,11 @@ import org.imtp.api.config.security.authentication.refreshtoken.RefreshTokenAuth
 import org.imtp.api.config.security.authentication.refreshtoken.RefreshTokenServices;
 import org.imtp.api.config.security.authorization.PathVariableGuard;
 import org.imtp.api.config.security.authorization.RequestPathAuthorizationManager;
+import org.imtp.api.config.security.oauth2.JwtGrantedScopeAuthoritiesConverter;
+import org.imtp.api.config.security.oauth2.OAuth2BearerTokenResolver;
 import org.imtp.api.config.security.oauth2.OAuthClientAuthenticationProvider;
 import org.imtp.api.service.LogoutService;
+import org.imtp.api.utils.RSAUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -39,6 +46,9 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.server.authorization.config.annotation.web.configuration.OAuth2AuthorizationServerConfiguration;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.web.BearerTokenResolver;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.intercept.AuthorizationFilter;
@@ -53,6 +63,8 @@ import org.springframework.security.web.context.SecurityContextHolderFilter;
 import org.springframework.security.web.header.HeaderWriterFilter;
 import org.springframework.web.cors.CorsConfiguration;
 
+import java.security.interfaces.RSAPrivateKey;
+import java.security.interfaces.RSAPublicKey;
 import java.util.List;
 
 /**
@@ -155,7 +167,12 @@ public class SecurityConfig {
                 .addFilterBefore(apikeyAuthenticationFilter(authenticationManager(http)), HeaderWriterFilter.class)
                 //登出过滤器
                 .addFilterAfter(logoutFilter(bearerTokenResolver(),tokenService(securityContextStore())), AuthorizationFilter.class)
-                .logout(AbstractHttpConfigurer::disable);
+                .logout(AbstractHttpConfigurer::disable)
+                // oauth2资源服务器
+                .oauth2ResourceServer((resourceServer) -> {
+                    resourceServer.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter()));
+                    resourceServer.bearerTokenResolver(oAuth2BearerTokenResolver());
+                });
         return http.build();
     }
 
@@ -337,6 +354,46 @@ public class SecurityConfig {
     @Bean
     public OneTimeTokenAuthenticationProvider oneTimeTokenAuthenticationProvider() {
         return new OneTimeTokenAuthenticationProvider(oneTimeTokenService(),userService);
+    }
+
+
+    //  oauth2 资源服务器
+
+    @Bean
+    public OAuth2BearerTokenResolver oAuth2BearerTokenResolver(){
+
+        return new OAuth2BearerTokenResolver();
+    }
+
+    @Bean
+    public JwtAuthenticationConverter jwtAuthenticationConverter() {
+        //自定义基于scope jwt解析器，设置解析出来的权限信息的前缀与在jwt中的key
+        JwtGrantedScopeAuthoritiesConverter jwtGrantedScopeAuthoritiesConverter = new JwtGrantedScopeAuthoritiesConverter();
+        // 设置解析权限信息的前缀，设置为空是去掉前缀
+        jwtGrantedScopeAuthoritiesConverter.setAuthorityPrefix("");
+
+        // 设置权限信息在jwt claims中的key
+        jwtGrantedScopeAuthoritiesConverter.setAuthoritiesClaimName("scope");
+        JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
+        jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(jwtGrantedScopeAuthoritiesConverter);
+        return jwtAuthenticationConverter;
+    }
+
+    @Bean
+    public JWKSource<com.nimbusds.jose.proc.SecurityContext> jwkSource() throws Exception {
+        RSAPublicKey publicKey = (RSAPublicKey) RSAUtils.loadLocalPublicKey();
+        RSAPrivateKey privateKey = (RSAPrivateKey) RSAUtils.loadLocalPrivateKey();
+        RSAKey rsaKey = new RSAKey.Builder(publicKey)
+                .privateKey(privateKey)
+                .keyID("355cbc56f03da91b86306f3520186699")
+                .build();
+        JWKSet jwkSet = new JWKSet(rsaKey);
+        return new ImmutableJWKSet<>(jwkSet);
+    }
+
+    @Bean
+    public JwtDecoder jwtDecoder(JWKSource<com.nimbusds.jose.proc.SecurityContext> jwkSource) {
+        return OAuth2AuthorizationServerConfiguration.jwtDecoder(jwkSource);
     }
 
 }

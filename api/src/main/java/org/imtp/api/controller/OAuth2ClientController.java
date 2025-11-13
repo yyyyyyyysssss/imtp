@@ -122,6 +122,12 @@ public class OAuth2ClientController {
         return ResultGenerator.ok(tokenInfo);
     }
 
+    @GetMapping("/oidc/logout")
+    public Result<?> oidcLogout(@RequestParam("state") String state){
+        log.info("oidc logout code:{}",state);
+        return ResultGenerator.ok();
+    }
+
     //使用github登录
     @GetMapping("/github/login")
     public Result<?> githubLogin(@RequestParam("code") String code){

@@ -34,9 +34,9 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        //登录接口或已授权的接口直接放行
+        //已授权的接口直接放行
         SecurityContext securityContext = SecurityContextHolder.getContext();
-        if (request.getServletPath().contains("/login") || request.getServletPath().contains("/refreshToken") || (securityContext != null && securityContext.getAuthentication() != null)){
+        if (securityContext != null && securityContext.getAuthentication() != null && securityContext.getAuthentication().isAuthenticated()){
             filterChain.doFilter(request,response);
             return;
         }

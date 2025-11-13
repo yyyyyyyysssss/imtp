@@ -1,7 +1,7 @@
 package org.imtp.api.config.thread;
 
 import lombok.extern.slf4j.Slf4j;
-import org.imtp.api.config.constant.CommonConstant;
+import org.imtp.common.config.constant.CommonConstant;
 import org.slf4j.MDC;
 import org.springframework.core.task.TaskDecorator;
 

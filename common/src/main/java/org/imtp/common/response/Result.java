@@ -1,5 +1,6 @@
 package org.imtp.common.response;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.imtp.common.config.constant.CommonConstant;
 import org.imtp.common.utils.JsonUtil;
 import org.slf4j.MDC;
@@ -61,6 +62,7 @@ public class Result<T> {
         return requestId;
     }
 
+    @JsonIgnore
     public boolean isSucceed(){
 
         return this.code == ResultCode.SUCCEED.getCode();

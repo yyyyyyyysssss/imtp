@@ -1,6 +1,7 @@
 package org.imtp.api.config.security.oauth2;
 
 import org.apache.commons.lang3.StringUtils;
+import org.imtp.api.config.security.RequestUrlAuthority;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -36,7 +37,7 @@ public class JwtGrantedScopeAuthoritiesConverter implements Converter<Jwt, Colle
         }
         List<String> scopes = jwt.getClaim(authClaimName);
         return scopes.stream()
-                .map(authority -> new SimpleGrantedAuthority(this.authorityPrefix + authority))
+                .map(authority -> new RequestUrlAuthority(this.authorityPrefix + authority))
                 .collect(Collectors.toList());
     }
 

@@ -1,7 +1,5 @@
 package org.imtp.api.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -13,9 +11,8 @@ import org.imtp.api.domain.entity.User;
 import org.imtp.api.domain.entity.UserTwoFactor;
 import org.imtp.api.enums.TwoFactorType;
 import org.imtp.api.mapper.UserTwoFactorMapper;
-import org.imtp.api.service.TwoFactorService;
 import org.imtp.api.service.TotpService;
-import org.imtp.api.service.UserService;
+import org.imtp.api.service.TwoFactorService;
 import org.imtp.api.utils.AESUtils;
 import org.imtp.api.utils.SecurityUtils;
 import org.springframework.stereotype.Service;
@@ -39,42 +36,76 @@ public class TwoFactorServiceImpl extends ServiceImpl<UserTwoFactorMapper, UserT
     @Resource
     private AuthProperties authProperties;
 
-    @Resource
-    private UserService userService;
-
     private final String totp_temp_key_prefix = "totp:temp_secret:";
 
     @Override
     public String totpSetup(String account) {
-        String secret = totpService.createSecret();
-        String otpAuthUrl = totpService.buildOtpAuthUrl(account, secret);
-        // 暂存secret，验证成功后再写入数据库
-        redisWrapper.setValue(totp_temp_key_prefix + account, secret, Duration.ofMinutes(10)); // 10分钟过期
-        return otpAuthUrl;
+        UserTwoFactor record = this.lambdaQuery()
+                .select(UserTwoFactor::getSecret)
+                .eq(UserTwoFactor::getUsername, account)
+                .eq(UserTwoFactor::getType, TwoFactorType.TOTP)
+                .one();
+        String secret;
+        if(record != null){
+            try {
+                secret = AESUtils.decrypt(
+                        record.getSecret(),
+                        authProperties.getTotp().getSecretKey()
+                );
+            } catch (Exception e) {
+                throw new BusinessException("二次认证TOTP解密失败");
+            }
+        } else {
+            secret = totpService.createSecret();
+            // 暂存secret，验证成功后再写入数据库
+            redisWrapper.setValue(totp_temp_key_prefix + account, secret, Duration.ofMinutes(10)); // 10分钟过期
+        }
+        return totpService.buildOtpAuthUrl(account, secret);
     }
 
     @Override
     public BufferedImage totpSetupQrcode(String account) {
-        String secret = totpService.createSecret();
-        String otpAuthUrl = totpService.buildOtpAuthUrl(account, secret);
-        BufferedImage bufferedImage = totpService.imageQrcode(otpAuthUrl);
-        // 暂存secret，验证成功后再写入数据库
-        redisWrapper.setValue(totp_temp_key_prefix + account, secret, Duration.ofMinutes(10)); // 10分钟过期
-        return bufferedImage;
+        String otpAuthUrl = totpSetup(account);
+        return totpService.imageQrcode(otpAuthUrl);
     }
 
     @Override
     public boolean totpVerify(String account, String code) {
-        String secret = (String) redisWrapper.getValue(totp_temp_key_prefix + account);
+        // 1. 查询用户的 TOTP 记录
+        UserTwoFactor record = this.lambdaQuery()
+                .select(UserTwoFactor::getId, UserTwoFactor::getSecret, UserTwoFactor::getEnabled)
+                .eq(UserTwoFactor::getUsername, account)
+                .eq(UserTwoFactor::getType, TwoFactorType.TOTP)
+                .one();
+        String secret;
+        if(record != null){
+            try {
+                secret = AESUtils.decrypt(
+                        record.getSecret(),
+                        authProperties.getTotp().getSecretKey()
+                );
+            } catch (Exception e) {
+                throw new BusinessException("二次认证TOTP密钥解密失败");
+            }
+        } else {
+            secret = (String) redisWrapper.getValue(totp_temp_key_prefix + account);
+        }
         if (secret == null) {
-            throw new BusinessException("No pending TOTP setup for this account");
+            throw new BusinessException("二次认证TOTP密钥已过期或不存在");
         }
         int totpCode = Integer.parseInt(code);
         boolean ok = totpVerify(secret, totpCode);
         if (!ok) {
-            return false;
+            throw new BusinessException("二次认证TOTP令牌不正确");
         }
-        // 验证成功后，将secret写入数据库
+        // 已存在则直接开启
+        if(record != null){
+            return this.lambdaUpdate()
+                    .eq(UserTwoFactor::getId, record.getId())
+                    .set(UserTwoFactor::getEnabled, true)
+                    .update();
+        }
+        // secret写入数据库
         UserTwoFactor userMfa = new UserTwoFactor();
         userMfa.setId(IdGen.genId());
         userMfa.setUserId(SecurityUtils.getCurrentUser(User::getId));
@@ -84,12 +115,12 @@ public class TwoFactorServiceImpl extends ServiceImpl<UserTwoFactorMapper, UserT
             userMfa.setSecret(AESUtils.encrypt(secret, authProperties.getTotp().getSecretKey()));
         } catch (Exception e) {
             log.error("totpVerify error:", e);
-            throw new BusinessException("totpVerify error: " + e.getMessage());
+            throw new BusinessException("二次认证TOTP密钥加密失败");
         }
         userMfa.setEnabled(true);
         int i = userTwoFactorMapper.insert(userMfa);
         if (i <= 0) {
-            throw new BusinessException("Failed to save TOTP secret");
+            throw new BusinessException("二次认证TOTP保存失败");
         }
         // 移除缓存的 secret
         redisWrapper.delete(totp_temp_key_prefix + account);
@@ -117,7 +148,7 @@ public class TwoFactorServiceImpl extends ServiceImpl<UserTwoFactorMapper, UserT
                 .one();
 
         if (record == null) {
-            throw new BusinessException("当前账号未绑定 TOTP");
+            throw new BusinessException("二次认证账号未开启TOTP认证");
         }
         // 状态一致，无需处理
         if (Boolean.valueOf(enable).equals(record.getEnabled())) {
@@ -134,11 +165,11 @@ public class TwoFactorServiceImpl extends ServiceImpl<UserTwoFactorMapper, UserT
             );
         } catch (Exception e) {
             log.error("toggleTotp error: account={}", account, e);
-            throw new BusinessException("totp secret 解密异常");
+            throw new BusinessException("二次认证TOTP解密异常");
         }
         // 4. 验证 TOTP 是否正确
         if (!totpVerify(secret, totpCode)) {
-            throw new BusinessException("totp令牌不正确");
+            throw new BusinessException("二次认证TOTP令牌不正确");
         }
         // 5. 更新状态
         boolean updated = this.lambdaUpdate()
@@ -146,16 +177,14 @@ public class TwoFactorServiceImpl extends ServiceImpl<UserTwoFactorMapper, UserT
                 .set(UserTwoFactor::getEnabled, enable)
                 .update();
         if (!updated) {
-            throw new BusinessException("更新失败，请稍后再试");
+            throw new BusinessException("二次认证TOTO更新失败");
         }
         log.info("TOTP {} success, account={}", enable ? "enabled" : "disabled", account);
         return true;
     }
 
     private boolean totpVerify(String secret, int code) {
-        if (secret == null) {
-            throw new BusinessException("No pending TOTP setup for this account");
-        }
+
         return totpService.verifyCode(secret, code);
     }
 
