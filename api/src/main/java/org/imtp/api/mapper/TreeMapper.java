@@ -21,6 +21,6 @@ public interface TreeMapper<T extends TreeRelation> {
     //批量递归查询父节点（包含自身）
     List<T> selectParentByIds(@Param("coll") Collection<? extends Serializable> idList);
 
-
+    // 递归查询指定节点的所有子节点和父节点（包含自身）
     List<T> selectLineageById(@Param("id") Serializable id);
 }

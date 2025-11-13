@@ -11,7 +11,7 @@ import java.util.Base64;
 @Slf4j
 public class EncryptUtils {
 
-    public static String sha256(String... data) {
+    public static String sha256(String data) {
         String waitEncryptStr = getWaitEncryptStr(data);
         MessageDigest messageDigest;
         String shaStr = "";
@@ -25,9 +25,8 @@ public class EncryptUtils {
         return shaStr;
     }
 
-    public static String base64Encode(String... data) {
-        String waitEncryptStr = getWaitEncryptStr(data);
-        byte[] encode = Base64.getEncoder().encode(waitEncryptStr.getBytes(StandardCharsets.UTF_8));
+    public static String base64Encode(String data) {
+        byte[] encode = Base64.getEncoder().encode(data.getBytes(StandardCharsets.UTF_8));
         return new String(encode,StandardCharsets.UTF_8);
     }
 
@@ -48,15 +47,7 @@ public class EncryptUtils {
         if (data == null || data.length == 0) {
             return "";
         }
-        StringBuilder waitEncrypt = new StringBuilder();
-        for (int i = 0; i < data.length; i++) {
-            if (i != data.length - 1) {
-                waitEncrypt.append(data[i]).append(":");
-            } else {
-                waitEncrypt.append(data[i]);
-            }
-        }
-        return waitEncrypt.toString();
+        return String.join(":", data);
     }
 
 }

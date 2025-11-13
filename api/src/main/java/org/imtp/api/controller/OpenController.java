@@ -3,7 +3,7 @@ package org.imtp.api.controller;
 import groovy.lang.Tuple2;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
-import org.imtp.api.utils.AvatarGeneratorUtils;
+import org.imtp.api.utils.*;
 import org.imtp.common.response.Result;
 import org.imtp.common.response.ResultGenerator;
 import org.imtp.api.config.security.authentication.email.EmailAuthenticationProvider;
@@ -12,9 +12,6 @@ import org.imtp.api.domain.vo.TokenValidVO;
 import org.imtp.api.enums.TokenType;
 import org.imtp.api.service.EmailService;
 import org.imtp.api.config.security.TokenService;
-import org.imtp.api.utils.PayloadInfo;
-import org.imtp.api.utils.QrCodeUtils;
-import org.imtp.api.utils.VerificationCodeUtils;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
@@ -56,25 +53,31 @@ public class OpenController extends BaseController{
         return ResultGenerator.ok(tokenValidVO);
     }
 
-    @GetMapping("/simpleQRCode")
+    @GetMapping("/simple/qrcode")
     public void simpleQRCode(@RequestParam("content") String content, HttpServletResponse response) throws IOException {
         BufferedImage qrCodeImage = QrCodeUtils.createQrCodeImage(content);
         writeImage(response.getOutputStream(),qrCodeImage);
     }
 
-    @GetMapping("/generatorAvatar")
+    @GetMapping("/captcha/image")
+    public void captchaImage(HttpServletResponse response) throws IOException {
+        BufferedImage bufferedImage = CaptchaUtils.generateCaptchaImage();
+        writeImage(response.getOutputStream(),bufferedImage);
+    }
+
+    @GetMapping("/generator/avatar")
     public void generatorAvatar(@RequestParam("content") String content, HttpServletResponse response) throws IOException {
         BufferedImage avatarImage = AvatarGeneratorUtils.generateAvatar(content);
         writeImage(response.getOutputStream(),avatarImage);
     }
 
-    @PostMapping("/mergeAvatar")
+    @PostMapping("/merge/avatar")
     public void mergeAvatar(@RequestBody List<String> urls, HttpServletResponse response) throws IOException {
         BufferedImage avatarImage = AvatarGeneratorUtils.mergeAvatar(urls);
         writeImage(response.getOutputStream(),avatarImage);
     }
 
-    @GetMapping("/sendEmailVerificationCode")
+    @GetMapping("/email/send/code")
     public Result<?> sendEmailVerificationCode(@RequestParam("email") String email) {
         EmailInfo emailInfo = EmailInfo
                 .builder()

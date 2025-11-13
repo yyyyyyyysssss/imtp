@@ -33,7 +33,7 @@ public class TreeUtils {
         return buildSubTree(rootParentId,parentGroupMap,idGetter,childrenSetter,nullKey);
     }
 
-    public static <T,ID extends Serializable> List<T> buildSubTree(
+    private static <T,ID extends Serializable> List<T> buildSubTree(
             ID parentId,
             Map<Object, List<T>> parentGroupMap,
             Function<T,ID> idGetter,

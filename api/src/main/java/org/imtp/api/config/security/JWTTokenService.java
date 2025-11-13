@@ -2,17 +2,21 @@ package org.imtp.api.config.security;
 
 import groovy.lang.Tuple2;
 import lombok.extern.slf4j.Slf4j;
+import org.imtp.api.config.exception.BusinessException;
 import org.imtp.api.config.redis.RedisKey;
 import org.imtp.api.config.redis.RedisWrapper;
 import org.imtp.api.config.security.authentication.refreshtoken.RefreshTokenServices;
 import org.imtp.api.domain.dto.TokenDTO;
 import org.imtp.api.domain.entity.TokenInfo;
+import org.imtp.api.domain.entity.User;
 import org.imtp.api.enums.TokenType;
 import org.imtp.api.utils.EncryptUtils;
 import org.imtp.api.utils.JwtUtils;
 import org.imtp.api.utils.PayloadInfo;
+import org.imtp.api.utils.SecurityUtils;
 import org.imtp.common.enums.ClientType;
 import org.springframework.security.crypto.codec.Utf8;
+import org.springframework.security.web.authentication.rememberme.TokenBasedRememberMeServices;
 
 import java.security.MessageDigest;
 import java.time.Duration;
@@ -40,15 +44,21 @@ public class JWTTokenService implements TokenService {
     }
 
     @Override
-    public TokenInfo generate(Long userId, ClientType clientType) {
+    public TokenInfo generate(User user, ClientType clientType, boolean rememberMe) {
+        Long userId = user.getId();
         String accessToken = generateAccessToken(userId,clientType);
         String refreshToken = generateRefreshToken(userId,clientType);
+        String rememberMeToken = null;
+        if(rememberMe){
+            rememberMeToken = generateRememberMeToken(user.getUsername(), user.getPassword());
+        }
         PayloadInfo payloadInfo = JwtUtils.extractPayloadInfo(accessToken);
         TokenInfo token = TokenInfo.builder()
                 .id(payloadInfo.getId())
                 .userId(userId)
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
+                .rememberMeToken(rememberMeToken)
                 .expiration(payloadInfo.getExpiration())
                 .clientType(clientType)
                 .build();
@@ -149,7 +159,14 @@ public class JWTTokenService implements TokenService {
                     return new Tuple2<>(false, null);
                 }
                 String secretKey = authProperties.getJwt().getSecretKey();
-                String expectedTokenSignature = EncryptUtils.sha256(userId, tokenExpiryTime + "",clientType, secretKey);
+                String expectedTokenSignature = EncryptUtils.sha256(
+                        String.join(":",
+                                userId,
+                                tokenExpiryTime + "",
+                                clientType,
+                                secretKey
+                        )
+                );
                 if(!equals(expectedTokenSignature, actualTokenSignature)){
                     log.warn("当前签名: {} 预期签名: {}",actualTokenSignature,expectedTokenSignature);
                     return new Tuple2<>(false, null);
@@ -188,8 +205,44 @@ public class JWTTokenService implements TokenService {
         Long configExpiration = authProperties.getJwt().getRefreshExpiration();
         long timestamp = configExpiration * 1000;
         long expiration = System.currentTimeMillis() + timestamp;
-        String encryptStr = EncryptUtils.sha256(userId.toString(), Long.toString(expiration),clientType.name(), authProperties.getJwt().getSecretKey());
-        return EncryptUtils.base64Encode(userId.toString(), Long.toString(expiration), clientType.name(), RefreshTokenServices.RefreshTokenAlgorithm.SHA256.name(), encryptStr);
+        String encryptStr = EncryptUtils.sha256(
+                String.join(":",
+                        userId.toString(),
+                        Long.toString(expiration),clientType.name(),
+                        authProperties.getJwt().getSecretKey()
+                )
+        );
+        return EncryptUtils.base64Encode(
+                String.join(":",
+                        userId.toString(),
+                        Long.toString(expiration),
+                        clientType.name(),
+                        RefreshTokenServices.RefreshTokenAlgorithm.SHA256.name(),
+                        encryptStr
+                )
+        );
+    }
+
+    private String generateRememberMeToken(String username,String password){
+        Long configExpiration = authProperties.getRememberMe().getExpiration();
+        long timestamp = configExpiration * 1000;
+        long expiration = System.currentTimeMillis() + timestamp;
+        String encryptStr = EncryptUtils.sha256(
+                String.join(":",
+                        username,
+                        Long.toString(expiration),
+                        password,
+                        authProperties.getRememberMe().getSecretKey()
+                )
+        );
+        return EncryptUtils.base64Encode(
+                String.join(":",
+                        username,
+                        Long.toString(expiration),
+                        TokenBasedRememberMeServices.RememberMeTokenAlgorithm.SHA256.name(),
+                        encryptStr
+                )
+        );
     }
 
     private static boolean equals(String expected, String actual) {

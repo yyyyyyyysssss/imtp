@@ -1,6 +1,5 @@
 package org.imtp.api.utils;
 
-import lombok.Getter;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -15,13 +14,16 @@ import org.springframework.stereotype.Component;
 public class SpringUtils implements ApplicationContextAware {
 
     // 获取applicationContext
-    @Getter
-    private static ApplicationContext applicationContext;
+    private static volatile ApplicationContext applicationContext;
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         if (SpringUtils.applicationContext == null) {
-            SpringUtils.applicationContext = applicationContext;
+            synchronized (SpringUtils.class){
+                if (SpringUtils.applicationContext == null) {
+                    SpringUtils.applicationContext = applicationContext;
+                }
+            }
         }
     }
 
@@ -40,5 +42,11 @@ public class SpringUtils implements ApplicationContextAware {
         return getApplicationContext().getBean(name, clazz);
     }
 
+    public static ApplicationContext getApplicationContext() {
+        if (applicationContext == null) {
+            throw new IllegalStateException("ApplicationContext has not been initialized.");
+        }
+        return applicationContext;
+    }
 }
 

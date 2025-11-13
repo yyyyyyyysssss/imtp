@@ -62,7 +62,7 @@ public class FileCookieAuthenticationFilter extends OncePerRequestFilter {
         Cookie[] cookies = request.getCookies();
         if (cookies != null) {
             for (Cookie cookie : cookies) {
-                if ("token".equalsIgnoreCase(cookie.getName()) || "accessToken".equalsIgnoreCase(cookie.getName()) || "access_token".equalsIgnoreCase(cookie.getName())) {
+                if ("accessToken".equalsIgnoreCase(cookie.getName()) || "access_token".equalsIgnoreCase(cookie.getName())) {
                     return cookie.getValue();
                 }
             }
