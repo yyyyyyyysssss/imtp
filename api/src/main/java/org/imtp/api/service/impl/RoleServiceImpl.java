@@ -14,13 +14,13 @@ import org.imtp.api.domain.dto.RoleUpdateDTO;
 import org.imtp.api.domain.entity.Role;
 import org.imtp.api.domain.entity.RoleAuthority;
 import org.imtp.api.domain.entity.UserRole;
-import org.imtp.api.domain.vo.AuthorityVO;
 import org.imtp.api.domain.vo.RoleVO;
-import org.imtp.api.domain.vo.UserVO;
 import org.imtp.api.enums.RoleType;
 import org.imtp.api.mapper.RoleMapper;
 import org.imtp.api.mapping.RoleMapping;
-import org.imtp.api.service.*;
+import org.imtp.api.service.RoleAuthorityService;
+import org.imtp.api.service.RoleService;
+import org.imtp.api.service.UserRoleService;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
@@ -50,13 +50,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role>  implements R
     private RoleAuthorityService roleAuthorityService;
 
     @Resource
-    private AuthorityService authorityService;
-
-    @Resource
     private UserRoleService userRoleService;
-
-    @Resource
-    private UserService userService;
 
     @Override
     @Transactional
@@ -139,17 +133,11 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role>  implements R
         Role role = checkAndResult(id);
         RoleVO roleVO = RoleMapping.INSTANCE.toRoleVO(role);
         // 查询角色对应的权限
-        List<AuthorityVO> authorityVOS = authorityService.findByRoleId(id);
-        if(!CollectionUtils.isEmpty(authorityVOS)){
-            List<Long> authorityIds = authorityVOS.stream().map(AuthorityVO::getId).toList();
-            roleVO.setAuthorityIds(authorityIds);
-        }
+        List<Long> authorityIds = roleAuthorityService.findAuthorityIdByRoleId(id);
+        roleVO.setAuthorityIds(authorityIds);
         // 查询角色关联的用户
-        List<UserVO> users = userService.findByRoleId(id);
-        if(!CollectionUtils.isEmpty(users)){
-            List<Long> userIds = users.stream().map(UserVO::getId).toList();
-            roleVO.setUserIds(userIds);
-        }
+        List<Long> userIds = userRoleService.findUserIdByRoleId(id);
+        roleVO.setUserIds(userIds);
         return roleVO;
     }
 

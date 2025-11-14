@@ -27,6 +27,7 @@ import org.imtp.api.utils.AvatarGeneratorUtils;
 import org.imtp.api.utils.PasswordGeneratorUtils;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Caching;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -68,10 +69,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     private RoleAuthorityService roleAuthorityService;
 
     @Resource
-    private PasswordEncoder passwordEncoder;
+    private FileService fileService;
 
     @Resource
-    private FileService fileService;
+    @Lazy // 避免循环依赖
+    private PasswordEncoder passwordEncoder;
 
     @Override
     public boolean saveOrUpdate(User user) {
