@@ -57,7 +57,7 @@ public class RequestPathAuthorizationManager implements AuthorizationManager<Req
             }
             boolean matched = false;
             for (AuthorityUrl authorityUrl : urls){
-                if(authorityUrl.getMethod() != null && !authorityUrl.getMethod().isBlank()){
+                if(authorityUrl.getMethod() != null && !authorityUrl.getMethod().isBlank() && !authorityUrl.getMethod().equals("*")){
                     //如果有指定请求方法，则使用指定的请求方法
                     matched = PathPatternRequestMatcher.withDefaults().matcher(HttpMethod.valueOf(authorityUrl.getMethod()),authorityUrl.getUrl()).matches(request);
                 }else {
