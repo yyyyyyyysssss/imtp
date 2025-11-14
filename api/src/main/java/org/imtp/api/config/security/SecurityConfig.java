@@ -55,7 +55,6 @@ import org.springframework.security.web.access.intercept.AuthorizationFilter;
 import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
-import org.springframework.security.web.authentication.logout.LogoutHandler;
 import org.springframework.security.web.authentication.preauth.RequestHeaderAuthenticationFilter;
 import org.springframework.security.web.authentication.rememberme.RememberMeAuthenticationFilter;
 import org.springframework.security.web.authentication.rememberme.TokenBasedRememberMeServices;
@@ -308,16 +307,6 @@ public class SecurityConfig {
         return new LogoutFilter((req, res, auth) -> {
         },logoutService);
     }
-//    @Bean
-//    public LogoutHandler logoutHandler(BearerTokenResolver bearerTokenResolver,TokenService tokenService){
-//
-//        return (request, response, authentication) -> {
-//            //提取token
-//            String token = bearerTokenResolver.resolve(request);
-//            //将token过期
-//            tokenService.revokeToken(token);
-//        };
-//    }
 
     //密码加密  调试使用 生产环境使用BCryptPasswordEncoder
     @Bean
