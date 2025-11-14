@@ -37,7 +37,7 @@ import java.util.List;
 public class AuthorityServiceImpl extends AbstractAuthorityService implements AuthorityService {
 
     @Resource
-    private AuthorityMapper authorityMapper;
+    protected AuthorityMapper authorityMapper;
 
     @Resource
     private RoleService roleService;

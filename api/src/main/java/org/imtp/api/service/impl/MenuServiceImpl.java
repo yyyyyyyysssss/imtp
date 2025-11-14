@@ -45,7 +45,7 @@ public class MenuServiceImpl extends AbstractAuthorityService implements MenuSer
     private RoleService roleService;
 
     @Resource
-    private AuthorityMapper authorityMapper;
+    protected AuthorityMapper authorityMapper;
 
     @Override
     public Long createMenu(MenuCreateDTO menuCreateDTO) {

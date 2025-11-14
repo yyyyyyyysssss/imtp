@@ -1,32 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>3.5.4</version>
-        <relativePath/>
+        <relativePath />
     </parent>
 
     <groupId>org.imtp.api</groupId>
     <artifactId>api</artifactId>
 
     <properties>
-        <java.version>21</java.version>
+        <java.version>25</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <common.version>1.0.0-SNAPSHOT</common.version>
         <spring.boot.version>3.5.4</spring.boot.version>
         <spring.cloud.version>2025.0.0</spring.cloud.version>
         <mapstruct.version>1.6.3</mapstruct.version>
+        <lombok.version>1.18.38</lombok.version>
+        <maven.compiler.proc>full</maven.compiler.proc>
         <skipTests>true</skipTests>
     </properties>
 
     <dependencyManagement>
         <dependencies>
-            <!-- https://mvnrepository.com/artifact/org.springframework.cloud/spring-cloud-dependencies -->
+            <!--
+            https://mvnrepository.com/artifact/org.springframework.cloud/spring-cloud-dependencies -->
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-dependencies</artifactId>
@@ -123,7 +127,8 @@
             </exclusions>
         </dependency>
 
-        <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-thymeleaf -->
+        <!--
+        https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-thymeleaf -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-thymeleaf</artifactId>
@@ -135,7 +140,8 @@
             <artifactId>spring-boot-starter-aop</artifactId>
         </dependency>
 
-        <!-- https://mvnrepository.com/artifact/org.springframework.cloud/spring-cloud-starter-circuitbreaker-resilience4j -->
+        <!--
+        https://mvnrepository.com/artifact/org.springframework.cloud/spring-cloud-starter-circuitbreaker-resilience4j -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-circuitbreaker-resilience4j</artifactId>
@@ -154,7 +160,8 @@
             <version>1.78</version>
         </dependency>
 
-        <!-- https://mvnrepository.com/artifact/org.springframework.cloud/spring-cloud-starter-openfeign -->
+        <!--
+        https://mvnrepository.com/artifact/org.springframework.cloud/spring-cloud-starter-openfeign -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-openfeign</artifactId>
@@ -188,20 +195,23 @@
             </exclusions>
         </dependency>
 
-        <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-validation -->
+        <!--
+        https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-validation -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-validation</artifactId>
         </dependency>
 
 
-        <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-security -->
+        <!--
+        https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-security -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
 
-        <!-- https://mvnrepository.com/artifact/org.springframework.security/spring-security-oauth2-authorization-server -->
+        <!--
+        https://mvnrepository.com/artifact/org.springframework.security/spring-security-oauth2-authorization-server -->
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-oauth2-authorization-server</artifactId>
@@ -363,7 +373,8 @@
                             <!-- 开启快速构建模式  -->
                             <quickBuild>true</quickBuild>
                             <buildArgs>
-                                <buildArg>--initialize-at-run-time=sun.net.dns.ResolverConfigurationImpl,io.netty</buildArg>
+                                <buildArg>
+                                    --initialize-at-run-time=sun.net.dns.ResolverConfigurationImpl,io.netty</buildArg>
                                 <!-- 开启G1垃圾收集器  目前只有linux平台支持 -->
                                 <buildArg>--gc=G1</buildArg>
                                 <!-- 在映像构建过程中显示异常堆栈跟踪 -->
@@ -373,7 +384,8 @@
                                 <!-- jfr分析 -->
                                 <buildArg>--enable-monitoring=jfr,jmxserver,jvmstat</buildArg>
                                 <!-- 本地镜像配置文件 -->
-                                <buildArg>-Dspring.config.additional-location=file:config/application.yaml</buildArg>
+                                <buildArg>
+                                    -Dspring.config.additional-location=file:config/application.yaml</buildArg>
                             </buildArgs>
                         </configuration>
                         <executions>
