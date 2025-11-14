@@ -166,7 +166,7 @@ public class SecurityConfig {
                 //基于请求头apikey认证的过滤器
                 .addFilterBefore(apikeyAuthenticationFilter(authenticationManager(http)), HeaderWriterFilter.class)
                 //登出过滤器
-                .addFilterAfter(logoutFilter(bearerTokenResolver(),tokenService(securityContextStore())), AuthorizationFilter.class)
+                .addFilterAfter(logoutFilter(), AuthorizationFilter.class)
                 .logout(AbstractHttpConfigurer::disable)
                 // oauth2资源服务器
                 .oauth2ResourceServer((resourceServer) -> {
@@ -303,21 +303,21 @@ public class SecurityConfig {
 
     //登出过滤器
     @Bean
-    public LogoutFilter logoutFilter(BearerTokenResolver bearerTokenResolver,TokenService tokenService) {
+    public LogoutFilter logoutFilter() {
 
         return new LogoutFilter((req, res, auth) -> {
-        }, logoutHandler(bearerTokenResolver,tokenService),logoutService);
+        },logoutService);
     }
-    @Bean
-    public LogoutHandler logoutHandler(BearerTokenResolver bearerTokenResolver,TokenService tokenService){
-
-        return (request, response, authentication) -> {
-            //提取token
-            String token = bearerTokenResolver.resolve(request);
-            //将token过期
-            tokenService.revokeToken(token);
-        };
-    }
+//    @Bean
+//    public LogoutHandler logoutHandler(BearerTokenResolver bearerTokenResolver,TokenService tokenService){
+//
+//        return (request, response, authentication) -> {
+//            //提取token
+//            String token = bearerTokenResolver.resolve(request);
+//            //将token过期
+//            tokenService.revokeToken(token);
+//        };
+//    }
 
     //密码加密  调试使用 生产环境使用BCryptPasswordEncoder
     @Bean
