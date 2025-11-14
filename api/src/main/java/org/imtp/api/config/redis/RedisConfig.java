@@ -1,8 +1,6 @@
 package org.imtp.api.config.redis;
 
-import com.fasterxml.jackson.core.StreamReadFeature;
 import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.imtp.api.config.security.RequestUrlAuthority;
 import org.imtp.api.config.security.authentication.email.EmailAuthenticationToken;

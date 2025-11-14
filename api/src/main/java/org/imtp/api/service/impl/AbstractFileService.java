@@ -22,11 +22,9 @@ import org.imtp.api.enums.FileUploadStatus;
 import org.imtp.api.mapper.FileUploadMapper;
 import org.imtp.api.service.FileService;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.MediaType;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;

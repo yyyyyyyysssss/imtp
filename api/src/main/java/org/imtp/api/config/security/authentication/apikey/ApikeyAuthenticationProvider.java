@@ -23,8 +23,6 @@ import java.util.stream.Collectors;
  */
 public class ApikeyAuthenticationProvider implements AuthenticationProvider {
 
-    private List<AuthProperties.RequestHeadAuthenticationConfig> requestHeadAuthentications;
-
     private Map<String, String> apikeyMap;
 
     private final static PathMatcher PATH_MATCHER = new AntPathMatcher();
@@ -40,7 +38,6 @@ public class ApikeyAuthenticationProvider implements AuthenticationProvider {
             throw new NullPointerException("requestHeadAuthentications not null");
         }
         this.apikeyMap = requestHeadAuthentications.stream().collect(Collectors.toMap(AuthProperties.RequestHeadAuthenticationConfig::getApikey, AuthProperties.RequestHeadAuthenticationConfig::getAntPath));
-        this.requestHeadAuthentications = requestHeadAuthentications;
     }
 
     @Override

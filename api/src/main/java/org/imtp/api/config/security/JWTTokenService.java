@@ -2,7 +2,6 @@ package org.imtp.api.config.security;
 
 import groovy.lang.Tuple2;
 import lombok.extern.slf4j.Slf4j;
-import org.imtp.api.config.exception.BusinessException;
 import org.imtp.api.config.redis.RedisKey;
 import org.imtp.api.config.redis.RedisWrapper;
 import org.imtp.api.config.security.authentication.refreshtoken.RefreshTokenServices;
@@ -13,7 +12,6 @@ import org.imtp.api.enums.TokenType;
 import org.imtp.api.utils.EncryptUtils;
 import org.imtp.api.utils.JwtUtils;
 import org.imtp.api.utils.PayloadInfo;
-import org.imtp.api.utils.SecurityUtils;
 import org.imtp.common.enums.ClientType;
 import org.springframework.security.crypto.codec.Utf8;
 import org.springframework.security.web.authentication.rememberme.TokenBasedRememberMeServices;

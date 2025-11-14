@@ -113,10 +113,10 @@ public class RestTemplateConfig {
                                     //单路由并发连接数
                                     .setMaxConnPerRoute(100)
                                     .setTlsSocketStrategy(
-                                            (TlsSocketStrategy) ClientTlsStrategyBuilder.create()
+                                            ClientTlsStrategyBuilder.create()
                                                     .setSslContext(createSSLContext())
                                                     .setHostnameVerifier(NoopHostnameVerifier.INSTANCE)
-                                                    .build()
+                                                    .buildClassic()
                                     )
                                     //使用LAX策略 HttpClient 可以在高负载下超过每个路由的最大限制，并且不强制执行总最大限制
                                     .setPoolConcurrencyPolicy(PoolConcurrencyPolicy.LAX)

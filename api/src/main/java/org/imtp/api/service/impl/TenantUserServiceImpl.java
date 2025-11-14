@@ -8,7 +8,6 @@ import org.imtp.api.mapper.TenantUserMapper;
 import org.imtp.api.service.TenantUserService;
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
 import java.util.List;
 
 /**

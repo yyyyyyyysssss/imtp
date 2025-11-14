@@ -1,11 +1,11 @@
 package org.imtp.api.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.extension.service.IService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import jakarta.annotation.Resource;
 import org.imtp.api.domain.entity.Authority;
 import org.imtp.api.mapper.AuthorityMapper;
+import org.imtp.api.service.AuthorityService;
 
 import java.io.Serializable;
 
@@ -14,7 +14,7 @@ import java.io.Serializable;
  * @Author ys
  * @Date 2025/5/30 11:09
  */
-public abstract class AbstractAuthorityService extends ServiceImpl<AuthorityMapper, Authority> implements IService<Authority> {
+public abstract class AbstractAuthorityService extends ServiceImpl<AuthorityMapper, Authority>{
 
     @Resource
     protected AuthorityMapper authorityMapper;

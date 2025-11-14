@@ -5,7 +5,8 @@ import java.awt.*;
 import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Random;
 
@@ -38,7 +39,7 @@ public class AvatarGeneratorUtils {
         return createAvatarImage(initial);
     }
 
-    public static BufferedImage mergeAvatar(List<String> imageUrls) throws IOException {
+    public static BufferedImage mergeAvatar(List<String> imageUrls) throws IOException, URISyntaxException {
         int size = imageUrls.size();
         if (size == 0) return null;
         if(imageUrls.size() > 9) {
@@ -48,7 +49,8 @@ public class AvatarGeneratorUtils {
         // 下载所有头像
         BufferedImage[] images = new BufferedImage[size];
         for (int i = 0; i < size; i++) {
-            images[i] = ImageIO.read(new URL(imageUrls.get(i)));
+            URI uri = new URI(imageUrls.get(i));
+            images[i] = ImageIO.read(uri.toURL());
         }
         return merge(images);
     }

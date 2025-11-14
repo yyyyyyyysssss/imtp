@@ -4,7 +4,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.imtp.api.config.security.RequestUrlAuthority;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.util.Assert;
 
@@ -18,7 +17,6 @@ import java.util.stream.Collectors;
  */
 public class JwtGrantedScopeAuthoritiesConverter implements Converter<Jwt, Collection<GrantedAuthority>> {
 
-    private static final String DEFAULT_AUTHORITY_PREFIX = "SCOPE_";
     private static final Collection<String> WELL_KNOWN_AUTHORITIES_CLAIM_NAMES = Arrays.asList("scope", "scp");
     private String authorityPrefix = "SCOPE_";
     private String authoritiesClaimName;

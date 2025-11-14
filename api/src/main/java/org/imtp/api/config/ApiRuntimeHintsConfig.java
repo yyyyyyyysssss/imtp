@@ -6,8 +6,6 @@ import org.springframework.context.annotation.ImportRuntimeHints;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.ProviderManager;
 
-import java.util.List;
-
 /**
  * @Description
  * @Author ys

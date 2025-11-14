@@ -8,12 +8,12 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.imtp.api.config.security.RedisSecurityContextRepository;
 import org.imtp.api.config.security.TokenService;
-import org.imtp.api.config.security.authorization.PathPatternRequestMatcher;
 import org.imtp.api.enums.TokenType;
 import org.imtp.api.utils.PayloadInfo;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -26,19 +26,18 @@ import java.io.IOException;
  */
 public class FileCookieAuthenticationFilter extends OncePerRequestFilter {
 
+    private final TokenService tokenService;
 
     private final RequestMatcher tokenEndpointMatcher;
 
-    private final TokenService tokenService;
-
     public FileCookieAuthenticationFilter(TokenService tokenService){
         this.tokenService = tokenService;
-        this.tokenEndpointMatcher = new PathPatternRequestMatcher("/file/**", HttpMethod.GET.name());
+        this.tokenEndpointMatcher = PathPatternRequestMatcher.withDefaults().matcher(HttpMethod.GET,"/file/**");
     }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        if (!this.tokenEndpointMatcher.matches(request)) {
+        if(!this.tokenEndpointMatcher.matches(request)){
             filterChain.doFilter(request, response);
             return;
         }

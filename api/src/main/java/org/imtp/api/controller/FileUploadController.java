@@ -4,7 +4,6 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.imtp.api.domain.dto.FileChunkDTO;
 import org.imtp.api.domain.dto.FileInfoDTO;
-import org.imtp.api.domain.vo.FileInfoVO;
 import org.imtp.api.domain.vo.FileUploadChunkVO;
 import org.imtp.api.domain.vo.FileUploadProgressVO;
 import org.imtp.api.service.FileService;

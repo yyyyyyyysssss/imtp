@@ -1,6 +1,5 @@
 package org.imtp.api.utils;
 
-import groovy.lang.Tuple2;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 

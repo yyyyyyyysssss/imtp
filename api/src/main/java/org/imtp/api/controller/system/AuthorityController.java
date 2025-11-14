@@ -4,7 +4,6 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.imtp.api.domain.dto.AuthorityCreateDTO;
 import org.imtp.api.domain.dto.AuthorityUpdateDTO;
-import org.imtp.api.domain.dto.IdsOnlyDTO;
 import org.imtp.api.domain.vo.AuthorityVO;
 import org.imtp.api.service.AuthorityService;
 import org.imtp.common.response.Result;

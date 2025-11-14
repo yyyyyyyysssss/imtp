@@ -3,7 +3,10 @@ package org.imtp.api.controller.system;
 import com.github.pagehelper.PageInfo;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.imtp.api.domain.dto.*;
+import org.imtp.api.domain.dto.TenantBindUserDTO;
+import org.imtp.api.domain.dto.TenantCreateDTO;
+import org.imtp.api.domain.dto.TenantQueryDTO;
+import org.imtp.api.domain.dto.TenantUpdateDTO;
 import org.imtp.api.domain.vo.TenantVO;
 import org.imtp.api.service.TenantService;
 import org.imtp.common.response.Result;
@@ -11,7 +14,6 @@ import org.imtp.common.response.ResultGenerator;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collection;
 import java.util.List;
 
 /**

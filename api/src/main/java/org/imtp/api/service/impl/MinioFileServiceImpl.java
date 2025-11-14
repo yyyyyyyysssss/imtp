@@ -13,19 +13,13 @@ import org.imtp.api.domain.entity.FileUpload;
 import org.imtp.api.domain.vo.FileStreamVO;
 import org.imtp.api.enums.FileStorageType;
 import org.imtp.api.mapper.FileUploadMapper;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
-import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.time.Duration;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**

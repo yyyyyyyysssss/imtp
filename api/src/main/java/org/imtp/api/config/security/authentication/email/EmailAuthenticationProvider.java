@@ -1,7 +1,6 @@
 package org.imtp.api.config.security.authentication.email;
 
 import org.imtp.api.config.redis.RedisWrapper;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;

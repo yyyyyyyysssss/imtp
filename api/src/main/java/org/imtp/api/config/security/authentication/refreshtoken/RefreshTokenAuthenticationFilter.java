@@ -4,16 +4,16 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.imtp.api.config.security.authentication.refreshtoken.RefreshTokenServices;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.server.resource.web.BearerTokenResolver;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
+
 import java.io.IOException;
 
 /**
@@ -35,7 +35,7 @@ public class RefreshTokenAuthenticationFilter extends OncePerRequestFilter {
         this.authenticationManager = authenticationManager;
         this.bearerTokenResolver = bearerTokenResolver;
         this.tokenService = refreshTokenServices;
-        this.tokenEndpointMatcher = new AntPathRequestMatcher("/refreshToken", HttpMethod.GET.name());
+        this.tokenEndpointMatcher = PathPatternRequestMatcher.withDefaults().matcher(HttpMethod.GET,"/refreshToken");
     }
 
     @Override

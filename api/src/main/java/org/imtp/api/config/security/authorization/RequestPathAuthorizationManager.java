@@ -1,8 +1,10 @@
 package org.imtp.api.config.security.authorization;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.imtp.api.config.security.RequestUrlAuthority;
 import org.imtp.api.domain.entity.AuthorityUrl;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationTrustResolver;
 import org.springframework.security.authentication.AuthenticationTrustResolverImpl;
 import org.springframework.security.authorization.AuthorizationDecision;
@@ -10,13 +12,12 @@ import org.springframework.security.authorization.AuthorizationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.access.intercept.RequestAuthorizationContext;
-import org.springframework.security.web.util.matcher.RequestMatcher;
+import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
 import org.springframework.util.CollectionUtils;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Supplier;
-import java.util.regex.Pattern;
 
 /**
  * @Description 基于请求路径的权限管理器
@@ -31,10 +32,6 @@ public class RequestPathAuthorizationManager implements AuthorizationManager<Req
     private static final AuthorizationDecision AFFIRM = new AuthorizationDecision(true);
 
     private final AuthenticationTrustResolver trustResolver = new AuthenticationTrustResolverImpl();
-
-    private final static String URL_SEPARATOR = ",";
-
-    private static final Pattern METHOD_PREFIX_PATTERN = Pattern.compile("^(GET|POST|PUT|DELETE|PATCH|OPTIONS|HEAD|\\*):(.+)$", Pattern.CASE_INSENSITIVE);
 
     @Override
     public AuthorizationDecision check(Supplier<Authentication> supplier, RequestAuthorizationContext requestAuthorizationContext) {
@@ -51,28 +48,26 @@ public class RequestPathAuthorizationManager implements AuthorizationManager<Req
         if (authorities == null || authorities.isEmpty()){
             return DENY;
         }
-        RequestMatcher requestMatcher;
+        HttpServletRequest request = requestAuthorizationContext.getRequest();
         List<RequestUrlAuthority> requestUrlAuthorities = authorities.stream().map(m -> (RequestUrlAuthority) m).filter(f -> f.getUrls() != null && !CollectionUtils.isEmpty(f.getUrls())).toList();
         for (RequestUrlAuthority urlAuthority : requestUrlAuthorities){
             List<AuthorityUrl> urls = urlAuthority.getUrls();
             if (urls == null || urls.isEmpty()){
                 continue;
             }
-            boolean b = false;
+            boolean matched = false;
             for (AuthorityUrl authorityUrl : urls){
                 if(authorityUrl.getMethod() != null && !authorityUrl.getMethod().isBlank()){
                     //如果有指定请求方法，则使用指定的请求方法
-                    requestMatcher = new PathPatternRequestMatcher(authorityUrl.getUrl(),authorityUrl.getMethod());
+                    matched = PathPatternRequestMatcher.withDefaults().matcher(HttpMethod.valueOf(authorityUrl.getMethod()),authorityUrl.getUrl()).matches(request);
                 }else {
-                    requestMatcher = new PathPatternRequestMatcher(authorityUrl.getUrl());
+                    matched = PathPatternRequestMatcher.withDefaults().matcher(authorityUrl.getUrl()).matches(request);
                 }
-                RequestMatcher.MatchResult matcher = requestMatcher.matcher(requestAuthorizationContext.getRequest());
-                if (matcher.isMatch()){
-                    b = true;
+                if (matched){
                     break;
                 }
             }
-            if (b){
+            if (matched){
                 return AFFIRM;
             }
         }

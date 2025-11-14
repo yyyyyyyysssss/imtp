@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -72,7 +73,7 @@ public class OpenController extends BaseController{
     }
 
     @PostMapping("/merge/avatar")
-    public void mergeAvatar(@RequestBody List<String> urls, HttpServletResponse response) throws IOException {
+    public void mergeAvatar(@RequestBody List<String> urls, HttpServletResponse response) throws IOException, URISyntaxException {
         BufferedImage avatarImage = AvatarGeneratorUtils.mergeAvatar(urls);
         writeImage(response.getOutputStream(),avatarImage);
     }

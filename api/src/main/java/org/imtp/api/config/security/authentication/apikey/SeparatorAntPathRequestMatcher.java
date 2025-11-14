@@ -1,7 +1,7 @@
 package org.imtp.api.config.security.authentication.apikey;
 
 import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 
 import java.util.ArrayList;
@@ -14,27 +14,21 @@ import java.util.List;
  */
 public class SeparatorAntPathRequestMatcher implements RequestMatcher{
 
-    private List<AntPathRequestMatcher> matchers;
+    private List<RequestMatcher> matchers;
 
-    private String defaultSeparator;
-
-    public SeparatorAntPathRequestMatcher(String[] paths){
-        this(paths,",");
-    }
-
-    public SeparatorAntPathRequestMatcher(String[] antPaths,String defaultSeparator){
+    public SeparatorAntPathRequestMatcher(String[] antPaths){
         if(antPaths == null || antPaths.length == 0){
             throw new NullPointerException("paths not null");
         }
         this.matchers = new ArrayList<>();
         for (String antPath : antPaths){
-            matchers.add(new AntPathRequestMatcher(antPath));
+            matchers.add(PathPatternRequestMatcher.withDefaults().matcher(antPath));
         }
-        this.defaultSeparator = defaultSeparator;
     }
 
     @Override
     public boolean matches(HttpServletRequest request) {
+
         return matchers.stream().anyMatch(matcher -> matcher.matches(request));
     }
 }
