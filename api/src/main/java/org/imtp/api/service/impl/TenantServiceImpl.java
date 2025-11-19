@@ -1,6 +1,8 @@
 package org.imtp.api.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.plugins.IgnoreStrategy;
+import com.baomidou.mybatisplus.core.plugins.InterceptorIgnoreHelper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -166,6 +168,15 @@ public class TenantServiceImpl extends ServiceImpl<TenantMapper, Tenant> impleme
 
 
     @Override
+    public Boolean addTenantUser(Long tenantId,Long userId) {
+        TenantUser tenantUser = new TenantUser();
+        tenantUser.setId(IdGen.genId());
+        tenantUser.setUserId(userId);
+        tenantUser.setTenantId(tenantId);
+        return tenantUserService.save(tenantUser);
+    }
+
+    @Override
     @Transactional
     @CacheEvict(value = "user:tenant", allEntries = true)
     public Boolean bindTenantUser(Long tenantId,Collection<Long> userIds){
@@ -185,12 +196,18 @@ public class TenantServiceImpl extends ServiceImpl<TenantMapper, Tenant> impleme
             log.error("unbindTenantUser called with empty tenantId");
             return true;
         }
-        QueryWrapper<TenantUser> tenantUserQueryWrapper = new QueryWrapper<>();
-        tenantUserQueryWrapper
-                .lambda()
-                .eq(TenantUser::getTenantId, tenantId);
-        // 删除原有的租户用户
-        return tenantUserService.remove(tenantUserQueryWrapper);
+        try {
+            InterceptorIgnoreHelper.handle(IgnoreStrategy.builder().tenantLine(true).build());
+            QueryWrapper<TenantUser> tenantUserQueryWrapper = new QueryWrapper<>();
+            tenantUserQueryWrapper
+                    .lambda()
+                    .eq(TenantUser::getTenantId, tenantId);
+            // 删除原有的租户用户
+            return tenantUserService.remove(tenantUserQueryWrapper);
+        }finally {
+            InterceptorIgnoreHelper.clearIgnoreStrategy();
+        }
+
     }
 
     @CacheEvict(value = "user:tenant", key = "#userId")
@@ -200,12 +217,18 @@ public class TenantServiceImpl extends ServiceImpl<TenantMapper, Tenant> impleme
             log.error("unbindUserTenant called with empty userId");
             return true;
         }
-        QueryWrapper<TenantUser> tenantUserQueryWrapper = new QueryWrapper<>();
-        tenantUserQueryWrapper
-                .lambda()
-                .eq(TenantUser::getUserId, userId);
-        // 删除原有的租户用户
-        return tenantUserService.remove(tenantUserQueryWrapper);
+        try {
+            InterceptorIgnoreHelper.handle(IgnoreStrategy.builder().tenantLine(true).build());
+            QueryWrapper<TenantUser> tenantUserQueryWrapper = new QueryWrapper<>();
+            tenantUserQueryWrapper
+                    .lambda()
+                    .eq(TenantUser::getUserId, userId);
+            // 删除原有的租户用户
+            return tenantUserService.remove(tenantUserQueryWrapper);
+        }finally {
+            InterceptorIgnoreHelper.clearIgnoreStrategy();
+        }
+
     }
 
     @Transactional
@@ -229,16 +252,10 @@ public class TenantServiceImpl extends ServiceImpl<TenantMapper, Tenant> impleme
     @Override
     @Cacheable(value = "user:tenant", key = "#userId")
     public List<TenantVO> findByUserId(Long userId) {
-        QueryWrapper<TenantUser> tenantUserQueryWrapper = new QueryWrapper<>();
-        tenantUserQueryWrapper
-                .lambda()
-                .select(TenantUser::getTenantId)
-                .eq(TenantUser::getUserId, userId);
-        List<TenantUser> tenantUsers = tenantUserService.list(tenantUserQueryWrapper);
-        if(CollectionUtils.isEmpty(tenantUsers)){
+        List<Long> tenantIds = tenantUserService.findTenantIdByUserId(userId);
+        if (CollectionUtils.isEmpty(tenantIds)){
             return Collections.emptyList();
         }
-        List<Long> tenantIds = tenantUsers.stream().map(TenantUser::getTenantId).toList();
         QueryWrapper<Tenant> tenantQueryWrapper = new QueryWrapper<>();
         tenantQueryWrapper
                 .lambda()

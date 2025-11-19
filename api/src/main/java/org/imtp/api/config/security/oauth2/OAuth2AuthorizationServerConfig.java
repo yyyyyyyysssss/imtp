@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.imtp.api.config.security.AuthProperties;
+import org.imtp.api.config.security.SecurityProperties;
 import org.imtp.api.config.security.RequestUrlAuthority;
 import org.imtp.api.config.security.SecurityContextStore;
 import org.imtp.api.config.security.authentication.TokenAuthenticationFilter;
@@ -66,7 +66,7 @@ public class OAuth2AuthorizationServerConfig {
     private SecurityContextStore securityContextStore;
 
     @Resource
-    private AuthProperties authProperties;
+    private SecurityProperties securityProperties;
 
     @Resource
     private JwtAuthenticationConverter jwtAuthenticationConverter;
@@ -110,7 +110,7 @@ public class OAuth2AuthorizationServerConfig {
                 // 当未登录时访问认证端点时重定向至login页面
                 .exceptionHandling((exceptions) -> exceptions
                         .defaultAuthenticationEntryPointFor(
-                                new LoginTargetAuthenticationEntryPoint(authProperties.getLoginPage()),
+                                new LoginTargetAuthenticationEntryPoint(securityProperties.getLoginPage()),
                                 new MediaTypeRequestMatcher(MediaType.TEXT_HTML)))
                 .securityContext(securityContext -> {
                     securityContext.securityContextRepository(securityContextStore);

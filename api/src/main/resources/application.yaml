@@ -92,8 +92,25 @@ mybatis-plus:
 
 api:
   endpoint: http://localhost:9090
+  tenant:
+    ignoreTables:
+      - im_files
+      - im_group
+      - im_group_user
+      - im_msg
+      - im_offline_msg
+      - im_session
+      - im_user
+      - im_user_friend
+      - im_user_msg_box
+      - im_user_2fa
+      - oauth2_authorization
+      - oauth2_authorization_consent
+      - oauth2_registered_client
+      - one_time_tokens
+      - tenant
 
-auth:
+security:
   loginPage: http://localhost:3000/login
   authorize:
     permit:

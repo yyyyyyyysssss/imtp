@@ -3,16 +3,29 @@ package org.imtp.api.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.imtp.api.config.exception.BusinessException;
+import org.imtp.api.config.security.RedisSecurityContextRepository;
+import org.imtp.api.config.security.SecurityContextStore;
+import org.imtp.api.context.TenantContext;
 import org.imtp.api.domain.dto.ChangePasswordDTO;
 import org.imtp.api.domain.entity.User;
 import org.imtp.api.domain.vo.*;
 import org.imtp.api.service.*;
 import org.imtp.api.utils.TreeUtils;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.web.context.request.RequestAttributes;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -45,6 +58,9 @@ public class ProfileServiceImpl implements ProfileService {
 
     @Resource
     private PasswordEncoder passwordEncoder;
+
+    @Resource
+    private SecurityContextStore securityContextStore;
 
     @Override
     public UserInfoVO userInfo(Long userId) {
@@ -97,6 +113,27 @@ public class ProfileServiceImpl implements ProfileService {
         userInfoVO.setTenants(tenantList);
 
         return userInfoVO;
+    }
+
+    @Override
+    public List<TenantVO> findUserTenant(Long userId) {
+
+        return tenantService.findByUserId(userId);
+    }
+
+    @Override
+    public void switchTenant(Long userId,Long tenantId, String tokenId) {
+        TenantContext.setTenantId(tenantId);
+        UserDetails userDetails = userService.loadUserByUserId(userId);
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+        Authentication currentAuth = securityContext.getAuthentication();
+        Authentication newAuth = new UsernamePasswordAuthenticationToken(
+                currentAuth.getPrincipal(),
+                currentAuth.getCredentials(),
+                userDetails.getAuthorities()
+        );
+        securityContext.setAuthentication(newAuth);
+        securityContextStore.saveContext(securityContext,tokenId);
     }
 
     @Override

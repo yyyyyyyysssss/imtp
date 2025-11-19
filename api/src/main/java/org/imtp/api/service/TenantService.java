@@ -23,6 +23,8 @@ public interface TenantService extends IService<Tenant> {
 
     Boolean deleteById(Long id);
 
+    Boolean addTenantUser(Long tenantId,Long userId);
+
     Boolean bindTenantUser(Long id, Collection<Long> userIds);
 
     Boolean unbindUserTenant(Long userId);

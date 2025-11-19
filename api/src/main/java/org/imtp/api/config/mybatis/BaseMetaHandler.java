@@ -2,6 +2,7 @@ package org.imtp.api.config.mybatis;
 
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
 import org.apache.ibatis.reflection.MetaObject;
+import org.imtp.api.context.TenantContext;
 import org.imtp.api.domain.entity.User;
 import org.imtp.api.utils.SecurityUtils;
 import org.springframework.stereotype.Component;
@@ -23,6 +24,10 @@ public class BaseMetaHandler implements MetaObjectHandler {
         Long userId = SecurityUtils.getCurrentUser(User::getId);
         this.strictInsertFill(metaObject, "createBy", Long.class, userId);
         this.strictInsertFill(metaObject, "updateBy", Long.class, userId);
+
+        // 自动填充租户 ID 字段
+        Long tenantId = TenantContext.getTenantId();
+        this.strictInsertFill(metaObject, "tenantId", Long.class, tenantId);
     }
 
     @Override

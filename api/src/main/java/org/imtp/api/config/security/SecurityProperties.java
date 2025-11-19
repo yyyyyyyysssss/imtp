@@ -17,8 +17,8 @@ import java.util.stream.Stream;
 @Getter
 @Setter
 @Component
-@ConfigurationProperties(prefix = "auth")
-public class AuthProperties {
+@ConfigurationProperties(prefix = "security")
+public class SecurityProperties {
 
     private String loginPage;
 

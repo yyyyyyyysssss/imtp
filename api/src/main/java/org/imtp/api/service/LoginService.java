@@ -1,9 +1,6 @@
 package org.imtp.api.service;
 
 import jakarta.annotation.Resource;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import org.imtp.api.config.security.RedisSecurityContextRepository;
 import org.imtp.api.config.security.SecurityContextStore;
 import org.imtp.api.config.security.TokenService;
 import org.imtp.api.domain.entity.TokenInfo;
@@ -15,9 +12,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.context.request.RequestAttributes;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
 /**
  * @Description
@@ -49,19 +43,13 @@ public class LoginService {
         User user = (User) authenticate.getPrincipal();
         //生成token
         TokenInfo tokenInfo = tokenService.generate(user, clientType, rememberMe);
+        String tokenId = tokenInfo.getId();
+        user.setTokenId(tokenId);
         //序列化securityContext
-        saveSecurityContext(tokenInfo.getId(), authenticate);
-        return tokenInfo;
-    }
-
-    private void saveSecurityContext(String tokenId, Authentication authenticate) {
         SecurityContext securityContext = SecurityContextHolder.getContext();
         securityContext.setAuthentication(authenticate);
-        RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
-        HttpServletRequest request = ((ServletRequestAttributes) requestAttributes).getRequest();
-        HttpServletResponse response = ((ServletRequestAttributes) requestAttributes).getResponse();
-        request.setAttribute(RedisSecurityContextRepository.DEFAULT_REQUEST_ATTR_NAME, tokenId);
-        securityContextStore.saveContext(securityContext, request, response);
+        securityContextStore.saveContext(securityContext,tokenId);
+        return tokenInfo;
     }
 
 }

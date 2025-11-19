@@ -10,4 +10,6 @@ public interface TenantUserService extends IService<TenantUser> {
 
     List<Long> findUserIdByTenantId(Long tenantId);
 
+    List<Long> findTenantIdByUserId(Long userId);
+
 }

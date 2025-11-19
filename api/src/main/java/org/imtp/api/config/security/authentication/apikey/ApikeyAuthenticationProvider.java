@@ -1,7 +1,7 @@
 package org.imtp.api.config.security.authentication.apikey;
 
 import jakarta.servlet.http.HttpServletRequest;
-import org.imtp.api.config.security.AuthProperties;
+import org.imtp.api.config.security.SecurityProperties;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
@@ -33,11 +33,11 @@ public class ApikeyAuthenticationProvider implements AuthenticationProvider {
 
     private final static String URL_SEPARATOR = ",";
 
-    public ApikeyAuthenticationProvider(List<AuthProperties.RequestHeadAuthenticationConfig> requestHeadAuthentications){
+    public ApikeyAuthenticationProvider(List<SecurityProperties.RequestHeadAuthenticationConfig> requestHeadAuthentications){
         if (requestHeadAuthentications == null || requestHeadAuthentications.isEmpty()){
             throw new NullPointerException("requestHeadAuthentications not null");
         }
-        this.apikeyMap = requestHeadAuthentications.stream().collect(Collectors.toMap(AuthProperties.RequestHeadAuthenticationConfig::getApikey, AuthProperties.RequestHeadAuthenticationConfig::getAntPath));
+        this.apikeyMap = requestHeadAuthentications.stream().collect(Collectors.toMap(SecurityProperties.RequestHeadAuthenticationConfig::getApikey, SecurityProperties.RequestHeadAuthenticationConfig::getAntPath));
     }
 
     @Override

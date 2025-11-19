@@ -7,6 +7,9 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.context.SecurityContextHolderStrategy;
 import org.springframework.security.web.context.HttpRequestResponseHolder;
+import org.springframework.web.context.request.RequestAttributes;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.time.Duration;
 
@@ -23,11 +26,11 @@ public class RedisSecurityContextRepository implements SecurityContextStore {
 
     private RedisTemplate<String,SecurityContext> redisTemplate;
 
-    private AuthProperties authProperties;
+    private SecurityProperties securityProperties;
 
-    public RedisSecurityContextRepository(RedisTemplate<String,SecurityContext> redisTemplate,AuthProperties authProperties){
+    public RedisSecurityContextRepository(RedisTemplate<String,SecurityContext> redisTemplate, SecurityProperties securityProperties){
         this.redisTemplate = redisTemplate;
-        this.authProperties = authProperties;
+        this.securityProperties = securityProperties;
     }
 
     private final SecurityContextHolderStrategy securityContextHolderStrategy = SecurityContextHolder.getContextHolderStrategy();
@@ -47,6 +50,15 @@ public class RedisSecurityContextRepository implements SecurityContextStore {
     }
 
     @Override
+    public void saveContext(SecurityContext context, String tokenId) {
+        RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
+        HttpServletRequest request = ((ServletRequestAttributes) requestAttributes).getRequest();
+        HttpServletResponse response = ((ServletRequestAttributes) requestAttributes).getResponse();
+        request.setAttribute(DEFAULT_REQUEST_ATTR_NAME, tokenId);
+        saveContext(context,request,response);
+    }
+
+    @Override
     public void saveContext(SecurityContext context, HttpServletRequest request, HttpServletResponse response) {
         String attribute = (String)request.getAttribute(DEFAULT_REQUEST_ATTR_NAME);
         if (attribute == null || attribute.isEmpty()){
@@ -58,7 +70,7 @@ public class RedisSecurityContextRepository implements SecurityContextStore {
             if (emptyContext.equals(context)){
                 redisTemplate.delete(SECURITY_CONTEXT_KEY_PREFIX + attribute);
             }else {
-                Long expiration = authProperties.getJwt().getExpiration();
+                Long expiration = securityProperties.getJwt().getExpiration();
                 redisTemplate.opsForValue().set(SECURITY_CONTEXT_KEY_PREFIX + attribute,context, Duration.ofSeconds(expiration));
             }
         }finally {

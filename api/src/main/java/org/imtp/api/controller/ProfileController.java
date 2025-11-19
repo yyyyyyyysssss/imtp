@@ -4,13 +4,17 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.imtp.api.domain.dto.ChangeAvatarDTO;
 import org.imtp.api.domain.dto.ChangePasswordDTO;
+import org.imtp.api.domain.dto.SwitchTenantDTO;
 import org.imtp.api.domain.entity.User;
+import org.imtp.api.domain.vo.TenantVO;
 import org.imtp.api.domain.vo.UserInfoVO;
 import org.imtp.api.service.ProfileService;
 import org.imtp.common.response.Result;
 import org.imtp.common.response.ResultGenerator;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * @Description 当前登录用户的个人信息管理控制器
@@ -30,6 +34,21 @@ public class ProfileController extends BaseController {
         Long userId = getCurrentUser(User::getId);
         UserInfoVO userInfoVO = profileService.userInfo(userId);
         return ResultGenerator.ok(userInfoVO);
+    }
+
+    @GetMapping("/user/tenant")
+    public Result<?> userTenant() {
+        Long userId = getCurrentUser(User::getId);
+        List<TenantVO> tenants = profileService.findUserTenant(userId);
+        return ResultGenerator.ok(tenants);
+    }
+
+    @PostMapping("/switch/tenant")
+    public Result<?> switchTenant(@RequestBody @Validated SwitchTenantDTO switchTenantDTO) {
+        Long userId = getCurrentUser(User::getId);
+        String tokenId = getCurrentUser(User::getTokenId);
+        profileService.switchTenant(userId, switchTenantDTO.getTenantId(), tokenId);
+        return ResultGenerator.ok();
     }
 
     @PutMapping("/password")

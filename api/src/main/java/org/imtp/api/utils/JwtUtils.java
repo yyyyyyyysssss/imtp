@@ -7,7 +7,7 @@ import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.imtp.common.utils.JsonUtil;
-import org.imtp.api.config.security.AuthProperties;
+import org.imtp.api.config.security.SecurityProperties;
 import org.imtp.common.enums.ClientType;
 import org.imtp.api.enums.TokenType;
 import org.springframework.stereotype.Component;
@@ -26,13 +26,13 @@ import java.util.function.Function;
 public class JwtUtils {
 
     @Resource
-    private AuthProperties authProperties;
+    private SecurityProperties securityProperties;
 
-    private static AuthProperties staticAuthProperties;
+    private static SecurityProperties staticAuthProperties;
 
     @PostConstruct
     public void init(){
-        staticAuthProperties = authProperties;
+        staticAuthProperties = securityProperties;
     }
 
     public static String genToken(String subject,ClientType clientType){

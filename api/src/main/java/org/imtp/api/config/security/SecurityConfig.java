@@ -82,7 +82,7 @@ public class SecurityConfig {
     private LogoutService logoutService;
 
     @Resource
-    private AuthProperties authProperties;
+    private SecurityProperties securityProperties;
 
     @Resource
     private RedisWrapper redisWrapper;
@@ -124,13 +124,13 @@ public class SecurityConfig {
                     //放行的路径
                     authorize
                             //允许所有人访问的路径
-                            .requestMatchers(authProperties.getAuthorize().getPermit().toArray(new String[0])).permitAll()
+                            .requestMatchers(securityProperties.getAuthorize().getPermit().toArray(new String[0])).permitAll()
                             //允许所有异步请求
                             .dispatcherTypeMatchers(DispatcherType.ASYNC).permitAll()
                             //只需要通过身份认证就能访问的路径
-                            .requestMatchers(authProperties.getAuthorize().getAuthenticated().toArray(new String[0])).authenticated()
+                            .requestMatchers(securityProperties.getAuthorize().getAuthenticated().toArray(new String[0])).authenticated()
                             //基于请求头apikey授权
-                            .requestMatchers(authProperties.requestHeadAuthenticationPath()).hasAuthority(ApikeyAuthenticationProvider.APIKEY_ROLE_CODE)
+                            .requestMatchers(securityProperties.requestHeadAuthenticationPath()).hasAuthority(ApikeyAuthenticationProvider.APIKEY_ROLE_CODE)
                             //基于用户id路径参数的授权
                             .requestMatchers("/api/social/*/{userId}")
                             .access((authentication, context) -> new AuthorizationDecision(
@@ -152,7 +152,7 @@ public class SecurityConfig {
                     //令牌生成以及存储
                     ott.tokenService(oneTimeTokenService());
                     //令牌生成成功处理器
-                    ott.tokenGenerationSuccessHandler(new MagicLinkOneTimeTokenGenerationSuccessHandler(authProperties.getLoginPage()));
+                    ott.tokenGenerationSuccessHandler(new MagicLinkOneTimeTokenGenerationSuccessHandler(securityProperties.getLoginPage()));
                 })
                 //该过滤器解析token并校验通过后由SecurityContextHolderFilter过滤器加载SecurityContext
                 .addFilterBefore(tokenAuthenticationFilter(tokenService(securityContextStore()),bearerTokenResolver()), SecurityContextHolderFilter.class)
@@ -266,7 +266,7 @@ public class SecurityConfig {
     //基于请求头apikey的认证过滤器
     @Bean
     public RequestHeaderAuthenticationFilter apikeyAuthenticationFilter(AuthenticationManager authenticationManager) throws Exception {
-        String[] antPaths = authProperties.requestHeadAuthenticationPath();
+        String[] antPaths = securityProperties.requestHeadAuthenticationPath();
         RequestHeaderAuthenticationFilter requestHeaderAuthenticationFilter = new RequestHeaderAuthenticationFilter();
         requestHeaderAuthenticationFilter.setPrincipalRequestHeader("apikey");
         requestHeaderAuthenticationFilter.setExceptionIfHeaderMissing(false);
@@ -277,7 +277,7 @@ public class SecurityConfig {
     @Bean
     public ApikeyAuthenticationProvider apikeyAuthenticationProvider() {
 
-        return new ApikeyAuthenticationProvider(authProperties.getRequestHeadAuthentications());
+        return new ApikeyAuthenticationProvider(securityProperties.getRequestHeadAuthentications());
     }
 
     //token解析器
@@ -291,13 +291,13 @@ public class SecurityConfig {
     @Bean
     public SecurityContextStore securityContextStore() {
 
-        return new RedisSecurityContextRepository(authRedisTemplate,authProperties);
+        return new RedisSecurityContextRepository(authRedisTemplate,securityProperties);
     }
 
     @Bean
     public TokenService tokenService(SecurityContextStore securityContextStore){
 
-        return new JWTTokenService(redisWrapper,authProperties,securityContextStore);
+        return new JWTTokenService(redisWrapper,securityProperties,securityContextStore);
     }
 
     //登出过滤器
@@ -323,13 +323,13 @@ public class SecurityConfig {
 
     @Bean
     public RememberMeServices rememberMeServices() {
-        String secretKey = authProperties.getRememberMe().getSecretKey();
+        String secretKey = securityProperties.getRememberMe().getSecretKey();
         return new TokenBasedRememberMeServices(secretKey, userService, TokenBasedRememberMeServices.RememberMeTokenAlgorithm.SHA256);
     }
 
     @Bean
     public RememberMeAuthenticationProvider rememberMeAuthenticationProvider() {
-        String secretKey = authProperties.getRememberMe().getSecretKey();
+        String secretKey = securityProperties.getRememberMe().getSecretKey();
         return new RememberMeAuthenticationProvider(secretKey);
     }
 

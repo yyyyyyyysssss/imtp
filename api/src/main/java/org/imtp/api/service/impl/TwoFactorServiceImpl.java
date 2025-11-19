@@ -6,7 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.imtp.api.config.exception.BusinessException;
 import org.imtp.api.config.idwork.IdGen;
 import org.imtp.api.config.redis.RedisWrapper;
-import org.imtp.api.config.security.AuthProperties;
+import org.imtp.api.config.security.SecurityProperties;
 import org.imtp.api.domain.entity.User;
 import org.imtp.api.domain.entity.UserTwoFactor;
 import org.imtp.api.enums.TwoFactorType;
@@ -34,7 +34,7 @@ public class TwoFactorServiceImpl extends ServiceImpl<UserTwoFactorMapper, UserT
     private UserTwoFactorMapper userTwoFactorMapper;
 
     @Resource
-    private AuthProperties authProperties;
+    private SecurityProperties securityProperties;
 
     private final String totp_temp_key_prefix = "totp:temp_secret:";
 
@@ -50,7 +50,7 @@ public class TwoFactorServiceImpl extends ServiceImpl<UserTwoFactorMapper, UserT
             try {
                 secret = AESUtils.decrypt(
                         record.getSecret(),
-                        authProperties.getTotp().getSecretKey()
+                        securityProperties.getTotp().getSecretKey()
                 );
             } catch (Exception e) {
                 throw new BusinessException("二次认证TOTP解密失败");
@@ -82,7 +82,7 @@ public class TwoFactorServiceImpl extends ServiceImpl<UserTwoFactorMapper, UserT
             try {
                 secret = AESUtils.decrypt(
                         record.getSecret(),
-                        authProperties.getTotp().getSecretKey()
+                        securityProperties.getTotp().getSecretKey()
                 );
             } catch (Exception e) {
                 throw new BusinessException("二次认证TOTP密钥解密失败");
@@ -112,7 +112,7 @@ public class TwoFactorServiceImpl extends ServiceImpl<UserTwoFactorMapper, UserT
         userMfa.setUsername(account);
         userMfa.setType(TwoFactorType.TOTP);
         try {
-            userMfa.setSecret(AESUtils.encrypt(secret, authProperties.getTotp().getSecretKey()));
+            userMfa.setSecret(AESUtils.encrypt(secret, securityProperties.getTotp().getSecretKey()));
         } catch (Exception e) {
             log.error("totpVerify error:", e);
             throw new BusinessException("二次认证TOTP密钥加密失败");
@@ -161,7 +161,7 @@ public class TwoFactorServiceImpl extends ServiceImpl<UserTwoFactorMapper, UserT
             // 3. 解密 secret
             secret = AESUtils.decrypt(
                     record.getSecret(),
-                    authProperties.getTotp().getSecretKey()
+                    securityProperties.getTotp().getSecretKey()
             );
         } catch (Exception e) {
             log.error("toggleTotp error: account={}", account, e);

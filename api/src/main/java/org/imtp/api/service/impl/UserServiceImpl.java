@@ -6,15 +6,18 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.github.yulichang.wrapper.MPJLambdaWrapper;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.imtp.api.config.exception.BusinessException;
 import org.imtp.api.config.idwork.IdGen;
 import org.imtp.api.config.security.RequestUrlAuthority;
+import org.imtp.api.context.TenantContext;
 import org.imtp.api.domain.dto.UserCreateDTO;
 import org.imtp.api.domain.dto.UserQueryDTO;
 import org.imtp.api.domain.dto.UserUpdateDTO;
 import org.imtp.api.domain.entity.Authority;
+import org.imtp.api.domain.entity.TenantUser;
 import org.imtp.api.domain.entity.User;
 import org.imtp.api.domain.entity.UserRole;
 import org.imtp.api.domain.vo.RoleVO;
@@ -191,6 +194,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         if(userCreateDTO.getRoleIds() != null && !userCreateDTO.getRoleIds().isEmpty()){
             bindRoles(user.getId(), userCreateDTO.getRoleIds());
         }
+        // 租户关联表
+        tenantService.addTenantUser(TenantContext.getTenantId(), user.getId());
+
         userCreateVO.setId(user.getId());
         return userCreateVO;
     }
@@ -255,8 +261,24 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         Integer pageNum = queryDTO.getPageNum();
         Integer pageSize = queryDTO.getPageSize();
         PageHelper.startPage(pageNum, pageSize);
-        QueryWrapper<User> userQueryWrapper = getUserQueryWrapper(queryDTO);
-        List<User> users = userMapper.selectList(userQueryWrapper);
+        MPJLambdaWrapper<User> userMPJLambdaQueryWrapper = new MPJLambdaWrapper<User>()
+                .selectAll(User.class)
+                .innerJoin(TenantUser.class,TenantUser::getUserId,User::getId);
+        if (queryDTO.getKeyword() != null && !queryDTO.getKeyword().isEmpty()) {
+            userMPJLambdaQueryWrapper
+                    .like(User::getUsername, queryDTO.getKeyword())
+                    .or()
+                    .like(User::getNickname, queryDTO.getKeyword())
+                    .or()
+                    .like(User::getEmail, queryDTO.getKeyword())
+                    .or()
+                    .like(User::getPhone, queryDTO.getKeyword());
+        }
+        if (queryDTO.getEnabled() != null) {
+            userMPJLambdaQueryWrapper.eq("enabled", queryDTO.getEnabled());
+        }
+        userMPJLambdaQueryWrapper.orderByDesc("create_time");
+        List<User> users = userMapper.selectJoinList(userMPJLambdaQueryWrapper);
         if (users == null || users.isEmpty()) {
             return new PageInfo<>();
         }
@@ -354,26 +376,5 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             return Collections.emptyList();
         }
         return UserMapping.INSTANCE.toUserVO(users);
-    }
-
-
-    private QueryWrapper<User> getUserQueryWrapper(UserQueryDTO userQueryDTO) {
-        QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
-        if (userQueryDTO.getKeyword() != null && !userQueryDTO.getKeyword().isEmpty()) {
-            userQueryWrapper
-                    .lambda()
-                    .like(User::getUsername, userQueryDTO.getKeyword())
-                    .or()
-                    .like(User::getNickname, userQueryDTO.getKeyword())
-                    .or()
-                    .like(User::getEmail, userQueryDTO.getKeyword())
-                    .or()
-                    .like(User::getPhone, userQueryDTO.getKeyword());
-        }
-        if (userQueryDTO.getEnabled() != null) {
-            userQueryWrapper.eq("enabled", userQueryDTO.getEnabled());
-        }
-        userQueryWrapper.orderByDesc("create_time");
-        return userQueryWrapper;
     }
 }

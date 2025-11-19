@@ -31,13 +31,13 @@ public class JWTTokenService implements TokenService {
 
     private RedisWrapper redisWrapper;
 
-    private AuthProperties authProperties;
+    private SecurityProperties securityProperties;
 
     private SecurityContextStore securityContextStore;
 
-    public JWTTokenService(RedisWrapper redisWrapper, AuthProperties authProperties, SecurityContextStore securityContextStore){
+    public JWTTokenService(RedisWrapper redisWrapper, SecurityProperties securityProperties, SecurityContextStore securityContextStore){
         this.redisWrapper = redisWrapper;
-        this.authProperties = authProperties;
+        this.securityProperties = securityProperties;
         this.securityContextStore = securityContextStore;
     }
 
@@ -63,7 +63,7 @@ public class JWTTokenService implements TokenService {
         String key = key(userId, clientType);
 
         Set<Object> tokens = redisWrapper.rangeAllZSet(key);
-        int reserveQty = authProperties.getCoexistToken() - 1;
+        int reserveQty = securityProperties.getCoexistToken() - 1;
         if (tokens != null && !tokens.isEmpty() && tokens.size() > reserveQty) {
             int delQty = tokens.size() - reserveQty;
             Object[] array = Arrays.copyOfRange(tokens.toArray(),0, delQty);
@@ -156,7 +156,7 @@ public class JWTTokenService implements TokenService {
                     log.warn("不支持的算法");
                     return new Tuple2<>(false, null);
                 }
-                String secretKey = authProperties.getJwt().getSecretKey();
+                String secretKey = securityProperties.getJwt().getSecretKey();
                 String expectedTokenSignature = EncryptUtils.sha256(
                         String.join(":",
                                 userId,
@@ -200,14 +200,14 @@ public class JWTTokenService implements TokenService {
     }
 
     private String generateRefreshToken(Long userId, ClientType clientType){
-        Long configExpiration = authProperties.getJwt().getRefreshExpiration();
+        Long configExpiration = securityProperties.getJwt().getRefreshExpiration();
         long timestamp = configExpiration * 1000;
         long expiration = System.currentTimeMillis() + timestamp;
         String encryptStr = EncryptUtils.sha256(
                 String.join(":",
                         userId.toString(),
                         Long.toString(expiration),clientType.name(),
-                        authProperties.getJwt().getSecretKey()
+                        securityProperties.getJwt().getSecretKey()
                 )
         );
         return EncryptUtils.base64Encode(
@@ -222,7 +222,7 @@ public class JWTTokenService implements TokenService {
     }
 
     private String generateRememberMeToken(String username,String password){
-        Long configExpiration = authProperties.getRememberMe().getExpiration();
+        Long configExpiration = securityProperties.getRememberMe().getExpiration();
         long timestamp = configExpiration * 1000;
         long expiration = System.currentTimeMillis() + timestamp;
         String encryptStr = EncryptUtils.sha256(
@@ -230,7 +230,7 @@ public class JWTTokenService implements TokenService {
                         username,
                         Long.toString(expiration),
                         password,
-                        authProperties.getRememberMe().getSecretKey()
+                        securityProperties.getRememberMe().getSecretKey()
                 )
         );
         return EncryptUtils.base64Encode(
