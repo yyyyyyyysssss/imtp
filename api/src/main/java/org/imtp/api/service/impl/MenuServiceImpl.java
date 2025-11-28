@@ -23,6 +23,7 @@ import org.imtp.api.mapping.AuthorityMapping;
 import org.imtp.api.service.MenuService;
 import org.imtp.api.service.RoleService;
 import org.imtp.api.utils.TreeUtils;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -79,6 +80,7 @@ public class MenuServiceImpl extends AbstractAuthorityService implements MenuSer
 
     @Override
     @Transactional
+    @CacheEvict(value = "user:menu", allEntries = true)
     public Boolean menuDrag(MenuDragDTO menuDragDTO) {
         String dragId = menuDragDTO.getDragId();
         String targetId = menuDragDTO.getTargetId();
@@ -115,7 +117,7 @@ public class MenuServiceImpl extends AbstractAuthorityService implements MenuSer
                 List<Authority> resetSortAuthorities = getResetSortAuthoritiesByIndex(insertIndex, authorities);
                 return this.updateBatchById(resetSortAuthorities);
             case INSIDE:
-                int minSortOfChildren = getMinSortOfChildren(targetAuthority.getParentId(), targetAuthority.getSort());
+                int minSortOfChildren = getMinSortOfChildren(targetAuthority.getId(), targetAuthority.getSort());
                 updateWrapper = new UpdateWrapper<>();
                 updateWrapper
                         .lambda()
