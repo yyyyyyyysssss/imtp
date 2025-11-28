@@ -28,6 +28,9 @@ public class UserRole {
     @TableId(value = "id", type = IdType.INPUT)
     private Long id;
 
+    @TableField("tenant_id")
+    private Long tenantId;
+
     @TableField("user_id")
     private Long userId;
 

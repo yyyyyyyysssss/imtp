@@ -33,6 +33,9 @@ public class Authority extends BaseEntity implements TreeRelation {
     @TableField("parent_id")
     private Long parentId;
 
+    @TableField("tenant_id")
+    private Long tenantId;
+
     @TableField("root_id")
     private Long rootId;
 

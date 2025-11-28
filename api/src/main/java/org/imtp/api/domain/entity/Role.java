@@ -25,6 +25,9 @@ public class Role extends BaseEntity{
     public Role(){
     }
 
+    @TableField("tenant_id")
+    private Long tenantId;
+
     @TableField("code")
     private String code;
 

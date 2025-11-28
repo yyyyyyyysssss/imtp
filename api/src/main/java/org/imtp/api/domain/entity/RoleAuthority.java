@@ -27,6 +27,9 @@ public class RoleAuthority {
     @TableId(value = "id", type = IdType.INPUT)
     private Long id;
 
+    @TableField("tenant_id")
+    private Long tenantId;
+
     @TableField("role_id")
     private Long roleId;
 
