@@ -17,7 +17,7 @@ import java.util.List;
  * @Author ys
  * @Date 2025/5/17 11:11
  */
-@Mapper(builder = @org.mapstruct.Builder(disableBuilder = true),uses = {DateMapper.class})
+@Mapper(builder = @org.mapstruct.Builder(disableBuilder = true),uses = {LocalDateTimeMapper.class,LocalDateMapper.class})
 public interface AuthorityMapping {
 
     AuthorityMapping INSTANCE = Mappers.getMapper(AuthorityMapping.class);

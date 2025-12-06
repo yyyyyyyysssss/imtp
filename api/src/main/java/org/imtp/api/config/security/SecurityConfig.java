@@ -6,7 +6,7 @@ import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import jakarta.annotation.Resource;
 import jakarta.servlet.DispatcherType;
-import org.imtp.api.config.redis.RedisWrapper;
+import org.imtp.api.config.redis.RedisHelper;
 import org.imtp.api.config.security.authentication.*;
 import org.imtp.api.config.security.authentication.apikey.ApikeyAuthenticationProvider;
 import org.imtp.api.config.security.authentication.apikey.SeparatorAntPathRequestMatcher;
@@ -85,7 +85,7 @@ public class SecurityConfig {
     private SecurityProperties securityProperties;
 
     @Resource
-    private RedisWrapper redisWrapper;
+    private RedisHelper redisHelper;
 
     @Resource
     private RedisTemplate<String, SecurityContext> authRedisTemplate;
@@ -202,7 +202,7 @@ public class SecurityConfig {
     @Bean
     public DaoAuthenticationProvider daoAuthenticationProvider() {
         // 密码防暴力破解登录
-        LoginAttemptService loginAttemptService = new LoginAttemptService(redisWrapper);
+        LoginAttemptService loginAttemptService = new LoginAttemptService(redisHelper);
         DaoAuthenticationProvider authProvider = new UsernamePasswordAuthenticationProvider(userService,loginAttemptService);
         // 设置密码编辑器
         authProvider.setPasswordEncoder(passwordEncoder());
@@ -213,7 +213,7 @@ public class SecurityConfig {
     //三方登录认证
     @Bean
     public EmailAuthenticationProvider emailAuthenticationProvider() {
-        return new EmailAuthenticationProvider(userService, redisWrapper);
+        return new EmailAuthenticationProvider(userService, redisHelper);
     }
 
     //三方登录认证
@@ -297,7 +297,7 @@ public class SecurityConfig {
     @Bean
     public TokenService tokenService(SecurityContextStore securityContextStore){
 
-        return new JWTTokenService(redisWrapper,securityProperties,securityContextStore);
+        return new JWTTokenService(redisHelper,securityProperties,securityContextStore);
     }
 
     //登出过滤器

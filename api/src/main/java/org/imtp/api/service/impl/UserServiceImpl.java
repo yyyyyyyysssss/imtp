@@ -41,6 +41,7 @@ import org.springframework.util.CollectionUtils;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -83,7 +84,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         User u = findByUsername(user.getUsername());
         if (u == null) {
             user.setId(IdGen.genId());
-            user.setCreateTime(new Date());
+            user.setCreateTime(LocalDateTime.now());
             return userMapper.insert(user) > 0;
         } else {
             user.setId(u.getId());

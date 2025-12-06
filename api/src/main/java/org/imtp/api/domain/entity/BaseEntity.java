@@ -7,7 +7,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 /**
  * @Description
@@ -22,9 +22,9 @@ public class BaseEntity {
     protected Long id;
 
     @TableField(value = "create_time",fill = FieldFill.INSERT)
-    protected Date createTime;
+    protected LocalDateTime createTime;
 
     @TableField(value = "update_time",fill = FieldFill.INSERT_UPDATE)
-    protected Date updateTime;
+    protected LocalDateTime updateTime;
 
 }

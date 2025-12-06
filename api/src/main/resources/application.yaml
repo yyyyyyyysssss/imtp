@@ -89,6 +89,9 @@ mybatis-plus:
   configuration:
     map-underscore-to-camel-case: true
 
+redisson:
+  enabled: true
+  config: classpath:redisson.yaml
 
 api:
   endpoint: http://localhost:9090
@@ -109,6 +112,8 @@ api:
       - oauth2_registered_client
       - one_time_tokens
       - tenant
+      - im_dict
+      - im_dict_item
 
 security:
   loginPage: http://localhost:3000/login

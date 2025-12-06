@@ -9,7 +9,7 @@ import org.mapstruct.factory.Mappers;
 
 import java.util.List;
 
-@Mapper(builder = @org.mapstruct.Builder(disableBuilder = true),uses = {DateMapper.class})
+@Mapper(builder = @org.mapstruct.Builder(disableBuilder = true),uses = {LocalDateTimeMapper.class,LocalDateMapper.class})
 public interface TenantMapping {
 
     TenantMapping INSTANCE = Mappers.getMapper(TenantMapping.class);

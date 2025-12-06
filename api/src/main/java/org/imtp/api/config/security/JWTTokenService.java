@@ -2,8 +2,8 @@ package org.imtp.api.config.security;
 
 import groovy.lang.Tuple2;
 import lombok.extern.slf4j.Slf4j;
+import org.imtp.api.config.redis.RedisHelper;
 import org.imtp.api.config.redis.RedisKey;
-import org.imtp.api.config.redis.RedisWrapper;
 import org.imtp.api.config.security.authentication.refreshtoken.RefreshTokenServices;
 import org.imtp.api.domain.dto.TokenDTO;
 import org.imtp.api.domain.entity.TokenInfo;
@@ -19,7 +19,7 @@ import org.springframework.security.web.authentication.rememberme.TokenBasedReme
 import java.security.MessageDigest;
 import java.time.Duration;
 import java.util.Arrays;
-import java.util.Set;
+import java.util.List;
 
 /**
  * @Description
@@ -29,14 +29,14 @@ import java.util.Set;
 @Slf4j
 public class JWTTokenService implements TokenService {
 
-    private RedisWrapper redisWrapper;
+    private RedisHelper redisHelper;
 
     private SecurityProperties securityProperties;
 
     private SecurityContextStore securityContextStore;
 
-    public JWTTokenService(RedisWrapper redisWrapper, SecurityProperties securityProperties, SecurityContextStore securityContextStore){
-        this.redisWrapper = redisWrapper;
+    public JWTTokenService(RedisHelper redisHelper, SecurityProperties securityProperties, SecurityContextStore securityContextStore){
+        this.redisHelper = redisHelper;
         this.securityProperties = securityProperties;
         this.securityContextStore = securityContextStore;
     }
@@ -62,16 +62,19 @@ public class JWTTokenService implements TokenService {
                 .build();
         String key = key(userId, clientType);
 
-        Set<Object> tokens = redisWrapper.rangeAllZSet(key);
-        int reserveQty = securityProperties.getCoexistToken() - 1;
-        if (tokens != null && !tokens.isEmpty() && tokens.size() > reserveQty) {
-            int delQty = tokens.size() - reserveQty;
-            Object[] array = Arrays.copyOfRange(tokens.toArray(),0, delQty);
-            for (int i = 0; i < delQty; i++) {
-                TokenDTO tokenDTO = (TokenDTO) array[i];
-                revokeToken(tokenDTO);
+        List<Object> tokens = redisHelper.rangeAllZSet(key);
+        Integer coexistToken = securityProperties.getCoexistToken();
+        if (coexistToken > 0) {
+            int reserveQty = coexistToken - 1;
+            if (tokens != null && !tokens.isEmpty() && tokens.size() > reserveQty) {
+                int delQty = tokens.size() - reserveQty;
+                Object[] array = Arrays.copyOfRange(tokens.toArray(),0, delQty);
+                for (int i = 0; i < delQty; i++) {
+                    TokenDTO tokenDTO = (TokenDTO) array[i];
+                    revokeToken(tokenDTO);
+                }
+                redisHelper.removeZSet(key,array);
             }
-            redisWrapper.removeZSet(key,array);
         }
         //token过期时间作为score 刷新token过期时间作为key的过期时间
         long expirationAt = payloadInfo.getExpiration();
@@ -80,7 +83,7 @@ public class JWTTokenService implements TokenService {
         tokenDTO.setAccessTokenId(payloadInfo.getId());
         tokenDTO.setRefreshToken(refreshToken);
         tokenDTO.setExpiration(payloadInfo.getExpiration());
-        redisWrapper.addZSet(key, tokenDTO, payloadInfo.getExpiration(), Duration.ofMillis(expiration));
+        redisHelper.addZSet(key, tokenDTO, payloadInfo.getExpiration(), Duration.ofMillis(expiration));
         return token;
     }
 
@@ -89,12 +92,11 @@ public class JWTTokenService implements TokenService {
         PayloadInfo payloadInfo = JwtUtils.extractPayloadInfo(token);
         String userId = payloadInfo.getSubject();
         String key = key(Long.parseLong(userId), payloadInfo.getClientType());
-        Set<Object> tokens = redisWrapper.rangeAllZSet(key);
-        for (Object object : tokens){
-            TokenDTO tokenDTO = (TokenDTO) object;
+        List<TokenDTO> tokens = redisHelper.rangeAllZSet(key,TokenDTO.class);
+        for (TokenDTO tokenDTO : tokens){
             if (tokenDTO.getAccessTokenId().equals(payloadInfo.getId())){
                 revokeToken(tokenDTO);
-                redisWrapper.removeZSet(key,tokenDTO);
+                redisHelper.removeZSet(key,tokenDTO);
             }
         }
     }
@@ -114,7 +116,7 @@ public class JWTTokenService implements TokenService {
 
     private void revokeToken(String tokenId,Long expiration) {
         //加入黑名单
-        redisWrapper.setValue(RedisKey.TOKEN_BLACKLIST + tokenId,null,Duration.ofMillis(expiration));
+        redisHelper.setValue(RedisKey.TOKEN_BLACKLIST + tokenId,null,Duration.ofMillis(expiration));
         //清除存储的认证信息
         securityContextStore.clearContext(tokenId);
     }
@@ -183,7 +185,7 @@ public class JWTTokenService implements TokenService {
                 throw new UnsupportedOperationException("不支持的token类型: " + tokenType);
         }
         //黑名单
-        if(redisWrapper.hasKey(RedisKey.TOKEN_BLACKLIST + tokenId)){
+        if(redisHelper.hasKey(RedisKey.TOKEN_BLACKLIST + tokenId)){
             log.warn("token已被加入黑名单");
             return new Tuple2<>(false, null);
         }

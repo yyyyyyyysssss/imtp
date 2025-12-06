@@ -5,7 +5,7 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.imtp.api.config.exception.BusinessException;
 import org.imtp.api.config.idwork.IdGen;
-import org.imtp.api.config.redis.RedisWrapper;
+import org.imtp.api.config.redis.RedisHelper;
 import org.imtp.api.config.security.SecurityProperties;
 import org.imtp.api.domain.entity.User;
 import org.imtp.api.domain.entity.UserTwoFactor;
@@ -28,7 +28,7 @@ public class TwoFactorServiceImpl extends ServiceImpl<UserTwoFactorMapper, UserT
     private TotpService totpService;
 
     @Resource
-    private RedisWrapper redisWrapper;
+    private RedisHelper redisHelper;
 
     @Resource
     private UserTwoFactorMapper userTwoFactorMapper;
@@ -58,7 +58,7 @@ public class TwoFactorServiceImpl extends ServiceImpl<UserTwoFactorMapper, UserT
         } else {
             secret = totpService.createSecret();
             // 暂存secret，验证成功后再写入数据库
-            redisWrapper.setValue(totp_temp_key_prefix + account, secret, Duration.ofMinutes(10)); // 10分钟过期
+            redisHelper.setValue(totp_temp_key_prefix + account, secret, Duration.ofMinutes(10)); // 10分钟过期
         }
         return totpService.buildOtpAuthUrl(account, secret);
     }
@@ -88,7 +88,7 @@ public class TwoFactorServiceImpl extends ServiceImpl<UserTwoFactorMapper, UserT
                 throw new BusinessException("二次认证TOTP密钥解密失败");
             }
         } else {
-            secret = (String) redisWrapper.getValue(totp_temp_key_prefix + account);
+            secret = (String) redisHelper.getValue(totp_temp_key_prefix + account);
         }
         if (secret == null) {
             throw new BusinessException("二次认证TOTP密钥已过期或不存在");
@@ -123,7 +123,7 @@ public class TwoFactorServiceImpl extends ServiceImpl<UserTwoFactorMapper, UserT
             throw new BusinessException("二次认证TOTP保存失败");
         }
         // 移除缓存的 secret
-        redisWrapper.delete(totp_temp_key_prefix + account);
+        redisHelper.delete(totp_temp_key_prefix + account);
         return true;
     }
 

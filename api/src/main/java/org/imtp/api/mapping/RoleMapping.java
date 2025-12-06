@@ -9,7 +9,7 @@ import org.mapstruct.factory.Mappers;
 
 import java.util.List;
 
-@Mapper(builder = @org.mapstruct.Builder(disableBuilder = true),uses = {DateMapper.class})
+@Mapper(builder = @org.mapstruct.Builder(disableBuilder = true),uses = {LocalDateTimeMapper.class,LocalDateMapper.class})
 public interface RoleMapping {
 
     RoleMapping INSTANCE = Mappers.getMapper(RoleMapping.class);

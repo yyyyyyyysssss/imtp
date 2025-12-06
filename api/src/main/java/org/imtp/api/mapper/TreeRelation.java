@@ -2,8 +2,12 @@ package org.imtp.api.mapper;
 
 public interface TreeRelation {
 
-    String parentFieldName();
+    default String parentFieldName(){
+        return "parent_id";
+    }
 
-    String childFieldName();
+    default String childFieldName(){
+        return "id";
+    }
 
 }

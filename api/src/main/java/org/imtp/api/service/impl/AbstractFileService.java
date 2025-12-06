@@ -10,7 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.imtp.api.config.exception.BusinessException;
 import org.imtp.api.config.exception.DatabaseException;
 import org.imtp.api.config.idwork.IdGen;
-import org.imtp.api.config.redis.RedisWrapper;
+import org.imtp.api.config.redis.RedisHelper;
 import org.imtp.api.domain.dto.FileChunkDTO;
 import org.imtp.api.domain.dto.FileInfoDTO;
 import org.imtp.api.domain.entity.FileUpload;
@@ -67,7 +67,7 @@ public abstract class AbstractFileService implements FileService {
     String apiEndpoint;
 
     @Resource
-    private RedisWrapper redisWrapper;
+    private RedisHelper redisHelper;
 
     @Override
     public String getUploadId(FileInfoDTO fileInfoDTO) {
@@ -98,7 +98,7 @@ public abstract class AbstractFileService implements FileService {
         map.put(uploadedChunkCountField,0);
         map.put(newFilenameField,newFilename);
         map.put(accessUrlField,null);
-        redisWrapper.addHash(uploadPrefix + uploadId,map);
+        redisHelper.addHash(uploadPrefix + uploadId,map);
         return uploadId;
     }
 
@@ -119,7 +119,7 @@ public abstract class AbstractFileService implements FileService {
         Integer chunkIndex = fileChunkDTO.getChunkIndex();
         Long chunkSize = fileChunkDTO.getChunkSize();
         MultipartFile file = fileChunkDTO.getFile();
-        Map<String, Object> map = redisWrapper.getHashAll(uploadPrefix + uploadId);
+        Map<String, Object> map = redisHelper.getHashAll(uploadPrefix + uploadId);
         if(map == null || map.isEmpty()){
             throw new BusinessException("上传任务不存在或已过期: " + uploadId);
         }
@@ -132,7 +132,7 @@ public abstract class AbstractFileService implements FileService {
             inputStream = file.getInputStream();
             String chunkEtag = storePart(uploadId, inputStream, filename, chunkSize, chunkIndex, file.getSize());
             //获取已上传的块数
-            Long uploadedChunkNum = redisWrapper.incrHash(uploadPrefix + uploadId, uploadedChunkCountField);
+            Long uploadedChunkNum = redisHelper.incrHash(uploadPrefix + uploadId, uploadedChunkCountField);
             if (log.isDebugEnabled()){
                 String progress = calculateProgress(uploadedChunkNum, totalChunk);
                 log.debug("上传进度:{}, totalChunk:{}, uploadedChunkNum:{}",progress,totalChunk,uploadedChunkNum);
@@ -152,7 +152,7 @@ public abstract class AbstractFileService implements FileService {
                 updateWrapper.eq("upload_id",uploadId);
                 fileUploadMapper.update(null, updateWrapper);
 
-                redisWrapper.addHash(uploadPrefix + uploadId,accessUrlField,accessUrl,Duration.ofMinutes(5));
+                redisHelper.addHash(uploadPrefix + uploadId,accessUrlField,accessUrl,Duration.ofMinutes(5));
             }
             FileUploadChunkVO fileUploadChunkVO = new FileUploadChunkVO();
             fileUploadChunkVO.setUploadId(uploadId);
@@ -161,14 +161,14 @@ public abstract class AbstractFileService implements FileService {
             fileUploadChunkVO.setUploadSize(file.getSize());
             return fileUploadChunkVO;
         } catch (Exception e) {
-            Object uploadedChunkNum = redisWrapper.getHash(uploadPrefix + uploadId, uploadedChunkCountField);
+            Object uploadedChunkNum = redisHelper.getHash(uploadPrefix + uploadId, uploadedChunkCountField);
             UpdateWrapper<FileUpload> updateWrapper = new UpdateWrapper<>();
             updateWrapper.set("status",FileUploadStatus.FAILED);
             updateWrapper.set("uploaded_chunk_count",uploadedChunkNum);
             updateWrapper.eq("upload_id",uploadId);
             fileUploadMapper.update(null, updateWrapper);
 
-            redisWrapper.expire(uploadPrefix + uploadId, Duration.ofDays(3));
+            redisHelper.expire(uploadPrefix + uploadId, Duration.ofDays(3));
             throw new BusinessException(e);
         }finally {
             if (inputStream != null) {
@@ -198,7 +198,7 @@ public abstract class AbstractFileService implements FileService {
     public FileUploadProgressVO getUploadProgress(String uploadId) {
         FileUploadProgressVO fileUploadProgressVO = new FileUploadProgressVO();
         fileUploadProgressVO.setUploadId(uploadId);
-        Map<String, Object> map = redisWrapper.getHashAll(uploadPrefix + uploadId);
+        Map<String, Object> map = redisHelper.getHashAll(uploadPrefix + uploadId);
         if (map != null && !map.isEmpty()){
             Integer totalChunk = (Integer) map.get(totalChunkField);
             Integer uploadedChunkCount = (Integer) map.get(uploadedChunkCountField);
@@ -221,7 +221,7 @@ public abstract class AbstractFileService implements FileService {
 
     @Override
     public String getAccessUrl(String uploadId) {
-        String accessUrl = (String)redisWrapper.getHash(uploadPrefix + uploadId, accessUrlField);
+        String accessUrl = (String) redisHelper.getHash(uploadPrefix + uploadId, accessUrlField);
         if (accessUrl != null && !accessUrl.isEmpty()){
             return accessUrl;
         }
