@@ -31,7 +31,7 @@ public interface DictionaryMapping {
 
     DictionaryVO toDictionaryVO(Dictionary dictionary);
 
-    @IterableMapping(elementTargetType = RoleVO.class)
+    @IterableMapping(elementTargetType = DictionaryVO.class)
     List<DictionaryVO> toDictionaryVO(List<Dictionary> dictionaryList);
 
 
@@ -47,7 +47,7 @@ public interface DictionaryMapping {
 
     DictionaryItemVO toDictionaryItemVO(DictionaryItem dictionaryItem);
 
-    @IterableMapping(elementTargetType = RoleVO.class)
+    @IterableMapping(elementTargetType = DictionaryItemVO.class)
     List<DictionaryItemVO> toDictionaryItemVO(List<DictionaryItem> dictionaryItems);
 
 }
