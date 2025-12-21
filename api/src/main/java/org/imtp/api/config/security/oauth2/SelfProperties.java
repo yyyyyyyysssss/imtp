@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
  */
 @Getter
 @Setter
-@ConfigurationProperties(prefix = "auth.other-login.self")
+@ConfigurationProperties(prefix = "security.other-login.self")
 @Component
 public class SelfProperties {
 

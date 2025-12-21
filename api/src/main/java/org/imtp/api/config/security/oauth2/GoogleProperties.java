@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
  */
 @Getter
 @Setter
-@ConfigurationProperties(prefix = "auth.other-login.google")
+@ConfigurationProperties(prefix = "security.other-login.google")
 @Component
 public class GoogleProperties {
 

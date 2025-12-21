@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
  */
 @Getter
 @Setter
-@ConfigurationProperties(prefix = "auth.other-login.github")
+@ConfigurationProperties(prefix = "security.other-login.github")
 @Component
 public class GithubProperties {
 

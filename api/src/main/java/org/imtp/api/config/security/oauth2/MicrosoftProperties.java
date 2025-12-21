@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
  */
 @Getter
 @Setter
-@ConfigurationProperties(prefix = "auth.other-login.microsoft")
+@ConfigurationProperties(prefix = "security.other-login.microsoft")
 @Component
 public class MicrosoftProperties {
 
