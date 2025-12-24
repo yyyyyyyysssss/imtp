@@ -4,6 +4,7 @@ import io.netty.buffer.ByteBuf;
 import lombok.Getter;
 import org.imtp.common.enums.Command;
 import org.imtp.common.enums.MessageState;
+import org.imtp.common.packet.base.AbstractMessagePacket;
 import org.imtp.common.packet.base.Header;
 
 
@@ -21,9 +22,7 @@ public class MessageStateResponse extends AbstractSystemMessage {
 
     public MessageStateResponse(MessageState state,AbstractTextMessage message){
         //服务器收到消息回复一个已送达响应给到客户端
-        super(0, message.getHeader().getReceiver(), Command.MSG_RES);
-        this.state = state;
-        this.ackId = message.getAckId();
+        this(state,message.getReceiver(),message.getAckId());
     }
 
     public MessageStateResponse(ByteBuf byteBuf, Header header){
@@ -31,6 +30,13 @@ public class MessageStateResponse extends AbstractSystemMessage {
         byte res = byteBuf.readByte();
         this.state = MessageState.find(res);
         this.ackId = byteBuf.readLong();
+    }
+
+    public MessageStateResponse(MessageState state,long receiver, long ackId){
+        //服务器收到消息回复一个已送达响应给到客户端
+        super(0, receiver, Command.MSG_RES);
+        this.state = state;
+        this.ackId = ackId;
     }
 
     @Override

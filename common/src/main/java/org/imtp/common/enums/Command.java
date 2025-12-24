@@ -25,7 +25,7 @@ public enum Command {
     SIGNALING_BUSY((byte) 44,"webrtc信令忙线"),
     SIGNALING_CLOSE((byte) 49,"webrtc信令关闭"),
 
-    MESSAGE((byte) 0x20, "消息帧"),
+    MESSAGE_PACKET((byte) 0x20, "消息帧"),
 
     MSG_RES((byte) -1, "通用消息响应"),
 

@@ -2,13 +2,13 @@ package org.imtp.server.handler;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.imtp.common.enums.Command;
 import org.imtp.common.packet.*;
+import org.imtp.common.packet.base.AbstractMessagePacket;
 import org.imtp.common.packet.base.Header;
 import org.imtp.common.packet.base.Packet;
 import org.springframework.stereotype.Component;
@@ -22,6 +22,9 @@ import org.springframework.stereotype.Component;
 @Component
 @ChannelHandler.Sharable
 public class CommandHandler extends AbstractHandler<Packet> {
+
+    @Resource
+    private MessagePacketHandler messagePacketHandler;
 
     @Resource
     private TextMessageHandler textMessageHandler;
@@ -76,6 +79,14 @@ public class CommandHandler extends AbstractHandler<Packet> {
             ByteBuf byteBuf = Unpooled.wrappedBuffer(commandPacket.getBytes());
             try {
                 switch (cmd) {
+                    case MESSAGE_PACKET:
+                        packet = AbstractMessagePacket.decodeBodyAsByteBuf(byteBuf,header).additionTimestamp();
+                        if (channelHandlerContext.pipeline().get(MessagePacketHandler.class) == null){
+                            channelHandlerContext.pipeline().addLast(messagePacketHandler).fireChannelRead(packet);
+                        }else {
+                            channelHandlerContext.fireChannelRead(packet);
+                        }
+                        break;
                     case TEXT_MESSAGE:
                         packet = new TextMessage(byteBuf,header).additionTimestamp();
                         if (channelHandlerContext.pipeline().get(TextMessageHandler.class) == null){

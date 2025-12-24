@@ -12,7 +12,10 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import lombok.extern.slf4j.Slf4j;
 import org.imtp.common.enums.DeliveryMethod;
+import org.imtp.common.enums.MessageType;
 import org.imtp.common.packet.AbstractTextMessage;
+import org.imtp.common.packet.base.AbstractMessagePacket;
+import org.imtp.common.packet.base.MessagePacket;
 import org.imtp.common.packet.base.Packet;
 import org.imtp.common.packet.body.GroupUserInfo;
 import org.imtp.common.packet.body.UserFriendInfo;
@@ -98,16 +101,17 @@ public class UserSessionController extends AbstractController{
         Packet packet = (Packet)object;
         SessionEntity sessionEntity = null;
         switch (packet.getHeader().getCmd()){
-            case TEXT_MESSAGE,IMAGE_MESSAGE:
+            case MESSAGE_PACKET :
                 Long sender = packet.realSender();
                 sessionEntity = userSessionEntityMap.get(sender);
-                AbstractTextMessage textMessage = (AbstractTextMessage) packet;
+                MessagePacket messagePacket = (MessagePacket) packet;
+                MessageType messageType = MessageType.findMessageTypeByValue(messagePacket.getMessageType().getValue());
                 if (sessionEntity == null){
-                    sessionEntity = createUserSessionByPacket(textMessage);
+                    sessionEntity = createUserSessionByPacket(messagePacket);
 
                     sessionEntity.setLastSendMsgUserId(packet.getSender());
-                    sessionEntity.setLastMsgType(packet.messageType());
-                    sessionEntity.setLastMsg(textMessage.getMessage());
+                    sessionEntity.setLastMsgType(messageType);
+                    sessionEntity.setLastMsg(messagePacket.getContent());
 
                     //添加会话项
                     addUserSessionNode(sessionEntity,true,false);
@@ -119,8 +123,8 @@ public class UserSessionController extends AbstractController{
                         addChatNode(sessionEntity);
                     }
                     sessionEntity.setLastSendMsgUserId(packet.getSender());
-                    sessionEntity.setLastMsgType(packet.messageType());
-                    sessionEntity.setLastMsg(textMessage.getMessage());
+                    sessionEntity.setLastMsgType(messageType);
+                    sessionEntity.setLastMsg(messagePacket.getContent());
 
                     if (packet.isGroup()){
                         GroupUserInfo groupUserInfo = userGroupController.findGroupUserInfo(packet.getReceiver(), packet.getSender());

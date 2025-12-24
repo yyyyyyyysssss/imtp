@@ -2,9 +2,9 @@
 spring:
   data:
     redis:
-      host: 127.0.0.1
-      port: 6379
-      password: 123456
+      host: ys0921.sbs
+      port: 46379
+      password: Yan@136156
       lettuce:
         pool:
           min-idle: 1

@@ -7,7 +7,9 @@ import io.netty.handler.timeout.IdleStateEvent;
 import io.netty.util.AttributeKey;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.imtp.common.enums.MessageState;
 import org.imtp.common.packet.HeartbeatPingMessage;
+import org.imtp.common.packet.MessageStateResponse;
 import org.imtp.common.packet.base.Packet;
 import org.imtp.common.packet.common.MessageDTO;
 import org.imtp.common.response.Result;
@@ -42,7 +44,7 @@ public abstract class AbstractHandler<I> extends SimpleChannelInboundHandler<I> 
     protected RedisWrapper redisWrapper;
 
     protected void forwardMessage(ChannelHandlerContext ctx, Packet msg){
-        log.debug("forward message from:[{}] to:[{}] message type:[{}]",msg.getSender(),msg.getReceiver(),msg.messageType());
+        log.debug("forward message from:[{}] to:[{}] command:[{}]",msg.getSender(),msg.getReceiver(),msg.getCommand().getDesc());
         //转发
         List<String> forwardChannelIds = new ArrayList<>();
         List<String> receiverUserIds = fetchReceiverUserIdByPacket(msg);
@@ -70,6 +72,12 @@ public abstract class AbstractHandler<I> extends SimpleChannelInboundHandler<I> 
             ForwardMessage forwardMessage = new ForwardMessage(forwardChannelIds, msg);
             redisWrapper.publishMsg(forwardMessage);
         }
+    }
+
+    //响应已送达报文
+    protected void acknowledgment(ChannelHandlerContext ctx, Long receiver, Long ackId){
+        ChannelSession senderChannelSession = ChannelContextHolder.channelContext().getChannel(ctx.channel().id().asLongText());
+        senderChannelSession.sendMessage(new MessageStateResponse(MessageState.DELIVERED,receiver,ackId));
     }
 
     //消息落库

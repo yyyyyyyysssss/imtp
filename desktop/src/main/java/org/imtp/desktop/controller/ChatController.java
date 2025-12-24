@@ -36,6 +36,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.bytedeco.javacv.FFmpegFrameGrabber;
 import org.bytedeco.javacv.Frame;
 import org.bytedeco.javacv.Java2DFrameConverter;
+import org.imtp.common.enums.MessageTypeV2;
+import org.imtp.common.packet.base.AbstractMessagePacket;
 import org.imtp.common.packet.body.GroupUserInfo;
 import org.imtp.desktop.component.ChunkedUploader;
 import org.imtp.desktop.context.ClientContextHolder;
@@ -259,9 +261,9 @@ public class ChatController extends AbstractController {
             case TEXT_MESSAGE:
                 String message = (String) object;
                 if (sessionEntity.getDeliveryMethod().equals(DeliveryMethod.SINGLE)) {
-                    packet = new TextMessage(message, ClientContextHolder.clientContext().id(), sessionEntity.getReceiverUserId(), ackId);
+                    packet = new TextMessageV2(message, ClientContextHolder.clientContext().id(), sessionEntity.getReceiverUserId(), ackId,false);
                 } else {
-                    packet = new TextMessage(message, ClientContextHolder.clientContext().id(), sessionEntity.getReceiverUserId(), ackId, true);
+                    packet = new TextMessageV2(message, ClientContextHolder.clientContext().id(), sessionEntity.getReceiverUserId(), ackId, true);
                 }
                 sessionEntity.setLastMsgType(messageType);
                 sessionEntity.setLastMsg(message);
@@ -442,6 +444,18 @@ public class ChatController extends AbstractController {
         }
         ChatItemEntity chatItemEntity = null;
         switch (packet.getHeader().getCmd()) {
+            case MESSAGE_PACKET:
+                AbstractMessagePacket messagePacket = (AbstractMessagePacket) packet;
+                MessageTypeV2 messageType = messagePacket.getMessageType();
+                switch (messageType){
+                    case TEXT :
+                        TextMessageV2 textMessage = (TextMessageV2) messagePacket;
+                        chatItemEntity = new ChatItemEntity();
+                        chatItemEntity.setContent(textMessage.getText());
+                        chatItemEntity.setMessageType(MessageType.findMessageTypeByValue(messageType.getValue()));
+                        break;
+                }
+                break;
             case TEXT_MESSAGE:
                 TextMessage textMessage = (TextMessage) packet;
                 chatItemEntity = new ChatItemEntity();
@@ -497,7 +511,7 @@ public class ChatController extends AbstractController {
             chatItemEntity.setName(sessionEntity.getName());
         }
         chatItemEntity.setSelf(false);
-        chatItemEntity.setMessageType(MessageType.findMessageTypeByValue((int) packet.getCommand().getCmdCode()));
+//        chatItemEntity.setMessageType(MessageType.findMessageTypeByValue((int) packet.getCommand().getCmdCode()));
         chatItemEntity.setDeliveryMethod(packet.isGroup() ? DeliveryMethod.GROUP : DeliveryMethod.SINGLE);
         addChatItem(chatItemEntity);
     }

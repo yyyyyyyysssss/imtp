@@ -23,4 +23,6 @@ module common {
     exports org.imtp.common.utils;
     exports org.imtp.common.idwork;
     exports org.imtp.common.response;
+
+    opens org.imtp.common.response to com.fasterxml.jackson.databind;
 }

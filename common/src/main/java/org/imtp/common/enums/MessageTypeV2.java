@@ -2,10 +2,9 @@ package org.imtp.common.enums;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Getter;
-import org.imtp.common.packet.AbstractMessage;
-import org.imtp.common.packet.TextMessageV2;
+import org.imtp.common.packet.*;
+import org.imtp.common.packet.base.AbstractMessagePacket;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -15,12 +14,18 @@ import java.util.stream.Stream;
 public enum MessageTypeV2 {
 
     TEXT(1, TextMessageV2::new),
+    VOICE((byte) 2, VoiceMessageV2::new),
+    MEME((byte) 3, MemeMessageV2::new),
+    IMAGE(4, ImageMessageV2::new),
+    VIDEO((byte) 5, VideoMessageV2::new),
+    FILE((byte) 6,FileMessageV2::new),
+
 
     ;
     private final Integer value;
-    private final Supplier<? extends AbstractMessage> factory;
+    private final Supplier<? extends AbstractMessagePacket> factory;
 
-    MessageTypeV2(int value, Supplier<? extends AbstractMessage> factory) {
+    MessageTypeV2(int value, Supplier<? extends AbstractMessagePacket> factory) {
         this.value = value;
         this.factory = factory;
     }
@@ -36,7 +41,7 @@ public enum MessageTypeV2 {
         return value;
     }
 
-    public AbstractMessage create() {
+    public AbstractMessagePacket create() {
         return factory.get();
     }
 

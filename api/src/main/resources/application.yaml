@@ -28,9 +28,9 @@ spring:
       max-request-size: 20MB
   data:
     redis:
-      host: 127.0.0.1
-      port: 6379
-      password: 123456
+      host: ys0921.sbs
+      port: 46379
+      password: Yan@136156
       lettuce:
         pool:
           min-idle: 1
@@ -74,15 +74,15 @@ logging:
   pattern:
     console: "%d{yyyy/MM/dd HH:mm:ss.SSS} %highlight(%-5level) %clr([x-request-id: %X{x-request-id}]) [%thread] %cyan(%logger) : %msg %n"
 zookeeper:
-  enabled: true
+  enabled: false
   servers: 127.0.0.1:2181
   sessionTimeout: 3000
 
 minio:
-  endpoint: http://localhost:9000
+  endpoint: http://ys0921.sbs:29000
   bucketName: y-chat-bucket
-  accessKey: e8VEFNP1QADzIYqCyrkS
-  secretKey: Cw7X1UMZc5Z6cnTxaqLOhndpD1d9rVphmzeI7fut
+  accessKey: L4C2Tx0MZEqkV9M6JZt6
+  secretKey: CQYZaB36pyMHPbVyIO4wjWMTNeqSBbVJlMoLPTwI
 
 mybatis-plus:
   mapper-locations: classpath:mapper/*xml

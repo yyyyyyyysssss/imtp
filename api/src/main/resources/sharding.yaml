@@ -6,9 +6,9 @@ dataSources:
   master:
     dataSourceClassName: com.zaxxer.hikari.HikariDataSource
     driverClassName: com.mysql.cj.jdbc.Driver
-    jdbcUrl: jdbc:mysql://127.0.0.1:3306/im?useUnicode=true&allowPublicKeyRetrieval=true&useSSL=false&useLegacyDatetimeCode=false&allowMultiQueries=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
-    username: root
-    password: 123456
+    jdbcUrl: jdbc:mysql://ys0921.sbs:43306/im?useUnicode=true&allowPublicKeyRetrieval=true&useSSL=false&useLegacyDatetimeCode=false&allowMultiQueries=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
+    username: ys
+    password: Yan@136156
     autoCommit: true
     # 属性控制客户端（即您）等待来自池的连接的最大毫秒数。如果超过此时间而没有可用连接，则会抛出 SQLException 可接受的最低连接超时为 250 毫秒。 默认值：30000（30 秒）
     connectionTimeout: 30000
@@ -27,9 +27,9 @@ dataSources:
   slave0:
     dataSourceClassName: com.zaxxer.hikari.HikariDataSource
     driverClassName: com.mysql.cj.jdbc.Driver
-    jdbcUrl: jdbc:mysql://127.0.0.1:3306/im?useUnicode=true&allowPublicKeyRetrieval=true&useSSL=false&useLegacyDatetimeCode=false&allowMultiQueries=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
-    username: root
-    password: 123456
+    jdbcUrl: jdbc:mysql://ys0921.sbs:43306/im?useUnicode=true&allowPublicKeyRetrieval=true&useSSL=false&useLegacyDatetimeCode=false&allowMultiQueries=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
+    username: ys
+    password: Yan@136156
     autoCommit: true
     connectionTimeout: 30000
     idleTimeout: 0

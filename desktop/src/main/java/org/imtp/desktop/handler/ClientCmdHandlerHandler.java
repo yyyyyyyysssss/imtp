@@ -7,6 +7,7 @@ import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
 import org.imtp.common.enums.Command;
 import org.imtp.common.packet.*;
+import org.imtp.common.packet.base.AbstractMessagePacket;
 import org.imtp.common.packet.base.Header;
 import org.imtp.common.packet.base.Packet;
 import org.imtp.desktop.Client;
@@ -39,6 +40,10 @@ public class ClientCmdHandlerHandler extends AbstractMessageModelHandler<Packet>
         Command cmd = header.getCmd();
         ByteBuf byteBuf = Unpooled.wrappedBuffer(commandPacket.getBytes());
         switch (cmd){
+            case MESSAGE_PACKET:
+                AbstractMessagePacket messagePacket = AbstractMessagePacket.decodeBodyAsByteBuf(byteBuf, header);
+                publishMessage(messagePacket);
+                break;
             case TEXT_MESSAGE:
                 publishMessage(new TextMessage(byteBuf,header));
                 break;
