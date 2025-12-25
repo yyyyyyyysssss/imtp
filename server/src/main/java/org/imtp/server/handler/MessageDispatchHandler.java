@@ -2,7 +2,7 @@ package org.imtp.server.handler;
 
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
-import org.imtp.common.packet.base.Packet;
+import org.imtp.common.packet.base.MessagePacket;
 
 /**
  * @Description
@@ -10,7 +10,7 @@ import org.imtp.common.packet.base.Packet;
  * @Date 2024/7/8 15:07
  */
 @Slf4j
-public abstract class ForwardMessageHandler<T extends Packet>  extends AbstractHandler<T>{
+public abstract class MessageDispatchHandler<T extends MessagePacket>  extends AbstractHandler<T>{
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, T msg) {
@@ -22,14 +22,15 @@ public abstract class ForwardMessageHandler<T extends Packet>  extends AbstractH
         postForward(ctx, msg);
     }
 
-    // 钩子方法，允许子类扩展转发前的逻辑
+    // 钩子方法
     protected void preForward(ChannelHandlerContext ctx, T msg) {
 
     }
 
-    // 钩子方法，允许子类扩展转发后的逻辑
+    // 钩子方法
     protected void postForward(ChannelHandlerContext ctx, T msg) {
-
+        // 响应已送达
+        acknowledgment(ctx,msg.getReceiver(),msg.getAckId());
     }
 
 

@@ -2,7 +2,6 @@ package org.imtp.server.handler;
 
 import io.netty.channel.ChannelHandler;
 import org.imtp.common.packet.VideoMessageV2;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 /**
@@ -12,6 +11,6 @@ import org.springframework.stereotype.Component;
  */
 @Component("video")
 @ChannelHandler.Sharable
-public class VideoMessageHandlerV2 extends ForwardMessageHandler<VideoMessageV2> {
+public class VideoMessageHandlerV2 extends MessageDispatchHandler<VideoMessageV2> {
 
 }

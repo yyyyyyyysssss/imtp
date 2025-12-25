@@ -11,6 +11,6 @@ import org.springframework.stereotype.Component;
  */
 @Component("text")
 @ChannelHandler.Sharable
-public class TextMessageHandlerV2 extends ForwardMessageHandler<TextMessageV2> {
+public class TextMessageHandlerV2 extends MessageDispatchHandler<TextMessageV2> {
 
 }
