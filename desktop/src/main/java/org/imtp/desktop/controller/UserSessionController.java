@@ -4,6 +4,7 @@ package org.imtp.desktop.controller;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -13,6 +14,7 @@ import javafx.scene.layout.HBox;
 import lombok.extern.slf4j.Slf4j;
 import org.imtp.common.enums.DeliveryMethod;
 import org.imtp.common.enums.MessageType;
+import org.imtp.common.enums.MessageTypeV2;
 import org.imtp.common.packet.AbstractTextMessage;
 import org.imtp.common.packet.base.AbstractMessagePacket;
 import org.imtp.common.packet.base.MessagePacket;
@@ -60,6 +62,8 @@ public class UserSessionController extends AbstractController{
     public void initialize(){
         userSessionChatNodeMap = new HashMap<>();
         userSessionEntityMap = new HashMap<>();
+        ObservableList<SessionEntity> list =  FXCollections.observableArrayList();
+        listView.setItems(list);
         //会话框设置
         listView.setCellFactory(c -> new UserSessionListCell());
         listView.setFocusTraversable(false);
@@ -105,7 +109,7 @@ public class UserSessionController extends AbstractController{
                 Long sender = packet.realSender();
                 sessionEntity = userSessionEntityMap.get(sender);
                 MessagePacket messagePacket = (MessagePacket) packet;
-                MessageType messageType = MessageType.findMessageTypeByValue(messagePacket.getMessageType().getValue());
+                MessageTypeV2 messageType = messagePacket.getMessageType();
                 if (sessionEntity == null){
                     sessionEntity = createUserSessionByPacket(messagePacket);
 

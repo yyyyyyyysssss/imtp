@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.shardingsphere.infra.hint.HintManager;
 import org.imtp.common.enums.DeliveryMethod;
 import org.imtp.common.enums.MessageType;
+import org.imtp.common.enums.MessageTypeV2;
 import org.imtp.common.packet.body.*;
 import org.imtp.common.packet.common.MessageDTO;
 import org.imtp.api.config.exception.BusinessException;
@@ -80,7 +81,7 @@ public class UserSocialServiceImpl implements UserSocialService {
                 if (messageId != null) {
                     MessageInfo messageInfo = latestMessageInfoMap.get(messageId);
                     if (messageInfo != null) {
-                        p.setLastMsgType(MessageType.findMessageTypeByValue(messageInfo.getType()));
+                        p.setLastMsgType(MessageTypeV2.findByValue(messageInfo.getType()));
                         p.setLastMsgContent(messageInfo.getContent());
                         p.setLastMsgTime(messageInfo.getSendTime());
                         p.setLastUserName(messageInfo.getName());

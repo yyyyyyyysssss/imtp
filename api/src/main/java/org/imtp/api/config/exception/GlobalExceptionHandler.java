@@ -3,12 +3,14 @@ package org.imtp.api.config.exception;
 import io.github.resilience4j.ratelimiter.RequestNotPermitted;
 import jakarta.validation.ValidationException;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.catalina.connector.ClientAbortException;
 import org.imtp.common.response.Result;
 import org.imtp.common.response.ResultCode;
 import org.imtp.common.response.ResultGenerator;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AccountStatusException;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -23,7 +25,10 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.context.request.async.AsyncRequestNotUsableException;
+import org.springframework.web.util.DisconnectedClientHelper;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -125,6 +130,11 @@ public class GlobalExceptionHandler {
     public Result<?> handleException(Exception e){
         log.error("未知异常: ",e);
         return ResultGenerator.failed(ResultCode.FAILED,e.getMessage());
+    }
+
+    @ExceptionHandler(AsyncRequestNotUsableException.class)
+    void handleAsyncRequestNotUsableException(AsyncRequestNotUsableException e) {
+
     }
 
 

@@ -17,6 +17,7 @@ import org.imtp.desktop.SceneManagerHolder;
 import org.imtp.desktop.constant.FXMLResourceConstant;
 import org.imtp.desktop.context.ClientContextHolder;
 import org.imtp.desktop.context.DefaultClientUserChannelContext;
+import org.imtp.desktop.context.UserContextHolder;
 import org.imtp.desktop.util.ResizeHelper;
 import org.imtp.desktop.util.ResourceUtils;
 import org.imtp.desktop.util.Tuple2;
@@ -99,11 +100,7 @@ public class HomeController extends AbstractController{
     @FXML
     public void initialize(){
         //设置当前登录人头像
-        DefaultClientUserChannelContext userChannelContext = (DefaultClientUserChannelContext)ClientContextHolder.clientContext();
-        UserInfo userInfo = userChannelContext.getUserInfo();
-        String avatar = userInfo.getAvatar();
-        String avatarUrl = loadImageUrl(avatar);
-        homeAvatarImageView.setImage(new Image(avatarUrl));
+        homeAvatarImageView.imageProperty().bind(UserContextHolder.userContext().avatarImageProperty());
         //初始化聊天图标
         URL chatIconUrl = ResourceUtils.classPathResource("/img/home_chat_icon.png");
         this.sessionIconImage = new Image(chatIconUrl.toExternalForm());

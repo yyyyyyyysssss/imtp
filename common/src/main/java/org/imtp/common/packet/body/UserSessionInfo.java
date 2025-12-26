@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.imtp.common.enums.DeliveryMethod;
 import org.imtp.common.enums.MessageType;
+import org.imtp.common.enums.MessageTypeV2;
 import org.imtp.common.packet.MessageMetadata;
 
 /**
@@ -25,7 +26,7 @@ public class UserSessionInfo {
 
     private String avatar;
 
-    private MessageType lastMsgType;
+    private MessageTypeV2 lastMsgType;
 
     private DeliveryMethod deliveryMethod;
 

@@ -7,9 +7,11 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.imtp.common.enums.MessageTypeV2;
 import org.imtp.desktop.component.ClassPathImageUrlParse;
 import org.imtp.desktop.context.ClientContextHolder;
 import org.imtp.desktop.context.DefaultClientUserChannelContext;
+import org.imtp.desktop.context.UserContextHolder;
 import org.imtp.desktop.enums.MessageStatus;
 import org.imtp.desktop.idwork.IdGen;
 import org.imtp.common.enums.DeliveryMethod;
@@ -27,7 +29,7 @@ import org.imtp.common.packet.MessageMetadata;
 @NoArgsConstructor
 public class ChatItemEntity {
 
-    private final ObjectProperty<Image> image = new SimpleObjectProperty<>();
+    private final ObjectProperty<Image> imageStatusIcon = new SimpleObjectProperty<>();
 
     private Long id;
 
@@ -39,7 +41,7 @@ public class ChatItemEntity {
 
     private String content;
 
-    private MessageType messageType;
+    private MessageTypeV2 messageType;
 
     private DeliveryMethod deliveryMethod;
 
@@ -47,18 +49,22 @@ public class ChatItemEntity {
 
     private Image selfVideoThumbnailImage;
 
+    private Object contentObject;
+
     private ObjectProperty<MessageStatus> messageStatus = new SimpleObjectProperty<>();
 
-    public ObjectProperty<Image> imageProperty() {
-        return image;
+    private ObjectProperty<Image> avatarImage = new SimpleObjectProperty<>();
+
+    public ObjectProperty<Image> imageStatusIconProperty() {
+        return imageStatusIcon;
     }
 
-    public void setImage(Image image) {
-        this.image.set(image);
+    public void setImageStatusIcon(Image image) {
+        this.imageStatusIcon.set(image);
     }
 
-    public Image getImage() {
-        return image.get();
+    public Image getImageStatusIconImage() {
+        return imageStatusIcon.get();
     }
 
 
@@ -74,16 +80,49 @@ public class ChatItemEntity {
         return messageStatus.get();
     }
 
+    public void setAvatar(String avatar) {
+        if (!avatar.equals(this.avatar)) {
+            this.avatar = avatar;
+            setAvatarImage(avatar);  // 更新头像
+        }
+    }
+
+    public ObjectProperty<Image> avatarImageProperty() {
+
+        return avatarImage;
+    }
+
+    public void setAvatarImage(String url) {
+        if (avatarImage.get() == null || !url.equals(avatarImage.get().getUrl())) {
+            this.avatarImage.set(new Image(url, true));
+        }
+    }
 
     public static ChatItemEntity createSelfChatItemEntity(){
         ChatItemEntity chatItemEntity = new ChatItemEntity();
         chatItemEntity.setId(IdGen.genId());
         chatItemEntity.setSelf(true);
-        DefaultClientUserChannelContext clientContext = (DefaultClientUserChannelContext)ClientContextHolder.clientContext();
-        String at = clientContext.getUserInfo().getAvatar();
-        chatItemEntity.setAvatar(new ClassPathImageUrlParse().loadUrl(at));
-
+        chatItemEntity.avatarImageProperty().bindBidirectional(UserContextHolder.userContext().avatarImageProperty());
         return chatItemEntity;
+    }
+
+    public Object getContentObject(){
+        switch (messageType){
+            case TEXT,FILE,VOICE:
+                this.contentObject = this.content;
+                break;
+            case IMAGE:
+                if(contentObject == null){
+                    this.contentObject = new Image(this.content,true);
+                }
+                break;
+            case VIDEO:
+                if(contentObject == null){
+                    this.contentObject = new Image(this.messageMetadata.getThumbnailUrl(),true);
+                }
+                break;
+        }
+        return contentObject;
     }
 
 }

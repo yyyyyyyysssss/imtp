@@ -28,6 +28,7 @@ import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
+import org.imtp.common.packet.body.UserInfo;
 import org.imtp.desktop.Client;
 import org.imtp.desktop.Config;
 import org.imtp.desktop.SceneManager;
@@ -36,6 +37,7 @@ import org.imtp.desktop.component.OKHttpClientHelper;
 import org.imtp.desktop.constant.FXMLResourceConstant;
 import org.imtp.desktop.constant.SendMessageListener;
 import org.imtp.common.packet.body.TokenInfo;
+import org.imtp.desktop.context.UserContextHolder;
 import org.imtp.desktop.handler.AuthenticationHandler;
 import org.imtp.desktop.util.EffectUtilities;
 import org.imtp.desktop.util.ResourceUtils;
@@ -251,6 +253,9 @@ public class LoginController extends AbstractController {
     public void update(Object object) {
         AuthenticationResponse authenticationResponse = (AuthenticationResponse) object;
         if (authenticationResponse.isAuthenticated()) {
+            UserInfo userInfo = authenticationResponse.getUserInfo();
+            // 初始化UserContext
+            UserContextHolder.createUserContext(userInfo);
             errorMsg.setVisible(false);
             log.info("登录成功");
             //触发静态代码块执行，提前加载表情包

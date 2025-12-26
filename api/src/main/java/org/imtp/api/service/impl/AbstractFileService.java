@@ -23,6 +23,7 @@ import org.imtp.api.mapper.FileUploadMapper;
 import org.imtp.api.service.FileService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.context.request.async.AsyncRequestNotUsableException;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -342,7 +343,7 @@ public abstract class AbstractFileService implements FileService {
             }
         } catch (IOException e) {
             // 处理异常
-            log.error("streaming file error: {}", e.getMessage(), e);
+            log.error("文件传输过程中发生错误: {}", e.getMessage());
         }
     }
 

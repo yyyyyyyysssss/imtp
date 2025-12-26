@@ -133,7 +133,7 @@ public class ChatController extends AbstractController {
         sendButton.setOnMouseClicked(mouseEvent -> {
             sendMessage();
         });
-        chatListView.setCellFactory(c -> new ChatItemListCell());
+        chatListView.setCellFactory(c -> new ChatItemListCell(sessionEntity));
         chatListView.setFocusTraversable(false);
         chatListView.setRotate(180);
         chatListView.setNodeOrientation(NodeOrientation.RIGHT_TO_LEFT);
@@ -171,7 +171,7 @@ public class ChatController extends AbstractController {
             File file = fileChooser.showOpenDialog(chatVbox.getScene().getWindow());
             if (file != null){
                 String filePath = file.toURI().toString().replaceAll("%20"," ");
-                MessageType messageType = messageTypeByPath(filePath);
+                MessageTypeV2 messageType = messageTypeByPath(filePath);
                 sendMessage(filePath, messageType);
             }
         });
@@ -205,7 +205,7 @@ public class ChatController extends AbstractController {
                 if (n instanceof Text text) {
                     String msg;
                     if ((msg = text.getText()).startsWith("file:")) {
-                        MessageType messageType = messageTypeByPath(msg);
+                        MessageTypeV2 messageType = messageTypeByPath(msg);
                         sendMessage(msg, messageType);
                     } else {
                         sb.append(msg);
@@ -222,11 +222,11 @@ public class ChatController extends AbstractController {
                     } else {
                         String message = sb.toString();
                         if (!message.isEmpty()) {
-                            sendMessage(message, MessageType.TEXT_MESSAGE);
+                            sendMessage(message, MessageTypeV2.TEXT);
                         }
 
                         String url = imageView.getImage().getUrl();
-                        sendMessage(url, MessageType.IMAGE_MESSAGE);
+                        sendMessage(url, MessageTypeV2.IMAGE);
                         sb = new StringBuilder();
                     }
                 }
@@ -236,29 +236,29 @@ public class ChatController extends AbstractController {
             }
         }
         if (!sb.toString().isEmpty()) {
-            sendMessage(sb.toString(), MessageType.TEXT_MESSAGE);
+            sendMessage(sb.toString(), MessageTypeV2.TEXT);
         }
         richTextArea.getActionFactory().newDocument().execute(new ActionEvent());
     }
 
-    private MessageType messageTypeByPath(String path) {
+    private MessageTypeV2 messageTypeByPath(String path) {
         String mediaType = mediaType(path);
         if (mediaType.startsWith("video/")) {
-            return MessageType.VIDEO_MESSAGE;
+            return MessageTypeV2.VIDEO;
         } else if (mediaType.startsWith("image/")) {
-            return MessageType.IMAGE_MESSAGE;
+            return MessageTypeV2.IMAGE;
         } else {
-            return MessageType.FILE_MESSAGE;
+            return MessageTypeV2.FILE;
         }
     }
 
-    private void sendMessage(Object object, MessageType messageType) {
+    private void sendMessage(Object object, MessageTypeV2 messageType) {
         sessionEntity.setLastSendMsgUserId(ClientContextHolder.clientContext().id());
         ChatItemEntity selfChatItemEntity = ChatItemEntity.createSelfChatItemEntity();
         Long ackId = IdGen.genId();
         Packet packet = null;
         switch (messageType) {
-            case TEXT_MESSAGE:
+            case TEXT:
                 String message = (String) object;
                 if (sessionEntity.getDeliveryMethod().equals(DeliveryMethod.SINGLE)) {
                     packet = new TextMessageV2(message, ClientContextHolder.clientContext().id(), sessionEntity.getReceiverUserId(), ackId,false);
@@ -272,7 +272,7 @@ public class ChatController extends AbstractController {
                 //发送
                 sendMessage(packet,selfChatItemEntity,ackId);
                 break;
-            case IMAGE_MESSAGE:
+            case IMAGE:
                 String imagePath = (String) object;
                 MessageMetadata imageMessageMetadata = baseMessageMetadata(imagePath);
                 Image image = new Image(imagePath);
@@ -283,7 +283,7 @@ public class ChatController extends AbstractController {
                         .whenComplete((r, e) -> {
                             if (e != null) {
                                 log.error("upload chunk failed: ", e);
-                                selfChatItemEntity.setImage(sendFailureImage);
+                                selfChatItemEntity.setImageStatusIcon(sendFailureImage);
                                 Platform.runLater(() -> {
                                     selfChatItemEntity.messageStatusProperty().set(MessageStatus.FAILED);
                                 });
@@ -293,9 +293,9 @@ public class ChatController extends AbstractController {
                             log.info("upload completed; accessUrl: {}", r);
                             Packet imagePacket;
                             if (sessionEntity.getDeliveryMethod().equals(DeliveryMethod.SINGLE)) {
-                                imagePacket = new ImageMessage(r, imageMessageMetadata, ClientContextHolder.clientContext().id(), sessionEntity.getReceiverUserId(), ackId, false);
+                                imagePacket = new ImageMessageV2(r, imageMessageMetadata, ClientContextHolder.clientContext().id(), sessionEntity.getReceiverUserId(), ackId, false);
                             } else {
-                                imagePacket = new ImageMessage(r, imageMessageMetadata, ClientContextHolder.clientContext().id(), sessionEntity.getReceiverUserId(), ackId, true);
+                                imagePacket = new ImageMessageV2(r, imageMessageMetadata, ClientContextHolder.clientContext().id(), sessionEntity.getReceiverUserId(), ackId, true);
                             }
                             selfChatItemEntity.messageStatusProperty().set(MessageStatus.SENT);
                             //发送消息
@@ -310,7 +310,7 @@ public class ChatController extends AbstractController {
                 //发送
                 sendMessage(null,selfChatItemEntity,ackId);
                 break;
-            case VIDEO_MESSAGE:
+            case VIDEO:
                 String videoPath = (String) object;
                 MessageMetadata videoMessageMetadata = baseMessageMetadata(videoPath);
                 try (FFmpegFrameGrabber grabber = new FFmpegFrameGrabber(videoPath.substring(6))){
@@ -341,7 +341,7 @@ public class ChatController extends AbstractController {
                             .whenComplete((r, e) -> {
                                 if (e != null) {
                                     log.error("upload chunk failed: ", e);
-                                    selfChatItemEntity.setImage(sendFailureImage);
+                                    selfChatItemEntity.setImageStatusIcon(sendFailureImage);
                                     Platform.runLater(() -> {
                                         selfChatItemEntity.messageStatusProperty().set(MessageStatus.FAILED);
                                     });
@@ -356,9 +356,9 @@ public class ChatController extends AbstractController {
                                             videoMessageMetadata.setThumbnailUrl(ru);
                                             Packet videoPacket;
                                             if (sessionEntity.getDeliveryMethod().equals(DeliveryMethod.SINGLE)) {
-                                                videoPacket = new VideoMessage(r, videoMessageMetadata, ClientContextHolder.clientContext().id(), sessionEntity.getReceiverUserId(), ackId, false);
+                                                videoPacket = new VideoMessageV2(r, videoMessageMetadata, ClientContextHolder.clientContext().id(), sessionEntity.getReceiverUserId(), ackId, false);
                                             } else {
-                                                videoPacket = new VideoMessage(r, videoMessageMetadata, ClientContextHolder.clientContext().id(), sessionEntity.getReceiverUserId(), ackId, true);
+                                                videoPacket = new VideoMessageV2(r, videoMessageMetadata, ClientContextHolder.clientContext().id(), sessionEntity.getReceiverUserId(), ackId, true);
                                             }
                                             selfChatItemEntity.messageStatusProperty().set(MessageStatus.SENT);
                                             //发送消息
@@ -381,7 +381,7 @@ public class ChatController extends AbstractController {
                     log.error("javacv error: ",exception);
                 }
                 break;
-            case FILE_MESSAGE:
+            case FILE:
                 String filePath = (String) object;
                 MessageMetadata fileMessageMetadata = baseMessageMetadata(filePath);
                 CompletableFuture<String> fileCompletableFuture = ChunkedUploader.uploadFile(filePath);
@@ -389,16 +389,16 @@ public class ChatController extends AbstractController {
                         .whenComplete((r, e) -> {
                             if (e != null) {
                                 log.error("upload chunk failed: ", e);
-                                selfChatItemEntity.setImage(sendFailureImage);
+                                selfChatItemEntity.setImageStatusIcon(sendFailureImage);
                             }
                         })
                         .thenAccept(r -> {
                             log.info("upload completed; accessUrl: {}", r);
                             Packet imagePacket;
                             if (sessionEntity.getDeliveryMethod().equals(DeliveryMethod.SINGLE)) {
-                                imagePacket = new FileMessage(r, fileMessageMetadata, ClientContextHolder.clientContext().id(), sessionEntity.getReceiverUserId(), ackId, false);
+                                imagePacket = new FileMessageV2(r, fileMessageMetadata, ClientContextHolder.clientContext().id(), sessionEntity.getReceiverUserId(), ackId, false);
                             } else {
-                                imagePacket = new FileMessage(r, fileMessageMetadata, ClientContextHolder.clientContext().id(), sessionEntity.getReceiverUserId(), ackId, true);
+                                imagePacket = new FileMessageV2(r, fileMessageMetadata, ClientContextHolder.clientContext().id(), sessionEntity.getReceiverUserId(), ackId, true);
                             }
                             //发送消息
                             send(imagePacket);
@@ -415,7 +415,7 @@ public class ChatController extends AbstractController {
 
     private void sendMessage(Packet packet,ChatItemEntity selfChatItemEntity,Long ackId){
         addChatItem(selfChatItemEntity);
-        selfChatItemEntity.setImage(sendingImage);
+        selfChatItemEntity.setImageStatusIcon(sendingImage);
         ackChatItemEntityMap.put(ackId, selfChatItemEntity);
         if (packet != null){
             //发送消息
@@ -429,7 +429,7 @@ public class ChatController extends AbstractController {
         retryTask.setScheduledFuture(eventLoop.schedule(() -> {
             ChatItemEntity chatItemEntity = ackChatItemEntityMap.get(ackId);
             if (chatItemEntity != null) {
-                chatItemEntity.setImage(sendFailureImage);
+                chatItemEntity.setImageStatusIcon(sendFailureImage);
             }
             retryTaskMap.remove(ackId);
         }, 10, TimeUnit.SECONDS));
@@ -447,12 +447,29 @@ public class ChatController extends AbstractController {
             case MESSAGE_PACKET:
                 AbstractMessagePacket messagePacket = (AbstractMessagePacket) packet;
                 MessageTypeV2 messageType = messagePacket.getMessageType();
+                chatItemEntity = new ChatItemEntity();
+                chatItemEntity.setMessageType(messageType);
+                chatItemEntity.setMessageMetadata(messagePacket.getContentMetadata());
                 switch (messageType){
                     case TEXT :
                         TextMessageV2 textMessage = (TextMessageV2) messagePacket;
-                        chatItemEntity = new ChatItemEntity();
                         chatItemEntity.setContent(textMessage.getText());
-                        chatItemEntity.setMessageType(MessageType.findMessageTypeByValue(messageType.getValue()));
+                        break;
+                    case IMAGE:
+                        ImageMessageV2 imageMessage = (ImageMessageV2) messagePacket;
+                        chatItemEntity.setContent(imageMessage.getUrl());
+                        break;
+                    case VIDEO:
+                        VideoMessageV2 videoMessage =  (VideoMessageV2) messagePacket;
+                        chatItemEntity.setContent(videoMessage.getUrl());
+                        break;
+                    case VOICE:
+                        VoiceMessageV2 voiceMessage = (VoiceMessageV2) messagePacket;
+                        chatItemEntity.setContent(voiceMessage.getUrl());
+                        break;
+                    case FILE:
+                        FileMessageV2 fileMessage = (FileMessageV2) messagePacket;
+                        chatItemEntity.setContent(fileMessage.getUrl());
                         break;
                 }
                 break;
@@ -486,7 +503,7 @@ public class ChatController extends AbstractController {
                     switch (messageStateResponse.getState()) {
                         case DELIVERED:
                             log.info("{},{}", messageStateResponse.getState(), messageStateResponse.getAckId());
-                            cie.imageProperty().set(null);
+                            cie.imageStatusIconProperty().set(null);
                             ackChatItemEntityMap.remove(messageStateResponse.getAckId());
                             RetryTask retryTask = retryTaskMap.get(messageStateResponse.getAckId());
                             if (retryTask != null) {
@@ -541,10 +558,7 @@ public class ChatController extends AbstractController {
 
     private void addChatItem(ChatItemEntity chatItemEntity) {
         ObservableList<ChatItemEntity> items = chatListView.getItems();
-//        int index = items.size();
-        items.addFirst(chatItemEntity);
-//        items.addLast(chatItemEntity);
-//        Platform.runLater(() -> chatListView.scrollTo(index));
+        items.add(chatItemEntity);
     }
 
 

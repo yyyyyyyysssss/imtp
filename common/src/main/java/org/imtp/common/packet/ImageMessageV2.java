@@ -23,8 +23,8 @@ public class ImageMessageV2 extends MessagePacket {
         super(header);
     }
 
-    public ImageMessageV2(String text, long sender, long receiver, Long ackId, boolean groupFlag) {
-        super(text, MessageTypeV2.TEXT, null, sender, receiver, ackId, groupFlag);
+    public ImageMessageV2(String text,MessageMetadata contentMetadata, long sender, long receiver, Long ackId, boolean groupFlag) {
+        super(text, MessageTypeV2.IMAGE, contentMetadata, sender, receiver, ackId, groupFlag);
     }
 
     public String getUrl() {

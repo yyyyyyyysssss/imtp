@@ -23,8 +23,8 @@ public class VideoMessageV2 extends MessagePacket {
         super(header);
     }
 
-    public VideoMessageV2(String text, long sender, long receiver, Long ackId, boolean groupFlag) {
-        super(text, MessageTypeV2.VIDEO, null, sender, receiver, ackId, groupFlag);
+    public VideoMessageV2(String text,MessageMetadata messageMetadata, long sender, long receiver, Long ackId, boolean groupFlag) {
+        super(text, MessageTypeV2.VIDEO, messageMetadata, sender, receiver, ackId, groupFlag);
     }
 
     public String getUrl() {

@@ -25,8 +25,8 @@ public class UserSessionListCell extends ListCell<SessionEntity> {
 
     @Override
     protected void updateItem(SessionEntity sessionEntity, boolean b) {
+        super.updateItem(sessionEntity, b);
         Platform.runLater(() -> {
-            super.updateItem(sessionEntity, b);
             if (b || sessionEntity == null){
                 setGraphic(null);
                 setText(null);

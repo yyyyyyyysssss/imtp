@@ -15,6 +15,7 @@ import javafx.scene.shape.StrokeType;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextBoundsType;
 import lombok.extern.slf4j.Slf4j;
+import org.imtp.common.enums.MessageTypeV2;
 import org.imtp.desktop.context.ClientContextHolder;
 import org.imtp.desktop.entity.SessionEntity;
 import org.imtp.common.enums.DeliveryMethod;
@@ -43,6 +44,8 @@ public class UserSessionItemController extends AbstractController{
 
     @FXML
     private Circle alertCircle;
+
+    private SessionEntity sessionEntity;
 
     private static final int R = 10;
 
@@ -85,8 +88,8 @@ public class UserSessionItemController extends AbstractController{
 
     @Override
     public void initData(Object object) {
-        if(object instanceof SessionEntity sessionEntity){
-            setData(sessionEntity);
+        if(object instanceof SessionEntity se){
+            setData(se);
         }
     }
 
@@ -98,7 +101,7 @@ public class UserSessionItemController extends AbstractController{
 
     private void setData(SessionEntity sessionEntity){
         Platform.runLater(() -> {
-            sessionImg.setImage(new Image(sessionEntity.getAvatar()));
+            sessionImg.imageProperty().bind(sessionEntity.avatarImageProperty());
             nameLabel.setText(sessionEntity.getName());
             StringBuilder sb = new StringBuilder();
             if (sessionEntity.getDeliveryMethod().equals(DeliveryMethod.GROUP)
@@ -106,15 +109,15 @@ public class UserSessionItemController extends AbstractController{
                     && !ClientContextHolder.clientContext().id().equals(sessionEntity.getLastSendMsgUserId())){
                 sb.append(sessionEntity.getLastUserName()).append("：");
             }
-            if (MessageType.TEXT_MESSAGE.equals(sessionEntity.getLastMsgType())){
+            if (MessageTypeV2.TEXT.equals(sessionEntity.getLastMsgType())){
                 sb.append(sessionEntity.getLastMsg());
-            }else if (MessageType.IMAGE_MESSAGE.equals(sessionEntity.getLastMsgType())){
+            }else if (MessageTypeV2.IMAGE.equals(sessionEntity.getLastMsgType())){
                 sb.append("[图片]");
-            }else if (MessageType.VIDEO_MESSAGE.equals(sessionEntity.getLastMsgType())){
+            }else if (MessageTypeV2.VIDEO.equals(sessionEntity.getLastMsgType())){
                 sb.append("[视频]");
-            }else if (MessageType.VOICE_MESSAGE.equals(sessionEntity.getLastMsgType())){
+            }else if (MessageTypeV2.VOICE.equals(sessionEntity.getLastMsgType())){
                 sb.append("[语音]");
-            }else if (MessageType.FILE_MESSAGE.equals(sessionEntity.getLastMsgType())){
+            }else if (MessageTypeV2.FILE.equals(sessionEntity.getLastMsgType())){
                 sb.append("[文件]");
             }
             if (!sb.toString().isEmpty()){

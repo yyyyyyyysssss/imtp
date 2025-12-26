@@ -100,6 +100,10 @@ public abstract class AbstractMessagePacket extends Packet {
         return this;
     }
 
+    public MessageMetadata getContentMetadata() {
+        return contentMetadata;
+    }
+
     public long getAckId() {
         return ackId;
     }

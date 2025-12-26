@@ -1,7 +1,7 @@
 package org.imtp.server.handler;
 
 import io.netty.channel.ChannelHandler;
-import org.imtp.common.packet.ImageMessage;
+import org.imtp.common.packet.ImageMessageV2;
 import org.springframework.stereotype.Component;
 
 /**
@@ -11,6 +11,6 @@ import org.springframework.stereotype.Component;
  */
 @Component("image")
 @ChannelHandler.Sharable
-public class ImageMessageHandlerV2 extends MessageDispatchHandler<ImageMessage> {
+public class ImageMessageHandlerV2 extends MessageDispatchHandler<ImageMessageV2> {
 
 }

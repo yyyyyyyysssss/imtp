@@ -3,6 +3,7 @@ package org.imtp.desktop.controller;
 import com.gluonhq.emoji.Emoji;
 import com.gluonhq.emoji.util.TextUtils;
 import javafx.application.Platform;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
@@ -21,7 +22,9 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import lombok.extern.slf4j.Slf4j;
+import org.imtp.desktop.context.UserContextHolder;
 import org.imtp.desktop.entity.ChatItemEntity;
+import org.imtp.desktop.entity.SessionEntity;
 import org.imtp.desktop.enums.MessageStatus;
 import org.imtp.desktop.util.ResourceUtils;
 import org.imtp.common.enums.DeliveryMethod;
@@ -55,6 +58,8 @@ public class ChatItemController extends AbstractController {
 
     @FXML
     private TextFlow chatItemTextFlow;
+
+    private SessionEntity sessionEntity;
 
     private static Image fileIcon = new Image(ResourceUtils.classPathResource("/img/icons8-file-50.png").toExternalForm());
 
@@ -117,11 +122,14 @@ public class ChatItemController extends AbstractController {
 
     }
 
+    public void setSessionEntity(SessionEntity sessionEntity) {
+        this.sessionEntity = sessionEntity;
+    }
+
     @Override
     public void initData(Object object) {
         if (object instanceof ChatItemEntity chatItemEntity) {
             Platform.runLater(() -> {
-                chatItemImageView.setImage(new Image(chatItemEntity.getAvatar()));
                 //清除节点
                 ObservableList<Node> rootChildren = chatItemHBox.getChildren();
                 ObservableList<Node> chatItemVBoxChildren = chatItemVBox.getChildren();
@@ -144,6 +152,7 @@ public class ChatItemController extends AbstractController {
     }
 
     private void leftNode(ChatItemEntity chatItemEntity) {
+        chatItemImageView.imageProperty().bind(getFriendAvatar(chatItemEntity));
         ObservableList<Node> rootChildren = chatItemHBox.getChildren();
         ObservableList<Node> chatItemVBoxChildren = chatItemVBox.getChildren();
         ObservableList<Node> chatItemLabelHBoxChildren = chatItemLabelHBox.getChildren();
@@ -164,12 +173,20 @@ public class ChatItemController extends AbstractController {
         HBox.setMargin(chatItemVBox, LEFT_INSETS);
     }
 
+    private ObjectProperty<Image> getFriendAvatar(ChatItemEntity chatItemEntity){
+        if(chatItemEntity.getDeliveryMethod().equals(DeliveryMethod.SINGLE)){
+            return sessionEntity.avatarImageProperty();
+        }
+        return chatItemEntity.avatarImageProperty();
+    }
+
     private void rightNode(ChatItemEntity chatItemEntity) {
+        chatItemImageView.imageProperty().bind(UserContextHolder.userContext().avatarImageProperty());
         ObservableList<Node> rootChildren = chatItemHBox.getChildren();
         ObservableList<Node> chatItemVBoxChildren = chatItemVBox.getChildren();
         ObservableList<Node> chatItemLabelHBoxChildren = chatItemLabelHBox.getChildren();
 
-        imageView.imageProperty().bind(chatItemEntity.imageProperty());
+        imageView.imageProperty().bind(chatItemEntity.imageStatusIconProperty());
         chatItemHBox.setPadding(RIGHT_INSETS_PADDING);
         chatItemHBox.setAlignment(Pos.TOP_RIGHT);
         chatItemTextFlow.setBackground(BACKGROUND_RIGHT);
@@ -185,24 +202,23 @@ public class ChatItemController extends AbstractController {
     private void showMsg(ChatItemEntity chatItemEntity) {
         ObservableList<Node> textFlowChildren = chatItemTextFlow.getChildren();
         switch (chatItemEntity.getMessageType()) {
-            case TEXT_MESSAGE:
+            case TEXT:
                 List<Node> nodes = parseContent(chatItemEntity.getContent());
                 textFlowChildren.addAll(nodes);
                 break;
-            case IMAGE_MESSAGE:
+            case IMAGE:
                 chatItemTextFlow.setBackground(null);
-                String path = chatItemEntity.getContent();
                 MessageMetadata imageMessageMetadata = chatItemEntity.getMessageMetadata();
                 Node imageNode = createImageMessageNode(chatItemEntity, imageMessageMetadata);
                 textFlowChildren.add(imageNode);
                 break;
-            case VIDEO_MESSAGE:
+            case VIDEO:
                 chatItemTextFlow.setBackground(null);
                 MessageMetadata videoMessageMetadata = chatItemEntity.getMessageMetadata();
                 Node videoNode = createVideoMessageNode(chatItemEntity, videoMessageMetadata);
                 textFlowChildren.add(videoNode);
                 break;
-            case FILE_MESSAGE:
+            case FILE:
                 chatItemTextFlow.setBackground(null);
                 MessageMetadata fileMessageMetadata = chatItemEntity.getMessageMetadata();
                 Node fileNode = createFileMessageNode(chatItemEntity, fileMessageMetadata);
@@ -234,10 +250,10 @@ public class ChatItemController extends AbstractController {
     }
 
     private Node createImageMessageNode(ChatItemEntity chatItemEntity, MessageMetadata messageMetadata) {
-        String url = chatItemEntity.getContent();
         double height = messageMetadata.getHeight();
         double width = messageMetadata.getWidth();
-        ImageView iv = new ImageView(url);
+        Image image = (Image) chatItemEntity.getContentObject();
+        ImageView iv = new ImageView(image);
         iv.setStyle("-fx-effect: dropshadow(three-pass-box, rgba(149, 157, 165, 0.2), 10, 0, 0, 0);");
         if (width > max_width_image) {
             iv.setFitWidth(max_width_image);
@@ -255,20 +271,20 @@ public class ChatItemController extends AbstractController {
         iv.setClip(clip);
 
         MessageStatus messageStatus;
-        Rectangle gradientRect;
+        Rectangle gradientRect = new Rectangle(0, 0, iv.getFitWidth(), iv.getFitHeight());;
+        gradientRect.setFill(new Color(0, 0, 0, 0.7));
+        gradientRect.setArcWidth(15);
+        gradientRect.setArcHeight(15);
+        ProgressIndicator progressIndicator = new ProgressIndicator();
+        progressIndicator.setStyle("-fx-accent: #666666;");
+
         if ((messageStatus = chatItemEntity.getMessageStatus()) != null && messageStatus.equals(MessageStatus.PENDING)){
-            gradientRect = new Rectangle(0, 0, iv.getFitWidth(), iv.getFitHeight());
-            gradientRect.setFill(new Color(0, 0, 0, 0.7));
-            gradientRect.setArcWidth(15);
-            gradientRect.setArcHeight(15);
             //加载中
-            ProgressIndicator progressIndicator = new ProgressIndicator();
             stackPane.getChildren().addAll(iv,progressIndicator);
 
             anchorPane.getChildren().addAll(stackPane, gradientRect);
             AnchorPane.setBottomAnchor(gradientRect, 0.0);
         }else {
-            gradientRect = null;
             stackPane.getChildren().addAll(iv);
             anchorPane.getChildren().addAll(stackPane);
         }
@@ -291,6 +307,22 @@ public class ChatItemController extends AbstractController {
                 });
             }
         });
+        // 监听图片加载状态，更新进度
+        image.progressProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue.doubleValue() != 1.0) {
+                //加载中
+                stackPane.getChildren().clear();
+                anchorPane.getChildren().clear();
+                stackPane.getChildren().addAll(iv,progressIndicator);
+                anchorPane.getChildren().addAll(stackPane, gradientRect);
+                AnchorPane.setBottomAnchor(gradientRect, 0.0);
+            } else {
+                stackPane.getChildren().clear();
+                anchorPane.getChildren().clear();
+                stackPane.getChildren().addAll(iv);
+                anchorPane.getChildren().addAll(stackPane);
+            }
+        });
 
         return anchorPane;
     }
@@ -299,12 +331,13 @@ public class ChatItemController extends AbstractController {
         String url = chatItemEntity.getContent();
         double height = messageMetadata.getHeight();
         double width = messageMetadata.getWidth();
-        ImageView iv;
+        Image image;
         if (chatItemEntity.isSelf() && (messageMetadata.getThumbnailUrl() == null || messageMetadata.getThumbnailUrl().isEmpty())) {
-            iv = new ImageView(chatItemEntity.getSelfVideoThumbnailImage());
+            image = chatItemEntity.getSelfVideoThumbnailImage();
         } else {
-            iv = new ImageView(messageMetadata.getThumbnailUrl());
+            image = (Image) chatItemEntity.getContentObject();
         }
+        ImageView iv = new ImageView(image);
         iv.setPreserveRatio(true);
         iv.setStyle("-fx-effect: dropshadow(three-pass-box, rgba(149, 157, 165, 0.2), 10, 0, 0, 0);");
         if (width > max_width_video) {

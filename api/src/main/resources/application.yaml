@@ -129,12 +129,13 @@ security:
       - /oauth2/activate
       - /activated
       - /api/open/**
+      - /file/**
     authenticated:
       - /refreshToken
       - /logout
       - /service/discovery
       - /ott/generate
-      - /file/**
+#      - /file/**
       - /api/file/**
       - /api/profile/**
       - /api/authenticated/**

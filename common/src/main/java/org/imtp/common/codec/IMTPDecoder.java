@@ -3,6 +3,7 @@ package org.imtp.common.codec;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
+import lombok.extern.slf4j.Slf4j;
 import org.imtp.common.packet.*;
 import org.imtp.common.packet.base.Header;
 import org.imtp.common.packet.base.Packet;
@@ -15,6 +16,7 @@ import java.util.List;
  * @Author ys
  * @Date 2024/4/7 15:35
  */
+@Slf4j
 public class IMTPDecoder extends ByteToMessageDecoder {
     @Override
     protected void decode(ChannelHandlerContext channelHandlerContext, ByteBuf byteBuf, List<Object> list) {
@@ -35,13 +37,18 @@ public class IMTPDecoder extends ByteToMessageDecoder {
         }
         byte[] data= new byte[header.getLength()];
         byteBuf.readBytes(data);
-        short verify = CRC16Util.calculateCRC(data);
         short receiveVerify = byteBuf.readShort();
         //校验位不相同则丢弃包
-        if(verify != receiveVerify){
+        if(!isValidCRC(data,receiveVerify)){
+            log.warn("CRC mismatch: expected {}, received {}", CRC16Util.calculateCRC(data), byteBuf.readShort());
             return;
         }
         Packet packet = new CommandPacket(header,data,receiveVerify);
         list.add(packet);
+    }
+
+    private boolean isValidCRC(byte[] data, short receiveVerify) {
+        short verify = CRC16Util.calculateCRC(data);
+        return verify == receiveVerify;
     }
 }

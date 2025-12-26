@@ -1,11 +1,19 @@
 package org.imtp.desktop.entity;
 
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.scene.effect.DropShadow;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import lombok.Getter;
 import lombok.Setter;
 import org.imtp.common.enums.DeliveryMethod;
 import org.imtp.common.enums.MessageType;
+import org.imtp.common.enums.MessageTypeV2;
 import org.imtp.common.packet.MessageMetadata;
 
 import java.util.Objects;
@@ -22,7 +30,7 @@ public class SessionEntity {
 
     private Long receiverUserId;
 
-    private MessageType lastMsgType;
+    private MessageTypeV2 lastMsgType;
 
     private DeliveryMethod deliveryMethod;
 
@@ -40,6 +48,12 @@ public class SessionEntity {
 
     private MessageMetadata lastMessageMetadata;
 
+    private ObjectProperty<Image> avatarImage;
+
+    public SessionEntity(){
+        this.avatarImage = new SimpleObjectProperty<>();
+    }
+
     public StringProperty countProperty(){
         if (count == null){
             count = new SimpleStringProperty(this,"count");
@@ -53,6 +67,25 @@ public class SessionEntity {
 
     public void setCount(String count) {
         this.countProperty().set(count);
+    }
+
+
+    public void setAvatar(String avatar) {
+        if (!avatar.equals(this.avatar)) {
+            this.avatar = avatar;
+            setAvatarImage(avatar);  // 更新头像
+        }
+    }
+
+    public ObjectProperty<Image> avatarImageProperty() {
+
+        return avatarImage;
+    }
+
+    public void setAvatarImage(String url) {
+        if (avatarImage.get() == null || !url.equals(avatarImage.get().getUrl())) {
+            this.avatarImage.set(new Image(url, true));
+        }
     }
 
     @Override

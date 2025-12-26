@@ -23,8 +23,8 @@ public class FileMessageV2 extends MessagePacket {
         super(header);
     }
 
-    public FileMessageV2(String text, long sender, long receiver, Long ackId, boolean groupFlag) {
-        super(text, MessageTypeV2.FILE, null, sender, receiver, ackId, groupFlag);
+    public FileMessageV2(String text,MessageMetadata messageMetadata, long sender, long receiver, Long ackId, boolean groupFlag) {
+        super(text, MessageTypeV2.FILE, messageMetadata, sender, receiver, ackId, groupFlag);
     }
 
     public String getUrl() {
