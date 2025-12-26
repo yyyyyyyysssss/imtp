@@ -133,10 +133,12 @@ public class ChatController extends AbstractController {
         sendButton.setOnMouseClicked(mouseEvent -> {
             sendMessage();
         });
+        ObservableList<ChatItemEntity> list = FXCollections.observableArrayList();
+        chatListView.setItems(list);
         chatListView.setCellFactory(c -> new ChatItemListCell(sessionEntity));
         chatListView.setFocusTraversable(false);
-        chatListView.setRotate(180);
-        chatListView.setNodeOrientation(NodeOrientation.RIGHT_TO_LEFT);
+//        chatListView.setRotate(180);
+//        chatListView.setNodeOrientation(NodeOrientation.RIGHT_TO_LEFT);
 
         chatEmoteIcon.setOnMouseClicked(mouseEvent -> {
             if (dialog == null) {
@@ -533,11 +535,6 @@ public class ChatController extends AbstractController {
         addChatItem(chatItemEntity);
     }
 
-    private void setListView(List<ChatItemEntity> chatItemEntities) {
-        ObservableList<ChatItemEntity> chatItemEntityObservableList = FXCollections.observableArrayList(chatItemEntities);
-        chatListView.setItems(chatItemEntityObservableList);
-    }
-
     private void addChatItem(SessionEntity sessionEntity) {
         ChatItemEntity chatItemEntity = new ChatItemEntity();
         chatItemEntity.setId(IdGen.genId());
@@ -559,6 +556,9 @@ public class ChatController extends AbstractController {
     private void addChatItem(ChatItemEntity chatItemEntity) {
         ObservableList<ChatItemEntity> items = chatListView.getItems();
         items.add(chatItemEntity);
+        Platform.runLater(() -> {
+            chatListView.scrollTo(chatListView.getItems().size() - 1);  // 滚动到最后一项
+        });
     }
 
 

@@ -5,6 +5,7 @@ import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import org.imtp.desktop.constant.FXMLResourceConstant;
+import org.imtp.desktop.context.ClientContext;
 import org.imtp.desktop.context.ClientContextHolder;
 import org.imtp.desktop.handler.AuthenticationHandler;
 import org.imtp.desktop.util.ResourceUtils;
@@ -33,7 +34,10 @@ public class MainApp extends Application {
 
     @Override
     public void stop() {
-        ClientContextHolder.clientContext().channel().close();
+        ClientContext clientContext = ClientContextHolder.clientContext();
+        if(clientContext != null){
+            clientContext.channel().close();
+        }
         System.exit(0);
     }
 }

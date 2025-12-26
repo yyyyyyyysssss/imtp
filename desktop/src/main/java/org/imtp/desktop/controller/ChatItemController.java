@@ -111,8 +111,8 @@ public class ChatItemController extends AbstractController {
             }
         });
 
-        chatItemHBox.setRotate(180);
-        chatItemHBox.setNodeOrientation(NodeOrientation.LEFT_TO_RIGHT);
+//        chatItemHBox.setRotate(180);
+//        chatItemHBox.setNodeOrientation(NodeOrientation.LEFT_TO_RIGHT);
 
     }
 
