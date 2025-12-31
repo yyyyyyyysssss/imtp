@@ -7,6 +7,7 @@ import org.imtp.api.config.exception.BusinessException;
 import org.imtp.api.domain.dto.FileRangeDTO;
 import org.imtp.api.domain.vo.FileStreamVO;
 import org.imtp.api.enums.FileStorageType;
+import org.imtp.api.utils.MD5Utils;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
@@ -84,10 +85,10 @@ public class LocalFileServiceImpl extends AbstractFileService {
         Path path = Paths.get(newFilePath);
         try {
             Files.move(tmpPath, path, StandardCopyOption.REPLACE_EXISTING);
-            String etag = calculateMD5(newFilePath);
+            String etag = MD5Utils.getMD5(new File(newFilePath));
             log.info("upload success; filename:{}, accessUrl:{}", filename, newFilePath);
             return new Tuple2<>(etag, newFilePath);
-        } catch (IOException e) {
+        } catch (IOException | NoSuchAlgorithmException e) {
             log.error("upload  Files.move error: ", e);
             throw new BusinessException(e);
         }
@@ -96,6 +97,16 @@ public class LocalFileServiceImpl extends AbstractFileService {
     @Override
     public String generateTemporaryUrl(String uploadId, Duration duration) {
         throw new UnsupportedOperationException("本地文件暂不支持生成临时访问url");
+    }
+
+    @Override
+    public InputStream download(String bucketName, String objectName) {
+        String newFilePath = tmpdir + bucketName + File.separator + objectName;
+        try {
+            return new FileInputStream(newFilePath);
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

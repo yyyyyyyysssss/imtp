@@ -2,8 +2,10 @@ package org.imtp.api.controller;
 
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.imtp.api.domain.dto.FileChunkDTO;
 import org.imtp.api.domain.dto.FileInfoDTO;
+import org.imtp.api.domain.vo.FileMD5CheckVO;
 import org.imtp.api.domain.vo.FileUploadChunkVO;
 import org.imtp.api.domain.vo.FileUploadProgressVO;
 import org.imtp.api.service.FileService;
@@ -27,6 +29,22 @@ public class FileUploadController {
 
     @Resource
     private FileService fileService;
+
+
+    // md5检查 如果存在直接返回访问的url
+    @GetMapping("/check/{md5}")
+    public Result<FileMD5CheckVO> checkMD5(@PathVariable("md5")String md5){
+        String accessUrl = fileService.checkMD5(md5);
+        FileMD5CheckVO fileMD5CheckVO = new FileMD5CheckVO();
+        if(StringUtils.isNotEmpty(accessUrl)){
+            fileMD5CheckVO.setFound(true);
+            fileMD5CheckVO.setAccessUrl(accessUrl);
+            return ResultGenerator.ok(fileMD5CheckVO);
+        } else {
+            fileMD5CheckVO.setFound(false);
+        }
+        return ResultGenerator.ok(fileMD5CheckVO);
+    }
 
     //分片上传前置获取当前上传id
     @PostMapping("/uploadId")

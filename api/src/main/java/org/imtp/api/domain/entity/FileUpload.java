@@ -61,6 +61,9 @@ public class FileUpload {
     @TableField("original_url")
     private String originalUrl;
 
+    @TableField("md5")
+    private String md5;
+
     @TableField("status")
     private FileUploadStatus status;
 

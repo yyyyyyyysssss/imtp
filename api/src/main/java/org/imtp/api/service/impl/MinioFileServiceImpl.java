@@ -77,13 +77,22 @@ public class MinioFileServiceImpl extends AbstractFileService {
     }
 
     @Override
+    public InputStream download(String bucketName, String objectName) {
+        return minioHelper.download(bucketName, objectName);
+    }
+
+    @Override
     public FileStreamVO getFileStream(String bucketName, String objectName, FileRangeDTO range) {
         Map<String, String> headerMap = new HashMap<>();
         GetObjectResponse objectResponse;
         // 如果没有指定范围，则直接下载整个文件
         if (range == null) {
             objectResponse = minioHelper.download(bucketName, objectName);
-            objectResponse.headers().forEach(h -> headerMap.put(h.getFirst(), h.getSecond()));
+            objectResponse.headers().forEach(h -> {
+                if(h != null){
+                    headerMap.put(h.getFirst(), h.getSecond());
+                }
+            });
             return new FileStreamVO(outputStream -> streamFile(objectResponse, outputStream), headerMap);
         }
         //指定范围时 先获取文件信息

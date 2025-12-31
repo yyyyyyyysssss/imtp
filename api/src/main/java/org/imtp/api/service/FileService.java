@@ -19,6 +19,8 @@ import java.time.Duration;
  */
 public interface FileService {
 
+    String checkMD5(String md5);
+
     String getUploadId(FileInfoDTO fileInfoDTO);
 
     FileUploadChunkVO uploadChunk(FileChunkDTO fileChunkDTO);
@@ -32,6 +34,8 @@ public interface FileService {
     String uploadSingleFile(MultipartFile file);
 
     String uploadSingleFile(InputStream inputStream, String fileName, String fileType);
+
+    InputStream download(String bucketName, String objectName);
 
     FileStreamVO getFileStream(String bucketName, String objectName, FileRangeDTO range);
 

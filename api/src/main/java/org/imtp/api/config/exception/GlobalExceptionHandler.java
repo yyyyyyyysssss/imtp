@@ -133,7 +133,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(AsyncRequestNotUsableException.class)
-    void handleAsyncRequestNotUsableException(AsyncRequestNotUsableException e) {
+    public void handleAsyncRequestNotUsableException(AsyncRequestNotUsableException e) {
 
     }
 

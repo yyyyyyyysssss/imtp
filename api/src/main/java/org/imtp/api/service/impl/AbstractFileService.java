@@ -21,7 +21,9 @@ import org.imtp.api.enums.FileStorageType;
 import org.imtp.api.enums.FileUploadStatus;
 import org.imtp.api.mapper.FileUploadMapper;
 import org.imtp.api.service.FileService;
+import org.imtp.api.utils.MD5Utils;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.request.async.AsyncRequestNotUsableException;
 import org.springframework.web.multipart.MultipartFile;
@@ -41,6 +43,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ExecutorService;
 import java.util.regex.Pattern;
 
 /**
@@ -69,6 +72,27 @@ public abstract class AbstractFileService implements FileService {
 
     @Resource
     private RedisHelper redisHelper;
+
+    @Resource
+    private ExecutorService defaultThreadPool;
+
+
+    @Override
+    @Cacheable(value = "file:upload:check", key = "#md5", unless="#result == null")
+    public String checkMD5(String md5){
+        QueryWrapper<FileUpload> fileUploadQueryWrapper = new QueryWrapper<>();
+        fileUploadQueryWrapper
+                .lambda()
+                .select(FileUpload::getAccessUrl)
+                .eq(FileUpload::getMd5,md5)
+                .orderByDesc(FileUpload::getId)
+                .last("limit 1");
+        FileUpload fileUpload = fileUploadMapper.selectOne(fileUploadQueryWrapper);
+        if(fileUpload != null){
+            return fileUpload.getAccessUrl();
+        }
+        return null;
+    }
 
     @Override
     public String getUploadId(FileInfoDTO fileInfoDTO) {
@@ -99,7 +123,7 @@ public abstract class AbstractFileService implements FileService {
         map.put(uploadedChunkCountField,0);
         map.put(newFilenameField,newFilename);
         map.put(accessUrlField,null);
-        redisHelper.addHash(uploadPrefix + uploadId,map);
+        redisHelper.addHash(uploadPrefix + uploadId,map, Duration.ofHours(24));
         return uploadId;
     }
 
@@ -152,8 +176,9 @@ public abstract class AbstractFileService implements FileService {
                 updateWrapper.set("etag",etag);
                 updateWrapper.eq("upload_id",uploadId);
                 fileUploadMapper.update(null, updateWrapper);
-
                 redisHelper.addHash(uploadPrefix + uploadId,accessUrlField,accessUrl,Duration.ofMinutes(5));
+                // 异步计算md5
+                calculateMD5Async(uploadId,originalUrl);
             }
             FileUploadChunkVO fileUploadChunkVO = new FileUploadChunkVO();
             fileUploadChunkVO.setUploadId(uploadId);
@@ -168,8 +193,6 @@ public abstract class AbstractFileService implements FileService {
             updateWrapper.set("uploaded_chunk_count",uploadedChunkNum);
             updateWrapper.eq("upload_id",uploadId);
             fileUploadMapper.update(null, updateWrapper);
-
-            redisHelper.expire(uploadPrefix + uploadId, Duration.ofDays(3));
             throw new BusinessException(e);
         }finally {
             if (inputStream != null) {
@@ -276,6 +299,7 @@ public abstract class AbstractFileService implements FileService {
             String originalUrl = tuple2.getV2();
             String accessUrl = createAccessUrl(originalUrl);
             fileUpload.setEtag(etag);
+            fileUpload.setMd5(etag);
             fileUpload.setAccessUrl(accessUrl);
             fileUpload.setOriginalUrl(originalUrl);
             fileUpload.setStatus(FileUploadStatus.COMPLETED);
@@ -307,31 +331,26 @@ public abstract class AbstractFileService implements FileService {
         return fileInfoVO;
     }
 
-    protected String calculateMD5(String filePath) throws IOException{
-        Path path = Paths.get(filePath);
-        return calculateMD5(path);
+
+    protected InputStream download(String fileUrl){
+        String[] parsePath = parsePath(fileUrl);
+        return download(parsePath[parsePath.length - 2],parsePath[parsePath.length - 1]);
     }
 
-    protected String calculateMD5(Path path) throws IOException {
-        return calculateMD5(Files.newInputStream(path));
-    }
-
-    protected String calculateMD5(InputStream inputStream) throws IOException {
-        try (inputStream) {
-            MessageDigest messageDigest = MessageDigest.getInstance("MD5");
-            byte[] buffer = new byte[8192];
-            int bytesRead;
-
-            while ((bytesRead = inputStream.read(buffer)) != -1) {
-                messageDigest.update(buffer, 0, bytesRead);
+    protected void calculateMD5Async(String uploadId,String url){
+        defaultThreadPool.execute(() -> {
+            try (InputStream inputStream = download(url)){
+                String md5 = MD5Utils.getMD5(inputStream);
+                UpdateWrapper<FileUpload> fileUploadUpdateWrapper = new UpdateWrapper<>();
+                fileUploadUpdateWrapper
+                        .lambda()
+                        .set(FileUpload::getMd5,md5)
+                        .eq(FileUpload::getUploadId,uploadId);
+                fileUploadMapper.update(null,fileUploadUpdateWrapper);
+            }catch (Exception e){
+                log.error("文件md5计算异常; uploadId: {}",uploadId,e);
             }
-
-            byte[] md5Bytes = messageDigest.digest();
-            return Hex.encodeHexString(md5Bytes);  // 通过 Apache Commons Codec 将 MD5 转为字符串
-        } catch (NoSuchAlgorithmException e) {
-            log.error("MD5 algorithm not found", e);
-            throw new BusinessException("MD5 algorithm not found");
-        }
+        });
     }
 
     protected void streamFile(InputStream is, OutputStream outputStream) {

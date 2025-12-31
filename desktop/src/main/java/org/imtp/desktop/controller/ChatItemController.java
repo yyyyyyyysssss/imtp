@@ -420,6 +420,44 @@ public class ChatItemController extends AbstractController {
                 });
             }
         });
+
+        // 监听图片加载状态，更新进度
+        image.progressProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue.doubleValue() != 1.0) {
+                //加载中
+                stackPane.getChildren().clear();
+                anchorPane.getChildren().clear();
+                Rectangle gr = new Rectangle(0, 0, iv.getFitWidth(), iv.getFitHeight());
+                gr.setFill(new Color(0, 0, 0, 0.7));
+                gr.setArcWidth(15);
+                gr.setArcHeight(15);
+                //加载中
+                ProgressIndicator progressIndicator = new ProgressIndicator();
+                stackPane.getChildren().addAll(iv,progressIndicator);
+                anchorPane.getChildren().addAll(stackPane, gr);
+                AnchorPane.setBottomAnchor(gr, 0.0);
+            } else {
+                stackPane.getChildren().clear();
+                anchorPane.getChildren().clear();
+                Rectangle gr = new Rectangle(0, 0, iv.getFitWidth(), 50);
+                gr.setFill(GRADIENT_PAINT);
+                gr.setArcWidth(15);
+                gr.setArcHeight(15);
+                stackPane.getChildren().addAll(iv,new ImageView(videoPlayerIcon));
+                anchorPane.setOnMouseClicked(m -> {
+                    log.info("video player");
+                    VideoPlayerDialog videoPlayerDialog = VideoPlayerDialog.getInstance();
+                    videoPlayerDialog.showPane(url, messageMetadata.getWidth(), messageMetadata.getHeight());
+                });
+
+                anchorPane.getChildren().addAll(stackPane, gr, label);
+                //时间放在右下角
+                AnchorPane.setRightAnchor(label, 10.0);
+                AnchorPane.setBottomAnchor(label, 10.0);
+                AnchorPane.setBottomAnchor(gr, 0.0);
+            }
+        });
+
         return anchorPane;
     }
 
