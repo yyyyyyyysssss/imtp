@@ -132,6 +132,11 @@ public class GlobalExceptionHandler {
         return ResultGenerator.failed(ResultCode.FAILED,e.getMessage());
     }
 
+    @ExceptionHandler(IOException.class)
+    public void handleIOException(IOException e) {
+
+    }
+
     @ExceptionHandler(AsyncRequestNotUsableException.class)
     public void handleAsyncRequestNotUsableException(AsyncRequestNotUsableException e) {
 
