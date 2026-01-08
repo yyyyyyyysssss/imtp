@@ -1,5 +1,7 @@
 package org.imtp.api.config.security;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
@@ -65,6 +67,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @Description
@@ -228,7 +231,7 @@ public class SecurityConfig {
     @Bean
     public RequestPathAuthorizationManager requestPathAuthorizationManager() {
 
-        return new RequestPathAuthorizationManager();
+        return new RequestPathAuthorizationManager(permissionCache());
     }
 
     @Bean
@@ -304,8 +307,16 @@ public class SecurityConfig {
     @Bean
     public LogoutFilter logoutFilter() {
 
-        return new LogoutFilter((req, res, auth) -> {
-        },logoutService);
+        return new LogoutFilter(new CustomLogoutSuccessHandler(permissionCache()),logoutService);
+    }
+
+    // 用于缓存权限校验的结果
+    @Bean
+    public Cache<String, Boolean> permissionCache(){
+        return Caffeine.newBuilder()
+                .expireAfterWrite(60, TimeUnit.MINUTES)
+                .maximumSize(50000)
+                .build();
     }
 
     //密码加密  调试使用 生产环境使用BCryptPasswordEncoder
