@@ -36,8 +36,11 @@ public class RequestPathAuthorizationManager implements AuthorizationManager<Req
 
     private final Cache<String, Boolean> cache;
 
+    private final PathPatternRequestMatcher.Builder builder;
+
     public RequestPathAuthorizationManager(Cache<String, Boolean> permissionCache){
         this.cache = permissionCache;
+        builder = PathPatternRequestMatcher.withDefaults();
     }
 
     @Override
@@ -64,31 +67,40 @@ public class RequestPathAuthorizationManager implements AuthorizationManager<Req
             cache.put(cacheKey,false);
             return DENY;
         }
-        List<RequestUrlAuthority> requestUrlAuthorities = authorities.stream().map(m -> (RequestUrlAuthority) m).filter(f -> f.getUrls() != null && !CollectionUtils.isEmpty(f.getUrls())).toList();
+        List<RequestUrlAuthority> requestUrlAuthorities = authorities
+                .stream()
+                .filter(f -> f instanceof RequestUrlAuthority)
+                .map(m -> (RequestUrlAuthority) m)
+                .filter(f -> f.getUrls() != null && !CollectionUtils.isEmpty(f.getUrls()))
+                .toList();
         for (RequestUrlAuthority urlAuthority : requestUrlAuthorities){
             List<AuthorityUrl> urls = urlAuthority.getUrls();
-            if (urls == null || urls.isEmpty()){
-                continue;
-            }
-            boolean matched = false;
-            for (AuthorityUrl authorityUrl : urls){
-                if(authorityUrl.getMethod() != null && !authorityUrl.getMethod().isBlank() && !authorityUrl.getMethod().equals("*")){
-                    //如果有指定请求方法，则使用指定的请求方法
-                    matched = PathPatternRequestMatcher.withDefaults().matcher(HttpMethod.valueOf(authorityUrl.getMethod()),authorityUrl.getUrl()).matches(request);
-                }else {
-                    matched = PathPatternRequestMatcher.withDefaults().matcher(authorityUrl.getUrl()).matches(request);
-                }
-                if (matched){
-                    break;
-                }
-            }
-            if (matched){
+            if (matches(request,urls)){
                 cache.put(cacheKey,true); // 缓存通过结果
                 return AFFIRM;
             }
         }
         cache.put(cacheKey,false); // 缓存拒绝结果
         return DENY;
+    }
+
+    public boolean matches(HttpServletRequest request, List<AuthorityUrl> urls) {
+        if(CollectionUtils.isEmpty(urls)){
+            return false;
+        }
+        for (AuthorityUrl authorityUrl : urls){
+            boolean matches;
+            if(authorityUrl.getMethod() != null && !authorityUrl.getMethod().isBlank() && !authorityUrl.getMethod().equals("*")){
+                //如果有指定请求方法，则使用指定的请求方法
+                matches = builder.matcher(HttpMethod.valueOf(authorityUrl.getMethod()), authorityUrl.getUrl()).matches(request);
+            }else {
+                matches = builder.matcher(authorityUrl.getUrl()).matches(request);
+            }
+            if(matches){
+                return true;
+            }
+        }
+        return false;
     }
 
     // 生成缓存的 key（基于用户、请求路径、请求方法）
