@@ -27,66 +27,59 @@ const Message = React.memo(({ messageId, onContextMenu }) => {
     let messageStatusIcon;
     switch (status) {
         case MessageStatus.PENDING:
-            messageStatusIcon = <LoadingOutlined style={{ fontSize: '15px', display: 'none' }} />;
-            break
         case MessageStatus.SENT:
-            messageStatusIcon = <LoadingOutlined style={{ fontSize: '15px', display: 'none' }} />;
+            messageStatusIcon = <LoadingOutlined className="message-status-pending" />;
             break
         case MessageStatus.DELIVERED:
-            messageStatusIcon = <></>
+            messageStatusIcon = null
             break
         case MessageStatus.FAILED:
-            messageStatusIcon = <img src={sendFailIcon} alt='' style={{ width: '20px', height: '20px' }} />;
+            messageStatusIcon = <img src={sendFailIcon} alt='' className="message-status-failed" />;
             break
         default:
-            messageStatusIcon = <></>
+            messageStatusIcon = null
             break
     }
 
-    const renderItem = useCallback((type, self, status, content, contentMetadata) => {
+
+    const renderMessage = (type, content, contentMetadata, status, self) => {
         switch (type) {
             case MessageType.TEXT_MESSAGE:
-                return <TextMessage content={content} direction={self ? 'RIGHT' : 'LEFT'} />
+                return <TextMessage content={content} direction={self ? 'RIGHT' : 'LEFT'} />;
             case MessageType.IMAGE_MESSAGE:
-                return (
-                    <ProgressOverlayBox
-                        enabled={status && status === MessageStatus.PENDING}
-                        progress={progressInfo?.percentage}
-                    >
-                        <ImageMessage content={content} contentMetadata={contentMetadata} status={status} />
-                    </ProgressOverlayBox>
-                )
+                return <ImageMessage content={content} contentMetadata={contentMetadata} status={status} />;
             case MessageType.VIDEO_MESSAGE:
-                return (
-                    <ProgressOverlayBox
-                        enabled={status && status === MessageStatus.PENDING}
-                        progress={progressInfo?.percentage}
-                    >
-                        <VideoMessage content={content} contentMetadata={contentMetadata} status={status} />
-                    </ProgressOverlayBox>
-
-                )
+                return <VideoMessage content={content} contentMetadata={contentMetadata} status={status} />;
             case MessageType.VOICE_MESSAGE:
-                return (
-                    <VoiceMessage content={content} status={status} duration={contentMetadata.duration} direction={self ? 'RIGHT' : 'LEFT'} />
-                )
+                return <VoiceMessage content={content} status={status} duration={contentMetadata.duration} direction={self ? 'RIGHT' : 'LEFT'} />;
+            case MessageType.FILE_MESSAGE:
+                return <FileMessage content={content} status={status} filename={contentMetadata.name} fileSize={contentMetadata.sizeDesc} direction={self ? 'RIGHT' : 'LEFT'} />;
+            case MessageType.VOICE_CALL_MESSAGE:
+                return <VoiceCallMessage callStatus={contentMetadata.callStatus} duration={contentMetadata.duration} durationDesc={contentMetadata.durationDesc} self={self} />;
+            case MessageType.VIDEO_CALL_MESSAGE:
+                return <VideoCallMessage callStatus={contentMetadata.callStatus} duration={contentMetadata.duration} durationDesc={contentMetadata.durationDesc} self={self} />;
+            default:
+                return null;
+        }
+    }
+
+    const renderItem = useCallback((type, self, status, content, contentMetadata) => {
+        const isPending = status === MessageStatus.PENDING
+        const progress = progressInfo?.percentage
+        switch (type) {
+            case MessageType.IMAGE_MESSAGE:
+            case MessageType.VIDEO_MESSAGE:
             case MessageType.FILE_MESSAGE:
                 return (
-                    <ProgressOverlayBox
-                        enabled={status && status === MessageStatus.PENDING}
-                        progress={progressInfo?.percentage}
-                    >
-                        <FileMessage content={content} status={status} filename={contentMetadata.name} fileSize={contentMetadata.sizeDesc} direction={self ? 'RIGHT' : 'LEFT'} />
+                    <ProgressOverlayBox enabled={isPending} progress={progress}>
+                        {renderMessage(type, content, contentMetadata, status, self)}
                     </ProgressOverlayBox>
                 )
+            case MessageType.TEXT_MESSAGE:
+            case MessageType.VOICE_MESSAGE:
             case MessageType.VOICE_CALL_MESSAGE:
-                return (
-                    <VoiceCallMessage callStatus={contentMetadata.callStatus} duration={contentMetadata.duration} durationDesc={contentMetadata.durationDesc} self={self} />
-                )
             case MessageType.VIDEO_CALL_MESSAGE:
-                return (
-                    <VideoCallMessage callStatus={contentMetadata.callStatus} duration={contentMetadata.duration} durationDesc={contentMetadata.durationDesc} self={self} />
-                )
+                return renderMessage(type, content, contentMetadata, status, self)
             default:
         }
     }, [progressInfo])
@@ -94,7 +87,7 @@ const Message = React.memo(({ messageId, onContextMenu }) => {
     return (
         <Flex gap="small" style={{ flexDirection: self ? 'row-reverse' : '' }}>
             <Avatar size={45} shape="square" src={avatar} />
-            <Flex flex={1} style={{ width: '100%',overflow: 'hidden' }} gap="small" justify='center' align={self ? 'end' : 'start'} vertical>
+            <Flex flex={1} style={{ width: '100%', overflow: 'hidden' }} gap="small" justify='center' align={self ? 'end' : 'start'} vertical>
                 {!self && deliveryMethod === 'GROUP' && (
                     <Flex>
                         <label className='chat-item-label-name'>{name}</label>

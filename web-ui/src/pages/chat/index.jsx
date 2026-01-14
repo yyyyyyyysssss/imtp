@@ -201,7 +201,7 @@ const Chat = (props) => {
     const items = useMemo(() => {
         return result.map((id) => ({
             key: id,
-            forceRender: false,
+            forceRender: true,
             label: <UserSessionItem sessionId={id} />,
             children: <ChatItem sessionId={id} />
         }))

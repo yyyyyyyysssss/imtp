@@ -84,6 +84,8 @@ public class MinioFileServiceImpl extends AbstractFileService {
     @Override
     public FileStreamVO getFileStream(String bucketName, String objectName, FileRangeDTO range) {
         Map<String, String> headerMap = new HashMap<>();
+        // 表示支持分段加载
+        headerMap.put(HttpHeaders.ACCEPT_RANGES,"bytes");
         GetObjectResponse objectResponse;
         // 如果没有指定范围，则直接下载整个文件
         if (range == null) {
@@ -97,6 +99,7 @@ public class MinioFileServiceImpl extends AbstractFileService {
         }
         //指定范围时 先获取文件信息
         StatObjectResponse statObjectResponse = minioHelper.statObject(bucketName, objectName);
+        headerMap.put(HttpHeaders.CONTENT_TYPE, statObjectResponse.contentType());
         long size = statObjectResponse.size();
         //验证范围
         validateRange(range, size);
@@ -108,10 +111,8 @@ public class MinioFileServiceImpl extends AbstractFileService {
         //设置请求头
         headerMap.put(HttpHeaders.CONTENT_RANGE, "bytes " + start + "-" + end + "/" + size);
         headerMap.put(HttpHeaders.CONTENT_LENGTH, String.valueOf(length));
-        headerMap.put(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_OCTET_STREAM_VALUE);
         //读取
         GetObjectResponse rangeObjectResponse = minioHelper.download(bucketName, objectName, start, length);
-
         return new FileStreamVO(outputStream -> streamFile(rangeObjectResponse, outputStream), headerMap);
     }
 

@@ -112,6 +112,7 @@ public class LocalFileServiceImpl extends AbstractFileService {
     @Override
     public FileStreamVO getFileStream(String bucketName, String objectName, FileRangeDTO range) {
         Map<String, String> headerMap = new HashMap<>();
+        headerMap.put(HttpHeaders.ACCEPT_RANGES,"bytes");
         try {
             String newFilePath = tmpdir + bucketName + File.separator + objectName;
             headerMap.put("Content-Type", Files.probeContentType(Paths.get(newFilePath)));

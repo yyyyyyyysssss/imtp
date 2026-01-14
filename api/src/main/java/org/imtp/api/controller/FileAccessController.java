@@ -11,6 +11,7 @@ import org.imtp.api.service.FileService;
 import org.imtp.common.response.Result;
 import org.imtp.common.response.ResultGenerator;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -49,10 +50,17 @@ public class FileAccessController {
             // 将文件头信息添加到响应头中
             headerMap.forEach(httpHeaders::add);
         }
-        if(fileRangeDTO == null && type != null && (type.equalsIgnoreCase("download") || type.equalsIgnoreCase("d"))) {
-            // 设置响应头以指示下载
-            httpHeaders.setContentDispositionFormData("attachment", objectName);
-            httpHeaders.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+        if(fileRangeDTO == null) {
+            if(type != null && (type.equalsIgnoreCase("download") || type.equalsIgnoreCase("d"))){
+                // 设置响应头以指示下载
+                httpHeaders.setContentDispositionFormData("attachment", objectName);
+                httpHeaders.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+            }
+        } else {
+            // 返回部分内容（206）
+            return ResponseEntity.status(HttpStatus.PARTIAL_CONTENT)
+                    .headers(httpHeaders)
+                    .body(streamingResponseBody);
         }
         return ResponseEntity.ok()
                 .headers(httpHeaders)
