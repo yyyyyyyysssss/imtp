@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Hex;
 import org.imtp.api.config.exception.BusinessException;
 import org.imtp.api.domain.dto.FileRangeDTO;
+import org.imtp.api.domain.entity.FileUpload;
 import org.imtp.api.domain.vo.FileStreamVO;
 import org.imtp.api.enums.FileStorageType;
 import org.imtp.api.utils.MD5Utils;
@@ -20,6 +21,7 @@ import java.nio.file.StandardCopyOption;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
+import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -112,41 +114,45 @@ public class LocalFileServiceImpl extends AbstractFileService {
     @Override
     public FileStreamVO getFileStream(String bucketName, String objectName, FileRangeDTO range) {
         Map<String, String> headerMap = new HashMap<>();
-        headerMap.put(HttpHeaders.ACCEPT_RANGES,"bytes");
         try {
             String newFilePath = tmpdir + bucketName + File.separator + objectName;
-            headerMap.put("Content-Type", Files.probeContentType(Paths.get(newFilePath)));
+            FileUpload fileUpload = getFileUploadByOriginUrl(newFilePath);
+            headerMap.put(HttpHeaders.ACCEPT_RANGES,"bytes");
+            headerMap.put(HttpHeaders.CONTENT_TYPE, fileUpload.getFileType());
+            headerMap.put(HttpHeaders.ETAG,fileUpload.getEtag());
+            headerMap.put(HttpHeaders.LAST_MODIFIED,fileUpload.getUpdateTime().atZone(ZoneId.systemDefault()).toString());
             File file = new File(newFilePath);
+            long length = file.length();
             if (range != null) {
                 if (range.getStart() < 0 || (range.getEnd() != -1 && range.getEnd() >= file.length())) {
                     throw new BusinessException("Invalid range: The range exceeds the file size.");
                 }
-                headerMap.put(HttpHeaders.CONTENT_RANGE, "bytes " + range.getStart() + "-" + (range.getEnd() == -1 ? file.length() - 1 : range.getEnd()) + "/" + file.length());
-                long length;
                 if (range.getEnd() == -1) {
                     length = file.length() - range.getStart();
                 } else {
                     length = range.getEnd() - range.getStart() + 1;
                 }
-                headerMap.put(HttpHeaders.CONTENT_LENGTH, String.valueOf(length));
+                //设置请求头
+                headerMap.put(HttpHeaders.CONTENT_RANGE, "bytes " + range.getStart() + "-" + (range.getEnd() == -1 ? file.length() - 1 : range.getEnd()) + "/" + file.length());
             }
+            headerMap.put(HttpHeaders.CONTENT_LENGTH, String.valueOf(length));
             StreamingResponseBody responseBody = outputStream -> {
                 if (range != null) {
                     try (RandomAccessFile randomAccessFile = new RandomAccessFile(newFilePath, "r")) {
                         long start = range.getStart();
-                        long length;
+                        long len;
                         // 如果 range.getEnd() 为 -1，表示下载到文件末尾
                         if (range.getEnd() == -1) {
-                            length = file.length() - range.getStart();
+                            len = file.length() - range.getStart();
                         } else {
-                            length = range.getEnd() - range.getStart();
+                            len = range.getEnd() - range.getStart();
                         }
                         randomAccessFile.seek(start);
                         byte[] buffer = new byte[bufferSize];
                         int bytesRead;
-                        while (length > 0 && (bytesRead = randomAccessFile.read(buffer, 0, (int) Math.min(bufferSize, length))) != -1) {
+                        while (len > 0 && (bytesRead = randomAccessFile.read(buffer, 0, (int) Math.min(bufferSize, len))) != -1) {
                             outputStream.write(buffer, 0, bytesRead);
-                            length -= bytesRead;
+                            len -= bytesRead;
                         }
                     } catch (IOException e) {
                         log.error("getFileStream error: ", e);

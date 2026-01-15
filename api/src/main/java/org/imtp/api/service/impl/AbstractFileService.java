@@ -39,6 +39,7 @@ import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -107,7 +108,8 @@ public abstract class AbstractFileService implements FileService {
                 .uploadedChunkCount(0)
                 .status(FileUploadStatus.PENDING)
                 .storageType(fileStorageType())
-                .createTime(new Date())
+                .createTime(LocalDateTime.now())
+                .updateTime(LocalDateTime.now())
                 .build();
         String newFilename = newFilename(fileInfoDTO.getFilename());
         String fileType = StringUtils.isEmpty(fileInfoDTO.getFileType()) ?  "application/octet-stream" : fileInfoDTO.getFileType();
@@ -288,7 +290,8 @@ public abstract class AbstractFileService implements FileService {
                 .fileType(fileType)
                 .totalChunk(1)
                 .uploadedChunkCount(1)
-                .createTime(new Date())
+                .createTime(LocalDateTime.now())
+                .updateTime(LocalDateTime.now())
                 .build();
         try (InputStream in = inputStream){
             long size = inputStream.available();
@@ -369,6 +372,17 @@ public abstract class AbstractFileService implements FileService {
             // 处理异常
             log.error("文件传输过程中发生错误: {}", e.getMessage());
         }
+    }
+
+    protected FileUpload getFileUploadByOriginUrl(String originUrl){
+        if(originUrl == null || originUrl.isEmpty()){
+            throw new NullPointerException("originUrl is null");
+        }
+        QueryWrapper<FileUpload> fileUploadQueryWrapper = new QueryWrapper<>();
+        fileUploadQueryWrapper
+                .lambda()
+                .eq(FileUpload::getOriginalUrl,originUrl);
+        return fileUploadMapper.selectOne(fileUploadQueryWrapper);
     }
 
     private boolean isClientAbort(Throwable e) {

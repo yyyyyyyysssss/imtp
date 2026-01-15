@@ -10,6 +10,9 @@ import lombok.Setter;
 import lombok.experimental.Tolerate;
 import org.imtp.api.enums.FileStorageType;
 import org.imtp.api.enums.FileUploadStatus;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 /**
@@ -71,9 +74,9 @@ public class FileUpload {
     private FileStorageType storageType;
 
     @TableField("create_time")
-    private Date createTime;
+    private LocalDateTime createTime;
 
     @TableField("update_time")
-    private Date updateTime;
+    private LocalDateTime updateTime;
 
 }

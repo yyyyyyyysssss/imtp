@@ -10,15 +10,13 @@ import org.imtp.api.domain.vo.FileStreamVO;
 import org.imtp.api.service.FileService;
 import org.imtp.common.response.Result;
 import org.imtp.common.response.ResultGenerator;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 @RequestMapping("/file")
 @RestController
@@ -40,7 +38,16 @@ public class FileAccessController {
     public ResponseEntity<StreamingResponseBody> getFile(@PathVariable("bucketName") String bucketName,
                                                          @PathVariable("objectName") String objectName,
                                                          @RequestParam(required = false,value = "type") String type,
-                                                         @RequestHeader(value = HttpHeaders.RANGE, required = false) String range) {
+                                                         @RequestHeader(value = HttpHeaders.RANGE, required = false) String range,
+                                                         @RequestHeader(value = HttpHeaders.IF_NONE_MATCH, required = false) String etag) {
+        if(etag != null && !etag.isEmpty()){
+            HttpHeaders headers = new HttpHeaders();
+            headers.set(HttpHeaders.ETAG, etag);
+            return ResponseEntity
+                    .status(HttpStatus.NOT_MODIFIED)
+                    .headers(headers)
+                    .build();
+        }
         HttpHeaders httpHeaders = new HttpHeaders();
         FileRangeDTO fileRangeDTO = parseRange(range);
         FileStreamVO fileStream = fileService.getFileStream(bucketName, objectName, fileRangeDTO);
@@ -60,10 +67,12 @@ public class FileAccessController {
             // 返回部分内容（206）
             return ResponseEntity.status(HttpStatus.PARTIAL_CONTENT)
                     .headers(httpHeaders)
+                    .cacheControl(CacheControl.maxAge(1, TimeUnit.DAYS).cachePublic())
                     .body(streamingResponseBody);
         }
         return ResponseEntity.ok()
                 .headers(httpHeaders)
+                .cacheControl(CacheControl.maxAge(1, TimeUnit.DAYS).cachePublic())
                 .body(streamingResponseBody);
     }
 
