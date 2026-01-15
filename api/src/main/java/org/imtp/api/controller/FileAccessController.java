@@ -67,12 +67,12 @@ public class FileAccessController {
             // 返回部分内容（206）
             return ResponseEntity.status(HttpStatus.PARTIAL_CONTENT)
                     .headers(httpHeaders)
-                    .cacheControl(CacheControl.maxAge(1, TimeUnit.DAYS).cachePublic())
+                    .cacheControl(CacheControl.maxAge(1, TimeUnit.DAYS).cachePublic().immutable())
                     .body(streamingResponseBody);
         }
         return ResponseEntity.ok()
                 .headers(httpHeaders)
-                .cacheControl(CacheControl.maxAge(1, TimeUnit.DAYS).cachePublic())
+                .cacheControl(CacheControl.maxAge(1, TimeUnit.DAYS).cachePublic().immutable())
                 .body(streamingResponseBody);
     }
 
