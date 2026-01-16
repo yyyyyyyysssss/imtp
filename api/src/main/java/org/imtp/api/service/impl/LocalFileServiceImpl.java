@@ -41,7 +41,7 @@ public class LocalFileServiceImpl extends AbstractFileService {
 
 
     @Override
-    public String uploadId(String filename, String fileType) {
+    public String getUploadId(String objectName, String fileType) {
         return UUID.randomUUID().toString().replaceAll("-", "");
     }
 
@@ -51,8 +51,8 @@ public class LocalFileServiceImpl extends AbstractFileService {
     }
 
     @Override
-    public String storePart(String uploadId, InputStream inputStream, String filename, Long chunkSize, Integer chunkIndex, Long partSize) {
-        String tmpFilePath = newFilePath(uploadId) + ".tmp";
+    public String storePart(String uploadId, InputStream inputStream, String objectName, Long chunkSize, Integer chunkIndex, Long partSize) {
+        String tmpFilePath = buildFilePath(objectName) + ".tmp";
         try (RandomAccessFile raf = new RandomAccessFile(tmpFilePath, "rw")) {
             raf.seek(chunkIndex * chunkSize);
 
@@ -80,16 +80,16 @@ public class LocalFileServiceImpl extends AbstractFileService {
     }
 
     @Override
-    public Tuple2<String, String> mergePart(String uploadId, String filename, Integer totalChunk) {
-        String tmpFilePath = newFilePath(uploadId) + ".tmp";
+    public Tuple2<String, String> mergePart(String uploadId, String objectName, Integer totalChunk) {
+        String tmpFilePath = buildFilePath(objectName) + ".tmp";
         Path tmpPath = Paths.get(tmpFilePath);
-        String newFilePath = newFilePath(filename);
-        Path path = Paths.get(newFilePath);
+        String filePath = buildFilePath(objectName);
+        Path path = Paths.get(filePath);
         try {
             Files.move(tmpPath, path, StandardCopyOption.REPLACE_EXISTING);
-            String etag = MD5Utils.getMD5(new File(newFilePath));
-            log.info("upload success; filename:{}, accessUrl:{}", filename, newFilePath);
-            return new Tuple2<>(etag, newFilePath);
+            String etag = MD5Utils.getMD5(new File(filePath));
+            log.info("upload success; objectName:{}, accessUrl:{}", objectName, filePath);
+            return new Tuple2<>(etag, filePath);
         } catch (IOException | NoSuchAlgorithmException e) {
             log.error("upload  Files.move error: ", e);
             throw new BusinessException(e);
@@ -103,9 +103,9 @@ public class LocalFileServiceImpl extends AbstractFileService {
 
     @Override
     public InputStream download(String bucketName, String objectName) {
-        String newFilePath = tmpdir + bucketName + File.separator + objectName;
+        String filePath = buildFilePath(bucketName,objectName);
         try {
-            return new FileInputStream(newFilePath);
+            return new FileInputStream(filePath);
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
         }
@@ -115,13 +115,12 @@ public class LocalFileServiceImpl extends AbstractFileService {
     public FileStreamVO getFileStream(String bucketName, String objectName, FileRangeDTO range) {
         Map<String, String> headerMap = new HashMap<>();
         try {
-            String newFilePath = tmpdir + bucketName + File.separator + objectName;
-            FileUpload fileUpload = getFileUploadByOriginUrl(newFilePath);
+            FileUpload fileUpload = getFileUpload(bucketName,objectName);
             headerMap.put(HttpHeaders.ACCEPT_RANGES,"bytes");
             headerMap.put(HttpHeaders.CONTENT_TYPE, fileUpload.getFileType());
             headerMap.put(HttpHeaders.ETAG,fileUpload.getEtag());
             headerMap.put(HttpHeaders.LAST_MODIFIED,fileUpload.getUpdateTime().atZone(ZoneId.systemDefault()).toString());
-            File file = new File(newFilePath);
+            File file = new File(fileUpload.getOriginalUrl());
             long length = file.length();
             if (range != null) {
                 if (range.getStart() < 0 || (range.getEnd() != -1 && range.getEnd() >= file.length())) {
@@ -138,7 +137,7 @@ public class LocalFileServiceImpl extends AbstractFileService {
             headerMap.put(HttpHeaders.CONTENT_LENGTH, String.valueOf(length));
             StreamingResponseBody responseBody = outputStream -> {
                 if (range != null) {
-                    try (RandomAccessFile randomAccessFile = new RandomAccessFile(newFilePath, "r")) {
+                    try (RandomAccessFile randomAccessFile = new RandomAccessFile(fileUpload.getOriginalUrl(), "r")) {
                         long start = range.getStart();
                         long len;
                         // 如果 range.getEnd() 为 -1，表示下载到文件末尾
@@ -159,7 +158,7 @@ public class LocalFileServiceImpl extends AbstractFileService {
                         throw new BusinessException("getFileStream error: " + e.getMessage());
                     }
                 } else {
-                    streamFile(new FileInputStream(newFilePath), outputStream);
+                    streamFile(new FileInputStream(fileUpload.getOriginalUrl()), outputStream);
                 }
             };
 
@@ -171,12 +170,12 @@ public class LocalFileServiceImpl extends AbstractFileService {
     }
 
     @Override
-    public Tuple2<String, String> simpleUpload(InputStream inputStream, String filename, String contentType, Long size) {
-        String newFilePath = newFilePath(filename);
+    public Tuple2<String, String> simpleUpload(InputStream inputStream, String objectName, String contentType, Long size) {
+        String filePath = buildFilePath(objectName);
         FileOutputStream fileOutputStream = null;
         try {
             MessageDigest md = MessageDigest.getInstance("MD5");
-            fileOutputStream = new FileOutputStream(newFilePath);
+            fileOutputStream = new FileOutputStream(filePath);
             byte[] buffer = new byte[bufferSize];
             int n;
             while ((n = inputStream.read(buffer)) != -1) {
@@ -185,7 +184,7 @@ public class LocalFileServiceImpl extends AbstractFileService {
             }
             byte[] md5Bytes = md.digest();
             String etag = Hex.encodeHexString(md5Bytes);
-            return new Tuple2<>(etag, newFilePath);
+            return new Tuple2<>(etag, filePath);
         } catch (Exception e) {
             log.error("simpleUpload error: ", e);
             throw new BusinessException("simpleUpload error: " + e.getMessage());
@@ -207,8 +206,29 @@ public class LocalFileServiceImpl extends AbstractFileService {
         }
     }
 
-    private String newFilePath(String filename) {
-        String basePath = tmpdir + bucketName + File.separator;
+    @Override
+    protected String bucketName() {
+        return bucketName;
+    }
+
+    private String buildFilePath(String objectName){
+
+        return buildFilePath(bucketName(),objectName);
+    }
+
+    private String buildFilePath(String bucketName, String objectName) {
+        String pathSeparator = pathSeparator();
+        String basePath = tmpdir + bucketName;
+        String parentDirectory = new File(objectName).getParent();
+        if(parentDirectory != null){
+            if(parentDirectory.startsWith(pathSeparator)){
+                basePath += parentDirectory + pathSeparator;
+            } else {
+                basePath += pathSeparator + parentDirectory + pathSeparator;
+            }
+        } else {
+            basePath += pathSeparator;
+        }
         File directory = new File(basePath);
         if (!directory.exists()) {
             boolean created = directory.mkdirs();
@@ -216,11 +236,6 @@ public class LocalFileServiceImpl extends AbstractFileService {
                 throw new BusinessException("Failed to create directory: " + basePath);
             }
         }
-        return basePath + filename;
-    }
-
-    @Override
-    public String pathSeparator() {
-        return File.separator;
+        return basePath + new File(objectName).getName();
     }
 }

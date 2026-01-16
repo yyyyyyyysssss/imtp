@@ -21,6 +21,8 @@ public interface FileService {
 
     String checkMD5(String md5);
 
+    String pathSeparator();
+
     String getUploadId(FileInfoDTO fileInfoDTO);
 
     FileUploadChunkVO uploadChunk(FileChunkDTO fileChunkDTO);

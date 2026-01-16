@@ -39,6 +39,7 @@ public class ControllerLogAspect {
         simpleModule.addSerializer(HttpServletRequest.class, new HttpServletRequestSerializer());
         simpleModule.addSerializer(HttpServletResponse.class, new HttpServletResponseSerializer());
         OBJECT_MAPPER.registerModule(simpleModule);
+        OBJECT_MAPPER.findAndRegisterModules();
     }
 
     //切点

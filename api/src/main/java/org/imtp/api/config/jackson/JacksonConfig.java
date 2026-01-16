@@ -24,6 +24,7 @@ public class JacksonConfig {
 
         // 注册模块
         objectMapper.registerModule(module);
+        objectMapper.findAndRegisterModules();
         return objectMapper;
     }
 

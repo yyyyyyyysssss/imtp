@@ -5,7 +5,6 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import groovy.lang.Tuple2;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.lang3.StringUtils;
 import org.imtp.api.config.exception.BusinessException;
 import org.imtp.api.config.exception.DatabaseException;
@@ -25,27 +24,18 @@ import org.imtp.api.utils.MD5Utils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.context.request.async.AsyncRequestNotUsableException;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
-import java.util.regex.Pattern;
 
 /**
  * @Description
@@ -65,7 +55,7 @@ public abstract class AbstractFileService implements FileService {
     private final String totalChunkField = "totalChunk";
     private final String totalSizeField = "totalSize";
     private final String uploadedChunkCountField = "uploadedChunkCount";
-    private final String newFilenameField = "newFilenameField";
+    private final String objectNameField = "objectNameField";
     private final String accessUrlField = "accessUrlField";
 
     @Value("${api.endpoint}")
@@ -77,6 +67,17 @@ public abstract class AbstractFileService implements FileService {
     @Resource
     private ExecutorService defaultThreadPool;
 
+    protected abstract String getUploadId(String objectName,String fileType);
+
+    protected abstract FileStorageType fileStorageType();
+
+    protected abstract String storePart(String uploadId,InputStream inputStream,String objectName,Long chunkSize,Integer chunkIndex,Long partSize);
+
+    protected abstract Tuple2<String, String> mergePart(String uploadId, String objectName, Integer totalChunk);
+
+    protected abstract Tuple2<String, String> simpleUpload(InputStream inputStream,String objectName,String contentType,Long size);
+
+    protected abstract String bucketName();
 
     @Override
     @Cacheable(value = "file:upload:check", key = "#md5", unless="#result == null")
@@ -97,24 +98,11 @@ public abstract class AbstractFileService implements FileService {
 
     @Override
     public String getUploadId(FileInfoDTO fileInfoDTO) {
-        FileUpload fileUpload = FileUpload
-                .builder()
-                .id(IdGen.genId())
-                .fileName(fileInfoDTO.getFilename())
-                .fileType(fileInfoDTO.getFileType())
-                .totalSize(fileInfoDTO.getTotalSize())
-                .totalChunk(fileInfoDTO.getTotalChunk())
-                .chunkSize(fileInfoDTO.getChunkSize())
-                .uploadedChunkCount(0)
-                .status(FileUploadStatus.PENDING)
-                .storageType(fileStorageType())
-                .createTime(LocalDateTime.now())
-                .updateTime(LocalDateTime.now())
-                .build();
-        String newFilename = newFilename(fileInfoDTO.getFilename());
+        FileUpload fileUpload = createFileUpload(fileInfoDTO);
         String fileType = StringUtils.isEmpty(fileInfoDTO.getFileType()) ?  "application/octet-stream" : fileInfoDTO.getFileType();
-        String uploadId = uploadId(newFilename,fileType);
+        String uploadId = getUploadId(fileUpload.getObjectName(),fileType);
         fileUpload.setUploadId(uploadId);
+        fileUpload.setObjectName(fileUpload.getObjectName());
         int i = fileUploadMapper.insert(fileUpload);
         if (i == 0){
             throw new DatabaseException("文件上传落库失败");
@@ -123,21 +111,11 @@ public abstract class AbstractFileService implements FileService {
         map.put(totalSizeField,fileInfoDTO.getTotalSize());
         map.put(totalChunkField,fileInfoDTO.getTotalChunk());
         map.put(uploadedChunkCountField,0);
-        map.put(newFilenameField,newFilename);
+        map.put(objectNameField,fileUpload.getObjectName());
         map.put(accessUrlField,null);
         redisHelper.addHash(uploadPrefix + uploadId,map, Duration.ofHours(24));
         return uploadId;
     }
-
-    public abstract String uploadId(String filename,String fileType);
-
-    public abstract FileStorageType fileStorageType();
-
-    public abstract String storePart(String uploadId,InputStream inputStream,String filename,Long chunkSize,Integer chunkIndex,Long partSize);
-
-    public abstract Tuple2<String, String> mergePart(String uploadId, String filename, Integer totalChunk);
-
-    public abstract String pathSeparator();
 
     @Override
     @Transactional(noRollbackFor = BusinessException.class)
@@ -150,14 +128,14 @@ public abstract class AbstractFileService implements FileService {
         if(map == null || map.isEmpty()){
             throw new BusinessException("上传任务不存在或已过期: " + uploadId);
         }
-        String filename = (String) map.get(newFilenameField);
+        String objectName = (String) map.get(objectNameField);
         Long totalSize = Long.parseLong(map.get(totalSizeField).toString());
         Long totalChunk = Long.parseLong(map.get(totalChunkField).toString());
         log.debug("uploadId:{}, totalSize:{}, totalChunk:{}, chunkIndex:{}, chunkSize:{}, partSize:{}", uploadId, totalSize, totalChunk, chunkIndex, chunkSize,file.getSize());
         InputStream inputStream = null;
         try {
             inputStream = file.getInputStream();
-            String chunkEtag = storePart(uploadId, inputStream, filename, chunkSize, chunkIndex, file.getSize());
+            String chunkEtag = storePart(uploadId, inputStream, objectName, chunkSize, chunkIndex, file.getSize());
             //获取已上传的块数
             Long uploadedChunkNum = redisHelper.incrHash(uploadPrefix + uploadId, uploadedChunkCountField);
             if (log.isDebugEnabled()){
@@ -165,22 +143,23 @@ public abstract class AbstractFileService implements FileService {
                 log.debug("上传进度:{}, totalChunk:{}, uploadedChunkNum:{}",progress,totalChunk,uploadedChunkNum);
             }
             if (totalChunk.equals(uploadedChunkNum)){
-                Tuple2<String, String> tuple2 = mergePart(uploadId, filename, totalChunk.intValue());
-
+                Tuple2<String, String> tuple2 = mergePart(uploadId, objectName, totalChunk.intValue());
                 String etag = tuple2.getV1();
                 String originalUrl = tuple2.getV2();
-                String accessUrl = createAccessUrl(originalUrl);
+                String accessUrl = createAccessUrl(objectName);
                 UpdateWrapper<FileUpload> updateWrapper = new UpdateWrapper<>();
-                updateWrapper.set("access_url",accessUrl);
-                updateWrapper.set("original_url",originalUrl);
-                updateWrapper.set("uploaded_chunk_count",uploadedChunkNum);
-                updateWrapper.set("status",FileUploadStatus.COMPLETED);
-                updateWrapper.set("etag",etag);
-                updateWrapper.eq("upload_id",uploadId);
+                updateWrapper
+                        .lambda()
+                        .set(FileUpload::getAccessUrl,accessUrl)
+                        .set(FileUpload::getOriginalUrl,originalUrl)
+                        .set(FileUpload::getUploadedChunkCount,uploadedChunkNum)
+                        .set(FileUpload::getStatus,FileUploadStatus.COMPLETED)
+                        .set(FileUpload::getEtag,etag)
+                        .eq(FileUpload::getUploadId,uploadId);
                 fileUploadMapper.update(null, updateWrapper);
                 redisHelper.addHash(uploadPrefix + uploadId,accessUrlField,accessUrl,Duration.ofMinutes(5));
                 // 异步计算md5
-                calculateMD5Async(uploadId,originalUrl);
+                calculateMD5Async(uploadId,objectName);
             }
             FileUploadChunkVO fileUploadChunkVO = new FileUploadChunkVO();
             fileUploadChunkVO.setUploadId(uploadId);
@@ -191,9 +170,10 @@ public abstract class AbstractFileService implements FileService {
         } catch (Exception e) {
             Object uploadedChunkNum = redisHelper.getHash(uploadPrefix + uploadId, uploadedChunkCountField);
             UpdateWrapper<FileUpload> updateWrapper = new UpdateWrapper<>();
-            updateWrapper.set("status",FileUploadStatus.FAILED);
-            updateWrapper.set("uploaded_chunk_count",uploadedChunkNum);
-            updateWrapper.eq("upload_id",uploadId);
+            updateWrapper.lambda()
+                    .set(FileUpload::getUploadedChunkCount,uploadedChunkNum)
+                    .set(FileUpload::getStatus,FileUploadStatus.FAILED)
+                    .eq(FileUpload::getUploadId,uploadId);
             fileUploadMapper.update(null, updateWrapper);
             throw new BusinessException(e);
         }finally {
@@ -205,14 +185,6 @@ public abstract class AbstractFileService implements FileService {
                 }
             }
         }
-    }
-
-    private String newFilename(String originFilename){
-        if (StringUtils.isEmpty(originFilename)){
-            throw new NullPointerException("文件名称不可为空");
-        }
-        String fileSuffix = originFilename.substring(originFilename.lastIndexOf("."));
-        return UUID.randomUUID().toString().replaceAll("-","") + fileSuffix;
     }
 
     private String calculateProgress(long uploadedChunkNum,long totalChunk) {
@@ -264,8 +236,6 @@ public abstract class AbstractFileService implements FileService {
         return fileUpload.getAccessUrl();
     }
 
-    public abstract Tuple2<String, String> simpleUpload(InputStream inputStream,String filename,String contentType,Long size);
-
     @Override
     public String uploadSingleFile(MultipartFile file) {
         InputStream inputStream = null;
@@ -274,33 +244,22 @@ public abstract class AbstractFileService implements FileService {
         } catch (IOException e) {
             throw new BusinessException(e);
         }
-        String filename = newFilename(file.getOriginalFilename());
-        String contentType = file.getContentType();
-        return uploadSingleFile(inputStream, filename, contentType);
+        return uploadSingleFile(inputStream, file.getOriginalFilename(), file.getContentType());
     }
 
     @Override
     public String uploadSingleFile(InputStream inputStream, String fileName, String fileType) {
-        FileUpload fileUpload = FileUpload
-                .builder()
-                .id(IdGen.genId())
-                .uploadId(UUID.randomUUID().toString().replaceAll("-",""))
-                .storageType(fileStorageType())
-                .fileName(fileName)
-                .fileType(fileType)
-                .totalChunk(1)
-                .uploadedChunkCount(1)
-                .createTime(LocalDateTime.now())
-                .updateTime(LocalDateTime.now())
-                .build();
+        FileUpload fileUpload = null;
         try (InputStream in = inputStream){
             long size = inputStream.available();
-            fileUpload.setTotalSize(size);
-            fileUpload.setChunkSize((int)size);
-            Tuple2<String, String> tuple2 = simpleUpload(in, fileName, fileType, size);
+            fileUpload = createFileUpload(fileName, fileType, size, 1, (int) size);
+            fileUpload.setUploadId(UUID.randomUUID().toString().replaceAll("-",""));
+            fileUpload.setUploadedChunkCount(1);
+
+            Tuple2<String, String> tuple2 = simpleUpload(in, fileUpload.getObjectName(), fileType, size);
             String etag = tuple2.getV1();
             String originalUrl = tuple2.getV2();
-            String accessUrl = createAccessUrl(originalUrl);
+            String accessUrl = createAccessUrl(fileUpload.getObjectName());
             fileUpload.setEtag(etag);
             fileUpload.setMd5(etag);
             fileUpload.setAccessUrl(accessUrl);
@@ -310,39 +269,38 @@ public abstract class AbstractFileService implements FileService {
             return accessUrl;
         } catch (IOException e) {
             log.error("upload error: ",e);
-            fileUpload.setStatus(FileUploadStatus.FAILED);
-            fileUploadMapper.insert(fileUpload);
+            if (fileUpload != null) {
+                fileUpload.setStatus(FileUploadStatus.FAILED);
+                fileUploadMapper.insert(fileUpload);  // 将失败的上传记录插入数据库
+            }
             throw new BusinessException(e);
         }
     }
 
     @Override
     public FileInfoVO getFileInfo(String bucketName, String objectName) {
-        String accessUrl = createAccessUrl(bucketName + pathSeparator() + objectName);
-        QueryWrapper<FileUpload> fileUploadQueryWrapper = new QueryWrapper<>();
-        fileUploadQueryWrapper
-                .lambda()
-                .eq(FileUpload::getAccessUrl, accessUrl);
-        FileUpload fileUpload = fileUploadMapper.selectOne(fileUploadQueryWrapper);
+        FileUpload fileUpload = getFileUpload(bucketName, objectName);
         if(fileUpload == null){
-            throw new BusinessException("文件不存在或已被删除: " + accessUrl);
+            throw new BusinessException("文件不存在或已被删除: " + objectName);
         }
         FileInfoVO fileInfoVO = new FileInfoVO();
         fileInfoVO.setFilename(fileUpload.getFileName());
         fileInfoVO.setFileType(fileUpload.getFileType());
         fileInfoVO.setTotalSize(fileUpload.getTotalSize());
+        fileInfoVO.setEtag(fileUpload.getEtag());
+        fileInfoVO.setMd5(fileUpload.getMd5());
+        fileInfoVO.setLastModified(fileUpload.getUpdateTime());
         return fileInfoVO;
     }
 
-
-    protected InputStream download(String fileUrl){
-        String[] parsePath = parsePath(fileUrl);
-        return download(parsePath[parsePath.length - 2],parsePath[parsePath.length - 1]);
+    @Override
+    public String pathSeparator() {
+        return File.separator;
     }
 
-    protected void calculateMD5Async(String uploadId,String url){
+    protected void calculateMD5Async(String uploadId,String objectName){
         defaultThreadPool.execute(() -> {
-            try (InputStream inputStream = download(url)){
+            try (InputStream inputStream = download(bucketName(),objectName)){
                 String md5 = MD5Utils.getMD5(inputStream);
                 UpdateWrapper<FileUpload> fileUploadUpdateWrapper = new UpdateWrapper<>();
                 fileUploadUpdateWrapper
@@ -374,14 +332,15 @@ public abstract class AbstractFileService implements FileService {
         }
     }
 
-    protected FileUpload getFileUploadByOriginUrl(String originUrl){
-        if(originUrl == null || originUrl.isEmpty()){
-            throw new NullPointerException("originUrl is null");
+    protected FileUpload getFileUpload(String bucketName, String objectName){
+        if(bucketName == null || bucketName.isEmpty() || objectName == null || objectName.isEmpty()){
+            throw new NullPointerException("bucketName or objectName is null");
         }
         QueryWrapper<FileUpload> fileUploadQueryWrapper = new QueryWrapper<>();
         fileUploadQueryWrapper
                 .lambda()
-                .eq(FileUpload::getOriginalUrl,originUrl);
+                .eq(FileUpload::getBucketName,bucketName)
+                .eq(FileUpload::getObjectName,objectName);
         return fileUploadMapper.selectOne(fileUploadQueryWrapper);
     }
 
@@ -396,26 +355,54 @@ public abstract class AbstractFileService implements FileService {
         return false;
     }
 
-    protected String createAccessUrl(String originalUrl) {
-        if (StringUtils.isEmpty(originalUrl)) {
-            throw new BusinessException("original url cannot be empty");
+    protected String createObjectName(String originFilename){
+        if (StringUtils.isEmpty(originFilename)){
+            throw new NullPointerException("文件名称不可为空");
         }
-        String[] parsePath = parsePath(originalUrl);
-        return apiEndpoint + "/file/" + parsePath[parsePath.length - 2] + "/" + parsePath[parsePath.length - 1];
+        String fileSuffix = originFilename.substring(originFilename.lastIndexOf("."));
+        return UUID.randomUUID().toString().replaceAll("-","") + fileSuffix;
     }
 
-    private String[] parsePath(String path) {
-
-        return removeProtocol(path).split(Pattern.quote(pathSeparator()));
+    protected String createAccessUrl(String objectName) {
+        if (StringUtils.isEmpty(objectName)) {
+            throw new BusinessException("objectName cannot be empty");
+        }
+        String pathSeparator = pathSeparator();
+        objectName = objectName.replace(pathSeparator, "/");
+        if (!objectName.startsWith("/")) {
+            objectName = "/" + objectName;
+        }
+        return apiEndpoint + "/file/" + bucketName() + objectName;
     }
 
-    private String removeProtocol(String url) {
-        try {
-            URI uri = new URI(url);
-            return uri.getPath();  // 获取去掉协议后的路径部分
-        } catch (URISyntaxException e) {
-            // 如果是无效的URL，可以返回原始字符串或根据需求处理
-            return url;
-        }
+    protected FileUpload createFileUpload(FileInfoDTO fileInfoDTO){
+
+        return createFileUpload(
+                fileInfoDTO.getFilename(),
+                fileInfoDTO.getFileType(),
+                fileInfoDTO.getTotalSize(),
+                fileInfoDTO.getTotalChunk(),
+                fileInfoDTO.getChunkSize()
+        );
+    }
+
+    protected FileUpload createFileUpload(String filename,String fileType,Long totalSize,Integer totalChunk,Integer chunkSize){
+        String objectName = createObjectName(filename);
+        return FileUpload
+                .builder()
+                .id(IdGen.genId())
+                .bucketName(bucketName())
+                .objectName(objectName)
+                .fileName(filename)
+                .fileType(fileType)
+                .totalSize(totalSize)
+                .totalChunk(totalChunk)
+                .chunkSize(chunkSize)
+                .uploadedChunkCount(0)
+                .status(FileUploadStatus.PENDING)
+                .storageType(fileStorageType())
+                .createTime(LocalDateTime.now())
+                .updateTime(LocalDateTime.now())
+                .build();
     }
 }

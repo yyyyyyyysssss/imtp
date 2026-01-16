@@ -37,6 +37,12 @@ public class FileUpload {
     @TableField("upload_id")
     private String uploadId;
 
+    @TableField("bucket_name")
+    private String bucketName;
+
+    @TableField("object_name")
+    private String objectName;
+
     @TableField("file_name")
     private String fileName;
 

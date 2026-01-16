@@ -13,6 +13,7 @@ import org.imtp.api.domain.entity.FileUpload;
 import org.imtp.api.domain.vo.FileStreamVO;
 import org.imtp.api.enums.FileStorageType;
 import org.imtp.api.mapper.FileUploadMapper;
+import org.springframework.context.annotation.Primary;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -27,7 +28,8 @@ import java.util.Map;
  * @Author ys
  * @Date 2024/8/19 10:19
  */
-@Service("fileService")
+@Primary
+@Service("minioFileService")
 @Slf4j
 public class MinioFileServiceImpl extends AbstractFileService {
 
@@ -43,18 +45,18 @@ public class MinioFileServiceImpl extends AbstractFileService {
     }
 
     @Override
-    public String uploadId(String filename, String fileType) {
-        return minioHelper.uploadId(filename, fileType);
+    public String getUploadId(String objectName, String fileType) {
+        return minioHelper.uploadId(objectName, fileType);
     }
 
     @Override
-    public String storePart(String uploadId, InputStream inputStream, String filename, Long chunkSize, Integer chunkIndex, Long partSize) {
-        return minioHelper.uploadPart(uploadId, inputStream, filename, chunkIndex, partSize);
+    public String storePart(String uploadId, InputStream inputStream, String objectName, Long chunkSize, Integer chunkIndex, Long partSize) {
+        return minioHelper.uploadPart(uploadId, inputStream, objectName, chunkIndex, partSize);
     }
 
     @Override
-    public Tuple2<String, String> mergePart(String uploadId, String filename, Integer totalChunk) {
-        return minioHelper.mergePart(uploadId, filename, totalChunk);
+    public Tuple2<String, String> mergePart(String uploadId, String objectName, Integer totalChunk) {
+        return minioHelper.mergePart(uploadId, objectName, totalChunk);
     }
 
     @Override
@@ -72,8 +74,8 @@ public class MinioFileServiceImpl extends AbstractFileService {
     }
 
     @Override
-    public Tuple2<String, String> simpleUpload(InputStream inputStream, String filename, String contentType, Long size) {
-        return minioHelper.upload(inputStream, filename, contentType, size);
+    public Tuple2<String, String> simpleUpload(InputStream inputStream, String objectName, String contentType, Long size) {
+        return minioHelper.upload(inputStream, objectName, contentType, size);
     }
 
     @Override
@@ -129,4 +131,8 @@ public class MinioFileServiceImpl extends AbstractFileService {
         return "/";
     }
 
+    @Override
+    protected String bucketName() {
+        return minioHelper.getBucketName();
+    }
 }

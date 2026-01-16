@@ -3,6 +3,8 @@ package org.imtp.api.domain.vo;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 /**
  * @Description
  * @Author ys
@@ -20,5 +22,11 @@ public class FileInfoVO {
 
     //文件总大小
     private Long totalSize;
+
+    private String etag;
+
+    private String md5;
+
+    private LocalDateTime lastModified;
 
 }
