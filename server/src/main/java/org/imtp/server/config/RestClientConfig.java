@@ -107,7 +107,7 @@ public class RestClientConfig {
                                 .setDefaultConnectionConfig(
                                         ConnectionConfig.custom()
                                                 //建立连接最大等待时长
-                                                .setConnectTimeout(Timeout.ofMinutes(1))
+                                                .setConnectTimeout(Timeout.ofSeconds(30))
                                                 .build()
                                 )
                                 .build()
