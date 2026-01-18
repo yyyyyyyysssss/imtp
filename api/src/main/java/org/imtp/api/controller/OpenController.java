@@ -3,6 +3,7 @@ package org.imtp.api.controller;
 import groovy.lang.Tuple2;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
+import org.imtp.api.config.webdav.WebDavClient;
 import org.imtp.api.utils.*;
 import org.imtp.common.response.Result;
 import org.imtp.common.response.ResultGenerator;
@@ -91,6 +92,15 @@ public class OpenController extends BaseController{
         variable.put("verificationCode", verificationCode);
         emailService.sendHtmlEmail(emailInfo, "EmailVerificationCode", variable);
         return ResultGenerator.ok();
+    }
+
+    @Resource
+    private WebDavClient webDavClient;
+
+    @GetMapping("/webdev/test")
+    public Result<?> webdev() {
+        String authorization = webDavClient.getAuthorization();
+        return ResultGenerator.ok(authorization);
     }
 
 }

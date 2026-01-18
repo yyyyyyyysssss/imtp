@@ -90,7 +90,7 @@ public class LocalFileServiceImpl extends AbstractFileService {
             String etag = MD5Utils.getMD5(new File(filePath));
             log.info("upload success; objectName:{}, accessUrl:{}", objectName, filePath);
             return new Tuple2<>(etag, filePath);
-        } catch (IOException | NoSuchAlgorithmException e) {
+        } catch (IOException e) {
             log.error("upload  Files.move error: ", e);
             throw new BusinessException(e);
         }
