@@ -60,17 +60,6 @@ public class HttpClientFactory {
         }
     }
 
-    private static class HttpClientTraceIdInterceptor implements HttpRequestInterceptor {
-
-        @Override
-        public void process(HttpRequest httpRequest, EntityDetails entityDetails, HttpContext httpContext) {
-            String tranceId = MDC.get(CommonConstant.TRACE_ID);
-            if (tranceId != null) {
-                httpRequest.addHeader(CommonConstant.TRACE_ID, tranceId);
-            }
-        }
-    }
-
     private CloseableHttpClient getDefaultClient() throws URISyntaxException {
         if (defaultClient == null) {
             synchronized (this) {
@@ -153,6 +142,17 @@ public class HttpClientFactory {
     public void shutdown() {
         log.info("Shutting down HttpClient connection pool");
         connectionManager.close();
+    }
+
+    private static class HttpClientTraceIdInterceptor implements HttpRequestInterceptor {
+
+        @Override
+        public void process(HttpRequest httpRequest, EntityDetails entityDetails, HttpContext httpContext) {
+            String tranceId = MDC.get(CommonConstant.TRACE_ID);
+            if (tranceId != null) {
+                httpRequest.addHeader(CommonConstant.TRACE_ID, tranceId);
+            }
+        }
     }
 
     private static SSLContext createSSLContext() {
