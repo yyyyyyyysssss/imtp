@@ -50,6 +50,12 @@ public class AuthorityController {
         return ResultGenerator.ok(details);
     }
 
+    @GetMapping("/menu/{menuId}")
+    public Result<?> getByMenuId(@PathVariable("menuId") Long menuId) {
+        List<AuthorityVO> authorityList = authorityService.findByMenuId(menuId);
+        return ResultGenerator.ok(authorityList);
+    }
+
     @GetMapping("/tree")
     public Result<?> tree() {
         List<AuthorityVO> tree = authorityService.tree();

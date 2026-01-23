@@ -89,6 +89,23 @@ public class AuthorityServiceImpl extends AbstractAuthorityService implements Au
     }
 
     @Override
+    public List<AuthorityVO> findByMenuId(Long menuId) {
+        if(menuId == null){
+            throw new NullPointerException("menuId is null");
+        }
+        QueryWrapper<Authority> authorityQueryWrapper = new QueryWrapper<>();
+        authorityQueryWrapper
+                .lambda()
+                .eq(Authority::getType,AuthorityType.BUTTON)
+                .eq(Authority::getParentId,menuId);
+        List<Authority> authorities = authorityMapper.selectList(authorityQueryWrapper);
+        if (CollectionUtils.isEmpty(authorities)){
+            return Collections.emptyList();
+        }
+        return AuthorityMapping.INSTANCE.toAuthorityVO(authorities);
+    }
+
+    @Override
     public List<AuthorityVO> tree() {
         QueryWrapper<Authority> queryWrapper = new QueryWrapper<>();
         queryWrapper

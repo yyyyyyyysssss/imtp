@@ -16,6 +16,8 @@ public interface AuthorityService extends IService<Authority> {
 
     AuthorityVO details(String id);
 
+    List<AuthorityVO> findByMenuId(Long menuId);
+
     List<AuthorityVO> tree();
 
     Boolean deleteAuthority(Long id);
