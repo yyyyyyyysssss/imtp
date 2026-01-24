@@ -13,15 +13,17 @@ public class DictionaryUpdateDTO {
     @NotNull(message = "id不能为空")
     private Long id;
 
-    @NotBlank(message = "名称不能为空")
+    @NotBlank(message = "名称不能为空",groups = UpdateGroup.class)
     private String name;
 
-    private Boolean status;
+    private Boolean enabled;
 
     private String description;
 
     private Integer sort;
 
     private String extJson;
+
+    public interface UpdateGroup{}
 
 }

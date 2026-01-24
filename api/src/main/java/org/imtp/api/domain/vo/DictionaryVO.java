@@ -16,7 +16,7 @@ public class DictionaryVO {
 
     private String description;
 
-    private Boolean status;
+    private Boolean enabled;
 
     private Integer sort;
 
@@ -24,6 +24,10 @@ public class DictionaryVO {
 
     private String createTime;
 
+    private String creatorName;
+
     private String updateTime;
+
+    private String updaterName;
 
 }

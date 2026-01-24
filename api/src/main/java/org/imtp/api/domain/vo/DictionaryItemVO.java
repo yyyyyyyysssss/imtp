@@ -22,7 +22,7 @@ public class DictionaryItemVO {
 
     private String alias;
 
-    private Boolean status;
+    private Boolean enabled;
 
     private String imgUrl;
 

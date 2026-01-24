@@ -15,7 +15,7 @@ public class DictionaryCreateDTO {
     @NotBlank(message = "名称不能为空")
     private String name;
 
-    private Boolean status;
+    private Boolean enabled;
 
     private String description;
 

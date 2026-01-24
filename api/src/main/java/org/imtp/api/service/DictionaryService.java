@@ -18,6 +18,8 @@ public interface DictionaryService extends IService<Dictionary> {
 
     DictionaryVO details(Long id);
 
+    DictionaryVO findByCode(String code);
+
     void deleteDictionary(Long id);
 
 }

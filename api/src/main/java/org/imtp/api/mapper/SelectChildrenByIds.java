@@ -20,7 +20,7 @@ public class SelectChildrenByIds extends AbstractMethod {
             "<script>" +
                 "WITH RECURSIVE tmp as (" +
                 " SELECT t.* FROM %s t WHERE t.%s IN (%s) \n" +
-                " UNION ALL \n" +
+                " UNION \n" +
                 " SELECT f.* FROM %s f INNER JOIN tmp on f.%s = tmp.%s \n" +
                 ") select * from tmp %s" +
             "</script>";

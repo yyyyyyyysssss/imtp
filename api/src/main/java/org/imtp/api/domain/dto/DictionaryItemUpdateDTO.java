@@ -26,7 +26,7 @@ public class DictionaryItemUpdateDTO {
 
     private String alias;
 
-    private Boolean status;
+    private Boolean enabled;
 
     private String imgUrl;
 

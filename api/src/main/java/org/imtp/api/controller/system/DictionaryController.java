@@ -29,7 +29,7 @@ public class DictionaryController {
     }
 
     @PutMapping
-    public Result<?> updateDictionary(@RequestBody @Validated DictionaryUpdateDTO updateDTO) {
+    public Result<?> updateDictionary(@RequestBody @Validated(DictionaryUpdateDTO.UpdateGroup.class) DictionaryUpdateDTO updateDTO) {
         dictionaryService.updateDictionary(updateDTO,true);
         return ResultGenerator.ok();
     }

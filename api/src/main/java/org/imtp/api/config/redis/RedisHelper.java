@@ -1,5 +1,6 @@
 package org.imtp.api.config.redis;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.geo.*;
@@ -141,6 +142,11 @@ public class RedisHelper {
     public <T> T getValue(String key, Class<T> clazz) {
         Object obj = getValue(key);
         return deserialize(obj, clazz);
+    }
+
+    public <T> T getValue(String key, TypeReference<T> toValueTypeRef) {
+        Object obj = getValue(key);
+        return deserialize(obj, toValueTypeRef);
     }
 
     /**
@@ -983,6 +989,11 @@ public class RedisHelper {
                 connection.stringCommands().strLen(key.getBytes(StandardCharsets.UTF_8))
         );
         return byteLength * 8;
+    }
+
+    private <T> T deserialize(Object obj, TypeReference<T> toValueTypeRef) {
+
+        return objectMapper.convertValue(obj, toValueTypeRef);
     }
 
 

@@ -1,9 +1,11 @@
 package org.imtp.api.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import jakarta.annotation.Resource;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.imtp.api.config.exception.BusinessException;
@@ -27,19 +29,20 @@ import java.util.List;
 
 @Service
 @Slf4j
-@AllArgsConstructor
 public class DictionaryServiceImpl extends ServiceImpl<DictionaryMapper, Dictionary> implements DictionaryService {
 
-    private final DictionaryMapper dictionaryMapper;
+    @Resource
+    private DictionaryMapper dictionaryMapper;
 
-    private final DictionaryItemService dictionaryItemService;
+    @Resource
+    private DictionaryItemService dictionaryItemService;
 
     @Override
     public Long createDictionary(DictionaryCreateDTO createDTO) {
         Dictionary dictionary = DictionaryMapping.INSTANCE.toDictionary(createDTO);
         dictionary.setId(IdGen.genId());
-        if(dictionary.getStatus() == null){
-            dictionary.setStatus(true);
+        if(dictionary.getEnabled() == null){
+            dictionary.setEnabled(true);
         }
         dictionaryMapper.insert(dictionary);
         return dictionary.getId();
@@ -73,7 +76,7 @@ public class DictionaryServiceImpl extends ServiceImpl<DictionaryMapper, Diction
                     .like(Dictionary::getCode, queryDTO.getKeyword());
         }
         if (queryDTO.getEnabled() != null) {
-            dictionaryQueryWrapper.eq("status", queryDTO.getEnabled());
+            dictionaryQueryWrapper.eq("enabled", queryDTO.getEnabled());
         }
         dictionaryQueryWrapper.orderByDesc("sort");
         List<Dictionary> dictionaries = dictionaryMapper.selectList(dictionaryQueryWrapper);
@@ -93,6 +96,15 @@ public class DictionaryServiceImpl extends ServiceImpl<DictionaryMapper, Diction
     @Override
     public DictionaryVO details(Long id) {
         Dictionary dictionary = checkAndResult(id);
+        return DictionaryMapping.INSTANCE.toDictionaryVO(dictionary);
+    }
+
+    @Override
+    public DictionaryVO findByCode(String code) {
+        LambdaQueryWrapper<Dictionary> dictionaryLambdaQueryWrapper = new QueryWrapper<Dictionary>()
+                .lambda()
+                .eq(Dictionary::getCode, code);
+        Dictionary dictionary = dictionaryMapper.selectOne(dictionaryLambdaQueryWrapper);
         return DictionaryMapping.INSTANCE.toDictionaryVO(dictionary);
     }
 

@@ -121,6 +121,7 @@ api:
       - tenant
       - im_dict
       - im_dict_item
+      - tmp
 
 security:
   loginPage: http://localhost:3000/login

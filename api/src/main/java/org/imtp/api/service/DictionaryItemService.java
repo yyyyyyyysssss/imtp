@@ -8,6 +8,8 @@ import org.imtp.api.domain.dto.DictionaryItemUpdateDTO;
 import org.imtp.api.domain.entity.DictionaryItem;
 import org.imtp.api.domain.vo.DictionaryItemVO;
 
+import java.util.List;
+
 public interface DictionaryItemService extends IService<DictionaryItem> {
 
     Long createDictionaryItem(DictionaryItemCreateDTO createDTO);
@@ -20,6 +22,12 @@ public interface DictionaryItemService extends IService<DictionaryItem> {
 
     DictionaryItemVO details(Long id);
 
+    List<DictionaryItemVO> findChildrenById(Long id);
+
+    List<DictionaryItemVO> findChildrenById(List<Long> ids);
+
     void deleteDictionaryItem(Long roleId);
+
+    List<DictionaryItemVO> findDictByCode(String code);
 
 }

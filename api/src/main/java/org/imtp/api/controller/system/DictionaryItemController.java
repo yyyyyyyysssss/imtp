@@ -14,6 +14,8 @@ import org.imtp.common.response.ResultGenerator;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RequestMapping("/api/system/dict/item")
 @RestController
 @Slf4j
@@ -62,6 +64,18 @@ public class DictionaryItemController {
     public Result<DictionaryItemVO> details(@PathVariable("id") Long id) {
         DictionaryItemVO dictionaryItemVO = dictionaryItemService.details(id);
         return ResultGenerator.ok(dictionaryItemVO);
+    }
+
+    @GetMapping("/{id}/children")
+    public Result<List<DictionaryItemVO>> children(@PathVariable("id") Long id) {
+        List<DictionaryItemVO> children = dictionaryItemService.findChildrenById(id);
+        return ResultGenerator.ok(children);
+    }
+
+    @PostMapping("/children/batch")
+    public Result<List<DictionaryItemVO>> getBatchChildren(@RequestBody List<Long> ids) {
+        List<DictionaryItemVO> children = dictionaryItemService.findChildrenById(ids);
+        return ResultGenerator.ok(children);
     }
 
     @DeleteMapping("/{id}")

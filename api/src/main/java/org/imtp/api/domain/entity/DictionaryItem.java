@@ -34,8 +34,14 @@ public class DictionaryItem extends BaseEntity implements TreeRelation {
     @TableField("alias")
     private String alias;
 
-    @TableField("status")
-    private Boolean status;
+    @TableField("level")
+    private Integer level;
+
+    @TableField("category")
+    private String category;
+
+    @TableField("enabled")
+    private Boolean enabled;
 
     @TableField("img_url")
     private String imgUrl;

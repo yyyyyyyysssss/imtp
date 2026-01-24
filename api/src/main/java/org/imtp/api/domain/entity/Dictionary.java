@@ -25,8 +25,8 @@ public class Dictionary extends BaseEntity {
     @TableField("description")
     private String description;
 
-    @TableField("status")
-    private Boolean status;
+    @TableField("enabled")
+    private Boolean enabled;
 
     @TableField("sort")
     private Integer sort;

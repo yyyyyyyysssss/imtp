@@ -49,6 +49,7 @@ public class MenuServiceImpl extends AbstractAuthorityService implements MenuSer
     private AuthorityMapper authorityMapper;
 
     @Override
+    @CacheEvict(value = "user:menu", allEntries = true)
     public Long createMenu(MenuCreateDTO menuCreateDTO) {
         Authority authority = AuthorityMapping.INSTANCE.toAuthority(menuCreateDTO);
         authority.setId(IdGen.genId());
@@ -69,6 +70,7 @@ public class MenuServiceImpl extends AbstractAuthorityService implements MenuSer
     }
 
     @Override
+    @CacheEvict(value = "user:menu", allEntries = true)
     public Integer updateMenu(MenuUpdateDTO menuUpdateDTO) {
         Authority authority = authorityMapper.selectById(menuUpdateDTO.getId());
         if (authority == null || !authority.getType().equals(AuthorityType.MENU)) {
@@ -281,6 +283,7 @@ public class MenuServiceImpl extends AbstractAuthorityService implements MenuSer
 
     @Override
     @Transactional
+    @CacheEvict(value = "user:menu", allEntries = true)
     public Boolean deleteMenu(Long id) {
         //查询出菜单对应的所有子菜单或权限
         List<Authority> authorities = authorityMapper.selectChildrenById(id);
