@@ -7,6 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatusCode;
+import org.springframework.http.MediaType;
 import org.springframework.http.client.ClientHttpRequestExecution;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
@@ -69,7 +70,8 @@ public class RestClientFactory {
 
         @Override
         public ClientHttpResponse intercept(@NotNull HttpRequest request, @NotNull byte[] body, @NotNull ClientHttpRequestExecution execution) throws IOException {
-            String requestContentType = request.getHeaders().getContentType().toString();
+            MediaType reqType = request.getHeaders().getContentType();
+            String requestContentType = reqType != null ? reqType.toString() : "";
             StringBuilder logBuilder = new StringBuilder();
             logBuilder.append(String.format("Request: [%s] %s", request.getMethod(), request.getURI()));
             // 仅在 Content-Type 为 JSON 或 Text 类型时记录请求体内容
