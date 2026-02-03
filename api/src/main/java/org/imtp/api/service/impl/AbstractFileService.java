@@ -322,13 +322,7 @@ public abstract class AbstractFileService implements FileService {
                 outputStream.write(buffer, 0, bytesRead);
             }
         } catch (IOException e) {
-            if (isClientAbort(e)) {
-                // 客户端主动断开，正常行为
-                log.info("Client aborted file stream connection");
-                return;
-            }
-            // 处理异常
-            log.error("文件传输过程中发生错误: {}", e.getMessage());
+            throw new RuntimeException(e);
         }
     }
 
@@ -342,17 +336,6 @@ public abstract class AbstractFileService implements FileService {
                 .eq(FileUpload::getBucketName,bucketName)
                 .eq(FileUpload::getObjectName,objectName);
         return fileUploadMapper.selectOne(fileUploadQueryWrapper);
-    }
-
-    private boolean isClientAbort(Throwable e) {
-        Throwable t = e;
-        while (t != null) {
-            if (t instanceof org.apache.catalina.connector.ClientAbortException) {
-                return true;
-            }
-            t = t.getCause();
-        }
-        return false;
     }
 
     protected String createObjectName(String originFilename){

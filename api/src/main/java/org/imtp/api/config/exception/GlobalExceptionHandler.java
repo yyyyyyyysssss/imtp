@@ -134,7 +134,36 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(IOException.class)
     public void handleIOException(IOException e) {
+        if (isClientAbort(e)) {
+            // 客户端主动断开，正常行为
+            log.info("Client aborted file stream connection");
+            return;
+        }
+        // 处理异常
+        log.error("IO Exception: ", e);
+    }
 
+    private boolean isClientAbort(Throwable e) {
+        Throwable t = e;
+        while (t != null) {
+            if (t instanceof org.apache.catalina.connector.ClientAbortException) {
+                return true;
+            }
+            if (t instanceof java.io.IOException) {
+                String msg = t.getMessage();
+                if (msg != null) {
+                    // 兼容 Windows (你的堆栈) / Linux (Broken pipe) / 标准描述
+                    if (msg.contains("中止") ||
+                            msg.contains("aborted") ||
+                            msg.contains("Broken pipe") ||
+                            msg.contains("Connection reset")) {
+                        return true;
+                    }
+                }
+            }
+            t = t.getCause();
+        }
+        return false;
     }
 
     @ExceptionHandler(AsyncRequestNotUsableException.class)
